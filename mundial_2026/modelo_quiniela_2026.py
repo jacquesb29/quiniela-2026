@@ -609,7 +609,6 @@ def compute_statistical_depth(
 ) -> Dict[str, object]:
     result_probs = [max(win_a, 1e-12), max(draw, 1e-12), max(win_b, 1e-12)]
     entropy = -sum(prob * math.log(prob) for prob in result_probs) / math.log(3.0)
-    confidence = clamp(1.0 - entropy, 0.0, 1.0)
     both_score = sum(prob for (goals_a, goals_b), prob in final_dist.items() if goals_a > 0 and goals_b > 0)
     clean_sheet_a = sum(prob for (_, goals_b), prob in final_dist.items() if goals_b == 0)
     clean_sheet_b = sum(prob for (goals_a, _), prob in final_dist.items() if goals_a == 0)
@@ -619,6 +618,18 @@ def compute_statistical_depth(
     under_3_5 = 1.0 - over_3_5
     top_scores = sorted(final_dist.items(), key=lambda item: item[1], reverse=True)
     top3_coverage = sum(prob for _, prob in top_scores[:3])
+    sorted_results = sorted(result_probs, reverse=True)
+    top_outcome_prob = sorted_results[0]
+    second_outcome_prob = sorted_results[1]
+    confidence = clamp(
+        0.10
+        + 0.60 * top_outcome_prob
+        + 0.25 * (top_outcome_prob - second_outcome_prob)
+        + 0.10 * top3_coverage
+        + 0.10 * (1.0 - entropy),
+        0.05,
+        0.99,
+    )
     margin_dist: Dict[int, float] = {}
     for (goals_a, goals_b), prob in final_dist.items():
         margin = goals_a - goals_b
@@ -636,6 +647,8 @@ def compute_statistical_depth(
     return {
         "confidence_index": confidence,
         "entropy_index": entropy,
+        "top_outcome_prob": top_outcome_prob,
+        "second_outcome_prob": second_outcome_prob,
         "both_teams_score": both_score,
         "clean_sheet_a": clean_sheet_a,
         "clean_sheet_b": clean_sheet_b,
@@ -3522,6 +3535,7 @@ def dashboard_fixture_entries(
                 "live_score_a": fixture.get("live_score_a"),
                 "live_score_b": fixture.get("live_score_b"),
                 "weather_summary": dashboard_weather_summary(fixture),
+                "weather_stress": fixture.get("weather_stress"),
                 "referee": fixture.get("referee"),
                 "lineup_status_a": fixture.get("lineup_status_a"),
                 "lineup_status_b": fixture.get("lineup_status_b"),
@@ -3626,6 +3640,7 @@ def projected_bracket_entries(
                 "live_score_a": base_fixture.get("live_score_a"),
                 "live_score_b": base_fixture.get("live_score_b"),
                 "weather_summary": dashboard_weather_summary(base_fixture),
+                "weather_stress": base_fixture.get("weather_stress"),
                 "projection": True,
                 "projection_note": (
                     f"Cruce proyectado mas probable de esta llave {format_pct(match_projection['matchup_prob'])} | "
@@ -3696,6 +3711,44 @@ def dashboard_news_lines(entry: dict, team_a: str, team_b: str) -> List[str]:
     return lines
 
 
+def adjustment_reason_lines(entry: dict, prediction: MatchPrediction) -> List[str]:
+    lines = []
+    if entry.get("status_state") == "in" and prediction.current_score_a is not None and prediction.current_score_b is not None:
+        minute_text = f"{prediction.elapsed_minutes:.1f}" if prediction.elapsed_minutes is not None else "?"
+        lines.append(
+            f"- Ajuste en vivo: marcador {prediction.team_a} {prediction.current_score_a} - {prediction.current_score_b} {prediction.team_b} en el minuto {minute_text}."
+        )
+    if int(entry.get("unavailable_count_a", 0)) or int(entry.get("unavailable_count_b", 0)):
+        lines.append(
+            f"- Ajuste por bajas confirmadas: {prediction.team_a} {int(entry.get('unavailable_count_a', 0))} | {prediction.team_b} {int(entry.get('unavailable_count_b', 0))}."
+        )
+    if int(entry.get("questionable_count_a", 0)) or int(entry.get("questionable_count_b", 0)):
+        lines.append(
+            f"- Ajuste por dudas fisicas: {prediction.team_a} {int(entry.get('questionable_count_a', 0))} | {prediction.team_b} {int(entry.get('questionable_count_b', 0))}."
+        )
+    if entry.get("lineup_status_a") == "confirmada" or entry.get("lineup_status_b") == "confirmada":
+        lines.append(
+            f"- Ajuste por alineaciones: {prediction.team_a} {entry.get('lineup_status_a', 'sin confirmar')} | {prediction.team_b} {entry.get('lineup_status_b', 'sin confirmar')}."
+        )
+    if entry.get("lineup_change_count_a") or entry.get("lineup_change_count_b"):
+        lines.append(
+            f"- Ajuste por cambios en el XI: {prediction.team_a} {entry.get('lineup_change_count_a', 0)} | {prediction.team_b} {entry.get('lineup_change_count_b', 0)}."
+        )
+    if entry.get("weather_stress") is not None and float(entry.get("weather_stress", 0.0)) >= 0.18:
+        lines.append(f"- Ajuste por clima exigente: estres climatico {float(entry.get('weather_stress', 0.0)):.2f}.")
+    if entry.get("market_prob_a") is not None:
+        lines.append("- Ajuste por mercado: el prior de cuotas se mezcla con la estimacion propia del modelo.")
+    if entry.get("news_headlines"):
+        lines.append("- Ajuste por noticias relevantes detectadas en el feed del partido.")
+    drivers = top_factor_drivers(prediction.factors, limit=2)
+    if drivers:
+        lines.append(
+            "- Motores principales del pronostico ahora mismo: "
+            + "; ".join(f"{label} {value:+.3f}" for label, value in drivers)
+        )
+    return lines
+
+
 def goals_label(prediction: MatchPrediction) -> str:
     if prediction.live_phase == "regulation":
         return "Goles esperados al final del tiempo reglamentario"
@@ -3719,6 +3772,7 @@ def result_prob_label(prediction: MatchPrediction) -> str:
 def build_dashboard_markdown(
     entries: Sequence[dict],
     bracket_text: str,
+    backtest: dict,
     state_path: Path,
     fixtures_path: Path,
 ) -> str:
@@ -3733,6 +3787,8 @@ def build_dashboard_markdown(
         "",
     ]
     lines.extend(build_global_confidence_markdown(entries))
+    lines.extend(["", "## Calibracion historica y backtesting", ""])
+    lines.extend(build_backtesting_markdown(backtest))
     lines.extend([
         "",
         "## Llave actual",
@@ -3786,6 +3842,7 @@ def build_dashboard_markdown(
             )
         lines.extend(dashboard_absence_lines(entry, prediction.team_a, prediction.team_b))
         lines.extend(dashboard_news_lines(entry, prediction.team_a, prediction.team_b))
+        lines.extend(adjustment_reason_lines(entry, prediction))
         if entry.get("projection"):
             lines.append(f"- Proyeccion automatica: {entry.get('projection_note', '')}")
             alternatives = entry.get("projection_alternatives") or []
@@ -3879,10 +3936,10 @@ def statistical_depth_lines(prediction: MatchPrediction) -> List[str]:
         f"- Diagnóstico estadístico: confianza {format_pct(confidence)} | ambos marcan {format_pct(both_score)} | over 2.5 {format_pct(over_2_5)}"
     )
     lines.append(
-        f"- Porterías a cero: {prediction.team_a} {format_pct(clean_sheet_a)} | {prediction.team_b} {format_pct(clean_sheet_b)}"
+        f"- Probabilidad de que no reciba goles: {prediction.team_a} {format_pct(clean_sheet_a)} | {prediction.team_b} {format_pct(clean_sheet_b)}"
     )
     lines.append(
-        f"- Cobertura top-3 marcadores: {format_pct(top3_coverage)} | margen modal {modal_margin:+d} ({format_pct(modal_margin_prob)})"
+        f"- Probabilidad acumulada de los 3 marcadores mas probables: {format_pct(top3_coverage)} | diferencia de goles mas probable {modal_margin:+d} ({format_pct(modal_margin_prob)})"
     )
     if market_gap is not None:
         lines.append(f"- Diferencia promedio vs mercado de victoria/empate/derrota: {format_pct(float(market_gap))}")
@@ -3920,11 +3977,11 @@ def statistical_depth_html(prediction: MatchPrediction) -> str:
         f"<div><span>Confianza del pronóstico</span><strong>{format_pct(float(depth.get('confidence_index', 0.0)))}</strong></div>"
         f"<div><span>Ambos marcan</span><strong>{format_pct(float(depth.get('both_teams_score', 0.0)))}</strong></div>"
         f"<div><span>Over 2.5 goles</span><strong>{format_pct(float(depth.get('over_2_5', 0.0)))}</strong></div>"
-        f"<div><span>Cobertura top-3 marcadores</span><strong>{format_pct(float(depth.get('top3_coverage', 0.0)))}</strong></div>"
-        f"<div><span>Portería a cero {html.escape(prediction.team_a)}</span><strong>{format_pct(float(depth.get('clean_sheet_a', 0.0)))}</strong></div>"
-        f"<div><span>Portería a cero {html.escape(prediction.team_b)}</span><strong>{format_pct(float(depth.get('clean_sheet_b', 0.0)))}</strong></div>"
-        f"<div><span>Margen modal</span><strong>{int(depth.get('modal_margin', 0)):+d}</strong></div>"
-        f"<div><span>Prob. del margen modal</span><strong>{format_pct(float(depth.get('modal_margin_prob', 0.0)))}</strong></div>"
+        f"<div><span>Probabilidad acumulada del top-3 de marcadores</span><strong>{format_pct(float(depth.get('top3_coverage', 0.0)))}</strong></div>"
+        f"<div><span>Prob. de que {html.escape(prediction.team_a)} no reciba goles</span><strong>{format_pct(float(depth.get('clean_sheet_a', 0.0)))}</strong></div>"
+        f"<div><span>Prob. de que {html.escape(prediction.team_b)} no reciba goles</span><strong>{format_pct(float(depth.get('clean_sheet_b', 0.0)))}</strong></div>"
+        f"<div><span>Diferencia de goles mas probable</span><strong>{int(depth.get('modal_margin', 0)):+d}</strong></div>"
+        f"<div><span>Probabilidad de esa diferencia</span><strong>{format_pct(float(depth.get('modal_margin_prob', 0.0)))}</strong></div>"
         f"{market_html}"
         "</div>"
         f"{drivers_html}"
@@ -4155,7 +4212,102 @@ def build_bracket_visual_html(bracket_payload: dict) -> str:
     )
 
 
-def build_methodology_html(bracket_payload: dict) -> str:
+def build_backtesting_markdown(backtest: dict) -> List[str]:
+    if not backtest or not backtest.get("completed_matches"):
+        return ["_Sin partidos cerrados todavia para calibracion historica y backtesting._"]
+
+    lines = [
+        f"- Partidos cerrados analizados: {int(backtest.get('completed_matches', 0))}",
+        f"- Muestra evaluable en tiempo reglamentario: {int(backtest.get('regular_time_samples', 0))}",
+    ]
+    if backtest.get("favorite_hit_rate") is not None:
+        lines.append(f"- Tasa de acierto del resultado mas probable: {format_pct(float(backtest['favorite_hit_rate']))}")
+    if backtest.get("top1_score_hit_rate") is not None:
+        lines.append(f"- Acierto exacto del marcador mas probable: {format_pct(float(backtest['top1_score_hit_rate']))}")
+    if backtest.get("top3_score_hit_rate") is not None:
+        lines.append(f"- Acierto del marcador dentro del top-3: {format_pct(float(backtest['top3_score_hit_rate']))}")
+    if backtest.get("logloss_result") is not None:
+        lines.append(f"- Log-loss resultado: {float(backtest['logloss_result']):.3f}")
+    if backtest.get("brier_result") is not None:
+        lines.append(f"- Brier resultado: {float(backtest['brier_result']):.3f}")
+    if backtest.get("logloss_advance") is not None:
+        lines.append(f"- Log-loss clasificacion en knockout: {float(backtest['logloss_advance']):.3f}")
+    if backtest.get("brier_advance") is not None:
+        lines.append(f"- Brier clasificacion en knockout: {float(backtest['brier_advance']):.3f}")
+    if backtest.get("market_logloss_result") is not None:
+        lines.append(f"- Log-loss de mercado en esos mismos partidos: {float(backtest['market_logloss_result']):.3f}")
+    buckets = backtest.get("calibration_buckets") or []
+    if buckets:
+        lines.append(
+            "- Calibracion por buckets: "
+            + "; ".join(
+                f"{bucket['bucket']} -> confianza media {format_pct(float(bucket['avg_confidence']))}, acierto real {format_pct(float(bucket['hit_rate']))}, n={int(bucket['matches'])}"
+                for bucket in buckets
+            )
+        )
+    return lines
+
+
+def build_backtesting_html(backtest: dict) -> str:
+    if not backtest or not backtest.get("completed_matches"):
+        return (
+            "<section class=\"panel backtest-panel\">"
+            "<div class=\"panel-head\"><div><p class=\"eyebrow\">Validacion</p><h2>Calibracion historica y backtesting</h2>"
+            "<p class=\"lede-tight\">Todavia no hay partidos cerrados suficientes en el torneo para medir calibracion real. Esta seccion se llenara sola cuando existan resultados.</p>"
+            "</div></div></section>"
+        )
+
+    metrics = []
+    def tile(label: str, value: str) -> str:
+        return f"<div class=\"summary-tile\"><span>{html.escape(label)}</span><strong>{html.escape(value)}</strong></div>"
+
+    metrics.append(tile("Partidos cerrados", str(int(backtest.get("completed_matches", 0)))))
+    metrics.append(tile("Muestra en reglamentario", str(int(backtest.get("regular_time_samples", 0)))))
+    if backtest.get("favorite_hit_rate") is not None:
+        metrics.append(tile("Acierto del pick principal", format_pct(float(backtest["favorite_hit_rate"]))))
+    if backtest.get("top3_score_hit_rate") is not None:
+        metrics.append(tile("Marcador dentro del top-3", format_pct(float(backtest["top3_score_hit_rate"]))))
+
+    quality_rows = []
+    if backtest.get("logloss_result") is not None:
+        quality_rows.append(f"<li><strong>Log-loss resultado</strong><span>{float(backtest['logloss_result']):.3f}</span></li>")
+    if backtest.get("brier_result") is not None:
+        quality_rows.append(f"<li><strong>Brier resultado</strong><span>{float(backtest['brier_result']):.3f}</span></li>")
+    if backtest.get("logloss_advance") is not None:
+        quality_rows.append(f"<li><strong>Log-loss clasificacion</strong><span>{float(backtest['logloss_advance']):.3f}</span></li>")
+    if backtest.get("brier_advance") is not None:
+        quality_rows.append(f"<li><strong>Brier clasificacion</strong><span>{float(backtest['brier_advance']):.3f}</span></li>")
+    if backtest.get("market_logloss_result") is not None:
+        quality_rows.append(f"<li><strong>Log-loss mercado</strong><span>{float(backtest['market_logloss_result']):.3f}</span></li>")
+
+    calibration_rows = []
+    for bucket in backtest.get("calibration_buckets", []):
+        calibration_rows.append(
+            "<li>"
+            f"<strong>{html.escape(bucket['bucket'])}</strong>"
+            f"<span>confianza media {format_pct(float(bucket['avg_confidence']))} | acierto real {format_pct(float(bucket['hit_rate']))} | n={int(bucket['matches'])}</span>"
+            "</li>"
+        )
+
+    return (
+        "<section class=\"panel backtest-panel\">"
+        "<div class=\"panel-head\"><div><p class=\"eyebrow\">Validacion</p><h2>Calibracion historica y backtesting</h2>"
+        "<p class=\"lede-tight\">Se reconstruye el torneo partido por partido en orden cronologico, pronosticando antes de aplicar cada resultado real. Asi se mide si el modelo estuvo bien calibrado de verdad.</p>"
+        "</div></div>"
+        f"<div class=\"confidence-tiles\">{''.join(metrics)}</div>"
+        "<div class=\"confidence-grid\">"
+        "<article><h3>Calidad predictiva</h3><ul>"
+        f"{''.join(quality_rows) if quality_rows else '<li><strong>Sin muestra suficiente</strong><span>Aun no hay datos comparables.</span></li>'}"
+        "</ul></article>"
+        "<article><h3>Calibracion por buckets</h3><ul>"
+        f"{''.join(calibration_rows) if calibration_rows else '<li><strong>Sin buckets</strong><span>Aun no hay suficientes partidos.</span></li>'}"
+        "</ul></article>"
+        "</div>"
+        "</section>"
+    )
+
+
+def build_methodology_html(bracket_payload: dict, backtest: dict) -> str:
     iterations = int(bracket_payload.get("iterations", 0) or 0)
     montecarlo_line = f"{iterations} iteraciones" if iterations else "iteraciones variables"
     return (
@@ -4193,6 +4345,7 @@ def build_methodology_html(bracket_payload: dict) -> str:
         "<p>La portada publica hora de actualizacion, badge En vivo, minuto modelado y un latest.json. Si esos campos cambian, el in-play se esta recalculando bien.</p>"
         "</article>"
         "</div>"
+        f"<p class=\"lede-tight\">Backtesting actual: {html.escape(str(int(backtest.get('completed_matches', 0))))} partidos cerrados reconstruidos secuencialmente.</p>"
         "</section>"
     )
 
@@ -4201,6 +4354,7 @@ def build_dashboard_html(
     entries: Sequence[dict],
     bracket_text: str,
     bracket_payload: dict,
+    backtest: dict,
     state_path: Path,
     fixtures_path: Path,
 ) -> str:
@@ -4288,6 +4442,18 @@ def build_dashboard_html(
         for line in dashboard_news_lines(entry, prediction.team_a, prediction.team_b):
             news_html += f"<p class=\"meta\">{html.escape(line[2:] if line.startswith('- ') else line)}</p>"
 
+        reason_html = ""
+        reason_lines = adjustment_reason_lines(entry, prediction)
+        if reason_lines:
+            reason_html = (
+                "<div class=\"reason-block\"><h4>Por que cambia el pronostico</h4>"
+                + "".join(
+                    f"<p class=\"meta\">{html.escape(line[2:] if line.startswith('- ') else line)}</p>"
+                    for line in reason_lines
+                )
+                + "</div>"
+            )
+
         projection_html = ""
         if entry.get("projection"):
             projection_html = f"<p class=\"meta\">{html.escape(entry.get('projection_note', ''))}</p>"
@@ -4356,6 +4522,7 @@ def build_dashboard_html(
             f"{lineup_html}"
             f"{absence_html}"
             f"{news_html}"
+            f"{reason_html}"
             f"{projection_html}"
             "<div class=\"hero-metrics\">"
             f"<div class=\"metric metric-score\"><span>{html.escape(goals_label(prediction))}</span><strong>{prediction.expected_goals_a:.2f} - {prediction.expected_goals_b:.2f}</strong></div>"
@@ -4377,8 +4544,9 @@ def build_dashboard_html(
 
     bracket_html = html.escape(bracket_text.strip() or "No hay llave generada todavia.")
     bracket_visual_html = build_bracket_visual_html(bracket_payload)
-    methodology_html = build_methodology_html(bracket_payload)
+    methodology_html = build_methodology_html(bracket_payload, backtest)
     global_confidence_html = build_global_confidence_html(entries)
+    backtesting_html = build_backtesting_html(backtest)
     return f"""<!doctype html>
 <html lang="es">
 <head>
@@ -4746,6 +4914,17 @@ def build_dashboard_html(
       border-radius: 14px;
       padding: 10px 12px;
     }}
+    .reason-block {{
+      margin-top: 14px;
+      padding: 14px;
+      border-radius: 18px;
+      background: linear-gradient(180deg, rgba(15,109,102,0.08), rgba(255,255,255,0.65));
+      border: 1px solid rgba(15,109,102,0.16);
+    }}
+    .reason-block h4 {{
+      margin: 0 0 10px;
+      color: var(--accent-dark);
+    }}
     .scores h4 {{
       margin: 14px 0 8px;
       color: var(--accent);
@@ -4851,6 +5030,7 @@ def build_dashboard_html(
     </section>
     {methodology_html}
     {global_confidence_html}
+    {backtesting_html}
     {bracket_visual_html}
     <section class="panel">
       <div class="panel-head">
@@ -4893,8 +5073,9 @@ def command_project_dashboard(args: argparse.Namespace, teams: Dict[str, Team]) 
             [entry["match_id"] for entry in entries if entry.get("match_id")],
         )
     )
-    markdown = build_dashboard_markdown(entries, bracket_text, Path(args.state_file), fixture_path)
-    html_content = build_dashboard_html(entries, bracket_text, bracket_payload, Path(args.state_file), fixture_path)
+    backtest = compute_backtest_summary(fixtures, teams, args.top_scores)
+    markdown = build_dashboard_markdown(entries, bracket_text, backtest, Path(args.state_file), fixture_path)
+    html_content = build_dashboard_html(entries, bracket_text, bracket_payload, backtest, Path(args.state_file), fixture_path)
 
     output_md = Path(args.output_md)
     output_html = Path(args.output_html)
@@ -5201,6 +5382,194 @@ def context_from_fixture(
         lineup_change_count_b=int(fixture.get("lineup_change_count_b", 0)),
         importance=float(fixture.get("importance", STAGE_IMPORTANCE[stage])),
     )
+
+
+def fixture_has_final_result(fixture: dict) -> bool:
+    return fixture.get("actual_score_a") is not None and fixture.get("actual_score_b") is not None
+
+
+def regular_time_result_available(fixture: dict) -> bool:
+    return fixture_stage_name(fixture) == "group" or not bool(fixture.get("went_extra_time", False))
+
+
+def actual_regular_time_outcome(fixture: dict) -> Optional[str]:
+    if not fixture_has_final_result(fixture) or not regular_time_result_available(fixture):
+        return None
+    score_a = int(fixture["actual_score_a"])
+    score_b = int(fixture["actual_score_b"])
+    if score_a > score_b:
+        return "a"
+    if score_b > score_a:
+        return "b"
+    return "draw"
+
+
+def actual_advancement_outcome(fixture: dict, teams: Dict[str, Team]) -> Optional[str]:
+    if fixture_stage_name(fixture) == "group" or not fixture_has_final_result(fixture):
+        return None
+    winner = resolve_fixture_winner(fixture, teams, fixture["team_a"], fixture["team_b"])
+    if winner == fixture["team_a"]:
+        return "a"
+    if winner == fixture["team_b"]:
+        return "b"
+    return None
+
+
+def confidence_bucket(value: float) -> str:
+    pct = value * 100.0
+    if pct < 50.0:
+        return "<50%"
+    if pct < 60.0:
+        return "50-59%"
+    if pct < 70.0:
+        return "60-69%"
+    if pct < 80.0:
+        return "70-79%"
+    return "80%+"
+
+
+def compute_backtest_summary(fixtures: Sequence[dict], teams: Dict[str, Team], top_scores: int) -> dict:
+    completed = []
+    for fixture in fixtures:
+        if fixture.get("projection_only"):
+            continue
+        if not fixture_has_final_result(fixture):
+            continue
+        completed.append(dict(fixture))
+    completed.sort(key=lambda item: (item.get("kickoff_utc") or "", str(item.get("id", ""))))
+
+    if not completed:
+        return {
+            "completed_matches": 0,
+            "regular_time_samples": 0,
+            "advancement_samples": 0,
+            "favorite_hit_rate": None,
+            "top1_score_hit_rate": None,
+            "top3_score_hit_rate": None,
+            "brier_result": None,
+            "logloss_result": None,
+            "brier_advance": None,
+            "logloss_advance": None,
+            "market_logloss_result": None,
+            "calibration_buckets": [],
+        }
+
+    states = copy_states(empty_persistent_payload(teams))
+    result_brier = []
+    result_logloss = []
+    market_result_logloss = []
+    advance_brier = []
+    advance_logloss = []
+    favorite_hits = 0
+    favorite_total = 0
+    top1_hits = 0
+    top3_hits = 0
+    regular_samples = 0
+    advance_samples = 0
+    calibration = {}
+
+    for fixture in completed:
+        try:
+            fixture = resolve_fixture_names(fixture, teams)
+        except SystemExit:
+            continue
+        ctx = context_from_fixture(fixture, teams, states)
+        stage = fixture_stage_name(fixture)
+        prediction = predict_match(
+            teams,
+            fixture["team_a"],
+            fixture["team_b"],
+            ctx,
+            top_scores=top_scores,
+            include_advancement=stage != "group",
+            show_factors=False,
+            state_a=normalize_team_state(states.get(fixture["team_a"], {})),
+            state_b=normalize_team_state(states.get(fixture["team_b"], {})),
+        )
+
+        actual_outcome = actual_regular_time_outcome(fixture)
+        if actual_outcome is not None:
+            probs = {"a": prediction.win_a, "draw": prediction.draw, "b": prediction.win_b}
+            regular_samples += 1
+            favorite_total += 1
+            predicted_outcome = max(probs.items(), key=lambda item: item[1])[0]
+            if predicted_outcome == actual_outcome:
+                favorite_hits += 1
+            p_actual = max(probs[actual_outcome], 1e-12)
+            result_logloss.append(-math.log(p_actual))
+            result_brier.append(
+                ((probs["a"] - (1.0 if actual_outcome == "a" else 0.0)) ** 2
+                 + (probs["draw"] - (1.0 if actual_outcome == "draw" else 0.0)) ** 2
+                 + (probs["b"] - (1.0 if actual_outcome == "b" else 0.0)) ** 2) / 3.0
+            )
+            if fixture.get("market_prob_a") is not None and fixture.get("market_prob_draw") is not None and fixture.get("market_prob_b") is not None:
+                market_probs = {
+                    "a": float(fixture["market_prob_a"]),
+                    "draw": float(fixture["market_prob_draw"]),
+                    "b": float(fixture["market_prob_b"]),
+                }
+                market_result_logloss.append(-math.log(max(market_probs[actual_outcome], 1e-12)))
+
+            actual_score = f"{int(fixture['actual_score_a'])}-{int(fixture['actual_score_b'])}"
+            predicted_scores = [score for score, _ in prediction.exact_scores]
+            if predicted_scores:
+                if predicted_scores[0] == actual_score:
+                    top1_hits += 1
+                if actual_score in predicted_scores[:3]:
+                    top3_hits += 1
+
+            bucket = confidence_bucket(float(prediction.statistical_depth.get("confidence_index", 0.0))) if prediction.statistical_depth else "<50%"
+            bucket_state = calibration.setdefault(bucket, {"n": 0, "hit": 0, "avg_conf": 0.0})
+            bucket_state["n"] += 1
+            bucket_state["hit"] += 1 if predicted_outcome == actual_outcome else 0
+            bucket_state["avg_conf"] += float(prediction.statistical_depth.get("confidence_index", 0.0)) if prediction.statistical_depth else 0.0
+
+        actual_advance = actual_advancement_outcome(fixture, teams)
+        if actual_advance is not None and prediction.advance_a is not None and prediction.advance_b is not None:
+            probs = {"a": prediction.advance_a, "b": prediction.advance_b}
+            advance_samples += 1
+            p_actual = max(probs[actual_advance], 1e-12)
+            advance_logloss.append(-math.log(p_actual))
+            advance_brier.append(
+                ((probs["a"] - (1.0 if actual_advance == "a" else 0.0)) ** 2
+                 + (probs["b"] - (1.0 if actual_advance == "b" else 0.0)) ** 2) / 2.0
+            )
+
+        apply_state_updates(teams, states, fixture, ctx, prediction)
+
+    calibration_buckets = []
+    bucket_order = ["<50%", "50-59%", "60-69%", "70-79%", "80%+"]
+    for bucket in bucket_order:
+        payload = calibration.get(bucket)
+        if not payload:
+            continue
+        n = payload["n"]
+        calibration_buckets.append(
+            {
+                "bucket": bucket,
+                "matches": n,
+                "avg_confidence": payload["avg_conf"] / n,
+                "hit_rate": payload["hit"] / n,
+            }
+        )
+
+    def avg(values: List[float]) -> Optional[float]:
+        return sum(values) / len(values) if values else None
+
+    return {
+        "completed_matches": len(completed),
+        "regular_time_samples": regular_samples,
+        "advancement_samples": advance_samples,
+        "favorite_hit_rate": (favorite_hits / favorite_total) if favorite_total else None,
+        "top1_score_hit_rate": (top1_hits / regular_samples) if regular_samples else None,
+        "top3_score_hit_rate": (top3_hits / regular_samples) if regular_samples else None,
+        "brier_result": avg(result_brier),
+        "logloss_result": avg(result_logloss),
+        "brier_advance": avg(advance_brier),
+        "logloss_advance": avg(advance_logloss),
+        "market_logloss_result": avg(market_result_logloss),
+        "calibration_buckets": calibration_buckets,
+    }
 
 
 def print_prediction(prediction: MatchPrediction, show_factors: bool = False) -> None:
