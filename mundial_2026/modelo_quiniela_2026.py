@@ -3933,7 +3933,7 @@ def confidence_tier(confidence: float) -> str:
         return "Pick fuerte"
     if confidence >= 0.60:
         return "Pick utilizable"
-    return "Partido abierto: sin pick fuerte"
+    return "Pronóstico parejo: sin favorito estadístico claro"
 
 
 def statistical_depth_lines(prediction: MatchPrediction) -> List[str]:
@@ -4363,7 +4363,7 @@ def build_methodology_html(bracket_payload: dict, backtest: dict) -> str:
         "</article>"
         "<article>"
         "<h3>Modo in-play</h3>"
-        "<p>Durante un partido, condiciona las probabilidades por minuto, marcador actual y fase del juego. No es evento por evento, pero sí cambia en vivo.</p>"
+        "<p>Durante un partido, condiciona las probabilidades por minuto, marcador actual y fase del juego. No es evento por evento, pero sí recalcula en cada corrida las probabilidades y los marcadores finales mas probables.</p>"
         "</article>"
         "<article>"
         "<h3>Noticias y bajas</h3>"
@@ -5040,11 +5040,11 @@ def build_dashboard_html(
         <div class="hero-notes">
           <article class="hero-note">
             <h3>Qué significan las métricas</h3>
-            <p><strong>Goles esperados</strong> es el promedio estimado al cierre del corte relevante. <strong>Probabilidades de resultado</strong> es la chance de victoria, empate o derrota en ese mismo corte.</p>
+            <p><strong>Goles esperados</strong> es el promedio estimado al cierre del corte relevante. <strong>Probabilidades de resultado</strong> es la chance de victoria, empate o derrota en ese mismo corte. Si el partido esta en vivo, esos valores se condicionan al marcador actual.</p>
           </article>
           <article class="hero-note">
             <h3>Durante un partido</h3>
-            <p>El dashboard pasa a modo in-play: usa minuto, marcador actual y fase del juego para recalcular el resultado final más probable y el resto de goles esperados.</p>
+            <p>El dashboard pasa a modo in-play: usa minuto, marcador actual y fase del juego para recalcular el resultado final más probable, el resto de goles esperados y los marcadores finales mas probables en cada corte de actualizacion.</p>
           </article>
           <article class="hero-note">
             <h3>Trazabilidad</h3>
@@ -5052,7 +5052,7 @@ def build_dashboard_html(
           </article>
           <article class="hero-note">
             <h3>Como validar el in-play</h3>
-            <p>Si el partido esta en vivo, revisa la hora superior, el badge En vivo, el minuto modelado y el archivo <a href="latest.json" style="color:#fff3d7;">latest.json</a>. Todo eso se regenera en cada corrida de GitHub Actions.</p>
+            <p>Si el partido esta en vivo, revisa la hora superior, el badge En vivo, el minuto modelado y el archivo <a href="latest.json" style="color:#fff3d7;">latest.json</a>. Todo eso se regenera en cada corrida de GitHub Actions y debe mover probabilidades y marcadores proyectados cuando cambie el estado del juego.</p>
           </article>
         </div>
       </div>
