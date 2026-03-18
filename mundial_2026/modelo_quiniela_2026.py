@@ -4413,17 +4413,41 @@ def build_global_confidence_markdown(entries: Sequence[dict]) -> List[str]:
             "- Partidos mas abiertos: "
             + "; ".join(f"{item[2]['title']} {format_pct(item[0])}" for item in most_open)
         )
-    group_ranked = [item for item in ranked if str(item[2].get("stage_label", "")).startswith("Grupo ")]
-    if group_ranked:
-        closed_groups = sorted(group_ranked, key=lambda item: item[0], reverse=True)
-        open_groups = sorted(group_ranked, key=lambda item: item[0])
+    group_metrics = {}
+    for confidence, _, entry in ranked:
+        stage_label = str(entry.get("stage_label", ""))
+        if not stage_label.startswith("Grupo "):
+            continue
+        prediction: MatchPrediction = entry["prediction"]
+        bucket = group_metrics.setdefault(
+            stage_label,
+            {"matches": 0, "confidence_sum": 0.0, "draw_sum": 0.0},
+        )
+        bucket["matches"] += 1
+        bucket["confidence_sum"] += confidence
+        bucket["draw_sum"] += float(prediction.draw)
+    if group_metrics:
+        group_rows = []
+        for group_label, stats in group_metrics.items():
+            avg_conf = stats["confidence_sum"] / max(stats["matches"], 1)
+            avg_draw = stats["draw_sum"] / max(stats["matches"], 1)
+            balance = (1.0 - avg_conf) * 0.65 + avg_draw * 0.35
+            group_rows.append((group_label, avg_conf, avg_draw, balance, int(stats["matches"])))
+        balanced_groups = sorted(group_rows, key=lambda row: (row[3], row[2]), reverse=True)
+        favorite_groups = sorted(group_rows, key=lambda row: (row[1], -row[2]), reverse=True)
         lines.append(
-            "- Fase de grupos mas cerrada ahora mismo: "
-            + "; ".join(f"{item[2]['title']} {format_pct(item[0])}" for item in closed_groups)
+            "- Grupos mas equilibrados: "
+            + "; ".join(
+                f"{label} | equilibrio {format_pct(balance)} | empate medio {format_pct(avg_draw)} | partidos {matches}"
+                for label, avg_conf, avg_draw, balance, matches in balanced_groups
+            )
         )
         lines.append(
-            "- Fase de grupos mas abierta ahora mismo: "
-            + "; ".join(f"{item[2]['title']} {format_pct(item[0])}" for item in open_groups)
+            "- Grupos con favoritos mas marcados: "
+            + "; ".join(
+                f"{label} | confianza media {format_pct(avg_conf)} | empate medio {format_pct(avg_draw)} | partidos {matches}"
+                for label, avg_conf, avg_draw, balance, matches in favorite_groups
+            )
         )
     if market_edges:
         lines.append(
@@ -4457,7 +4481,19 @@ def build_global_confidence_html(entries: Sequence[dict]) -> str:
     strongest = sorted(ranked, key=lambda item: item[0], reverse=True)[:4]
     most_open = sorted(ranked, key=lambda item: item[0])[:4]
     market_edges = sorted(ranked_market, key=lambda item: item[0], reverse=True)[:4]
-    group_ranked = [item for item in ranked if str(item[2].get("stage_label", "")).startswith("Grupo ")]
+    group_metrics = {}
+    for confidence, _, entry in ranked:
+        stage_label = str(entry.get("stage_label", ""))
+        if not stage_label.startswith("Grupo "):
+            continue
+        prediction: MatchPrediction = entry["prediction"]
+        bucket = group_metrics.setdefault(
+            stage_label,
+            {"matches": 0, "confidence_sum": 0.0, "draw_sum": 0.0},
+        )
+        bucket["matches"] += 1
+        bucket["confidence_sum"] += confidence
+        bucket["draw_sum"] += float(prediction.draw)
 
     def bullet_list(items: Sequence[Tuple[float, float, dict]], mode: str) -> str:
         rows = []
@@ -4495,32 +4531,40 @@ def build_global_confidence_html(entries: Sequence[dict]) -> str:
             )
         return "".join(rows)
 
-    def group_list(items: Sequence[Tuple[float, float, dict]], label: str) -> str:
+    def group_list(items: Sequence[Tuple[str, float, float, float, int]], mode: str) -> str:
         rows = []
-        for confidence, _, entry in items:
-            prediction: MatchPrediction = entry["prediction"]
-            projected = projected_score_value(prediction)
+        for group_label, avg_conf, avg_draw, balance, matches in items:
+            if mode == "balanced":
+                tail = f"Equilibrio {format_pct(balance)} | empate medio {format_pct(avg_draw)} | partidos {matches}"
+            else:
+                tail = f"Confianza media {format_pct(avg_conf)} | empate medio {format_pct(avg_draw)} | partidos {matches}"
             rows.append(
                 "<li>"
-                f"<strong>{html.escape(entry['title'])}</strong>"
-                f"<span>{html.escape(label)} {format_pct(confidence)} | marcador proyectado {projected}</span>"
+                f"<strong>{html.escape(group_label)}</strong>"
+                f"<span>{html.escape(tail)}</span>"
                 "</li>"
             )
         return "".join(rows)
 
     group_closed_html = ""
     group_open_html = ""
-    if group_ranked:
-        closed_groups = sorted(group_ranked, key=lambda item: item[0], reverse=True)
-        open_groups = sorted(group_ranked, key=lambda item: item[0])
+    if group_metrics:
+        group_rows = []
+        for group_label, stats in group_metrics.items():
+            avg_conf = stats["confidence_sum"] / max(stats["matches"], 1)
+            avg_draw = stats["draw_sum"] / max(stats["matches"], 1)
+            balance = (1.0 - avg_conf) * 0.65 + avg_draw * 0.35
+            group_rows.append((group_label, avg_conf, avg_draw, balance, int(stats["matches"])))
+        balanced_groups = sorted(group_rows, key=lambda row: (row[3], row[2]), reverse=True)
+        favorite_groups = sorted(group_rows, key=lambda row: (row[1], -row[2]), reverse=True)
         group_closed_html = (
-            "<article><h3>Fase de grupos mas cerrada</h3><ul>"
-            f"{group_list(closed_groups, 'Confianza')}"
+            "<article><h3>Grupos mas equilibrados</h3><ul>"
+            f"{group_list(balanced_groups, 'balanced')}"
             "</ul></article>"
         )
         group_open_html = (
-            "<article><h3>Fase de grupos mas abierta</h3><ul>"
-            f"{group_list(open_groups, 'Confianza')}"
+            "<article><h3>Grupos con favoritos mas marcados</h3><ul>"
+            f"{group_list(favorite_groups, 'favorite')}"
             "</ul></article>"
         )
 
