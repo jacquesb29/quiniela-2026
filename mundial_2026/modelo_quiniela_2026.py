@@ -3724,9 +3724,135 @@ def build_dashboard_markdown(
     return "\n".join(lines)
 
 
+def probability_rows(prediction: MatchPrediction) -> List[Tuple[str, float, str]]:
+    return [
+        (f"Victoria {prediction.team_a}", prediction.win_a, "a"),
+        ("Empate", prediction.draw, "draw"),
+        (f"Victoria {prediction.team_b}", prediction.win_b, "b"),
+    ]
+
+
+def bracket_stage_sections(bracket_payload: dict) -> List[Tuple[str, str, List[dict]]]:
+    matches = bracket_payload.get("matches", {})
+    stage_order = [
+        ("round32", "Dieciseisavos"),
+        ("round16", "Octavos"),
+        ("quarterfinal", "Cuartos"),
+        ("semifinal", "Semifinales"),
+        ("third_place", "Tercer puesto"),
+        ("final", "Final"),
+    ]
+    sections = []
+    for stage_key, label in stage_order:
+        stage_matches = [
+            match for _, match in sorted(matches.items(), key=lambda item: item[0]) if match.get("stage") == stage_key
+        ]
+        if stage_matches:
+            sections.append((stage_key, label, stage_matches))
+    return sections
+
+
+def build_bracket_visual_html(bracket_payload: dict) -> str:
+    iterations = bracket_payload.get("iterations")
+    sections_html = []
+    for _, label, stage_matches in bracket_stage_sections(bracket_payload):
+        match_cards = []
+        for match in stage_matches:
+            alt_lines = ""
+            alternatives = match.get("top_scenarios", [])[1:]
+            if alternatives:
+                alt_lines = (
+                    "<p class=\"mini\">Alternativas: "
+                    + html.escape(
+                        "; ".join(
+                            f"{scenario['team_a']} vs {scenario['team_b']} -> {scenario['winner']} {format_pct(float(scenario['prob']))}"
+                            for scenario in alternatives[:2]
+                        )
+                    )
+                    + "</p>"
+                )
+            timing_html = ""
+            if match.get("stage") != "third_place":
+                timing_html = (
+                    f"<p class=\"mini\">Prórroga {format_pct(float(match.get('extra_time_prob', 0.0)))} | "
+                    f"penales {format_pct(float(match.get('penalties_prob', 0.0)))}</p>"
+                )
+            match_cards.append(
+                "<article class=\"bracket-match\">"
+                f"<p class=\"match-kicker\">{html.escape(str(match.get('title', '')))}</p>"
+                f"<h4>{html.escape(match.get('team_a', '?'))} vs {html.escape(match.get('team_b', '?'))}</h4>"
+                f"<p class=\"winner-line\">Gana más probable: <strong>{html.escape(match.get('winner', '?'))}</strong></p>"
+                f"<p class=\"mini\">Cruce modal {format_pct(float(match.get('matchup_prob', 0.0)))} | "
+                f"ganador {format_pct(float(match.get('winner_prob', 0.0)))}</p>"
+                f"{timing_html}"
+                f"{alt_lines}"
+                "</article>"
+            )
+        sections_html.append(
+            "<section class=\"bracket-stage\">"
+            f"<div class=\"stage-head\"><h3>{html.escape(label)}</h3></div>"
+            f"<div class=\"stage-matches\">{''.join(match_cards)}</div>"
+            "</section>"
+        )
+    if not sections_html:
+        return "<p class=\"meta\">No hay llave estructurada todavía.</p>"
+    subtitle = ""
+    if iterations:
+        subtitle = f"<p class=\"lede-tight\">Llave Monte Carlo dinámica con {int(iterations)} iteraciones publicadas.</p>"
+    return (
+        "<section class=\"panel bracket-panel\">"
+        "<div class=\"panel-head\">"
+        "<div>"
+        "<p class=\"eyebrow\">Hoja de Ruta</p>"
+        "<h2>Llave Proyectada</h2>"
+        f"{subtitle}"
+        "</div>"
+        "</div>"
+        "<div class=\"bracket-grid\">"
+        f"{''.join(sections_html)}"
+        "</div>"
+        "</section>"
+    )
+
+
+def build_methodology_html(bracket_payload: dict) -> str:
+    iterations = int(bracket_payload.get("iterations", 0) or 0)
+    montecarlo_line = f"{iterations} iteraciones" if iterations else "iteraciones variables"
+    return (
+        "<section class=\"panel methodology\">"
+        "<div class=\"panel-head\">"
+        "<div>"
+        "<p class=\"eyebrow\">Cómo Leer Esto</p>"
+        "<h2>Profundidad Estadística</h2>"
+        "<p class=\"lede-tight\">El modelo ya es robusto para quiniela. Más que agregar proxies nuevos, lo que más aporta ahora es calibración, backtesting y mejores feeds en vivo.</p>"
+        "</div>"
+        "</div>"
+        "<div class=\"method-grid\">"
+        "<article>"
+        "<h3>Partido a partido</h3>"
+        "<p>Usa Poisson bivariante para estimar el marcador final y probabilidades de victoria, empate y derrota.</p>"
+        "</article>"
+        "<article>"
+        "<h3>Cuadro completo</h3>"
+        f"<p>La llave publicada se construye con Monte Carlo dinámico y {html.escape(montecarlo_line)} para reducir ruido de simulación.</p>"
+        "</article>"
+        "<article>"
+        "<h3>Estado dinámico</h3>"
+        "<p>Actualiza Elo, forma, fatiga, disponibilidad, disciplina, clima, alineaciones y mercado a medida que aparecen datos nuevos.</p>"
+        "</article>"
+        "<article>"
+        "<h3>Modo in-play</h3>"
+        "<p>Durante un partido, condiciona las probabilidades por minuto, marcador actual y fase del juego. No es evento por evento, pero sí cambia en vivo.</p>"
+        "</article>"
+        "</div>"
+        "</section>"
+    )
+
+
 def build_dashboard_html(
     entries: Sequence[dict],
     bracket_text: str,
+    bracket_payload: dict,
     state_path: Path,
     fixtures_path: Path,
 ) -> str:
@@ -3735,6 +3861,16 @@ def build_dashboard_html(
         prediction: MatchPrediction = entry["prediction"]
         status_class, status_text = dashboard_status(entry)
         status_html = f"<p class=\"badge {status_class}\">{html.escape(status_text)}</p>"
+        probability_rows_html = "".join(
+            (
+                "<div class=\"prob-row\">"
+                f"<div class=\"prob-label\">{html.escape(label)}</div>"
+                f"<div class=\"prob-bar\"><span class=\"prob-fill {row_class}\" style=\"width:{prob * 100:.1f}%\"></span></div>"
+                f"<div class=\"prob-value\">{format_pct(prob)}</div>"
+                "</div>"
+            )
+            for label, prob, row_class in probability_rows(prediction)
+        )
         result_html = ""
         if entry["actual_score_a"] is not None and entry["actual_score_b"] is not None:
             result_text = f"Resultado real: {prediction.team_a} {entry['actual_score_a']} - {entry['actual_score_b']} {prediction.team_b}"
@@ -3867,14 +4003,15 @@ def build_dashboard_html(
             f"{lineup_html}"
             f"{absence_html}"
             f"{projection_html}"
-            "<div class=\"grid\">"
-            f"<div><span>{html.escape(goals_label(prediction))}</span><strong>{prediction.expected_goals_a:.2f} - {prediction.expected_goals_b:.2f}</strong></div>"
-            f"<div><span>{html.escape(result_prob_label(prediction))}</span><strong>{format_pct(prediction.win_a)} / {format_pct(prediction.draw)} / {format_pct(prediction.win_b)}</strong></div>"
+            "<div class=\"hero-metrics\">"
+            f"<div class=\"metric metric-score\"><span>{html.escape(goals_label(prediction))}</span><strong>{prediction.expected_goals_a:.2f} - {prediction.expected_goals_b:.2f}</strong></div>"
+            f"<div class=\"metric metric-probs\"><span>{html.escape(result_prob_label(prediction))}</span><strong>{html.escape(prediction.team_a)} / Empate / {html.escape(prediction.team_b)}</strong></div>"
             "</div>"
+            f"<div class=\"prob-block\">{probability_rows_html}</div>"
             f"{remaining_goals_html}"
             f"{knockout_html}"
             "<div class=\"scores\">"
-            "<h4>Marcadores mas probables</h4>"
+            "<h4>Marcadores finales mas probables</h4>"
             f"<ul>{top_scores_html}</ul>"
             "</div>"
             "</section>"
@@ -3884,6 +4021,8 @@ def build_dashboard_html(
         cards.append("<section class=\"card\"><h3>Sin partidos cargados</h3><p class=\"meta\">Agrega partidos a fixtures_template.json para ver probabilidades aqui.</p></section>")
 
     bracket_html = html.escape(bracket_text.strip() or "No hay llave generada todavia.")
+    bracket_visual_html = build_bracket_visual_html(bracket_payload)
+    methodology_html = build_methodology_html(bracket_payload)
     return f"""<!doctype html>
 <html lang="es">
 <head>
@@ -3893,41 +4032,141 @@ def build_dashboard_html(
   <style>
     :root {{
       --bg: #f4efe2;
-      --panel: #fffdf6;
-      --ink: #1f2a2e;
-      --muted: #5e6b70;
-      --line: #d7cdb6;
+      --panel: rgba(255, 253, 246, 0.92);
+      --panel-strong: #fffaf0;
+      --ink: #182126;
+      --muted: #5a676b;
+      --line: rgba(184, 160, 109, 0.34);
       --accent: #0f6d66;
+      --accent-dark: #0a4e49;
+      --accent-soft: rgba(15, 109, 102, 0.10);
+      --gold: #b5832f;
+      --gold-soft: rgba(181, 131, 47, 0.12);
+      --rose: #b0473c;
+      --shadow: 0 20px 45px rgba(49, 40, 23, 0.10);
     }}
     * {{ box-sizing: border-box; }}
     body {{
       margin: 0;
-      font-family: Georgia, "Times New Roman", serif;
+      font-family: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Georgia, serif;
       color: var(--ink);
       background:
-        radial-gradient(circle at top left, rgba(15,109,102,0.10), transparent 28%),
-        linear-gradient(180deg, #f6f1e7 0%, #efe4cf 100%);
+        radial-gradient(circle at top left, rgba(15,109,102,0.16), transparent 24%),
+        radial-gradient(circle at top right, rgba(181,131,47,0.14), transparent 22%),
+        linear-gradient(180deg, #f8f3e8 0%, #eedfc4 100%);
     }}
     main {{
-      max-width: 980px;
+      max-width: 1180px;
       margin: 0 auto;
-      padding: 20px 14px 40px;
+      padding: 24px 14px 56px;
     }}
     h1, h2, h3, h4 {{ margin: 0; }}
-    h1 {{ font-size: 2rem; margin-bottom: 8px; }}
-    .lede {{ color: var(--muted); margin: 0 0 18px; }}
+    h1 {{ font-size: clamp(2.2rem, 5vw, 3.6rem); line-height: 0.95; margin-bottom: 10px; }}
+    h2 {{ font-size: clamp(1.4rem, 3vw, 2rem); }}
+    h3 {{ font-size: 1.05rem; }}
+    .lede {{ color: var(--muted); margin: 0; max-width: 60ch; font-size: 1.02rem; }}
+    .lede-tight {{ color: var(--muted); margin: 8px 0 0; max-width: 58ch; }}
+    .eyebrow {{
+      margin: 0 0 10px;
+      color: var(--accent-dark);
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      font-size: 0.75rem;
+      font-weight: 700;
+    }}
     .panel {{
       background: var(--panel);
       border: 1px solid var(--line);
+      backdrop-filter: blur(12px);
+      border-radius: 24px;
+      padding: 18px;
+      box-shadow: var(--shadow);
+      margin-bottom: 18px;
+    }}
+    .hero {{
+      position: relative;
+      overflow: hidden;
+      background:
+        linear-gradient(135deg, rgba(15, 109, 102, 0.94), rgba(10, 78, 73, 0.92)),
+        linear-gradient(180deg, #0f6d66 0%, #0a4e49 100%);
+      color: #f7f3ea;
+      padding: 26px 22px;
+    }}
+    .hero::after {{
+      content: "";
+      position: absolute;
+      inset: auto -60px -70px auto;
+      width: 220px;
+      height: 220px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.08);
+    }}
+    .hero .eyebrow,
+    .hero .lede,
+    .hero .meta,
+    .hero .lede-tight {{
+      color: rgba(247, 243, 234, 0.86);
+    }}
+    .hero-grid {{
+      display: grid;
+      gap: 18px;
+      grid-template-columns: minmax(0, 1.6fr) minmax(280px, 1fr);
+      position: relative;
+      z-index: 1;
+    }}
+    .summary-grid {{
+      display: grid;
+      gap: 12px;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      margin-top: 18px;
+    }}
+    .summary-tile {{
+      background: rgba(255,255,255,0.09);
+      border: 1px solid rgba(255,255,255,0.12);
       border-radius: 18px;
-      padding: 16px;
-      box-shadow: 0 8px 20px rgba(53, 44, 25, 0.06);
-      margin-bottom: 16px;
+      padding: 14px;
+    }}
+    .summary-tile span {{
+      color: rgba(247, 243, 234, 0.72);
+      font-size: 0.72rem;
+      margin-bottom: 6px;
+    }}
+    .summary-tile strong {{
+      font-size: 1.05rem;
+      color: #fffdf7;
+    }}
+    .hero-notes {{
+      display: grid;
+      gap: 12px;
+    }}
+    .hero-note {{
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.10);
+      border-radius: 18px;
+      padding: 14px;
+    }}
+    .hero-note h3 {{
+      margin-bottom: 8px;
+      font-size: 1rem;
+    }}
+    .hero-note p {{
+      margin: 0;
+      color: rgba(247, 243, 234, 0.84);
+      line-height: 1.45;
+      font-size: 0.95rem;
+    }}
+    .panel-head {{
+      display: flex;
+      justify-content: space-between;
+      gap: 14px;
+      align-items: start;
+      margin-bottom: 14px;
     }}
     .meta {{
       margin: 6px 0 0;
       color: var(--muted);
       font-size: 0.95rem;
+      line-height: 1.4;
     }}
     .badge {{
       display: inline-block;
@@ -3944,30 +4183,94 @@ def build_dashboard_html(
     .badge.final {{ background: #355c3a; }}
     .badge.pending {{ background: #7d6a43; }}
     .badge.projection {{ background: #0f6d66; }}
-    .cards {{
+    .bracket-panel {{
+      padding-bottom: 22px;
+    }}
+    .bracket-grid {{
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
       gap: 14px;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
     }}
-    .card {{
-      background: var(--panel);
+    .bracket-stage {{
+      background: var(--panel-strong);
       border: 1px solid var(--line);
-      border-radius: 18px;
-      padding: 16px;
-      box-shadow: 0 8px 20px rgba(53, 44, 25, 0.06);
+      border-radius: 20px;
+      padding: 14px;
     }}
-    .grid, .subgrid {{
+    .stage-head {{
+      margin-bottom: 12px;
+      padding-bottom: 10px;
+      border-bottom: 1px dashed var(--line);
+    }}
+    .stage-matches {{
       display: grid;
       gap: 10px;
+    }}
+    .bracket-match {{
+      padding: 12px;
+      border-radius: 16px;
+      background: linear-gradient(180deg, rgba(15,109,102,0.08), rgba(181,131,47,0.06));
+      border: 1px solid rgba(15,109,102,0.10);
+    }}
+    .match-kicker {{
+      margin: 0 0 4px;
+      color: var(--accent-dark);
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-weight: 700;
+    }}
+    .winner-line {{
+      margin: 8px 0 0;
+      color: var(--ink);
+    }}
+    .mini {{
+      margin: 8px 0 0;
+      color: var(--muted);
+      font-size: 0.84rem;
+      line-height: 1.35;
+    }}
+    .method-grid {{
+      display: grid;
+      gap: 12px;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    }}
+    .method-grid article {{
+      border-radius: 18px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.65), rgba(15,109,102,0.05));
+      border: 1px solid var(--line);
+      padding: 14px;
+    }}
+    .method-grid p {{
+      margin: 8px 0 0;
+      color: var(--muted);
+      line-height: 1.45;
+    }}
+    .cards {{
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 16px;
+    }}
+    .card {{
+      background: linear-gradient(180deg, rgba(255,253,246,0.97), rgba(251,246,234,0.94));
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      padding: 18px;
+      box-shadow: var(--shadow);
+    }}
+    .hero-metrics, .subgrid {{
+      display: grid;
+      gap: 12px;
       margin-top: 12px;
     }}
-    .grid {{
+    .hero-metrics {{
       grid-template-columns: repeat(2, minmax(0, 1fr));
     }}
-    .grid div, .subgrid div {{
-      background: rgba(15,109,102,0.06);
-      border-radius: 12px;
-      padding: 10px 12px;
+    .metric, .subgrid div {{
+      background: rgba(15,109,102,0.07);
+      border-radius: 16px;
+      padding: 12px 14px;
+      border: 1px solid rgba(15,109,102,0.08);
     }}
     span {{
       display: block;
@@ -3979,6 +4282,40 @@ def build_dashboard_html(
     }}
     strong {{
       font-size: 1rem;
+    }}
+    .prob-block {{
+      margin-top: 14px;
+      display: grid;
+      gap: 10px;
+    }}
+    .prob-row {{
+      display: grid;
+      gap: 10px;
+      align-items: center;
+      grid-template-columns: minmax(92px, 1fr) minmax(100px, 2.3fr) auto;
+    }}
+    .prob-label {{
+      font-size: 0.88rem;
+      color: var(--muted);
+    }}
+    .prob-bar {{
+      height: 10px;
+      border-radius: 999px;
+      overflow: hidden;
+      background: rgba(24, 33, 38, 0.10);
+    }}
+    .prob-fill {{
+      display: block;
+      height: 100%;
+      border-radius: 999px;
+    }}
+    .prob-fill.a {{ background: linear-gradient(90deg, var(--accent), #14a39a); }}
+    .prob-fill.draw {{ background: linear-gradient(90deg, var(--gold), #d2a54c); }}
+    .prob-fill.b {{ background: linear-gradient(90deg, #34495e, #4f7091); }}
+    .prob-value {{
+      font-variant-numeric: tabular-nums;
+      font-weight: 700;
+      color: var(--ink);
     }}
     .scores h4 {{
       margin: 14px 0 8px;
@@ -4004,18 +4341,87 @@ def build_dashboard_html(
       margin: 0;
       font-size: 0.92rem;
       color: var(--ink);
+      max-height: 480px;
+      overflow: auto;
+      padding-right: 4px;
+    }}
+    @media (max-width: 820px) {{
+      .hero-grid {{
+        grid-template-columns: 1fr;
+      }}
+      .hero-metrics {{
+        grid-template-columns: 1fr;
+      }}
+      .prob-row {{
+        grid-template-columns: 1fr;
+      }}
+    }}
+    @media (max-width: 640px) {{
+      main {{
+        padding: 16px 12px 42px;
+      }}
+      .panel, .card {{
+        border-radius: 20px;
+      }}
+      .summary-grid {{
+        grid-template-columns: 1fr;
+      }}
     }}
   </style>
 </head>
 <body>
   <main>
-    <section class="panel">
-      <h1>Dashboard Mundial 2026</h1>
-      <p class="lede">Actualizado: {html.escape(iso_timestamp())}</p>
-      <p class="meta">Estado usado: {html.escape(str(state_path))}</p>
-      <p class="meta">Fixtures leidos: {html.escape(str(fixtures_path))}</p>
+    <section class="panel hero">
+      <div class="hero-grid">
+        <div>
+          <p class="eyebrow">Modelo Dinámico | Mundial 2026</p>
+          <h1>Pronóstico En Vivo y Hoja de Ruta</h1>
+          <p class="lede">Cada partido combina fortaleza base, forma reciente, clima, alineaciones, bajas, mercado y estado del torneo. Si un juego está en curso, las probabilidades ya se condicionan al minuto y al marcador actual.</p>
+          <div class="summary-grid">
+            <div class="summary-tile">
+              <span>Última actualización</span>
+              <strong>{html.escape(iso_timestamp())}</strong>
+            </div>
+            <div class="summary-tile">
+              <span>Frecuencia cloud</span>
+              <strong>Cada 5 minutos</strong>
+            </div>
+            <div class="summary-tile">
+              <span>Estado del torneo</span>
+              <strong>Elo + forma + fatiga + disciplina</strong>
+            </div>
+            <div class="summary-tile">
+              <span>Origen operativo</span>
+              <strong>GitHub Actions + Pages</strong>
+            </div>
+          </div>
+        </div>
+        <div class="hero-notes">
+          <article class="hero-note">
+            <h3>Qué significan las métricas</h3>
+            <p><strong>Goles esperados</strong> es el promedio estimado al cierre del corte relevante. <strong>Probabilidades de resultado</strong> es la chance de victoria, empate o derrota en ese mismo corte.</p>
+          </article>
+          <article class="hero-note">
+            <h3>Durante un partido</h3>
+            <p>El dashboard pasa a modo in-play: usa minuto, marcador actual y fase del juego para recalcular el resultado final más probable y el resto de goles esperados.</p>
+          </article>
+          <article class="hero-note">
+            <h3>Trazabilidad</h3>
+            <p>Estado usado: {html.escape(str(state_path))}<br>Fixtures leídos: {html.escape(str(fixtures_path))}</p>
+          </article>
+        </div>
+      </div>
     </section>
+    {methodology_html}
+    {bracket_visual_html}
     <section class="panel">
+      <div class="panel-head">
+        <div>
+          <p class="eyebrow">Texto técnico</p>
+          <h2>Resumen completo de la llave</h2>
+          <p class="lede-tight">Además del bracket visual, aquí se conserva el detalle textual completo para revisar todos los cruces y porcentajes publicados.</p>
+        </div>
+      </div>
       <h2>Llave actual</h2>
       <pre>{bracket_html}</pre>
     </section>
@@ -4050,7 +4456,7 @@ def command_project_dashboard(args: argparse.Namespace, teams: Dict[str, Team]) 
         )
     )
     markdown = build_dashboard_markdown(entries, bracket_text, Path(args.state_file), fixture_path)
-    html_content = build_dashboard_html(entries, bracket_text, Path(args.state_file), fixture_path)
+    html_content = build_dashboard_html(entries, bracket_text, bracket_payload, Path(args.state_file), fixture_path)
 
     output_md = Path(args.output_md)
     output_html = Path(args.output_html)
