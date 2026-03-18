@@ -2888,6 +2888,17 @@ def stage_for_match_id(match_id: str) -> str:
 def structured_match_projection(match_id: str, aggregate: dict, iterations: int) -> dict:
     modal_outcome, modal_count = max(aggregate["outcomes"].items(), key=lambda item: item[1])
     team_a, team_b, winner = modal_outcome
+    top_scenarios = []
+    for outcome, count in sorted(aggregate["outcomes"].items(), key=lambda item: item[1], reverse=True)[:3]:
+        scenario_a, scenario_b, scenario_winner = outcome
+        top_scenarios.append(
+            {
+                "team_a": scenario_a,
+                "team_b": scenario_b,
+                "winner": scenario_winner,
+                "prob": count / float(iterations),
+            }
+        )
     return {
         "match_id": match_id,
         "title": BRACKET_MATCH_TITLES.get(match_id, match_id),
@@ -2899,6 +2910,7 @@ def structured_match_projection(match_id: str, aggregate: dict, iterations: int)
         "winner_prob": aggregate["winner"][winner] / float(iterations),
         "extra_time_prob": aggregate["went_extra_time"] / float(iterations),
         "penalties_prob": aggregate["went_penalties"] / float(iterations),
+        "top_scenarios": top_scenarios,
     }
 
 
@@ -2916,6 +2928,12 @@ def format_match_projection(match_id: str, aggregate: dict, iterations: int) -> 
         f"- Escenario modal: {team_a} vs {team_b} -> gana {winner} ({outcome_prob:.1%})",
         f"- Ganador mas probable total: {winner} ({winner_prob:.1%})",
     ]
+    alternatives = [
+        f"{scenario['team_a']} vs {scenario['team_b']} -> {scenario['winner']} ({scenario['prob']:.1%})"
+        for scenario in projection.get("top_scenarios", [])[1:]
+    ]
+    if alternatives:
+        lines.append(f"- Cruces alternativos mas probables: {'; '.join(alternatives)}")
     if match_id != "M104":
         lines.append(f"- Va a proroga en {extra_time_prob:.1%} y a penales en {penalties_prob:.1%}")
     return lines
@@ -3080,12 +3098,24 @@ def dashboard_fixture_entries(
                 "kickoff_utc": fixture.get("kickoff_utc"),
                 "venue_name": fixture.get("venue_name"),
                 "venue_country": fixture.get("venue_country"),
+                "status_state": fixture.get("status_state"),
+                "status_detail": fixture.get("status_detail"),
+                "live_score_a": fixture.get("live_score_a"),
+                "live_score_b": fixture.get("live_score_b"),
                 "weather_summary": dashboard_weather_summary(fixture),
                 "referee": fixture.get("referee"),
                 "lineup_status_a": fixture.get("lineup_status_a"),
                 "lineup_status_b": fixture.get("lineup_status_b"),
                 "lineup_change_count_a": int(fixture.get("lineup_change_count_a", 0)),
                 "lineup_change_count_b": int(fixture.get("lineup_change_count_b", 0)),
+                "injuries_a": fixture.get("injuries_a"),
+                "injuries_b": fixture.get("injuries_b"),
+                "unavailable_count_a": int(fixture.get("unavailable_count_a", 0)),
+                "unavailable_count_b": int(fixture.get("unavailable_count_b", 0)),
+                "questionable_count_a": int(fixture.get("questionable_count_a", 0)),
+                "questionable_count_b": int(fixture.get("questionable_count_b", 0)),
+                "unavailable_notes_a": fixture.get("unavailable_notes_a", []),
+                "unavailable_notes_b": fixture.get("unavailable_notes_b", []),
                 "market_provider": fixture.get("market_provider"),
                 "market_summary": fixture.get("market_summary"),
                 "market_prob_a": fixture.get("market_prob_a"),
@@ -3169,17 +3199,62 @@ def projected_bracket_entries(
                 "kickoff_utc": base_fixture.get("kickoff_utc"),
                 "venue_name": base_fixture.get("venue_name"),
                 "venue_country": base_fixture.get("venue_country"),
+                "status_state": base_fixture.get("status_state"),
+                "status_detail": base_fixture.get("status_detail"),
+                "live_score_a": base_fixture.get("live_score_a"),
+                "live_score_b": base_fixture.get("live_score_b"),
                 "weather_summary": dashboard_weather_summary(base_fixture),
                 "projection": True,
                 "projection_note": (
                     f"Emparejamiento modal de la llave {format_pct(match_projection['matchup_prob'])} | "
                     f"ganador modal {match_projection['winner']} {format_pct(match_projection['winner_prob'])}"
                 ),
+                "projection_alternatives": match_projection.get("top_scenarios", [])[1:],
                 "projection_penalties": match_projection.get("penalties_prob", 0.0),
                 "projection_extra_time": match_projection.get("extra_time_prob", 0.0),
+                "injuries_a": base_fixture.get("injuries_a"),
+                "injuries_b": base_fixture.get("injuries_b"),
+                "unavailable_count_a": int(base_fixture.get("unavailable_count_a", 0)),
+                "unavailable_count_b": int(base_fixture.get("unavailable_count_b", 0)),
+                "questionable_count_a": int(base_fixture.get("questionable_count_a", 0)),
+                "questionable_count_b": int(base_fixture.get("questionable_count_b", 0)),
+                "unavailable_notes_a": base_fixture.get("unavailable_notes_a", []),
+                "unavailable_notes_b": base_fixture.get("unavailable_notes_b", []),
             }
         )
     return entries
+
+
+def dashboard_status(entry: dict) -> Tuple[str, str]:
+    if entry.get("actual_score_a") is not None and entry.get("actual_score_b") is not None:
+        return ("final", "Final")
+    if entry.get("live_score_a") is not None and entry.get("live_score_b") is not None:
+        detail = entry.get("status_detail")
+        return ("live", f"En vivo{f' | {detail}' if detail else ''}")
+    if entry.get("projection"):
+        return ("projection", "Proyeccion")
+    detail = entry.get("status_detail")
+    return ("pending", detail or "Pendiente")
+
+
+def dashboard_absence_lines(entry: dict, team_a: str, team_b: str) -> List[str]:
+    lines = []
+    count_a = int(entry.get("unavailable_count_a", 0))
+    count_b = int(entry.get("unavailable_count_b", 0))
+    questionable_a = int(entry.get("questionable_count_a", 0))
+    questionable_b = int(entry.get("questionable_count_b", 0))
+    if count_a or count_b or questionable_a or questionable_b:
+        lines.append(
+            f"- Bajas/dudas: {team_a} {count_a} bajas, {questionable_a} dudas | "
+            f"{team_b} {count_b} bajas, {questionable_b} dudas"
+        )
+    notes_a = entry.get("unavailable_notes_a") or []
+    notes_b = entry.get("unavailable_notes_b") or []
+    if notes_a:
+        lines.append(f"- Detalle {team_a}: {'; '.join(notes_a[:3])}")
+    if notes_b:
+        lines.append(f"- Detalle {team_b}: {'; '.join(notes_b[:3])}")
+    return lines
 
 
 def build_dashboard_markdown(
@@ -3212,6 +3287,8 @@ def build_dashboard_markdown(
         prediction: MatchPrediction = entry["prediction"]
         lines.append(f"### {entry['title']}")
         lines.append(f"- Etapa: {entry['stage_label']}")
+        _, status_text = dashboard_status(entry)
+        lines.append(f"- Estado: {status_text}")
         if entry.get("kickoff_utc"):
             venue_bits = [entry.get("venue_name"), entry.get("venue_country")]
             venue_bits = [bit for bit in venue_bits if bit]
@@ -3240,8 +3317,18 @@ def build_dashboard_markdown(
                 f"- Cambios de alineacion: {prediction.team_a} {entry.get('lineup_change_count_a', 0)} | "
                 f"{prediction.team_b} {entry.get('lineup_change_count_b', 0)}"
             )
+        lines.extend(dashboard_absence_lines(entry, prediction.team_a, prediction.team_b))
         if entry.get("projection"):
             lines.append(f"- Proyeccion automatica: {entry.get('projection_note', '')}")
+            alternatives = entry.get("projection_alternatives") or []
+            if alternatives:
+                lines.append(
+                    "- Cruces alternativos: "
+                    + "; ".join(
+                        f"{scenario['team_a']} vs {scenario['team_b']} -> {scenario['winner']} {format_pct(float(scenario['prob']))}"
+                        for scenario in alternatives
+                    )
+                )
         if entry["actual_score_a"] is not None and entry["actual_score_b"] is not None:
             result_line = f"- Resultado real: {prediction.team_a} {entry['actual_score_a']} - {entry['actual_score_b']} {prediction.team_b}"
             if entry["went_penalties"]:
@@ -3249,8 +3336,12 @@ def build_dashboard_markdown(
             elif entry["went_extra_time"]:
                 result_line += " | con proroga"
             lines.append(result_line)
+        elif entry.get("live_score_a") is not None and entry.get("live_score_b") is not None:
+            lines.append(
+                f"- Marcador en vivo: {prediction.team_a} {entry['live_score_a']} - {entry['live_score_b']} {prediction.team_b}"
+            )
         else:
-            lines.append("- Estado: pendiente")
+            pass
         lines.append(
             f"- xG: {prediction.expected_goals_a:.2f} - {prediction.expected_goals_b:.2f}"
         )
@@ -3298,6 +3389,8 @@ def build_dashboard_html(
     cards = []
     for entry in entries:
         prediction: MatchPrediction = entry["prediction"]
+        status_class, status_text = dashboard_status(entry)
+        status_html = f"<p class=\"badge {status_class}\">{html.escape(status_text)}</p>"
         result_html = ""
         if entry["actual_score_a"] is not None and entry["actual_score_b"] is not None:
             result_text = f"Resultado real: {prediction.team_a} {entry['actual_score_a']} - {entry['actual_score_b']} {prediction.team_b}"
@@ -3306,8 +3399,13 @@ def build_dashboard_html(
             elif entry["went_extra_time"]:
                 result_text += " | con proroga"
             result_html = f"<p class=\"meta\">{html.escape(result_text)}</p>"
+        elif entry.get("live_score_a") is not None and entry.get("live_score_b") is not None:
+            result_html = (
+                f"<p class=\"meta\">En vivo: {html.escape(prediction.team_a)} {entry['live_score_a']} - "
+                f"{entry['live_score_b']} {html.escape(prediction.team_b)}</p>"
+            )
         else:
-            result_html = "<p class=\"meta\">Pendiente</p>"
+            result_html = ""
 
         venue_html = ""
         if entry.get("kickoff_utc") or entry.get("venue_name"):
@@ -3351,9 +3449,25 @@ def build_dashboard_html(
                 f"{html.escape(prediction.team_b)} {entry.get('lineup_change_count_b', 0)}</p>"
             )
 
+        absence_html = ""
+        for line in dashboard_absence_lines(entry, prediction.team_a, prediction.team_b):
+            absence_html += f"<p class=\"meta\">{html.escape(line[2:] if line.startswith('- ') else line)}</p>"
+
         projection_html = ""
         if entry.get("projection"):
             projection_html = f"<p class=\"meta\">{html.escape(entry.get('projection_note', ''))}</p>"
+            alternatives = entry.get("projection_alternatives") or []
+            if alternatives:
+                projection_html += (
+                    "<p class=\"meta\">Cruces alternativos: "
+                    + html.escape(
+                        "; ".join(
+                            f"{scenario['team_a']} vs {scenario['team_b']} -> {scenario['winner']} {format_pct(float(scenario['prob']))}"
+                            for scenario in alternatives
+                        )
+                    )
+                    + "</p>"
+                )
 
         knockout_html = ""
         if prediction.advance_a is not None and prediction.advance_b is not None:
@@ -3388,6 +3502,7 @@ def build_dashboard_html(
         )
         cards.append(
             "<section class=\"card\">"
+            f"{status_html}"
             f"<h3>{html.escape(entry['title'])}</h3>"
             f"<p class=\"meta\">{html.escape(entry['stage_label'])}</p>"
             f"{result_html}"
@@ -3396,6 +3511,7 @@ def build_dashboard_html(
             f"{officiating_html}"
             f"{market_html}"
             f"{lineup_html}"
+            f"{absence_html}"
             f"{projection_html}"
             "<div class=\"grid\">"
             f"<div><span>xG</span><strong>{prediction.expected_goals_a:.2f} - {prediction.expected_goals_b:.2f}</strong></div>"
@@ -3458,6 +3574,21 @@ def build_dashboard_html(
       color: var(--muted);
       font-size: 0.95rem;
     }}
+    .badge {{
+      display: inline-block;
+      margin: 0 0 10px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #fff;
+    }}
+    .badge.live {{ background: #c0392b; }}
+    .badge.final {{ background: #355c3a; }}
+    .badge.pending {{ background: #7d6a43; }}
+    .badge.projection {{ background: #0f6d66; }}
     .cards {{
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));

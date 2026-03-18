@@ -188,7 +188,8 @@ python3 mundial_2026/modelo_quiniela_2026.py team-profile Argentina
 - En knockout, `predict` ya modela empate en 90', proroga, probabilidad de penales y probabilidad total de clasificar.
 - En knockout, el dashboard ya muestra tambien un marcador esperado de la tanda de penales y los resultados de penales mas probables.
 - `sync_live_data_2026.py` ya mete clima por sede y, cuando el feed lo expone cerca del partido, odds de mercado como prior externo.
-- Alineaciones confirmadas, cambios de XI y arbitro estan preparados en modo best-effort: se cargan automaticamente si el feed publico los expone para ese partido.
+- Alineaciones confirmadas, cambios de XI, arbitro y bajas/ausencias estan preparados en modo best-effort: se cargan automaticamente si el feed publico los expone para ese partido.
+- La llave publicada en el dashboard cloud ahora usa 1200 iteraciones por defecto para reducir ruido Monte Carlo frente a 300.
 - Si un partido real se va a proroga o penales y lo marcas en el JSON, el estado acumula fatiga adicional y baja de disponibilidad para el siguiente partido.
 - Si corriges un resultado viejo, lo correcto es ejecutar `state-reset` y luego volver a correr `fixtures` sobre el archivo completo en orden cronologico.
 - Conviene poner un `id` estable en cada partido del JSON para que el script no aplique dos veces el mismo resultado.

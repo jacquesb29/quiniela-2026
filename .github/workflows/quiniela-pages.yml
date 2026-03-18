@@ -2,6 +2,9 @@ name: Quiniela 2026 Live
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - main
   schedule:
     - cron: "*/5 * * * *"
 
@@ -35,7 +38,7 @@ jobs:
           python3 mundial_2026/sync_live_data_2026.py
           python3 mundial_2026/modelo_quiniela_2026.py state-reset
           python3 mundial_2026/modelo_quiniela_2026.py fixtures mundial_2026/fixtures_live_2026.json
-          python3 mundial_2026/modelo_quiniela_2026.py project-bracket --config mundial_2026/tournament_2026_draw.json --iterations 300 --seed 7 --progress-every 100
+          python3 mundial_2026/modelo_quiniela_2026.py project-bracket --config mundial_2026/tournament_2026_draw.json --iterations 1200 --seed 7 --progress-every 300
           python3 mundial_2026/modelo_quiniela_2026.py project-dashboard --fixtures mundial_2026/fixtures_live_2026.json
           ./mundial_2026/build_pages_site.sh
 

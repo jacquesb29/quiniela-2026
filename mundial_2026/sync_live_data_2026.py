@@ -361,6 +361,117 @@ def extract_lineup_data(summary_payload: dict) -> Dict[str, dict]:
     return lineup_data
 
 
+ABSENCE_HARD_TOKENS = (
+    "out",
+    "injured",
+    "injury",
+    "suspended",
+    "illness",
+    "inactive",
+    "ruled out",
+    "will miss",
+)
+
+ABSENCE_SOFT_TOKENS = (
+    "questionable",
+    "doubtful",
+    "probable",
+    "fitness test",
+    "late decision",
+    "day-to-day",
+)
+
+
+def nested_text(value) -> str:
+    if value is None:
+        return ""
+    if isinstance(value, dict):
+        return " ".join(piece for piece in (nested_text(item) for item in value.values()) if piece)
+    if isinstance(value, list):
+        return " ".join(piece for piece in (nested_text(item) for item in value) if piece)
+    return str(value)
+
+
+def classify_absence(player_obj: dict) -> Optional[Tuple[str, float, str]]:
+    if not isinstance(player_obj, dict):
+        return None
+    if not any(key in player_obj for key in ("displayName", "shortName", "name")):
+        return None
+
+    status_blob = " ".join(
+        piece
+        for piece in (
+            nested_text(player_obj.get("status")),
+            nested_text(player_obj.get("availability")),
+            nested_text(player_obj.get("injury")),
+            nested_text(player_obj.get("injuryStatus")),
+            nested_text(player_obj.get("injuryNote")),
+            nested_text(player_obj.get("note")),
+            nested_text(player_obj.get("detail")),
+            nested_text(player_obj.get("description")),
+            nested_text(player_obj.get("type")),
+        )
+        if piece
+    ).lower()
+    if not status_blob:
+        return None
+
+    severity = 0.0
+    if any(token in status_blob for token in ABSENCE_HARD_TOKENS):
+        severity = 1.0
+    elif any(token in status_blob for token in ABSENCE_SOFT_TOKENS):
+        severity = 0.5
+    if severity <= 0.0:
+        return None
+
+    player_name = player_obj.get("displayName") or player_obj.get("shortName") or player_obj.get("name")
+    if not player_name:
+        return None
+
+    note = (
+        nested_text(player_obj.get("injuryNote"))
+        or nested_text(player_obj.get("detail"))
+        or nested_text(player_obj.get("description"))
+        or nested_text(player_obj.get("status"))
+        or nested_text(player_obj.get("availability"))
+    )
+    return str(player_name), severity, note.strip()
+
+
+def extract_absence_data(summary_payload: dict) -> Dict[str, dict]:
+    absences: Dict[str, dict] = {}
+    for roster in summary_payload.get("rosters", []):
+        side = roster.get("homeAway")
+        if side not in {"home", "away"}:
+            continue
+        hard_absences: List[str] = []
+        soft_absences: List[str] = []
+        seen = set()
+        for obj in walk_objects(roster):
+            classified = classify_absence(obj)
+            if not classified:
+                continue
+            player_name, severity, note = classified
+            key = (player_name, note)
+            if key in seen:
+                continue
+            seen.add(key)
+            label = f"{player_name}: {note}" if note else player_name
+            if severity >= 1.0:
+                hard_absences.append(label)
+            else:
+                soft_absences.append(label)
+
+        load = min(0.85, 0.18 * len(hard_absences) + 0.08 * len(soft_absences))
+        absences[side] = {
+            "hard_count": len(hard_absences),
+            "soft_count": len(soft_absences),
+            "load": round(load, 3),
+            "notes": (hard_absences + soft_absences)[:6],
+        }
+    return absences
+
+
 def summarize_market(odds_entry: dict) -> dict:
     home_line = odds_entry.get("homeTeamOdds", {}).get("moneyLine")
     away_line = odds_entry.get("awayTeamOdds", {}).get("moneyLine")
@@ -417,6 +528,16 @@ def summary_enrichment(event_id: str, kickoff: datetime, status_state: Optional[
         enrichment[f"lineup_confirmed_{prefix}"] = bool(lineup["confirmed"])
         enrichment[f"starting_xi_{prefix}"] = lineup["starters"]
         enrichment[f"lineup_status_{prefix}"] = "confirmada" if lineup["confirmed"] else "sin confirmar"
+
+    absences = extract_absence_data(payload)
+    for side, prefix in (("home", "a"), ("away", "b")):
+        absence_data = absences.get(side)
+        if not absence_data:
+            continue
+        enrichment[f"injuries_{prefix}"] = absence_data["load"]
+        enrichment[f"unavailable_count_{prefix}"] = int(absence_data["hard_count"])
+        enrichment[f"questionable_count_{prefix}"] = int(absence_data["soft_count"])
+        enrichment[f"unavailable_notes_{prefix}"] = absence_data["notes"]
     return enrichment
 
 
