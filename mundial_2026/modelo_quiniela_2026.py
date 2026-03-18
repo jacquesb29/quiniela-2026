@@ -510,6 +510,7 @@ class MatchPrediction:
     current_score_b: Optional[int] = None
     elapsed_minutes: Optional[float] = None
     live_phase: Optional[str] = None
+    statistical_depth: Optional[Dict[str, object]] = None
 
 
 def clamp(value: float, low: float, high: float) -> float:
@@ -597,6 +598,96 @@ def combine_current_score_distribution(
         final_score = (current_score_a + goals_a, current_score_b + goals_b)
         final_dist[final_score] = final_dist.get(final_score, 0.0) + prob
     return final_dist
+
+
+def compute_statistical_depth(
+    final_dist: Dict[Tuple[int, int], float],
+    win_a: float,
+    draw: float,
+    win_b: float,
+    ctx: Optional[MatchContext] = None,
+) -> Dict[str, object]:
+    result_probs = [max(win_a, 1e-12), max(draw, 1e-12), max(win_b, 1e-12)]
+    entropy = -sum(prob * math.log(prob) for prob in result_probs) / math.log(3.0)
+    confidence = clamp(1.0 - entropy, 0.0, 1.0)
+    both_score = sum(prob for (goals_a, goals_b), prob in final_dist.items() if goals_a > 0 and goals_b > 0)
+    clean_sheet_a = sum(prob for (_, goals_b), prob in final_dist.items() if goals_b == 0)
+    clean_sheet_b = sum(prob for (goals_a, _), prob in final_dist.items() if goals_a == 0)
+    over_2_5 = sum(prob for (goals_a, goals_b), prob in final_dist.items() if goals_a + goals_b >= 3)
+    under_2_5 = 1.0 - over_2_5
+    over_3_5 = sum(prob for (goals_a, goals_b), prob in final_dist.items() if goals_a + goals_b >= 4)
+    under_3_5 = 1.0 - over_3_5
+    top_scores = sorted(final_dist.items(), key=lambda item: item[1], reverse=True)
+    top3_coverage = sum(prob for _, prob in top_scores[:3])
+    margin_dist: Dict[int, float] = {}
+    for (goals_a, goals_b), prob in final_dist.items():
+        margin = goals_a - goals_b
+        margin_dist[margin] = margin_dist.get(margin, 0.0) + prob
+    modal_margin, modal_margin_prob = max(margin_dist.items(), key=lambda item: item[1])
+
+    market_gap = None
+    if ctx and ctx.market_prob_a is not None and ctx.market_prob_draw is not None and ctx.market_prob_b is not None:
+        market_gap = (
+            abs(win_a - float(ctx.market_prob_a))
+            + abs(draw - float(ctx.market_prob_draw))
+            + abs(win_b - float(ctx.market_prob_b))
+        ) / 3.0
+
+    return {
+        "confidence_index": confidence,
+        "entropy_index": entropy,
+        "both_teams_score": both_score,
+        "clean_sheet_a": clean_sheet_a,
+        "clean_sheet_b": clean_sheet_b,
+        "over_2_5": over_2_5,
+        "under_2_5": under_2_5,
+        "over_3_5": over_3_5,
+        "under_3_5": under_3_5,
+        "top3_coverage": top3_coverage,
+        "modal_margin": modal_margin,
+        "modal_margin_prob": modal_margin_prob,
+        "market_gap": market_gap,
+    }
+
+
+def top_factor_drivers(factors: Optional[Dict[str, float]], limit: int = 3) -> List[Tuple[str, float]]:
+    if not factors:
+        return []
+    labels = {
+        "elo_diff": "Elo dinámico",
+        "resource_diff": "Recursos/PIB proxy",
+        "heritage_diff": "Historia mundialista",
+        "coach_diff": "Entrenador",
+        "trajectory_diff": "Trayectoria futbolística",
+        "attack_unit_diff": "Ataque",
+        "midfield_diff": "Mediocampo",
+        "defense_diff": "Defensa",
+        "goalkeeper_diff": "Portero",
+        "bench_depth_diff": "Profundidad de banco",
+        "discipline_diff": "Disciplina estructural",
+        "experience_diff": "Experiencia de plantilla",
+        "morale_diff": "Moral",
+        "home_diff": "Localía/sede",
+        "travel_diff": "Viaje",
+        "injury_diff": "Bajas/lesiones",
+        "cards_diff": "Tarjetas y suspensiones",
+        "group_pressure_diff": "Presión de grupo",
+        "lineup_diff": "Alineaciones",
+        "market_prob_diff": "Mercado 1X2",
+        "recent_form_diff": "Forma reciente",
+        "attack_form_diff": "Forma ofensiva",
+        "defense_form_diff": "Forma defensiva",
+        "fatigue_diff": "Fatiga",
+        "availability_diff": "Disponibilidad",
+        "discipline_trend_diff": "Tendencia disciplinaria",
+        "rivalry": "Rivalidad",
+    }
+    ranked = sorted(
+        ((labels.get(key, key), value) for key, value in factors.items() if key not in {"market_draw_prob", "market_total_line", "importance"}),
+        key=lambda item: abs(item[1]),
+        reverse=True,
+    )
+    return ranked[:limit]
 
 
 def normalize_team_text(value: str) -> str:
@@ -1597,6 +1688,7 @@ def predict_match(
             penalties_context_state(ctx.morale_b, state_b),
             iterations=1600,
         )
+    factors = factor_breakdown(team_a, team_b, ctx, state_a=state_a, state_b=state_b) if show_factors else None
 
     return MatchPrediction(
         team_a=team_a_name,
@@ -1611,7 +1703,8 @@ def predict_match(
         advance_b=advance_b,
         knockout_detail=knockout_detail,
         penalty_shootout=penalty_shootout,
-        factors=factor_breakdown(team_a, team_b, ctx, state_a=state_a, state_b=state_b) if show_factors else None,
+        factors=factors,
+        statistical_depth=compute_statistical_depth(dist, win_a, draw, win_b, ctx),
     )
 
 
@@ -1650,6 +1743,8 @@ def predict_match_live(
             penalties_context_state(ctx.morale_b, state_b),
             iterations=1600,
         )
+        factors = factor_breakdown(team_a, team_b, ctx, state_a=state_a, state_b=state_b) if show_factors else None
+        final_dist = {(current_score_a, current_score_b): 1.0}
         return MatchPrediction(
             team_a=team_a_name,
             team_b=team_b_name,
@@ -1676,13 +1771,14 @@ def predict_match_live(
             if include_advancement
             else None,
             penalty_shootout=shootout if include_advancement else None,
-            factors=factor_breakdown(team_a, team_b, ctx, state_a=state_a, state_b=state_b) if show_factors else None,
+            factors=factors,
             expected_remaining_goals_a=0.0,
             expected_remaining_goals_b=0.0,
             current_score_a=current_score_a,
             current_score_b=current_score_b,
             elapsed_minutes=elapsed_minutes,
             live_phase=phase,
+            statistical_depth=compute_statistical_depth(final_dist, 0.0, 1.0, 0.0, ctx),
         )
 
     if phase == "extra_time":
@@ -1729,6 +1825,7 @@ def predict_match_live(
             penalties_context_state(ctx.morale_b, state_b),
             iterations=1600,
         ) if include_advancement else None
+        factors = factor_breakdown(team_a, team_b, ctx, state_a=state_a, state_b=state_b) if show_factors else None
         return MatchPrediction(
             team_a=team_a_name,
             team_b=team_b_name,
@@ -1755,13 +1852,14 @@ def predict_match_live(
             if include_advancement
             else None,
             penalty_shootout=shootout,
-            factors=factor_breakdown(team_a, team_b, ctx, state_a=state_a, state_b=state_b) if show_factors else None,
+            factors=factors,
             expected_remaining_goals_a=rem_mu_a,
             expected_remaining_goals_b=rem_mu_b,
             current_score_a=current_score_a,
             current_score_b=current_score_b,
             elapsed_minutes=elapsed_minutes,
             live_phase=phase,
+            statistical_depth=compute_statistical_depth(final_dist, win_a, draw, win_b, ctx),
         )
 
     remaining_fraction = 1.0 if elapsed_minutes is None else clamp((90.0 - elapsed_minutes) / 90.0, 0.0, 1.0)
@@ -1815,6 +1913,7 @@ def predict_match_live(
             penalties_context_state(ctx.morale_b, state_b),
             iterations=1600,
         )
+    factors = factor_breakdown(team_a, team_b, ctx, state_a=state_a, state_b=state_b) if show_factors else None
 
     return MatchPrediction(
         team_a=team_a_name,
@@ -1829,13 +1928,14 @@ def predict_match_live(
         advance_b=advance_b,
         knockout_detail=knockout_detail,
         penalty_shootout=penalty_shootout,
-        factors=factor_breakdown(team_a, team_b, ctx, state_a=state_a, state_b=state_b) if show_factors else None,
+        factors=factors,
         expected_remaining_goals_a=rem_mu_a,
         expected_remaining_goals_b=rem_mu_b,
         current_score_a=current_score_a,
         current_score_b=current_score_b,
         elapsed_minutes=elapsed_minutes,
         live_phase="regulation",
+        statistical_depth=compute_statistical_depth(final_dist, win_a, draw, win_b, ctx),
     )
 
 
@@ -3385,7 +3485,7 @@ def dashboard_fixture_entries(
                 status_detail=fixture.get("status_detail"),
                 top_scores=top_scores,
                 include_advancement=stage != "group",
-                show_factors=False,
+                show_factors=True,
                 state_a=state_a,
                 state_b=state_b,
             )
@@ -3397,7 +3497,7 @@ def dashboard_fixture_entries(
                 ctx,
                 top_scores=top_scores,
                 include_advancement=stage != "group",
-                show_factors=False,
+                show_factors=True,
                 state_a=state_a,
                 state_b=state_b,
             )
@@ -3498,7 +3598,7 @@ def projected_bracket_entries(
             ctx,
             top_scores=top_scores,
             include_advancement=True,
-            show_factors=False,
+            show_factors=True,
             state_a=state_a,
             state_b=state_b,
         )
@@ -3692,6 +3792,7 @@ def build_dashboard_markdown(
         lines.append(
             f"- {result_prob_label(prediction)}: {format_pct(prediction.win_a)} / {format_pct(prediction.draw)} / {format_pct(prediction.win_b)}"
         )
+        lines.extend(statistical_depth_lines(prediction))
         if prediction.advance_a is not None and prediction.advance_b is not None:
             detail = prediction.knockout_detail or {}
             lines.append(
@@ -3730,6 +3831,78 @@ def probability_rows(prediction: MatchPrediction) -> List[Tuple[str, float, str]
         ("Empate", prediction.draw, "draw"),
         (f"Victoria {prediction.team_b}", prediction.win_b, "b"),
     ]
+
+
+def statistical_depth_lines(prediction: MatchPrediction) -> List[str]:
+    depth = prediction.statistical_depth or {}
+    lines = []
+    if not depth:
+        return lines
+    confidence = float(depth.get("confidence_index", 0.0))
+    both_score = float(depth.get("both_teams_score", 0.0))
+    over_2_5 = float(depth.get("over_2_5", 0.0))
+    top3_coverage = float(depth.get("top3_coverage", 0.0))
+    clean_sheet_a = float(depth.get("clean_sheet_a", 0.0))
+    clean_sheet_b = float(depth.get("clean_sheet_b", 0.0))
+    market_gap = depth.get("market_gap")
+    modal_margin = int(depth.get("modal_margin", 0))
+    modal_margin_prob = float(depth.get("modal_margin_prob", 0.0))
+
+    lines.append(
+        f"- Diagnóstico estadístico: confianza {format_pct(confidence)} | ambos marcan {format_pct(both_score)} | over 2.5 {format_pct(over_2_5)}"
+    )
+    lines.append(
+        f"- Porterías a cero: {prediction.team_a} {format_pct(clean_sheet_a)} | {prediction.team_b} {format_pct(clean_sheet_b)}"
+    )
+    lines.append(
+        f"- Cobertura top-3 marcadores: {format_pct(top3_coverage)} | margen modal {modal_margin:+d} ({format_pct(modal_margin_prob)})"
+    )
+    if market_gap is not None:
+        lines.append(f"- Diferencia promedio vs mercado 1X2: {format_pct(float(market_gap))}")
+    drivers = top_factor_drivers(prediction.factors, limit=3)
+    if drivers:
+        lines.append(
+            "- Factores dominantes: "
+            + "; ".join(f"{label} {value:+.3f}" for label, value in drivers)
+        )
+    return lines
+
+
+def statistical_depth_html(prediction: MatchPrediction) -> str:
+    depth = prediction.statistical_depth or {}
+    if not depth:
+        return ""
+    market_gap = depth.get("market_gap")
+    market_html = ""
+    if market_gap is not None:
+        market_html = (
+            f"<div><span>Diferencia vs mercado</span><strong>{format_pct(float(market_gap))}</strong></div>"
+        )
+    drivers = top_factor_drivers(prediction.factors, limit=3)
+    drivers_html = ""
+    if drivers:
+        drivers_html = (
+            "<p class=\"meta\"><strong>Factores dominantes:</strong> "
+            + html.escape("; ".join(f"{label} {value:+.3f}" for label, value in drivers))
+            + "</p>"
+        )
+    return (
+        "<div class=\"depth-block\">"
+        "<h4>Profundidad estadística</h4>"
+        "<div class=\"depth-grid\">"
+        f"<div><span>Confianza del pronóstico</span><strong>{format_pct(float(depth.get('confidence_index', 0.0)))}</strong></div>"
+        f"<div><span>Ambos marcan</span><strong>{format_pct(float(depth.get('both_teams_score', 0.0)))}</strong></div>"
+        f"<div><span>Over 2.5 goles</span><strong>{format_pct(float(depth.get('over_2_5', 0.0)))}</strong></div>"
+        f"<div><span>Cobertura top-3 marcadores</span><strong>{format_pct(float(depth.get('top3_coverage', 0.0)))}</strong></div>"
+        f"<div><span>Portería a cero {html.escape(prediction.team_a)}</span><strong>{format_pct(float(depth.get('clean_sheet_a', 0.0)))}</strong></div>"
+        f"<div><span>Portería a cero {html.escape(prediction.team_b)}</span><strong>{format_pct(float(depth.get('clean_sheet_b', 0.0)))}</strong></div>"
+        f"<div><span>Margen modal</span><strong>{int(depth.get('modal_margin', 0)):+d}</strong></div>"
+        f"<div><span>Prob. del margen modal</span><strong>{format_pct(float(depth.get('modal_margin_prob', 0.0)))}</strong></div>"
+        f"{market_html}"
+        "</div>"
+        f"{drivers_html}"
+        "</div>"
+    )
 
 
 def bracket_stage_sections(bracket_payload: dict) -> List[Tuple[str, str, List[dict]]]:
@@ -3951,6 +4124,7 @@ def build_dashboard_html(
                     )
                     + "</p>"
                 )
+        depth_html = statistical_depth_html(prediction)
 
         knockout_html = ""
         if prediction.advance_a is not None and prediction.advance_b is not None:
@@ -4009,6 +4183,7 @@ def build_dashboard_html(
             "</div>"
             f"<div class=\"prob-block\">{probability_rows_html}</div>"
             f"{remaining_goals_html}"
+            f"{depth_html}"
             f"{knockout_html}"
             "<div class=\"scores\">"
             "<h4>Marcadores finales mas probables</h4>"
@@ -4317,6 +4492,28 @@ def build_dashboard_html(
       font-weight: 700;
       color: var(--ink);
     }}
+    .depth-block {{
+      margin-top: 14px;
+      padding: 14px;
+      border-radius: 18px;
+      background: linear-gradient(180deg, rgba(181,131,47,0.10), rgba(15,109,102,0.05));
+      border: 1px solid rgba(181,131,47,0.18);
+    }}
+    .depth-block h4 {{
+      margin: 0 0 10px;
+      color: var(--accent-dark);
+    }}
+    .depth-grid {{
+      display: grid;
+      gap: 10px;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }}
+    .depth-grid div {{
+      background: rgba(255,255,255,0.45);
+      border: 1px solid rgba(15,109,102,0.08);
+      border-radius: 14px;
+      padding: 10px 12px;
+    }}
     .scores h4 {{
       margin: 14px 0 8px;
       color: var(--accent);
@@ -4353,6 +4550,9 @@ def build_dashboard_html(
         grid-template-columns: 1fr;
       }}
       .prob-row {{
+        grid-template-columns: 1fr;
+      }}
+      .depth-grid {{
         grid-template-columns: 1fr;
       }}
     }}
