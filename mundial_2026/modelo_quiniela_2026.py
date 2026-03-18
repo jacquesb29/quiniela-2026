@@ -3473,15 +3473,16 @@ def format_match_projection(match_id: str, aggregate: dict, iterations: int) -> 
     penalties_prob = projection["penalties_prob"]
     lines = [
         f"### {BRACKET_MATCH_TITLES.get(match_id, match_id)}",
-        f"- Cruce proyectado mas probable: {team_a} vs {team_b} -> avanza {winner} ({outcome_prob:.1%})",
-        f"- Equipo con mayor probabilidad de avanzar: {winner} ({winner_prob:.1%})",
+        f"- Cruce que aparece mas veces en la simulacion: {team_a} vs {team_b}",
+        f"- Probabilidad de que este cruce ocurra: {outcome_prob:.1%}",
+        f"- Equipo con mas probabilidad de salir de esta llave: {winner} ({winner_prob:.1%})",
     ]
     alternatives = [
-        f"{scenario['team_a']} vs {scenario['team_b']} -> {scenario['winner']} ({scenario['prob']:.1%})"
+        f"{scenario['team_a']} vs {scenario['team_b']} | gana mas probable {scenario['winner']} | este escenario aparece {scenario['prob']:.1%}"
         for scenario in projection.get("top_scenarios", [])[1:]
     ]
     if alternatives:
-        lines.append(f"- Otras rutas probables de esta llave: {'; '.join(alternatives)}")
+        lines.append(f"- Otros cruces que tambien aparecen seguido: {'; '.join(alternatives)}")
     if match_id != "M104":
         lines.append(f"- Va a proroga en {extra_time_prob:.1%} y a penales en {penalties_prob:.1%}")
     return lines
@@ -3911,8 +3912,9 @@ def projected_bracket_entries(
                 "weather_stress": base_fixture.get("weather_stress"),
                 "projection": True,
                 "projection_note": (
-                    f"Cruce proyectado mas probable: {team_a} vs {team_b} {format_pct(match_projection['matchup_prob'])} | "
-                    f"equipo con mayor probabilidad de avanzar {match_projection['winner']} {format_pct(match_projection['winner_prob'])}"
+                    f"Cruce que mas aparece hoy: {team_a} vs {team_b} | "
+                    f"probabilidad de que ese cruce ocurra {format_pct(match_projection['matchup_prob'])} | "
+                    f"equipo con mayor probabilidad de salir de esa llave {match_projection['winner']} {format_pct(match_projection['winner_prob'])}"
                 ),
                 "projection_alternatives": match_projection.get("top_scenarios", [])[1:],
                 "projection_penalties": match_projection.get("penalties_prob", 0.0),
@@ -4554,10 +4556,10 @@ def build_bracket_visual_html(bracket_payload: dict) -> str:
             alternatives = match.get("top_scenarios", [])[1:]
             if alternatives:
                 alt_lines = (
-                    "<p class=\"mini\">Alternativas: "
+                    "<p class=\"mini\"><strong>Otros cruces que tambien aparecen:</strong> "
                     + html.escape(
                         "; ".join(
-                            f"{scenario['team_a']} vs {scenario['team_b']} -> {scenario['winner']} {format_pct(float(scenario['prob']))}"
+                            f"{scenario['team_a']} vs {scenario['team_b']} | gana mas probable {scenario['winner']} | escenario {format_pct(float(scenario['prob']))}"
                             for scenario in alternatives[:2]
                         )
                     )
@@ -4573,9 +4575,9 @@ def build_bracket_visual_html(bracket_payload: dict) -> str:
                 "<article class=\"bracket-match\">"
                 f"<p class=\"match-kicker\">{html.escape(str(match.get('title', '')))}</p>"
                 f"<h4>{html.escape(match.get('team_a', '?'))} vs {html.escape(match.get('team_b', '?'))}</h4>"
-                f"<p class=\"winner-line\">Gana más probable: <strong>{html.escape(match.get('winner', '?'))}</strong></p>"
-                f"<p class=\"mini\">Cruce proyectado mas probable {format_pct(float(match.get('matchup_prob', 0.0)))} | "
-                f"equipo con mayor probabilidad de avanzar {format_pct(float(match.get('winner_prob', 0.0)))}</p>"
+                f"<p class=\"winner-line\">Equipo con mayor probabilidad de avanzar: <strong>{html.escape(match.get('winner', '?'))}</strong></p>"
+                f"<p class=\"mini\"><strong>Probabilidad de que este cruce ocurra:</strong> {format_pct(float(match.get('matchup_prob', 0.0)))}</p>"
+                f"<p class=\"mini\"><strong>Probabilidad de que {html.escape(match.get('winner', '?'))} salga de esta llave:</strong> {format_pct(float(match.get('winner_prob', 0.0)))}</p>"
                 f"{timing_html}"
                 f"{alt_lines}"
                 "</article>"
@@ -4592,7 +4594,7 @@ def build_bracket_visual_html(bracket_payload: dict) -> str:
     if iterations:
         subtitle = (
             f"<p class=\"lede-tight\">Llave Monte Carlo dinámica con {int(iterations)} iteraciones publicadas. "
-            "Cada bloque muestra la ruta mas probable hoy; si la probabilidad del cruce es baja, esa parte del cuadro sigue muy abierta.</p>"
+            "Cada bloque muestra el cruce que mas veces aparece hoy. Si la probabilidad de ese cruce es baja, esa parte del cuadro sigue abierta y puede cambiar con resultados reales.</p>"
         )
     return (
         "<section class=\"panel bracket-panel\">"
