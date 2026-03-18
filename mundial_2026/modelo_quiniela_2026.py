@@ -4632,12 +4632,14 @@ def build_bracket_visual_html(bracket_payload: dict) -> str:
     for stage_key, label, stage_matches in bracket_stage_sections(bracket_payload):
         match_cards = []
         for match in stage_matches:
-            alt_lines = ""
+            team_a = html.escape(match.get("team_a", "?"))
+            team_b = html.escape(match.get("team_b", "?"))
+            winner = html.escape(match.get("winner", "?"))
+
+            extra_parts = []
             alternatives = match.get("top_scenarios", [])[1:]
             if alternatives:
-                alt_lines = (
-                    "<details class=\"bracket-extra\">"
-                    "<summary>Ver rutas alternativas</summary>"
+                extra_parts.append(
                     "<div class=\"mini\">"
                     "<strong>Otros cruces que tambien aparecen:</strong> "
                     + html.escape(
@@ -4647,7 +4649,6 @@ def build_bracket_visual_html(bracket_payload: dict) -> str:
                         )
                     )
                     + "</div>"
-                    "</details>"
                 )
             timing_html = ""
             if match.get("stage") != "third_place":
@@ -4660,7 +4661,7 @@ def build_bracket_visual_html(bracket_payload: dict) -> str:
             penalty_html = ""
             penalty_scores = match.get("top_penalty_scores", [])
             if penalty_scores:
-                penalty_html = (
+                extra_parts.append(
                     "<p class=\"mini penalty-note\"><strong>Si se define por penales:</strong> "
                     + html.escape(
                         "; ".join(
@@ -4670,22 +4671,32 @@ def build_bracket_visual_html(bracket_payload: dict) -> str:
                     )
                     + "</p>"
                 )
+            if extra_parts:
+                penalty_html = (
+                    "<details class=\"bracket-extra\">"
+                    "<summary>Mas detalle</summary>"
+                    + "".join(extra_parts)
+                    + "</details>"
+                )
+
+            row_a_class = "team-row favorite" if match.get("winner") == match.get("team_a") else "team-row"
+            row_b_class = "team-row favorite" if match.get("winner") == match.get("team_b") else "team-row"
+            row_a_badge = "<span class=\"team-badge\">Favorito</span>" if "favorite" in row_a_class else ""
+            row_b_badge = "<span class=\"team-badge\">Favorito</span>" if "favorite" in row_b_class else ""
             match_cards.append(
                 "<article class=\"bracket-match\">"
                 f"<p class=\"match-kicker\">{html.escape(str(match.get('title', '')))}</p>"
                 "<div class=\"match-teams\">"
-                f"<span>{html.escape(match.get('team_a', '?'))}</span>"
-                "<em>vs</em>"
-                f"<span>{html.escape(match.get('team_b', '?'))}</span>"
+                f"<div class=\"{row_a_class}\"><span class=\"team-name\">{team_a}</span>{row_a_badge}</div>"
+                "<div class=\"team-divider\"></div>"
+                f"<div class=\"{row_b_class}\"><span class=\"team-name\">{team_b}</span>{row_b_badge}</div>"
                 "</div>"
-                f"<p class=\"winner-line\">Favorito actual para avanzar: <strong>{html.escape(match.get('winner', '?'))}</strong></p>"
                 "<div class=\"bracket-pills\">"
                 f"<span>Cruce {format_pct(float(match.get('matchup_prob', 0.0)))}</span>"
-                f"<span>Avanza {html.escape(match.get('winner', '?'))} {format_pct(float(match.get('winner_prob', 0.0)))}</span>"
+                f"<span>Avanza {winner} {format_pct(float(match.get('winner_prob', 0.0)))}</span>"
                 "</div>"
                 f"{timing_html}"
                 f"{penalty_html}"
-                f"{alt_lines}"
                 "</article>"
             )
         sections_html.append(
@@ -5315,12 +5326,12 @@ def build_dashboard_html(
     }}
     .bracket-match {{
       position: relative;
-      min-height: 118px;
-      padding: 14px;
-      border-radius: 18px;
-      background: linear-gradient(180deg, rgba(255,253,246,0.98), rgba(245,239,225,0.96));
-      border: 1px solid rgba(15,109,102,0.12);
-      box-shadow: 0 16px 28px rgba(12, 41, 45, 0.10);
+      min-height: 126px;
+      padding: 12px 12px 14px;
+      border-radius: 14px;
+      background: linear-gradient(180deg, rgba(255,253,246,0.99), rgba(245,239,225,0.97));
+      border: 1px solid rgba(15,109,102,0.14);
+      box-shadow: 0 14px 24px rgba(12, 41, 45, 0.09);
     }}
     .stage-round32 .bracket-match::after,
     .stage-round16 .bracket-match::after,
@@ -5331,80 +5342,132 @@ def build_dashboard_html(
       top: 50%;
       right: -24px;
       width: 24px;
-      border-top: 2px solid rgba(15,109,102,0.20);
+      border-top: 3px solid rgba(15,109,102,0.28);
       transform: translateY(-50%);
+    }}
+    .stage-round16 .bracket-match::before,
+    .stage-quarterfinal .bracket-match::before,
+    .stage-semifinal .bracket-match::before,
+    .stage-final .bracket-match::before {{
+      content: "";
+      position: absolute;
+      left: -26px;
+      width: 26px;
+      background:
+        linear-gradient(rgba(15,109,102,0.28), rgba(15,109,102,0.28)) left center / 3px 100% no-repeat,
+        linear-gradient(rgba(15,109,102,0.28), rgba(15,109,102,0.28)) center center / 100% 3px no-repeat;
+    }}
+    .stage-round16 .bracket-match::before {{
+      height: 134px;
+      top: calc(50% - 67px);
+    }}
+    .stage-quarterfinal .bracket-match::before {{
+      height: 194px;
+      top: calc(50% - 97px);
+    }}
+    .stage-semifinal .bracket-match::before {{
+      height: 352px;
+      top: calc(50% - 176px);
+    }}
+    .stage-final .bracket-match::before {{
+      height: 622px;
+      top: calc(50% - 311px);
     }}
     .match-teams {{
       display: grid;
-      gap: 2px;
-      margin-bottom: 8px;
-    }}
-    .match-teams span {{
-      color: var(--ink);
-      font-size: 1rem;
-      font-weight: 700;
-      line-height: 1.2;
-      text-transform: none;
-      letter-spacing: 0;
-      margin: 0;
-    }}
-    .match-teams em {{
-      color: var(--muted);
-      font-style: normal;
-      font-size: 0.78rem;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
+      gap: 0;
+      margin-bottom: 10px;
+      border: 1px solid rgba(15,109,102,0.10);
+      border-radius: 12px;
+      overflow: hidden;
     }}
     .match-kicker {{
       margin: 0 0 4px;
       color: var(--accent-dark);
-      font-size: 0.72rem;
+      font-size: 0.68rem;
       text-transform: uppercase;
       letter-spacing: 0.08em;
       font-weight: 700;
     }}
-    .winner-line {{
-      margin: 8px 0 0;
+    .team-row {{
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 10px 12px;
+      background: rgba(255,255,255,0.68);
+    }}
+    .team-row.favorite {{
+      background: linear-gradient(90deg, rgba(15,109,102,0.12), rgba(255,255,255,0.90));
+    }}
+    .team-name {{
+      display: block;
+      margin: 0;
       color: var(--ink);
+      font-size: 0.96rem;
+      font-weight: 700;
+      text-transform: none;
+      letter-spacing: 0;
+      line-height: 1.2;
+    }}
+    .team-divider {{
+      height: 1px;
+      background: rgba(15,109,102,0.10);
+    }}
+    .team-badge {{
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 4px 8px;
+      border-radius: 999px;
+      background: rgba(15,109,102,0.12);
+      color: var(--accent-dark);
+      font-size: 0.70rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin: 0;
     }}
     .bracket-pills {{
       display: flex;
       flex-wrap: wrap;
-      gap: 8px;
-      margin-top: 10px;
+      gap: 7px;
+      margin-top: 8px;
     }}
     .bracket-pills span {{
       margin: 0;
-      padding: 6px 10px;
+      padding: 5px 9px;
       border-radius: 999px;
       background: rgba(15,109,102,0.08);
       border: 1px solid rgba(15,109,102,0.12);
       color: var(--accent-dark);
-      font-size: 0.76rem;
+      font-size: 0.73rem;
       font-weight: 700;
       text-transform: none;
       letter-spacing: 0;
     }}
     .mini {{
-      margin: 8px 0 0;
+      margin: 6px 0 0;
       color: var(--muted);
-      font-size: 0.84rem;
+      font-size: 0.80rem;
       line-height: 1.35;
     }}
     .penalty-note {{
-      margin-top: 10px;
+      margin-top: 6px;
     }}
     .bracket-extra {{
       margin-top: 10px;
       border-top: 1px dashed rgba(15,109,102,0.16);
-      padding-top: 8px;
+      padding-top: 6px;
     }}
     .bracket-extra summary {{
       cursor: pointer;
       color: var(--accent-dark);
-      font-size: 0.82rem;
+      font-size: 0.76rem;
       font-weight: 700;
       list-style: none;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
     }}
     .bracket-extra summary::-webkit-details-marker {{
       display: none;
