@@ -3759,6 +3759,32 @@ def goals_label(prediction: MatchPrediction) -> str:
     return "Goles esperados"
 
 
+def projected_score_label(prediction: MatchPrediction) -> str:
+    if prediction.live_phase == "regulation":
+        return "Marcador proyectado al final del tiempo reglamentario"
+    if prediction.live_phase == "extra_time":
+        return "Marcador proyectado al final de la prorroga"
+    if prediction.live_phase == "penalties":
+        return "Marcador actual"
+    return "Marcador proyectado"
+
+
+def projected_score_value(prediction: MatchPrediction) -> str:
+    if prediction.exact_scores:
+        return prediction.exact_scores[0][0]
+    return f"{int(round(prediction.expected_goals_a))}-{int(round(prediction.expected_goals_b))}"
+
+
+def average_goals_label(prediction: MatchPrediction) -> str:
+    if prediction.live_phase == "regulation":
+        return "Promedio estimado de goles al final del tiempo reglamentario"
+    if prediction.live_phase == "extra_time":
+        return "Promedio estimado de goles al final de la prorroga"
+    if prediction.live_phase == "penalties":
+        return "Marcador actual"
+    return "Promedio estimado de goles del modelo"
+
+
 def result_prob_label(prediction: MatchPrediction) -> str:
     if prediction.live_phase == "regulation":
         return "Probabilidades de resultado al final del tiempo reglamentario"
@@ -3867,10 +3893,15 @@ def build_dashboard_markdown(
             )
         else:
             pass
-        lines.append(f"- {goals_label(prediction)}: {prediction.expected_goals_a:.2f} - {prediction.expected_goals_b:.2f}")
+        lines.append(f"- {projected_score_label(prediction)}: {projected_score_value(prediction)}")
+        if prediction.live_phase != "penalties":
+            lines.append(
+                f"- {average_goals_label(prediction)}: {prediction.team_a} {prediction.expected_goals_a:.2f} | "
+                f"{prediction.team_b} {prediction.expected_goals_b:.2f}"
+            )
         if prediction.expected_remaining_goals_a is not None and prediction.expected_remaining_goals_b is not None:
             lines.append(
-                f"- Goles restantes esperados: {prediction.team_a} {prediction.expected_remaining_goals_a:.2f} | "
+                f"- Promedio estimado de goles restantes: {prediction.team_a} {prediction.expected_remaining_goals_a:.2f} | "
                 f"{prediction.team_b} {prediction.expected_remaining_goals_b:.2f}"
             )
         lines.append(
@@ -4534,8 +4565,15 @@ def build_dashboard_html(
         remaining_goals_html = ""
         if prediction.expected_remaining_goals_a is not None and prediction.expected_remaining_goals_b is not None:
             remaining_goals_html = (
-                f"<p class=\"meta\">Goles restantes esperados: {html.escape(prediction.team_a)} {prediction.expected_remaining_goals_a:.2f} | "
+                f"<p class=\"meta\">Promedio estimado de goles restantes: {html.escape(prediction.team_a)} {prediction.expected_remaining_goals_a:.2f} | "
                 f"{html.escape(prediction.team_b)} {prediction.expected_remaining_goals_b:.2f}</p>"
+            )
+        average_goals_html = ""
+        if prediction.live_phase != "penalties":
+            average_goals_html = (
+                f"<p class=\"meta\">{html.escape(average_goals_label(prediction))}: "
+                f"{html.escape(prediction.team_a)} {prediction.expected_goals_a:.2f} | "
+                f"{html.escape(prediction.team_b)} {prediction.expected_goals_b:.2f}</p>"
             )
         cards.append(
             "<section class=\"card\">"
@@ -4554,9 +4592,10 @@ def build_dashboard_html(
             f"{reason_html}"
             f"{projection_html}"
             "<div class=\"hero-metrics\">"
-            f"<div class=\"metric metric-score\"><span>{html.escape(goals_label(prediction))}</span><strong>{prediction.expected_goals_a:.2f} - {prediction.expected_goals_b:.2f}</strong></div>"
+            f"<div class=\"metric metric-score\"><span>{html.escape(projected_score_label(prediction))}</span><strong>{html.escape(projected_score_value(prediction))}</strong></div>"
             f"<div class=\"metric metric-probs\"><span>{html.escape(result_prob_label(prediction))}</span><strong>{html.escape(prediction.team_a)} / Empate / {html.escape(prediction.team_b)}</strong></div>"
             "</div>"
+            f"{average_goals_html}"
             f"<div class=\"prob-block\">{probability_rows_html}</div>"
             f"{remaining_goals_html}"
             f"{depth_html}"
@@ -5040,7 +5079,7 @@ def build_dashboard_html(
         <div class="hero-notes">
           <article class="hero-note">
             <h3>Qué significan las métricas</h3>
-            <p><strong>Goles esperados</strong> es el promedio estimado al cierre del corte relevante. <strong>Probabilidades de resultado</strong> es la chance de victoria, empate o derrota en ese mismo corte. Si el partido esta en vivo, esos valores se condicionan al marcador actual.</p>
+            <p><strong>Marcador proyectado</strong> muestra el resultado entero mas probable. <strong>Promedio estimado de goles del modelo</strong> es una media probabilistica y por eso puede llevar decimales. <strong>Probabilidades de resultado</strong> es la chance de victoria, empate o derrota en ese mismo corte.</p>
           </article>
           <article class="hero-note">
             <h3>Durante un partido</h3>
@@ -5608,12 +5647,17 @@ def print_prediction(prediction: MatchPrediction, show_factors: bool = False) ->
     if prediction.current_score_a is not None and prediction.current_score_b is not None:
         print(f"  Marcador actual: {prediction.team_a} {prediction.current_score_a} - {prediction.current_score_b} {prediction.team_b}")
     print(
-        f"  {goals_label(prediction)}: {prediction.expected_goals_a:.2f} - {prediction.expected_goals_b:.2f} | "
+        f"  {projected_score_label(prediction)}: {projected_score_value(prediction)} | "
         f"{result_prob_label(prediction)}: {prediction.win_a:.1%} / {prediction.draw:.1%} / {prediction.win_b:.1%}"
     )
+    if prediction.live_phase != "penalties":
+        print(
+            f"  {average_goals_label(prediction)}: {prediction.team_a} {prediction.expected_goals_a:.2f} | "
+            f"{prediction.team_b} {prediction.expected_goals_b:.2f}"
+        )
     if prediction.expected_remaining_goals_a is not None and prediction.expected_remaining_goals_b is not None:
         print(
-            f"  Goles restantes esperados: {prediction.team_a} {prediction.expected_remaining_goals_a:.2f} | "
+            f"  Promedio estimado de goles restantes: {prediction.team_a} {prediction.expected_remaining_goals_a:.2f} | "
             f"{prediction.team_b} {prediction.expected_remaining_goals_b:.2f}"
         )
     if prediction.advance_a is not None and prediction.advance_b is not None:
@@ -5822,7 +5866,7 @@ def command_score_prob(args: argparse.Namespace, teams: Dict[str, Team]) -> None
     distribution = score_distribution(mu_a, mu_b, max_goals=max(args.goals_a, args.goals_b, 10))
     probability = distribution.get((args.goals_a, args.goals_b), 0.0)
     print(f"{team_a_name} vs {team_b_name}")
-    print(f"  Goles esperados: {mu_a:.2f} - {mu_b:.2f}")
+    print(f"  Promedio estimado de goles del modelo: {team_a_name} {mu_a:.2f} | {team_b_name} {mu_b:.2f}")
     print(f"  Probabilidad de {args.goals_a}-{args.goals_b}: {probability:.2%}")
     if stage != "group" and args.goals_a == args.goals_b:
         detail = knockout_resolution_detail(
