@@ -114,6 +114,16 @@ KNOCKOUT_MATCHES = {
         ("M103", "M101", "M102"),
     ],
 }
+WINNER_NEXT_MATCH = {
+    source: match_id
+    for round_matches in KNOCKOUT_MATCHES.values()
+    for match_id, left_source, right_source in round_matches
+    for source in (left_source, right_source)
+}
+LOSER_NEXT_MATCH = {
+    "M101": "M104",
+    "M102": "M104",
+}
 BRACKET_FILE = Path(__file__).with_name("llave_actual_2026.md")
 BRACKET_JSON_FILE = Path(__file__).with_name("llave_actual_2026.json")
 DASHBOARD_HTML_FILE = Path(__file__).with_name("dashboard_actual_2026.html")
@@ -3304,6 +3314,16 @@ def stage_for_match_id(match_id: str) -> str:
 def structured_match_projection(match_id: str, aggregate: dict, iterations: int) -> dict:
     modal_outcome, modal_count = max(aggregate["outcomes"].items(), key=lambda item: item[1])
     team_a, team_b, winner = modal_outcome
+    appearance_counts: Dict[str, int] = {}
+    opponent_counts: Dict[str, Dict[str, int]] = {}
+    for outcome, count in aggregate["outcomes"].items():
+        scenario_a, scenario_b, _ = outcome
+        appearance_counts[scenario_a] = appearance_counts.get(scenario_a, 0) + count
+        appearance_counts[scenario_b] = appearance_counts.get(scenario_b, 0) + count
+        opponent_counts.setdefault(scenario_a, {})
+        opponent_counts.setdefault(scenario_b, {})
+        opponent_counts[scenario_a][scenario_b] = opponent_counts[scenario_a].get(scenario_b, 0) + count
+        opponent_counts[scenario_b][scenario_a] = opponent_counts[scenario_b].get(scenario_a, 0) + count
     top_scenarios = []
     for outcome, count in sorted(aggregate["outcomes"].items(), key=lambda item: item[1], reverse=True)[:3]:
         scenario_a, scenario_b, scenario_winner = outcome
@@ -3315,6 +3335,27 @@ def structured_match_projection(match_id: str, aggregate: dict, iterations: int)
                 "prob": count / float(iterations),
             }
         )
+    appearance_probabilities = {
+        team: count / float(iterations)
+        for team, count in sorted(appearance_counts.items(), key=lambda item: item[1], reverse=True)
+    }
+    advance_probabilities = {
+        team: count / float(iterations)
+        for team, count in sorted(aggregate["winner"].items(), key=lambda item: item[1], reverse=True)
+    }
+    opponent_map = {}
+    for team, counts in opponent_counts.items():
+        total = appearance_counts.get(team, 0)
+        if total <= 0:
+            continue
+        opponent_map[team] = [
+            {
+                "opponent": opponent,
+                "matchup_prob": count / float(iterations),
+                "conditional_if_reaches": count / float(total),
+            }
+            for opponent, count in sorted(counts.items(), key=lambda item: item[1], reverse=True)[:3]
+        ]
     return {
         "match_id": match_id,
         "title": BRACKET_MATCH_TITLES.get(match_id, match_id),
@@ -3327,6 +3368,9 @@ def structured_match_projection(match_id: str, aggregate: dict, iterations: int)
         "extra_time_prob": aggregate["went_extra_time"] / float(iterations),
         "penalties_prob": aggregate["went_penalties"] / float(iterations),
         "top_scenarios": top_scenarios,
+        "appearance_probabilities": appearance_probabilities,
+        "advance_probabilities": advance_probabilities,
+        "opponent_map": opponent_map,
     }
 
 
@@ -3450,6 +3494,73 @@ def dashboard_stage_label(stage: str, group: Optional[str]) -> str:
         "final": "Final",
     }
     return labels.get(stage, stage)
+
+
+def resolved_team_name_from_penalties(
+    penalties_winner: Optional[str],
+    team_a: str,
+    team_b: str,
+) -> Optional[str]:
+    if not penalties_winner:
+        return None
+    winner = str(penalties_winner).strip()
+    if winner == "A":
+        return team_a
+    if winner == "B":
+        return team_b
+    resolved = normalize_team_name(winner)
+    if resolved == team_a or winner == team_a:
+        return team_a
+    if resolved == team_b or winner == team_b:
+        return team_b
+    return None
+
+
+def resolved_winner_for_entry(entry: dict, prediction: MatchPrediction) -> Optional[str]:
+    score_a = entry.get("actual_score_a")
+    score_b = entry.get("actual_score_b")
+    if score_a is None or score_b is None:
+        return None
+    if int(score_a) > int(score_b):
+        return prediction.team_a
+    if int(score_b) > int(score_a):
+        return prediction.team_b
+    return resolved_team_name_from_penalties(entry.get("penalties_winner"), prediction.team_a, prediction.team_b)
+
+
+def next_round_projection_note(
+    entry: dict,
+    prediction: MatchPrediction,
+    bracket_payload: dict,
+) -> Optional[str]:
+    match_id = entry.get("match_id")
+    if not match_id:
+        return None
+    winner_name = resolved_winner_for_entry(entry, prediction)
+    if not winner_name:
+        return None
+    next_match_id = WINNER_NEXT_MATCH.get(str(match_id))
+    if not next_match_id:
+        return None
+    next_projection = (bracket_payload.get("matches") or {}).get(next_match_id)
+    if not next_projection:
+        return None
+    appearance_prob = float((next_projection.get("appearance_probabilities") or {}).get(winner_name, 0.0))
+    advance_prob = float((next_projection.get("advance_probabilities") or {}).get(winner_name, 0.0))
+    opponent_scenarios = (next_projection.get("opponent_map") or {}).get(winner_name) or []
+    if opponent_scenarios:
+        top = opponent_scenarios[0]
+        return (
+            f"Con este resultado, el siguiente cruce mas probable de {winner_name} es contra {top['opponent']}. "
+            f"Ese cruce aparece en {format_pct(float(top['matchup_prob']))} de las simulaciones; "
+            f"si {winner_name} llega a ese partido, su rival mas frecuente es {top['opponent']} en {format_pct(float(top['conditional_if_reaches']))}. "
+            f"Probabilidad actual de que {winner_name} alcance ese cruce: {format_pct(appearance_prob)} | "
+            f"probabilidad de avanzar desde esa llave: {format_pct(advance_prob)}."
+        )
+    return (
+        f"Con este resultado, {winner_name} pasa a la siguiente llave {BRACKET_MATCH_TITLES.get(next_match_id, next_match_id)} "
+        f"con probabilidad de presencia {format_pct(appearance_prob)} y probabilidad de avanzar {format_pct(advance_prob)}."
+    )
 
 
 def dashboard_fixture_title(fixture: dict) -> str:
@@ -3798,6 +3909,7 @@ def result_prob_label(prediction: MatchPrediction) -> str:
 def build_dashboard_markdown(
     entries: Sequence[dict],
     bracket_text: str,
+    bracket_payload: dict,
     backtest: dict,
     state_path: Path,
     fixtures_path: Path,
@@ -3869,6 +3981,9 @@ def build_dashboard_markdown(
         lines.extend(dashboard_absence_lines(entry, prediction.team_a, prediction.team_b))
         lines.extend(dashboard_news_lines(entry, prediction.team_a, prediction.team_b))
         lines.extend(adjustment_reason_lines(entry, prediction))
+        next_round_note = next_round_projection_note(entry, prediction, bracket_payload)
+        if next_round_note:
+            lines.append(f"- Siguiente cruce del ganador real: {next_round_note}")
         if entry.get("projection"):
             lines.append(f"- Proyeccion automatica: {entry.get('projection_note', '')}")
             alternatives = entry.get("projection_alternatives") or []
@@ -4513,6 +4628,14 @@ def build_dashboard_html(
                 )
                 + "</div>"
             )
+        next_round_html = ""
+        next_round_note = next_round_projection_note(entry, prediction, bracket_payload)
+        if next_round_note:
+            next_round_html = (
+                "<div class=\"reason-block\"><h4>Siguiente cruce del ganador real</h4>"
+                f"<p class=\"meta\">{html.escape(next_round_note)}</p>"
+                "</div>"
+            )
 
         projection_html = ""
         if entry.get("projection"):
@@ -4590,6 +4713,7 @@ def build_dashboard_html(
             f"{absence_html}"
             f"{news_html}"
             f"{reason_html}"
+            f"{next_round_html}"
             f"{projection_html}"
             "<div class=\"hero-metrics\">"
             f"<div class=\"metric metric-score\"><span>{html.escape(projected_score_label(prediction))}</span><strong>{html.escape(projected_score_value(prediction))}</strong></div>"
@@ -5142,7 +5266,7 @@ def command_project_dashboard(args: argparse.Namespace, teams: Dict[str, Team]) 
         )
     )
     backtest = compute_backtest_summary(fixtures, teams, args.top_scores)
-    markdown = build_dashboard_markdown(entries, bracket_text, backtest, Path(args.state_file), fixture_path)
+    markdown = build_dashboard_markdown(entries, bracket_text, bracket_payload, backtest, Path(args.state_file), fixture_path)
     html_content = build_dashboard_html(entries, bracket_text, bracket_payload, backtest, Path(args.state_file), fixture_path)
 
     output_md = Path(args.output_md)
