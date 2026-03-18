@@ -3917,12 +3917,32 @@ def probability_rows(prediction: MatchPrediction) -> List[Tuple[str, float, str]
     ]
 
 
+def pick_summary(prediction: MatchPrediction) -> Tuple[str, float]:
+    options = [
+        (f"Victoria {prediction.team_a}", prediction.win_a),
+        ("Empate", prediction.draw),
+        (f"Victoria {prediction.team_b}", prediction.win_b),
+    ]
+    return max(options, key=lambda item: item[1])
+
+
+def confidence_tier(confidence: float) -> str:
+    if confidence >= 0.90:
+        return "Pick muy fuerte"
+    if confidence >= 0.75:
+        return "Pick fuerte"
+    if confidence >= 0.60:
+        return "Pick utilizable"
+    return "Partido abierto: sin pick fuerte"
+
+
 def statistical_depth_lines(prediction: MatchPrediction) -> List[str]:
     depth = prediction.statistical_depth or {}
     lines = []
     if not depth:
         return lines
     confidence = float(depth.get("confidence_index", 0.0))
+    pick_label, pick_prob = pick_summary(prediction)
     both_score = float(depth.get("both_teams_score", 0.0))
     over_2_5 = float(depth.get("over_2_5", 0.0))
     top3_coverage = float(depth.get("top3_coverage", 0.0))
@@ -3933,7 +3953,10 @@ def statistical_depth_lines(prediction: MatchPrediction) -> List[str]:
     modal_margin_prob = float(depth.get("modal_margin_prob", 0.0))
 
     lines.append(
-        f"- Diagnóstico estadístico: confianza {format_pct(confidence)} | ambos marcan {format_pct(both_score)} | over 2.5 {format_pct(over_2_5)}"
+        f"- Diagnóstico estadístico: {confidence_tier(confidence)} | pick actual {pick_label} {format_pct(pick_prob)} | confianza {format_pct(confidence)}"
+    )
+    lines.append(
+        f"- Produccion ofensiva esperada: ambos marcan {format_pct(both_score)} | over 2.5 {format_pct(over_2_5)}"
     )
     lines.append(
         f"- Probabilidad de que no reciba goles: {prediction.team_a} {format_pct(clean_sheet_a)} | {prediction.team_b} {format_pct(clean_sheet_b)}"
@@ -3956,6 +3979,8 @@ def statistical_depth_html(prediction: MatchPrediction) -> str:
     depth = prediction.statistical_depth or {}
     if not depth:
         return ""
+    confidence = float(depth.get("confidence_index", 0.0))
+    pick_label, pick_prob = pick_summary(prediction)
     market_gap = depth.get("market_gap")
     market_html = ""
     if market_gap is not None:
@@ -3973,8 +3998,9 @@ def statistical_depth_html(prediction: MatchPrediction) -> str:
     return (
         "<div class=\"depth-block\">"
         "<h4>Profundidad estadística</h4>"
+        f"<p class=\"meta\"><strong>{html.escape(confidence_tier(confidence))}</strong> | pick actual: {html.escape(pick_label)} {format_pct(pick_prob)}</p>"
         "<div class=\"depth-grid\">"
-        f"<div><span>Confianza del pronóstico</span><strong>{format_pct(float(depth.get('confidence_index', 0.0)))}</strong></div>"
+        f"<div><span>Confianza del pronóstico</span><strong>{format_pct(confidence)}</strong></div>"
         f"<div><span>Ambos marcan</span><strong>{format_pct(float(depth.get('both_teams_score', 0.0)))}</strong></div>"
         f"<div><span>Over 2.5 goles</span><strong>{format_pct(float(depth.get('over_2_5', 0.0)))}</strong></div>"
         f"<div><span>Probabilidad acumulada del top-3 de marcadores</span><strong>{format_pct(float(depth.get('top3_coverage', 0.0)))}</strong></div>"
@@ -4195,7 +4221,10 @@ def build_bracket_visual_html(bracket_payload: dict) -> str:
         return "<p class=\"meta\">No hay llave estructurada todavía.</p>"
     subtitle = ""
     if iterations:
-        subtitle = f"<p class=\"lede-tight\">Llave Monte Carlo dinámica con {int(iterations)} iteraciones publicadas.</p>"
+        subtitle = (
+            f"<p class=\"lede-tight\">Llave Monte Carlo dinámica con {int(iterations)} iteraciones publicadas. "
+            "Cada bloque muestra la ruta mas probable hoy; si la probabilidad del cruce es baja, esa parte del cuadro sigue muy abierta.</p>"
+        )
     return (
         "<section class=\"panel bracket-panel\">"
         "<div class=\"panel-head\">"
