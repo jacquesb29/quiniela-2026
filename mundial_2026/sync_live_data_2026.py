@@ -616,6 +616,99 @@ def summarize_market(odds_entry: dict) -> dict:
     }
 
 
+def parse_numeric_stat(value) -> Optional[float]:
+    if value is None:
+        return None
+    if isinstance(value, (int, float)):
+        return float(value)
+    text = str(value).strip().replace("%", "")
+    if not text:
+        return None
+    try:
+        return float(text)
+    except ValueError:
+        return None
+
+
+def normalize_stat_label(value: str) -> str:
+    return "".join(char for char in str(value).lower() if char.isalnum() or char.isspace()).strip()
+
+
+def stat_key_from_label(label: str) -> Optional[str]:
+    normalized = normalize_stat_label(label)
+    if any(token in normalized for token in ("expected goals", "expectedgoal", "xg")):
+        return "xg"
+    if "shots on target" in normalized or "shots on goal" in normalized:
+        return "shots_on_target"
+    if normalized in {"shots", "total shots"} or ("shots" in normalized and "target" not in normalized and "goal" not in normalized):
+        return "shots"
+    if "possession" in normalized:
+        return "possession"
+    if "corner" in normalized:
+        return "corners"
+    if "foul" in normalized:
+        return "fouls"
+    if "yellow" in normalized:
+        return "yellow_cards"
+    if "red" in normalized:
+        return "red_cards"
+    return None
+
+
+def live_xg_proxy(stats: Dict[str, float]) -> Optional[float]:
+    shots = float(stats.get("shots", 0.0))
+    shots_on_target = float(stats.get("shots_on_target", 0.0))
+    corners = float(stats.get("corners", 0.0))
+    if shots <= 0.0 and shots_on_target <= 0.0 and corners <= 0.0:
+        return None
+    non_target = max(shots - shots_on_target, 0.0)
+    return round(0.11 * shots_on_target + 0.03 * non_target + 0.02 * corners, 3)
+
+
+def extract_live_statistics(summary_payload: dict) -> dict:
+    by_side: Dict[str, Dict[str, float]] = {"home": {}, "away": {}}
+    for obj in walk_objects(summary_payload):
+        if not isinstance(obj, dict):
+            continue
+        side = obj.get("homeAway")
+        stats = obj.get("statistics")
+        if side not in {"home", "away"} or not isinstance(stats, list):
+            continue
+        for stat in stats:
+            if not isinstance(stat, dict):
+                continue
+            label = (
+                stat.get("displayName")
+                or stat.get("name")
+                or stat.get("shortDisplayName")
+                or stat.get("abbreviation")
+            )
+            key = stat_key_from_label(str(label or ""))
+            if not key:
+                continue
+            value = (
+                stat.get("displayValue")
+                if stat.get("displayValue") is not None
+                else stat.get("value")
+            )
+            parsed = parse_numeric_stat(value)
+            if parsed is None:
+                continue
+            by_side[side][key] = parsed
+
+    enrichment = {}
+    for side, prefix in (("home", "a"), ("away", "b")):
+        stats = by_side.get(side, {})
+        for stat_key, value in stats.items():
+            enrichment[f"live_{stat_key}_{prefix}"] = value
+        proxy = live_xg_proxy(stats)
+        if proxy is not None and f"live_xg_{prefix}" not in enrichment:
+            enrichment[f"live_xg_proxy_{prefix}"] = proxy
+        elif proxy is not None:
+            enrichment[f"live_xg_proxy_{prefix}"] = proxy
+    return enrichment
+
+
 def summary_enrichment(event_id: str, kickoff: datetime, status_state: Optional[str], team_a: str, team_b: str) -> dict:
     if not should_fetch_summary(kickoff, status_state):
         return {}
@@ -654,6 +747,7 @@ def summary_enrichment(event_id: str, kickoff: datetime, status_state: Optional[
 
     news = extract_news_enrichment(payload, team_a, team_b)
     enrichment.update(news)
+    enrichment.update(extract_live_statistics(payload))
     for prefix in ("a", "b"):
         injury_bump = float(enrichment.pop(f"news_injury_bump_{prefix}", 0.0) or 0.0)
         if injury_bump > 0.0:
@@ -1068,6 +1162,14 @@ def build_fixture_from_event(
         team_obj_b = teams.get(team_b)
         yellows_a, reds_a = estimate_cards(team_obj_a, stage, fixture["weather_stress"]) if team_obj_a else (1, 0)
         yellows_b, reds_b = estimate_cards(team_obj_b, stage, fixture["weather_stress"]) if team_obj_b else (1, 0)
+        if fixture.get("live_yellow_cards_a") is not None:
+            yellows_a = int(round(float(fixture.get("live_yellow_cards_a", yellows_a))))
+        if fixture.get("live_yellow_cards_b") is not None:
+            yellows_b = int(round(float(fixture.get("live_yellow_cards_b", yellows_b))))
+        if fixture.get("live_red_cards_a") is not None:
+            reds_a = int(round(float(fixture.get("live_red_cards_a", reds_a))))
+        if fixture.get("live_red_cards_b") is not None:
+            reds_b = int(round(float(fixture.get("live_red_cards_b", reds_b))))
 
         fixture.update(
             {

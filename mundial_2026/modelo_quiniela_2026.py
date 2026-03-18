@@ -598,6 +598,77 @@ def live_game_state_adjustment(
     return clamp(mu_a, 0.01, 4.2), clamp(mu_b, 0.01, 4.2)
 
 
+def live_stats_adjustment(
+    base_total_mu: float,
+    mu_a: float,
+    mu_b: float,
+    progress: float,
+    phase: str,
+    live_stats: Optional[Dict[str, float]] = None,
+) -> Tuple[float, float]:
+    if not live_stats:
+        return mu_a, mu_b
+
+    xg_a = float(live_stats.get("xg_a") or live_stats.get("xg_proxy_a") or 0.0)
+    xg_b = float(live_stats.get("xg_b") or live_stats.get("xg_proxy_b") or 0.0)
+    shots_a = float(live_stats.get("shots_a", 0.0))
+    shots_b = float(live_stats.get("shots_b", 0.0))
+    sot_a = float(live_stats.get("shots_on_target_a", 0.0))
+    sot_b = float(live_stats.get("shots_on_target_b", 0.0))
+    poss_a = float(live_stats.get("possession_a", 50.0))
+    poss_b = float(live_stats.get("possession_b", 50.0))
+    corners_a = float(live_stats.get("corners_a", 0.0))
+    corners_b = float(live_stats.get("corners_b", 0.0))
+    red_a = float(live_stats.get("red_cards_a", 0.0))
+    red_b = float(live_stats.get("red_cards_b", 0.0))
+
+    if (
+        xg_a <= 0.0
+        and xg_b <= 0.0
+        and shots_a <= 0.0
+        and shots_b <= 0.0
+        and sot_a <= 0.0
+        and sot_b <= 0.0
+        and corners_a <= 0.0
+        and corners_b <= 0.0
+        and red_a <= 0.0
+        and red_b <= 0.0
+    ):
+        return mu_a, mu_b
+
+    scale = 0.18 if phase == "extra_time" else 0.28
+    xg_diff = clamp(xg_a - xg_b, -2.0, 2.0)
+    sot_diff = clamp(sot_a - sot_b, -8.0, 8.0)
+    shots_diff = clamp(shots_a - shots_b, -15.0, 15.0)
+    poss_diff = clamp(poss_a - poss_b, -40.0, 40.0)
+    corners_diff = clamp(corners_a - corners_b, -10.0, 10.0)
+    red_advantage_for_a = clamp(red_b - red_a, -2.0, 2.0)
+
+    edge_signal = (
+        0.42 * xg_diff
+        + 0.06 * sot_diff
+        + 0.015 * shots_diff
+        + 0.004 * poss_diff
+        + 0.012 * corners_diff
+        + 0.48 * red_advantage_for_a
+    )
+    edge_signal *= 0.45 + 0.55 * clamp(progress, 0.0, 1.0)
+
+    adjustment_a = clamp(1.0 + scale * edge_signal, 0.62, 1.55)
+    adjustment_b = clamp(1.0 - scale * edge_signal, 0.62, 1.55)
+
+    live_total_xg = xg_a + xg_b
+    if live_total_xg <= 0.0:
+        live_total_xg = float(live_stats.get("xg_proxy_a", 0.0)) + float(live_stats.get("xg_proxy_b", 0.0))
+    expected_so_far = base_total_mu * clamp(progress, 0.15, 1.0)
+    intensity_signal = clamp(live_total_xg - expected_so_far, -1.2, 1.2)
+    tempo_adjustment = clamp(1.0 + (0.10 if phase == "extra_time" else 0.18) * intensity_signal, 0.72, 1.35)
+
+    mu_a *= adjustment_a * tempo_adjustment
+    mu_b *= adjustment_b * tempo_adjustment
+    return clamp(mu_a, 0.01, 4.2), clamp(mu_b, 0.01, 4.2)
+
+
 def combine_current_score_distribution(
     current_score_a: int,
     current_score_b: int,
@@ -1744,6 +1815,7 @@ def predict_match_live(
     show_factors: bool = False,
     state_a: Optional[dict] = None,
     state_b: Optional[dict] = None,
+    live_stats: Optional[Dict[str, float]] = None,
 ) -> MatchPrediction:
     team_a = teams[team_a_name]
     team_b = teams[team_b_name]
@@ -1815,6 +1887,14 @@ def predict_match_live(
             current_score_b,
             progress,
             "extra_time",
+        )
+        rem_mu_a, rem_mu_b = live_stats_adjustment(
+            base_mu_a + base_mu_b,
+            rem_mu_a,
+            rem_mu_b,
+            progress,
+            "extra_time",
+            live_stats=live_stats,
         )
         remainder_dist = score_distribution(rem_mu_a, rem_mu_b, max_goals=4)
         final_dist = combine_current_score_distribution(current_score_a, current_score_b, remainder_dist)
@@ -1894,6 +1974,14 @@ def predict_match_live(
         current_score_b,
         progress,
         "regulation",
+    )
+    rem_mu_a, rem_mu_b = live_stats_adjustment(
+        base_mu_a + base_mu_b,
+        rem_mu_a,
+        rem_mu_b,
+        progress,
+        "regulation",
+        live_stats=live_stats,
     )
     remainder_dist = score_distribution(rem_mu_a, rem_mu_b, max_goals=6)
     final_dist = combine_current_score_distribution(current_score_a, current_score_b, remainder_dist)
@@ -3570,6 +3658,60 @@ def dashboard_fixture_title(fixture: dict) -> str:
     return f"{fixture['team_a']} vs {fixture['team_b']}"
 
 
+def extract_live_stats_payload(source: dict) -> Dict[str, float]:
+    payload = {}
+    stat_names = (
+        "shots",
+        "shots_on_target",
+        "possession",
+        "corners",
+        "fouls",
+        "yellow_cards",
+        "red_cards",
+        "xg",
+        "xg_proxy",
+    )
+    for stat in stat_names:
+        for prefix in ("a", "b"):
+            key = f"live_{stat}_{prefix}"
+            value = source.get(key)
+            if value is None:
+                continue
+            payload[f"{stat}_{prefix}"] = float(value)
+    return payload
+
+
+def dashboard_live_stats_lines(entry: dict, team_a: str, team_b: str) -> List[str]:
+    stats = extract_live_stats_payload(entry)
+    if not stats:
+        return []
+    lines = []
+    if stats.get("shots_a") is not None or stats.get("shots_b") is not None:
+        lines.append(
+            f"- Tiros: {team_a} {int(stats.get('shots_a', 0.0))} | {team_b} {int(stats.get('shots_b', 0.0))}"
+        )
+    if stats.get("shots_on_target_a") is not None or stats.get("shots_on_target_b") is not None:
+        lines.append(
+            f"- Tiros al arco: {team_a} {int(stats.get('shots_on_target_a', 0.0))} | {team_b} {int(stats.get('shots_on_target_b', 0.0))}"
+        )
+    if stats.get("possession_a") is not None or stats.get("possession_b") is not None:
+        lines.append(
+            f"- Posesion: {team_a} {stats.get('possession_a', 0.0):.0f}% | {team_b} {stats.get('possession_b', 0.0):.0f}%"
+        )
+    xg_a = stats.get("xg_a", stats.get("xg_proxy_a"))
+    xg_b = stats.get("xg_b", stats.get("xg_proxy_b"))
+    if xg_a is not None or xg_b is not None:
+        label = "xG live" if stats.get("xg_a") is not None or stats.get("xg_b") is not None else "xG live proxy"
+        lines.append(
+            f"- {label}: {team_a} {float(xg_a or 0.0):.2f} | {team_b} {float(xg_b or 0.0):.2f}"
+        )
+    if stats.get("red_cards_a") or stats.get("red_cards_b"):
+        lines.append(
+            f"- Rojas en vivo: {team_a} {int(stats.get('red_cards_a', 0.0))} | {team_b} {int(stats.get('red_cards_b', 0.0))}"
+        )
+    return lines
+
+
 def dashboard_weather_summary(fixture: dict) -> Optional[str]:
     if fixture.get("weather_temperature_c") is None:
         return None
@@ -3612,6 +3754,7 @@ def dashboard_fixture_entries(
                 show_factors=True,
                 state_a=state_a,
                 state_b=state_b,
+                live_stats=extract_live_stats_payload(fixture),
             )
         else:
             prediction = predict_match(
@@ -3663,6 +3806,20 @@ def dashboard_fixture_entries(
                 "news_headlines": fixture.get("news_headlines", []),
                 "news_notes_a": fixture.get("news_notes_a", []),
                 "news_notes_b": fixture.get("news_notes_b", []),
+                "live_shots_a": fixture.get("live_shots_a"),
+                "live_shots_b": fixture.get("live_shots_b"),
+                "live_shots_on_target_a": fixture.get("live_shots_on_target_a"),
+                "live_shots_on_target_b": fixture.get("live_shots_on_target_b"),
+                "live_possession_a": fixture.get("live_possession_a"),
+                "live_possession_b": fixture.get("live_possession_b"),
+                "live_corners_a": fixture.get("live_corners_a"),
+                "live_corners_b": fixture.get("live_corners_b"),
+                "live_red_cards_a": fixture.get("live_red_cards_a"),
+                "live_red_cards_b": fixture.get("live_red_cards_b"),
+                "live_xg_a": fixture.get("live_xg_a"),
+                "live_xg_b": fixture.get("live_xg_b"),
+                "live_xg_proxy_a": fixture.get("live_xg_proxy_a"),
+                "live_xg_proxy_b": fixture.get("live_xg_proxy_b"),
                 "market_provider": fixture.get("market_provider"),
                 "market_summary": fixture.get("market_summary"),
                 "market_prob_a": fixture.get("market_prob_a"),
@@ -3754,7 +3911,7 @@ def projected_bracket_entries(
                 "weather_stress": base_fixture.get("weather_stress"),
                 "projection": True,
                 "projection_note": (
-                    f"Cruce proyectado mas probable de esta llave {format_pct(match_projection['matchup_prob'])} | "
+                    f"Cruce proyectado mas probable: {team_a} vs {team_b} {format_pct(match_projection['matchup_prob'])} | "
                     f"equipo con mayor probabilidad de avanzar {match_projection['winner']} {format_pct(match_projection['winner_prob'])}"
                 ),
                 "projection_alternatives": match_projection.get("top_scenarios", [])[1:],
@@ -3849,6 +4006,23 @@ def adjustment_reason_lines(entry: dict, prediction: MatchPrediction) -> List[st
         lines.append(f"- Ajuste por clima exigente: estres climatico {float(entry.get('weather_stress', 0.0)):.2f}.")
     if entry.get("market_prob_a") is not None:
         lines.append("- Ajuste por mercado: el prior de cuotas se mezcla con la estimacion propia del modelo.")
+    live_stats = extract_live_stats_payload(entry)
+    if live_stats:
+        shots_on_target_a = int(live_stats.get("shots_on_target_a", 0.0))
+        shots_on_target_b = int(live_stats.get("shots_on_target_b", 0.0))
+        xg_a = float(live_stats.get("xg_a", live_stats.get("xg_proxy_a", 0.0)))
+        xg_b = float(live_stats.get("xg_b", live_stats.get("xg_proxy_b", 0.0)))
+        red_a = int(live_stats.get("red_cards_a", 0.0))
+        red_b = int(live_stats.get("red_cards_b", 0.0))
+        if shots_on_target_a or shots_on_target_b or xg_a or xg_b:
+            lines.append(
+                f"- Ajuste por datos en vivo: tiros al arco {prediction.team_a} {shots_on_target_a} | {prediction.team_b} {shots_on_target_b}; "
+                f"xG live {prediction.team_a} {xg_a:.2f} | {prediction.team_b} {xg_b:.2f}."
+            )
+        if red_a or red_b:
+            lines.append(
+                f"- Ajuste por expulsiones en vivo: rojas {prediction.team_a} {red_a} | {prediction.team_b} {red_b}."
+            )
     if entry.get("news_headlines"):
         lines.append("- Ajuste por noticias relevantes detectadas en el feed del partido.")
     drivers = top_factor_drivers(prediction.factors, limit=2)
@@ -3980,6 +4154,7 @@ def build_dashboard_markdown(
             )
         lines.extend(dashboard_absence_lines(entry, prediction.team_a, prediction.team_b))
         lines.extend(dashboard_news_lines(entry, prediction.team_a, prediction.team_b))
+        lines.extend(dashboard_live_stats_lines(entry, prediction.team_a, prediction.team_b))
         lines.extend(adjustment_reason_lines(entry, prediction))
         next_round_note = next_round_projection_note(entry, prediction, bracket_payload)
         if next_round_note:
@@ -4038,12 +4213,16 @@ def build_dashboard_markdown(
             )
             if prediction.penalty_shootout:
                 shootout = prediction.penalty_shootout
+                projected_shootout = (shootout.get("top_scores") or [("5-4", 0.0)])[0][0]
                 lines.append(
-                    f"- Marcador esperado en penales: {prediction.team_a} {shootout.get('avg_score_a', 0.0):.2f} | "
+                    f"- Tanda de penales proyectada: {projected_shootout}"
+                )
+                lines.append(
+                    f"- Promedio estimado de goles en la tanda: {prediction.team_a} {shootout.get('avg_score_a', 0.0):.2f} | "
                     f"{prediction.team_b} {shootout.get('avg_score_b', 0.0):.2f}"
                 )
                 lines.append(
-                    "- Penales mas probables: "
+                    "- Marcadores de penales mas probables: "
                     + ", ".join(
                         f"{score} {format_pct(prob)}" for score, prob in shootout.get("top_scores", [])
                     )
@@ -4202,6 +4381,18 @@ def build_global_confidence_markdown(entries: Sequence[dict]) -> List[str]:
             "- Partidos mas abiertos: "
             + "; ".join(f"{item[2]['title']} {format_pct(item[0])}" for item in most_open)
         )
+    group_ranked = [item for item in ranked if str(item[2].get("stage_label", "")).startswith("Grupo ")]
+    if group_ranked:
+        closed_groups = sorted(group_ranked, key=lambda item: item[0], reverse=True)
+        open_groups = sorted(group_ranked, key=lambda item: item[0])
+        lines.append(
+            "- Fase de grupos mas cerrada ahora mismo: "
+            + "; ".join(f"{item[2]['title']} {format_pct(item[0])}" for item in closed_groups)
+        )
+        lines.append(
+            "- Fase de grupos mas abierta ahora mismo: "
+            + "; ".join(f"{item[2]['title']} {format_pct(item[0])}" for item in open_groups)
+        )
     if market_edges:
         lines.append(
             "- Mayor diferencia modelo vs mercado: "
@@ -4234,6 +4425,7 @@ def build_global_confidence_html(entries: Sequence[dict]) -> str:
     strongest = sorted(ranked, key=lambda item: item[0], reverse=True)[:4]
     most_open = sorted(ranked, key=lambda item: item[0])[:4]
     market_edges = sorted(ranked_market, key=lambda item: item[0], reverse=True)[:4]
+    group_ranked = [item for item in ranked if str(item[2].get("stage_label", "")).startswith("Grupo ")]
 
     def bullet_list(items: Sequence[Tuple[float, float, dict]], mode: str) -> str:
         rows = []
@@ -4271,6 +4463,35 @@ def build_global_confidence_html(entries: Sequence[dict]) -> str:
             )
         return "".join(rows)
 
+    def group_list(items: Sequence[Tuple[float, float, dict]], label: str) -> str:
+        rows = []
+        for confidence, _, entry in items:
+            prediction: MatchPrediction = entry["prediction"]
+            projected = projected_score_value(prediction)
+            rows.append(
+                "<li>"
+                f"<strong>{html.escape(entry['title'])}</strong>"
+                f"<span>{html.escape(label)} {format_pct(confidence)} | marcador proyectado {projected}</span>"
+                "</li>"
+            )
+        return "".join(rows)
+
+    group_closed_html = ""
+    group_open_html = ""
+    if group_ranked:
+        closed_groups = sorted(group_ranked, key=lambda item: item[0], reverse=True)
+        open_groups = sorted(group_ranked, key=lambda item: item[0])
+        group_closed_html = (
+            "<article><h3>Fase de grupos mas cerrada</h3><ul>"
+            f"{group_list(closed_groups, 'Confianza')}"
+            "</ul></article>"
+        )
+        group_open_html = (
+            "<article><h3>Fase de grupos mas abierta</h3><ul>"
+            f"{group_list(open_groups, 'Confianza')}"
+            "</ul></article>"
+        )
+
     return (
         "<section class=\"panel confidence-panel\">"
         "<div class=\"panel-head\">"
@@ -4296,6 +4517,8 @@ def build_global_confidence_html(entries: Sequence[dict]) -> str:
         "<article><h3>Modelo vs mercado</h3><ul>"
         f"{market_list(market_edges) if market_edges else '<li><strong>Sin odds comparables</strong><span>Aun no llegaron cuotas utilizables del feed.</span></li>'}"
         "</ul></article>"
+        f"{group_closed_html}"
+        f"{group_open_html}"
         "</div>"
         "</section>"
     )
@@ -4509,7 +4732,7 @@ def build_methodology_html(bracket_payload: dict, backtest: dict) -> str:
         "</article>"
         "<article>"
         "<h3>Modo in-play</h3>"
-        "<p>Durante un partido, condiciona las probabilidades por minuto, marcador actual y fase del juego. No es evento por evento, pero sí recalcula en cada corrida las probabilidades y los marcadores finales mas probables.</p>"
+        "<p>Durante un partido, condiciona las probabilidades por minuto, marcador actual y fase del juego. Ademas, cuando el feed lo trae, suma tiros, tiros al arco, posesion, xG live o proxy y expulsiones para recalcular probabilidades y marcadores finales mas probables.</p>"
         "</article>"
         "<article>"
         "<h3>Noticias y bajas</h3>"
@@ -4616,6 +4839,9 @@ def build_dashboard_html(
         news_html = ""
         for line in dashboard_news_lines(entry, prediction.team_a, prediction.team_b):
             news_html += f"<p class=\"meta\">{html.escape(line[2:] if line.startswith('- ') else line)}</p>"
+        live_stats_html = ""
+        for line in dashboard_live_stats_lines(entry, prediction.team_a, prediction.team_b):
+            live_stats_html += f"<p class=\"meta\">{html.escape(line[2:] if line.startswith('- ') else line)}</p>"
 
         reason_html = ""
         reason_lines = adjustment_reason_lines(entry, prediction)
@@ -4659,14 +4885,16 @@ def build_dashboard_html(
             detail = prediction.knockout_detail or {}
             shootout_html = ""
             if prediction.penalty_shootout:
+                projected_shootout = ((prediction.penalty_shootout.get("top_scores") or [("5-4", 0.0)])[0][0])
                 shootout_scores = "".join(
                     f"<li><strong>{html.escape(score)}</strong><span>{format_pct(prob)}</span></li>"
                     for score, prob in prediction.penalty_shootout.get("top_scores", [])
                 )
                 shootout_html = (
-                    f"<div><span>Marcador esperado en penales</span><strong>{prediction.team_a} {prediction.penalty_shootout.get('avg_score_a', 0.0):.2f} | "
+                    f"<div><span>Tanda de penales proyectada</span><strong>{html.escape(projected_shootout)}</strong></div>"
+                    f"<div><span>Promedio estimado de goles en penales</span><strong>{prediction.team_a} {prediction.penalty_shootout.get('avg_score_a', 0.0):.2f} | "
                     f"{prediction.team_b} {prediction.penalty_shootout.get('avg_score_b', 0.0):.2f}</strong></div>"
-                    "<div class=\"scores\"><h4>Penales mas probables</h4>"
+                    "<div class=\"scores\"><h4>Marcadores de penales mas probables</h4>"
                     f"<ul>{shootout_scores}</ul></div>"
                 )
             knockout_html = (
@@ -4712,6 +4940,7 @@ def build_dashboard_html(
             f"{lineup_html}"
             f"{absence_html}"
             f"{news_html}"
+            f"{live_stats_html}"
             f"{reason_html}"
             f"{next_round_html}"
             f"{projection_html}"
