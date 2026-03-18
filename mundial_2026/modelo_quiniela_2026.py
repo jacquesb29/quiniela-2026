@@ -4607,13 +4607,19 @@ def bracket_stage_sections(bracket_payload: dict) -> List[Tuple[str, str, List[d
         ("round16", "Octavos"),
         ("quarterfinal", "Cuartos"),
         ("semifinal", "Semifinales"),
-        ("third_place", "Tercer puesto"),
         ("final", "Final"),
+        ("third_place", "Tercer puesto"),
     ]
+
+    def match_order(item: Tuple[str, dict]) -> Tuple[int, str]:
+        match_id = item[0]
+        digits = "".join(char for char in str(match_id) if char.isdigit())
+        return (int(digits), str(match_id)) if digits else (10**9, str(match_id))
+
     sections = []
     for stage_key, label in stage_order:
         stage_matches = [
-            match for _, match in sorted(matches.items(), key=lambda item: item[0]) if match.get("stage") == stage_key
+            match for _, match in sorted(matches.items(), key=match_order) if match.get("stage") == stage_key
         ]
         if stage_matches:
             sections.append((stage_key, label, stage_matches))
@@ -4623,33 +4629,39 @@ def bracket_stage_sections(bracket_payload: dict) -> List[Tuple[str, str, List[d
 def build_bracket_visual_html(bracket_payload: dict) -> str:
     iterations = bracket_payload.get("iterations")
     sections_html = []
-    for _, label, stage_matches in bracket_stage_sections(bracket_payload):
+    for stage_key, label, stage_matches in bracket_stage_sections(bracket_payload):
         match_cards = []
         for match in stage_matches:
             alt_lines = ""
             alternatives = match.get("top_scenarios", [])[1:]
             if alternatives:
                 alt_lines = (
-                    "<p class=\"mini\"><strong>Otros cruces que tambien aparecen:</strong> "
+                    "<details class=\"bracket-extra\">"
+                    "<summary>Ver rutas alternativas</summary>"
+                    "<div class=\"mini\">"
+                    "<strong>Otros cruces que tambien aparecen:</strong> "
                     + html.escape(
                         "; ".join(
-                            f"{scenario['team_a']} vs {scenario['team_b']} | gana mas probable {scenario['winner']} | escenario {format_pct(float(scenario['prob']))}"
+                            f"{scenario['team_a']} vs {scenario['team_b']} | favorito {scenario['winner']} | escenario {format_pct(float(scenario['prob']))}"
                             for scenario in alternatives[:2]
                         )
                     )
-                    + "</p>"
+                    + "</div>"
+                    "</details>"
                 )
             timing_html = ""
             if match.get("stage") != "third_place":
                 timing_html = (
-                    f"<p class=\"mini\">Prórroga {format_pct(float(match.get('extra_time_prob', 0.0)))} | "
-                    f"penales {format_pct(float(match.get('penalties_prob', 0.0)))}</p>"
+                    "<div class=\"bracket-pills\">"
+                    f"<span>Prórroga {format_pct(float(match.get('extra_time_prob', 0.0)))}</span>"
+                    f"<span>Penales {format_pct(float(match.get('penalties_prob', 0.0)))}</span>"
+                    "</div>"
                 )
             penalty_html = ""
             penalty_scores = match.get("top_penalty_scores", [])
             if penalty_scores:
                 penalty_html = (
-                    "<p class=\"mini\"><strong>Si se define por penales:</strong> "
+                    "<p class=\"mini penalty-note\"><strong>Si se define por penales:</strong> "
                     + html.escape(
                         "; ".join(
                             f"{item['score']} ({format_pct(float(item['prob']))})"
@@ -4661,18 +4673,24 @@ def build_bracket_visual_html(bracket_payload: dict) -> str:
             match_cards.append(
                 "<article class=\"bracket-match\">"
                 f"<p class=\"match-kicker\">{html.escape(str(match.get('title', '')))}</p>"
-                f"<h4>{html.escape(match.get('team_a', '?'))} vs {html.escape(match.get('team_b', '?'))}</h4>"
-                f"<p class=\"winner-line\">Equipo con mayor probabilidad de avanzar: <strong>{html.escape(match.get('winner', '?'))}</strong></p>"
-                f"<p class=\"mini\"><strong>Probabilidad de que este cruce ocurra:</strong> {format_pct(float(match.get('matchup_prob', 0.0)))}</p>"
-                f"<p class=\"mini\"><strong>Probabilidad de que {html.escape(match.get('winner', '?'))} salga de esta llave:</strong> {format_pct(float(match.get('winner_prob', 0.0)))}</p>"
+                "<div class=\"match-teams\">"
+                f"<span>{html.escape(match.get('team_a', '?'))}</span>"
+                "<em>vs</em>"
+                f"<span>{html.escape(match.get('team_b', '?'))}</span>"
+                "</div>"
+                f"<p class=\"winner-line\">Favorito actual para avanzar: <strong>{html.escape(match.get('winner', '?'))}</strong></p>"
+                "<div class=\"bracket-pills\">"
+                f"<span>Cruce {format_pct(float(match.get('matchup_prob', 0.0)))}</span>"
+                f"<span>Avanza {html.escape(match.get('winner', '?'))} {format_pct(float(match.get('winner_prob', 0.0)))}</span>"
+                "</div>"
                 f"{timing_html}"
                 f"{penalty_html}"
                 f"{alt_lines}"
                 "</article>"
             )
         sections_html.append(
-            "<section class=\"bracket-stage\">"
-            f"<div class=\"stage-head\"><h3>{html.escape(label)}</h3></div>"
+            f"<section class=\"bracket-stage stage-{html.escape(stage_key)}\">"
+            f"<div class=\"stage-head\"><p class=\"stage-kicker\">Ronda</p><h3>{html.escape(label)}</h3></div>"
             f"<div class=\"stage-matches\">{''.join(match_cards)}</div>"
             "</section>"
         )
@@ -4682,7 +4700,7 @@ def build_bracket_visual_html(bracket_payload: dict) -> str:
     if iterations:
         subtitle = (
             f"<p class=\"lede-tight\">Llave Monte Carlo dinámica con {int(iterations)} iteraciones publicadas. "
-            "Cada bloque muestra el cruce que mas veces aparece hoy. Si la probabilidad de ese cruce es baja, esa parte del cuadro sigue abierta y puede cambiar con resultados reales.</p>"
+            "Se lee de izquierda a derecha, como un cuadro real de Mundial. Cada tarjeta muestra el cruce que más aparece hoy en esa parte del torneo; si la probabilidad del cruce es baja, esa zona sigue abierta y puede cambiar con resultados reales.</p>"
         )
     return (
         "<section class=\"panel bracket-panel\">"
@@ -4693,8 +4711,10 @@ def build_bracket_visual_html(bracket_payload: dict) -> str:
         f"{subtitle}"
         "</div>"
         "</div>"
+        "<div class=\"bracket-shell\">"
         "<div class=\"bracket-grid\">"
         f"{''.join(sections_html)}"
+        "</div>"
         "</div>"
         "</section>"
     )
@@ -5221,31 +5241,119 @@ def build_dashboard_html(
     .bracket-panel {{
       padding-bottom: 22px;
     }}
+    .bracket-shell {{
+      overflow-x: auto;
+      padding: 8px 4px 12px;
+      margin: 0 -4px;
+    }}
     .bracket-grid {{
       display: grid;
-      gap: 14px;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 24px;
+      grid-template-columns: repeat(5, minmax(228px, 1fr));
+      min-width: 1280px;
+      align-items: start;
     }}
     .bracket-stage {{
-      background: var(--panel-strong);
-      border: 1px solid var(--line);
-      border-radius: 20px;
-      padding: 14px;
+      position: relative;
+      min-width: 0;
+      grid-row: 1;
+    }}
+    .stage-round32 {{ grid-column: 1; }}
+    .stage-round16 {{ grid-column: 2; }}
+    .stage-quarterfinal {{ grid-column: 3; }}
+    .stage-semifinal {{ grid-column: 4; }}
+    .stage-final {{
+      grid-column: 5;
+      margin-top: 240px;
+    }}
+    .stage-third_place {{
+      grid-column: 5;
+      margin-top: 760px;
     }}
     .stage-head {{
-      margin-bottom: 12px;
-      padding-bottom: 10px;
-      border-bottom: 1px dashed var(--line);
+      margin-bottom: 14px;
+      padding: 14px 16px;
+      border-radius: 18px;
+      background: linear-gradient(180deg, rgba(15,109,102,0.12), rgba(255,255,255,0.72));
+      border: 1px solid rgba(15,109,102,0.14);
+      box-shadow: 0 10px 24px rgba(12, 41, 45, 0.08);
+    }}
+    .stage-kicker {{
+      margin: 0 0 4px;
+      color: var(--accent-dark);
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-weight: 700;
+    }}
+    .stage-head h3 {{
+      margin: 0;
     }}
     .stage-matches {{
-      display: grid;
-      gap: 10px;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }}
+    .stage-round32 .stage-matches {{
+      gap: 14px;
+    }}
+    .stage-round16 .stage-matches {{
+      gap: 74px;
+      padding-top: 56px;
+    }}
+    .stage-quarterfinal .stage-matches {{
+      gap: 230px;
+      padding-top: 158px;
+    }}
+    .stage-semifinal .stage-matches {{
+      gap: 500px;
+      padding-top: 362px;
+    }}
+    .stage-final .stage-matches,
+    .stage-third_place .stage-matches {{
+      gap: 20px;
     }}
     .bracket-match {{
-      padding: 12px;
-      border-radius: 16px;
-      background: linear-gradient(180deg, rgba(15,109,102,0.08), rgba(181,131,47,0.06));
-      border: 1px solid rgba(15,109,102,0.10);
+      position: relative;
+      min-height: 118px;
+      padding: 14px;
+      border-radius: 18px;
+      background: linear-gradient(180deg, rgba(255,253,246,0.98), rgba(245,239,225,0.96));
+      border: 1px solid rgba(15,109,102,0.12);
+      box-shadow: 0 16px 28px rgba(12, 41, 45, 0.10);
+    }}
+    .stage-round32 .bracket-match::after,
+    .stage-round16 .bracket-match::after,
+    .stage-quarterfinal .bracket-match::after,
+    .stage-semifinal .bracket-match::after {{
+      content: "";
+      position: absolute;
+      top: 50%;
+      right: -24px;
+      width: 24px;
+      border-top: 2px solid rgba(15,109,102,0.20);
+      transform: translateY(-50%);
+    }}
+    .match-teams {{
+      display: grid;
+      gap: 2px;
+      margin-bottom: 8px;
+    }}
+    .match-teams span {{
+      color: var(--ink);
+      font-size: 1rem;
+      font-weight: 700;
+      line-height: 1.2;
+      text-transform: none;
+      letter-spacing: 0;
+      margin: 0;
+    }}
+    .match-teams em {{
+      color: var(--muted);
+      font-style: normal;
+      font-size: 0.78rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
     }}
     .match-kicker {{
       margin: 0 0 4px;
@@ -5259,11 +5367,47 @@ def build_dashboard_html(
       margin: 8px 0 0;
       color: var(--ink);
     }}
+    .bracket-pills {{
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 10px;
+    }}
+    .bracket-pills span {{
+      margin: 0;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: rgba(15,109,102,0.08);
+      border: 1px solid rgba(15,109,102,0.12);
+      color: var(--accent-dark);
+      font-size: 0.76rem;
+      font-weight: 700;
+      text-transform: none;
+      letter-spacing: 0;
+    }}
     .mini {{
       margin: 8px 0 0;
       color: var(--muted);
       font-size: 0.84rem;
       line-height: 1.35;
+    }}
+    .penalty-note {{
+      margin-top: 10px;
+    }}
+    .bracket-extra {{
+      margin-top: 10px;
+      border-top: 1px dashed rgba(15,109,102,0.16);
+      padding-top: 8px;
+    }}
+    .bracket-extra summary {{
+      cursor: pointer;
+      color: var(--accent-dark);
+      font-size: 0.82rem;
+      font-weight: 700;
+      list-style: none;
+    }}
+    .bracket-extra summary::-webkit-details-marker {{
+      display: none;
     }}
     .method-grid {{
       display: grid;
@@ -5477,6 +5621,9 @@ def build_dashboard_html(
       .depth-grid {{
         grid-template-columns: 1fr;
       }}
+      .bracket-grid {{
+        min-width: 1120px;
+      }}
     }}
     @media (max-width: 640px) {{
       main {{
@@ -5488,6 +5635,17 @@ def build_dashboard_html(
       .summary-grid,
       .confidence-tiles {{
         grid-template-columns: 1fr;
+      }}
+      .bracket-grid {{
+        min-width: 980px;
+        gap: 18px;
+      }}
+      .stage-head {{
+        padding: 12px 14px;
+      }}
+      .bracket-match {{
+        min-height: 112px;
+        padding: 12px;
       }}
     }}
   </style>
