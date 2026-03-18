@@ -1,0 +1,10 @@
+{
+  "updated_at_utc": "2026-03-18T15:01:08+00:00",
+  "files": {
+    "dashboard": "dashboard_actual_2026.html",
+    "report": "reporte_actual_2026.md",
+    "bracket_markdown": "llave_actual_2026.md",
+    "bracket_json": "llave_actual_2026.json",
+    "fixtures_live": "fixtures_live_2026.json"
+  }
+}

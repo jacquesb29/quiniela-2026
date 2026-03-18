@@ -1,0 +1,59 @@
+name: Quiniela 2026 Live
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "*/5 * * * *"
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "quiniela-pages"
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Make scripts executable
+        run: |
+          chmod +x mundial_2026/build_pages_site.sh
+
+      - name: Sync live data and rebuild model
+        run: |
+          python3 mundial_2026/sync_live_data_2026.py
+          python3 mundial_2026/modelo_quiniela_2026.py state-reset
+          python3 mundial_2026/modelo_quiniela_2026.py fixtures mundial_2026/fixtures_live_2026.json
+          python3 mundial_2026/modelo_quiniela_2026.py project-bracket --config mundial_2026/tournament_2026_draw.json --iterations 300 --seed 7 --progress-every 100
+          python3 mundial_2026/modelo_quiniela_2026.py project-dashboard --fixtures mundial_2026/fixtures_live_2026.json
+          ./mundial_2026/build_pages_site.sh
+
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload Pages Artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: mundial_2026/site
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
