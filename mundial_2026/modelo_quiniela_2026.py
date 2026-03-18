@@ -6,6 +6,7 @@ import html
 import json
 import math
 import random
+import re
 import shutil
 import tempfile
 import unicodedata
@@ -503,6 +504,12 @@ class MatchPrediction:
     knockout_detail: Optional[Dict[str, float]] = None
     penalty_shootout: Optional[dict] = None
     factors: Optional[Dict[str, float]] = None
+    expected_remaining_goals_a: Optional[float] = None
+    expected_remaining_goals_b: Optional[float] = None
+    current_score_a: Optional[int] = None
+    current_score_b: Optional[int] = None
+    elapsed_minutes: Optional[float] = None
+    live_phase: Optional[str] = None
 
 
 def clamp(value: float, low: float, high: float) -> float:
@@ -518,6 +525,78 @@ def stable_seed(value: str) -> int:
     for index, char in enumerate(value):
         total += (index + 1) * ord(char)
     return total
+
+
+def parse_elapsed_minutes(status_detail: Optional[str], knockout: bool) -> Tuple[Optional[float], str]:
+    if not status_detail:
+        return None, "regulation"
+    text = str(status_detail).strip().lower()
+    if not text:
+        return None, "regulation"
+    if "pen" in text or "shootout" in text:
+        return 120.0 if knockout else 90.0, "penalties"
+    if text in {"ht", "half time", "halftime"}:
+        return 45.0, "regulation"
+    if "extra" in text and "half" in text:
+        return 105.0, "extra_time"
+
+    match = re.search(r"(\d+)(?:\+(\d+))?", text)
+    if match:
+        elapsed = float(match.group(1))
+        if match.group(2):
+            elapsed += float(match.group(2))
+        if knockout and elapsed > 90.0:
+            return clamp(elapsed, 90.0, 120.0), "extra_time"
+        return clamp(elapsed, 0.0, 90.0), "regulation"
+
+    if knockout and ("extra time" in text or text.startswith("et")):
+        return 105.0, "extra_time"
+    return None, "regulation"
+
+
+def live_game_state_adjustment(
+    base_mu_a: float,
+    base_mu_b: float,
+    score_a: int,
+    score_b: int,
+    progress: float,
+    phase: str,
+) -> Tuple[float, float]:
+    diff = score_a - score_b
+    urgency = clamp(progress, 0.0, 1.0)
+    lead_suppression = 0.08 if phase == "extra_time" else 0.12
+    chase_boost = 0.12 if phase == "extra_time" else 0.18
+    total_late_boost = 0.04 if phase == "extra_time" else 0.08
+
+    mu_a = base_mu_a
+    mu_b = base_mu_b
+    if diff > 0:
+        lead = clamp(diff, 0, 3)
+        mu_a *= 1.0 - lead_suppression * urgency * lead
+        mu_b *= 1.0 + chase_boost * urgency * lead
+    elif diff < 0:
+        lead = clamp(-diff, 0, 3)
+        mu_b *= 1.0 - lead_suppression * urgency * lead
+        mu_a *= 1.0 + chase_boost * urgency * lead
+
+    if diff != 0:
+        total_push = 1.0 + total_late_boost * urgency * min(abs(diff), 2)
+        mu_a *= total_push
+        mu_b *= total_push
+
+    return clamp(mu_a, 0.01, 4.2), clamp(mu_b, 0.01, 4.2)
+
+
+def combine_current_score_distribution(
+    current_score_a: int,
+    current_score_b: int,
+    remainder_dist: Dict[Tuple[int, int], float],
+) -> Dict[Tuple[int, int], float]:
+    final_dist: Dict[Tuple[int, int], float] = {}
+    for (goals_a, goals_b), prob in remainder_dist.items():
+        final_score = (current_score_a + goals_a, current_score_b + goals_b)
+        final_dist[final_score] = final_dist.get(final_score, 0.0) + prob
+    return final_dist
 
 
 def normalize_team_text(value: str) -> str:
@@ -1533,6 +1612,230 @@ def predict_match(
         knockout_detail=knockout_detail,
         penalty_shootout=penalty_shootout,
         factors=factor_breakdown(team_a, team_b, ctx, state_a=state_a, state_b=state_b) if show_factors else None,
+    )
+
+
+def predict_match_live(
+    teams: Dict[str, Team],
+    team_a_name: str,
+    team_b_name: str,
+    ctx: MatchContext,
+    current_score_a: int,
+    current_score_b: int,
+    status_detail: Optional[str],
+    top_scores: int = 6,
+    include_advancement: bool = False,
+    show_factors: bool = False,
+    state_a: Optional[dict] = None,
+    state_b: Optional[dict] = None,
+) -> MatchPrediction:
+    team_a = teams[team_a_name]
+    team_b = teams[team_b_name]
+    base_mu_a, base_mu_b = expected_goals(team_a, team_b, ctx, state_a=state_a, state_b=state_b)
+    elapsed_minutes, phase = parse_elapsed_minutes(status_detail, ctx.knockout)
+
+    if phase == "penalties":
+        penalties_a = penalties_probability(
+            team_a,
+            team_b,
+            penalties_context_state(ctx.morale_a, state_a),
+            penalties_context_state(ctx.morale_b, state_b),
+        )
+        penalties_b = 1.0 - penalties_a
+        shootout = penalty_shootout_summary(
+            team_a,
+            team_b,
+            ctx,
+            penalties_context_state(ctx.morale_a, state_a),
+            penalties_context_state(ctx.morale_b, state_b),
+            iterations=1600,
+        )
+        return MatchPrediction(
+            team_a=team_a_name,
+            team_b=team_b_name,
+            expected_goals_a=float(current_score_a),
+            expected_goals_b=float(current_score_b),
+            win_a=0.0,
+            draw=1.0,
+            win_b=0.0,
+            exact_scores=[(f"{current_score_a}-{current_score_b}", 1.0)],
+            advance_a=penalties_a if include_advancement else None,
+            advance_b=penalties_b if include_advancement else None,
+            knockout_detail={
+                "et_xg_a": 0.0,
+                "et_xg_b": 0.0,
+                "et_win_a": 0.0,
+                "et_draw": 1.0,
+                "et_win_b": 0.0,
+                "penalties_a": penalties_a,
+                "penalties_b": penalties_b,
+                "reach_penalties": 1.0,
+                "advance_a_from_draw": penalties_a,
+                "advance_b_from_draw": penalties_b,
+            }
+            if include_advancement
+            else None,
+            penalty_shootout=shootout if include_advancement else None,
+            factors=factor_breakdown(team_a, team_b, ctx, state_a=state_a, state_b=state_b) if show_factors else None,
+            expected_remaining_goals_a=0.0,
+            expected_remaining_goals_b=0.0,
+            current_score_a=current_score_a,
+            current_score_b=current_score_b,
+            elapsed_minutes=elapsed_minutes,
+            live_phase=phase,
+        )
+
+    if phase == "extra_time":
+        base_remaining_a, base_remaining_b = extra_time_expected_goals(base_mu_a, base_mu_b, state_a=state_a, state_b=state_b)
+        remaining_fraction = 1.0 if elapsed_minutes is None else clamp((120.0 - elapsed_minutes) / 30.0, 0.0, 1.0)
+        progress = 1.0 if elapsed_minutes is None else clamp((elapsed_minutes - 90.0) / 30.0, 0.0, 1.0)
+        rem_mu_a, rem_mu_b = live_game_state_adjustment(
+            base_remaining_a * remaining_fraction,
+            base_remaining_b * remaining_fraction,
+            current_score_a,
+            current_score_b,
+            progress,
+            "extra_time",
+        )
+        remainder_dist = score_distribution(rem_mu_a, rem_mu_b, max_goals=4)
+        final_dist = combine_current_score_distribution(current_score_a, current_score_b, remainder_dist)
+        win_a = 0.0
+        draw = 0.0
+        win_b = 0.0
+        exact = []
+        for (goals_a, goals_b), prob in final_dist.items():
+            exact.append((f"{goals_a}-{goals_b}", prob))
+            if goals_a > goals_b:
+                win_a += prob
+            elif goals_b > goals_a:
+                win_b += prob
+            else:
+                draw += prob
+        exact.sort(key=lambda item: item[1], reverse=True)
+        penalties_a = penalties_probability(
+            team_a,
+            team_b,
+            penalties_context_state(ctx.morale_a, state_a),
+            penalties_context_state(ctx.morale_b, state_b),
+        )
+        penalties_b = 1.0 - penalties_a
+        advance_a = win_a + draw * penalties_a if include_advancement else None
+        advance_b = win_b + draw * penalties_b if include_advancement else None
+        shootout = penalty_shootout_summary(
+            team_a,
+            team_b,
+            ctx,
+            penalties_context_state(ctx.morale_a, state_a),
+            penalties_context_state(ctx.morale_b, state_b),
+            iterations=1600,
+        ) if include_advancement else None
+        return MatchPrediction(
+            team_a=team_a_name,
+            team_b=team_b_name,
+            expected_goals_a=current_score_a + rem_mu_a,
+            expected_goals_b=current_score_b + rem_mu_b,
+            win_a=win_a,
+            draw=draw,
+            win_b=win_b,
+            exact_scores=exact[:top_scores],
+            advance_a=advance_a,
+            advance_b=advance_b,
+            knockout_detail={
+                "et_xg_a": rem_mu_a,
+                "et_xg_b": rem_mu_b,
+                "et_win_a": win_a,
+                "et_draw": draw,
+                "et_win_b": win_b,
+                "penalties_a": penalties_a,
+                "penalties_b": penalties_b,
+                "reach_penalties": draw,
+                "advance_a_from_draw": penalties_a,
+                "advance_b_from_draw": penalties_b,
+            }
+            if include_advancement
+            else None,
+            penalty_shootout=shootout,
+            factors=factor_breakdown(team_a, team_b, ctx, state_a=state_a, state_b=state_b) if show_factors else None,
+            expected_remaining_goals_a=rem_mu_a,
+            expected_remaining_goals_b=rem_mu_b,
+            current_score_a=current_score_a,
+            current_score_b=current_score_b,
+            elapsed_minutes=elapsed_minutes,
+            live_phase=phase,
+        )
+
+    remaining_fraction = 1.0 if elapsed_minutes is None else clamp((90.0 - elapsed_minutes) / 90.0, 0.0, 1.0)
+    progress = 0.0 if elapsed_minutes is None else clamp(elapsed_minutes / 90.0, 0.0, 1.0)
+    rem_mu_a, rem_mu_b = live_game_state_adjustment(
+        base_mu_a * remaining_fraction,
+        base_mu_b * remaining_fraction,
+        current_score_a,
+        current_score_b,
+        progress,
+        "regulation",
+    )
+    remainder_dist = score_distribution(rem_mu_a, rem_mu_b, max_goals=6)
+    final_dist = combine_current_score_distribution(current_score_a, current_score_b, remainder_dist)
+
+    win_a = 0.0
+    draw = 0.0
+    win_b = 0.0
+    exact = []
+    for (goals_a, goals_b), prob in final_dist.items():
+        exact.append((f"{goals_a}-{goals_b}", prob))
+        if goals_a > goals_b:
+            win_a += prob
+        elif goals_b > goals_a:
+            win_b += prob
+        else:
+            draw += prob
+    exact.sort(key=lambda item: item[1], reverse=True)
+
+    advance_a = None
+    advance_b = None
+    knockout_detail = None
+    penalty_shootout = None
+    if include_advancement:
+        knockout_detail = knockout_resolution_detail(
+            team_a,
+            team_b,
+            ctx,
+            base_mu_a,
+            base_mu_b,
+            state_a=state_a,
+            state_b=state_b,
+        )
+        advance_a = win_a + draw * knockout_detail["advance_a_from_draw"]
+        advance_b = win_b + draw * knockout_detail["advance_b_from_draw"]
+        penalty_shootout = penalty_shootout_summary(
+            team_a,
+            team_b,
+            ctx,
+            penalties_context_state(ctx.morale_a, state_a),
+            penalties_context_state(ctx.morale_b, state_b),
+            iterations=1600,
+        )
+
+    return MatchPrediction(
+        team_a=team_a_name,
+        team_b=team_b_name,
+        expected_goals_a=current_score_a + rem_mu_a,
+        expected_goals_b=current_score_b + rem_mu_b,
+        win_a=win_a,
+        draw=draw,
+        win_b=win_b,
+        exact_scores=exact[:top_scores],
+        advance_a=advance_a,
+        advance_b=advance_b,
+        knockout_detail=knockout_detail,
+        penalty_shootout=penalty_shootout,
+        factors=factor_breakdown(team_a, team_b, ctx, state_a=state_a, state_b=state_b) if show_factors else None,
+        expected_remaining_goals_a=rem_mu_a,
+        expected_remaining_goals_b=rem_mu_b,
+        current_score_a=current_score_a,
+        current_score_b=current_score_b,
+        elapsed_minutes=elapsed_minutes,
+        live_phase="regulation",
     )
 
 
@@ -3071,17 +3374,33 @@ def dashboard_fixture_entries(
         state_b = normalize_team_state(states.get(team_b, {}))
         ctx = context_from_fixture(fixture, teams, states)
         stage = fixture_stage_name(fixture)
-        prediction = predict_match(
-            teams,
-            team_a,
-            team_b,
-            ctx,
-            top_scores=top_scores,
-            include_advancement=stage != "group",
-            show_factors=False,
-            state_a=state_a,
-            state_b=state_b,
-        )
+        if fixture.get("status_state") == "in" and fixture.get("live_score_a") is not None and fixture.get("live_score_b") is not None:
+            prediction = predict_match_live(
+                teams,
+                team_a,
+                team_b,
+                ctx,
+                current_score_a=int(fixture.get("live_score_a", 0)),
+                current_score_b=int(fixture.get("live_score_b", 0)),
+                status_detail=fixture.get("status_detail"),
+                top_scores=top_scores,
+                include_advancement=stage != "group",
+                show_factors=False,
+                state_a=state_a,
+                state_b=state_b,
+            )
+        else:
+            prediction = predict_match(
+                teams,
+                team_a,
+                team_b,
+                ctx,
+                top_scores=top_scores,
+                include_advancement=stage != "group",
+                show_factors=False,
+                state_a=state_a,
+                state_b=state_b,
+            )
         entries.append(
             {
                 "title": dashboard_fixture_title(fixture),
@@ -3257,6 +3576,26 @@ def dashboard_absence_lines(entry: dict, team_a: str, team_b: str) -> List[str]:
     return lines
 
 
+def goals_label(prediction: MatchPrediction) -> str:
+    if prediction.live_phase == "regulation":
+        return "Goles esperados al final del tiempo reglamentario"
+    if prediction.live_phase == "extra_time":
+        return "Goles esperados al final de la prorroga"
+    if prediction.live_phase == "penalties":
+        return "Marcador actual"
+    return "Goles esperados"
+
+
+def result_prob_label(prediction: MatchPrediction) -> str:
+    if prediction.live_phase == "regulation":
+        return "Probabilidades de resultado al final del tiempo reglamentario"
+    if prediction.live_phase == "extra_time":
+        return "Probabilidades de resultado al final de la prorroga"
+    if prediction.live_phase == "penalties":
+        return "Probabilidades de clasificar en penales"
+    return "Probabilidades de resultado (90')"
+
+
 def build_dashboard_markdown(
     entries: Sequence[dict],
     bracket_text: str,
@@ -3289,6 +3628,8 @@ def build_dashboard_markdown(
         lines.append(f"- Etapa: {entry['stage_label']}")
         _, status_text = dashboard_status(entry)
         lines.append(f"- Estado: {status_text}")
+        if prediction.elapsed_minutes is not None:
+            lines.append(f"- Minuto modelado: {prediction.elapsed_minutes:.1f}")
         if entry.get("kickoff_utc"):
             venue_bits = [entry.get("venue_name"), entry.get("venue_country")]
             venue_bits = [bit for bit in venue_bits if bit]
@@ -3342,11 +3683,14 @@ def build_dashboard_markdown(
             )
         else:
             pass
+        lines.append(f"- {goals_label(prediction)}: {prediction.expected_goals_a:.2f} - {prediction.expected_goals_b:.2f}")
+        if prediction.expected_remaining_goals_a is not None and prediction.expected_remaining_goals_b is not None:
+            lines.append(
+                f"- Goles restantes esperados: {prediction.team_a} {prediction.expected_remaining_goals_a:.2f} | "
+                f"{prediction.team_b} {prediction.expected_remaining_goals_b:.2f}"
+            )
         lines.append(
-            f"- xG: {prediction.expected_goals_a:.2f} - {prediction.expected_goals_b:.2f}"
-        )
-        lines.append(
-            f"- 1X2: {format_pct(prediction.win_a)} / {format_pct(prediction.draw)} / {format_pct(prediction.win_b)}"
+            f"- {result_prob_label(prediction)}: {format_pct(prediction.win_a)} / {format_pct(prediction.draw)} / {format_pct(prediction.win_b)}"
         )
         if prediction.advance_a is not None and prediction.advance_b is not None:
             detail = prediction.knockout_detail or {}
@@ -3415,6 +3759,9 @@ def build_dashboard_html(
                 f"<p class=\"meta\">{html.escape(' | '.join(venue_bits))}</p>"
                 f"<p class=\"meta\">UTC: {html.escape(str(entry.get('kickoff_utc', '')))}</p>"
             )
+        minute_html = ""
+        if prediction.elapsed_minutes is not None:
+            minute_html = f"<p class=\"meta\">Minuto modelado: {prediction.elapsed_minutes:.1f}</p>"
 
         weather_html = ""
         if entry.get("weather_summary"):
@@ -3500,6 +3847,12 @@ def build_dashboard_html(
             f"<li><strong>{html.escape(score)}</strong><span>{format_pct(prob)}</span></li>"
             for score, prob in prediction.exact_scores
         )
+        remaining_goals_html = ""
+        if prediction.expected_remaining_goals_a is not None and prediction.expected_remaining_goals_b is not None:
+            remaining_goals_html = (
+                f"<p class=\"meta\">Goles restantes esperados: {html.escape(prediction.team_a)} {prediction.expected_remaining_goals_a:.2f} | "
+                f"{html.escape(prediction.team_b)} {prediction.expected_remaining_goals_b:.2f}</p>"
+            )
         cards.append(
             "<section class=\"card\">"
             f"{status_html}"
@@ -3507,6 +3860,7 @@ def build_dashboard_html(
             f"<p class=\"meta\">{html.escape(entry['stage_label'])}</p>"
             f"{result_html}"
             f"{venue_html}"
+            f"{minute_html}"
             f"{weather_html}"
             f"{officiating_html}"
             f"{market_html}"
@@ -3514,9 +3868,10 @@ def build_dashboard_html(
             f"{absence_html}"
             f"{projection_html}"
             "<div class=\"grid\">"
-            f"<div><span>xG</span><strong>{prediction.expected_goals_a:.2f} - {prediction.expected_goals_b:.2f}</strong></div>"
-            f"<div><span>1X2</span><strong>{format_pct(prediction.win_a)} / {format_pct(prediction.draw)} / {format_pct(prediction.win_b)}</strong></div>"
+            f"<div><span>{html.escape(goals_label(prediction))}</span><strong>{prediction.expected_goals_a:.2f} - {prediction.expected_goals_b:.2f}</strong></div>"
+            f"<div><span>{html.escape(result_prob_label(prediction))}</span><strong>{format_pct(prediction.win_a)} / {format_pct(prediction.draw)} / {format_pct(prediction.win_b)}</strong></div>"
             "</div>"
+            f"{remaining_goals_html}"
             f"{knockout_html}"
             "<div class=\"scores\">"
             "<h4>Marcadores mas probables</h4>"
@@ -4006,14 +4361,23 @@ def context_from_fixture(
 
 def print_prediction(prediction: MatchPrediction, show_factors: bool = False) -> None:
     print(f"{prediction.team_a} vs {prediction.team_b}")
+    if prediction.elapsed_minutes is not None:
+        print(f"  Minuto modelado: {prediction.elapsed_minutes:.1f}")
+    if prediction.current_score_a is not None and prediction.current_score_b is not None:
+        print(f"  Marcador actual: {prediction.team_a} {prediction.current_score_a} - {prediction.current_score_b} {prediction.team_b}")
     print(
-        f"  xG: {prediction.expected_goals_a:.2f} - {prediction.expected_goals_b:.2f} | "
-        f"1X2: {prediction.win_a:.1%} / {prediction.draw:.1%} / {prediction.win_b:.1%}"
+        f"  {goals_label(prediction)}: {prediction.expected_goals_a:.2f} - {prediction.expected_goals_b:.2f} | "
+        f"{result_prob_label(prediction)}: {prediction.win_a:.1%} / {prediction.draw:.1%} / {prediction.win_b:.1%}"
     )
+    if prediction.expected_remaining_goals_a is not None and prediction.expected_remaining_goals_b is not None:
+        print(
+            f"  Goles restantes esperados: {prediction.team_a} {prediction.expected_remaining_goals_a:.2f} | "
+            f"{prediction.team_b} {prediction.expected_remaining_goals_b:.2f}"
+        )
     if prediction.advance_a is not None and prediction.advance_b is not None:
         detail = prediction.knockout_detail or {}
         print(
-            f"  Si empatan en 90': xG proroga {detail.get('et_xg_a', 0.0):.2f} - {detail.get('et_xg_b', 0.0):.2f}"
+            f"  Si llegan empatados al siguiente corte: goles esperados en prorroga {detail.get('et_xg_a', 0.0):.2f} - {detail.get('et_xg_b', 0.0):.2f}"
         )
         print(
             f"    Prorroga: {prediction.team_a} {detail.get('et_win_a', 0.0):.1%} | "
@@ -4036,7 +4400,7 @@ def print_prediction(prediction: MatchPrediction, show_factors: bool = False) ->
             f"  Clasificar: {prediction.team_a} {prediction.advance_a:.1%} | "
             f"{prediction.team_b} {prediction.advance_b:.1%}"
         )
-    print("  Marcadores mas probables (90'):" if prediction.advance_a is not None else "  Marcadores mas probables:")
+    print("  Marcadores finales mas probables:" if prediction.advance_a is not None else "  Marcadores mas probables:")
     for score, prob in prediction.exact_scores:
         print(f"    {score}: {prob:.1%}")
     if show_factors and prediction.factors:
@@ -4216,7 +4580,7 @@ def command_score_prob(args: argparse.Namespace, teams: Dict[str, Team]) -> None
     distribution = score_distribution(mu_a, mu_b, max_goals=max(args.goals_a, args.goals_b, 10))
     probability = distribution.get((args.goals_a, args.goals_b), 0.0)
     print(f"{team_a_name} vs {team_b_name}")
-    print(f"  xG: {mu_a:.2f} - {mu_b:.2f}")
+    print(f"  Goles esperados: {mu_a:.2f} - {mu_b:.2f}")
     print(f"  Probabilidad de {args.goals_a}-{args.goals_b}: {probability:.2%}")
     if stage != "group" and args.goals_a == args.goals_b:
         detail = knockout_resolution_detail(
