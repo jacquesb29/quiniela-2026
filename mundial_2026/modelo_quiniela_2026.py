@@ -4127,7 +4127,7 @@ def build_dashboard_markdown(
         f"Estado usado: {state_path}",
         f"Fixtures leidos: {fixtures_path}",
         "",
-        "## Confianza global del tablero",
+        "## Lectura global del tablero",
         "",
     ]
     lines.extend(build_global_confidence_markdown(entries))
@@ -4374,7 +4374,7 @@ def statistical_depth_html(prediction: MatchPrediction) -> str:
 
 def build_global_confidence_markdown(entries: Sequence[dict]) -> List[str]:
     if not entries:
-        return ["_Sin partidos cargados para calcular confianza global._"]
+        return ["_Sin partidos cargados para calcular la lectura global del tablero._"]
 
     ranked = []
     ranked_market = []
@@ -4398,19 +4398,20 @@ def build_global_confidence_markdown(entries: Sequence[dict]) -> List[str]:
     market_edges = sorted(ranked_market, key=lambda item: item[0], reverse=True)[:3]
 
     lines = [
-        f"- Confianza media del tablero: {format_pct(avg_confidence)}",
-        f"- Cobertura media de los 3 marcadores mas probables: {format_pct(avg_top3)}",
+        "- Que significa esta seccion: resume que tan claro o incierto esta el tablero hoy. No mide si el modelo es 'bueno' o 'malo' en abstracto; mide si los picks actuales salen con ventaja clara o si hay mucha dispersion entre escenarios.",
+        f"- Certeza media del pick principal: {format_pct(avg_confidence)}",
+        f"- Concentracion media de los 3 marcadores mas probables: {format_pct(avg_top3)}",
         f"- Partidos en vivo ahora mismo: {live_matches}",
         "- Como validar el refresh in-play: revisa la hora de publicacion de la portada, el badge 'En vivo', el minuto modelado y el archivo latest.json del sitio.",
     ]
     if strongest:
         lines.append(
-            "- Pronosticos mas firmes: "
+            "- Picks con ventaja mas clara: "
             + "; ".join(f"{item[2]['title']} {format_pct(item[0])}" for item in strongest)
         )
     if most_open:
         lines.append(
-            "- Partidos mas abiertos: "
+            "- Partidos mas parejos: "
             + "; ".join(f"{item[2]['title']} {format_pct(item[0])}" for item in most_open)
         )
     group_metrics = {}
@@ -4436,16 +4437,16 @@ def build_global_confidence_markdown(entries: Sequence[dict]) -> List[str]:
         balanced_groups = sorted(group_rows, key=lambda row: (row[3], row[2]), reverse=True)
         favorite_groups = sorted(group_rows, key=lambda row: (row[1], -row[2]), reverse=True)
         lines.append(
-            "- Grupos mas equilibrados: "
+            "- Grupos mas parejos: "
             + "; ".join(
                 f"{label} | equilibrio {format_pct(balance)} | empate medio {format_pct(avg_draw)} | partidos {matches}"
                 for label, avg_conf, avg_draw, balance, matches in balanced_groups
             )
         )
         lines.append(
-            "- Grupos con favoritos mas marcados: "
+            "- Grupos con favoritos mas claros: "
             + "; ".join(
-                f"{label} | confianza media {format_pct(avg_conf)} | empate medio {format_pct(avg_draw)} | partidos {matches}"
+                f"{label} | certeza media {format_pct(avg_conf)} | empate medio {format_pct(avg_draw)} | partidos {matches}"
                 for label, avg_conf, avg_draw, balance, matches in favorite_groups
             )
         )
@@ -4508,9 +4509,9 @@ def build_global_confidence_html(entries: Sequence[dict]) -> str:
                 key=lambda item: item[0],
             )
             tail = (
-                f"Confianza {format_pct(confidence)} | resultado mas probable {favorite[1]} {format_pct(favorite[0])}"
+                f"Certeza del pick {format_pct(confidence)} | resultado mas probable {favorite[1]} {format_pct(favorite[0])}"
                 if mode == "firm"
-                else f"Confianza {format_pct(confidence)} | partido mas abierto"
+                else f"Certeza del pick {format_pct(confidence)} | duelo parejo"
             )
             rows.append(
                 "<li>"
@@ -4537,7 +4538,7 @@ def build_global_confidence_html(entries: Sequence[dict]) -> str:
             if mode == "balanced":
                 tail = f"Equilibrio {format_pct(balance)} | empate medio {format_pct(avg_draw)} | partidos {matches}"
             else:
-                tail = f"Confianza media {format_pct(avg_conf)} | empate medio {format_pct(avg_draw)} | partidos {matches}"
+                tail = f"Certeza media {format_pct(avg_conf)} | empate medio {format_pct(avg_draw)} | partidos {matches}"
             rows.append(
                 "<li>"
                 f"<strong>{html.escape(group_label)}</strong>"
@@ -4558,12 +4559,12 @@ def build_global_confidence_html(entries: Sequence[dict]) -> str:
         balanced_groups = sorted(group_rows, key=lambda row: (row[3], row[2]), reverse=True)
         favorite_groups = sorted(group_rows, key=lambda row: (row[1], -row[2]), reverse=True)
         group_closed_html = (
-            "<article><h3>Grupos mas equilibrados</h3><ul>"
+            "<article><h3>Grupos mas parejos</h3><ul>"
             f"{group_list(balanced_groups, 'balanced')}"
             "</ul></article>"
         )
         group_open_html = (
-            "<article><h3>Grupos con favoritos mas marcados</h3><ul>"
+            "<article><h3>Grupos con favoritos mas claros</h3><ul>"
             f"{group_list(favorite_groups, 'favorite')}"
             "</ul></article>"
         )
@@ -4573,21 +4574,21 @@ def build_global_confidence_html(entries: Sequence[dict]) -> str:
         "<div class=\"panel-head\">"
         "<div>"
         "<p class=\"eyebrow\">Lectura global</p>"
-        "<h2>Confianza global del pronostico</h2>"
-        "<p class=\"lede-tight\">Este bloque resume que tan estables son los picks publicados, cuales partidos estan mas abiertos y donde el modelo se separa mas del mercado.</p>"
+        "<h2>Lectura global del tablero</h2>"
+        "<p class=\"lede-tight\">Este bloque resume que tan claros estan los picks publicados, donde los partidos se ven mas parejos y en que zonas el modelo se separa mas del mercado. No es una nota de calidad del modelo; es una lectura de certeza e incertidumbre del tablero actual.</p>"
         "</div>"
         "</div>"
         "<div class=\"confidence-tiles\">"
-        f"<div class=\"summary-tile\"><span>Confianza media</span><strong>{format_pct(avg_confidence)}</strong></div>"
-        f"<div class=\"summary-tile\"><span>Cobertura top-3 media</span><strong>{format_pct(avg_top3)}</strong></div>"
-        f"<div class=\"summary-tile\"><span>Partidos en vivo</span><strong>{live_matches}</strong></div>"
-        "<div class=\"summary-tile\"><span>Como validar el refresh</span><strong><a href=\"latest.json\">latest.json</a> + badge En vivo + minuto modelado</strong></div>"
+        f"<div class=\"summary-tile\"><span>Certeza media del pick principal</span><strong>{format_pct(avg_confidence)}</strong></div>"
+        f"<div class=\"summary-tile\"><span>Concentracion media de los 3 marcadores mas probables</span><strong>{format_pct(avg_top3)}</strong></div>"
+        f"<div class=\"summary-tile\"><span>Partidos en vivo detectados</span><strong>{live_matches}</strong></div>"
+        "<div class=\"summary-tile\"><span>Como comprobar actualizacion</span><strong><a href=\"latest.json\">latest.json</a> + badge En vivo + minuto modelado</strong></div>"
         "</div>"
         "<div class=\"confidence-grid\">"
-        "<article><h3>Pronosticos mas firmes</h3><ul>"
+        "<article><h3>Picks con ventaja mas clara</h3><ul>"
         f"{bullet_list(strongest, 'firm')}"
         "</ul></article>"
-        "<article><h3>Partidos mas abiertos</h3><ul>"
+        "<article><h3>Partidos mas parejos</h3><ul>"
         f"{bullet_list(most_open, 'open')}"
         "</ul></article>"
         "<article><h3>Modelo vs mercado</h3><ul>"
