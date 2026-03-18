@@ -4743,6 +4743,83 @@ def build_bracket_visual_html(bracket_payload: dict) -> str:
         build_stage_column("right right-round32", "round32", "Dieciseisavos", right_round32),
     ]
 
+    board_width = 1908
+    board_height = 1210
+    column_width = 196
+    column_gap = 18
+    head_total = 86
+    card_height = 126
+    center_stack_top = 362
+    center_stack_gap = 180
+
+    def column_x(index: int) -> float:
+        return float(index * (column_width + column_gap))
+
+    def left_edge(index: int) -> float:
+        return column_x(index)
+
+    def right_edge(index: int) -> float:
+        return column_x(index) + column_width
+
+    def stage_centers(count: int, top_padding: int, gap: int, stack_offset: int = 0) -> List[float]:
+        centers = []
+        base = stack_offset + head_total + top_padding + (card_height / 2.0)
+        for idx in range(count):
+            centers.append(base + idx * (card_height + gap))
+        return centers
+
+    left_r32_y = stage_centers(len(left_round32), 0, 14)
+    left_r16_y = stage_centers(len(left_round16), 56, 74)
+    left_qf_y = stage_centers(len(left_quarterfinal), 158, 230)
+    left_sf_y = stage_centers(len(left_semifinal), 362, 500)
+    right_r32_y = stage_centers(len(right_round32), 0, 14)
+    right_r16_y = stage_centers(len(right_round16), 56, 74)
+    right_qf_y = stage_centers(len(right_quarterfinal), 158, 230)
+    right_sf_y = stage_centers(len(right_semifinal), 362, 500)
+    final_y = stage_centers(len(final_matches), 0, 20, stack_offset=center_stack_top)
+    third_y = stage_centers(len(third_place_matches), 0, 20, stack_offset=center_stack_top + head_total + card_height + center_stack_gap)
+
+    def connector_path(x1: float, y1: float, x2: float, y2: float) -> str:
+        mid = (x1 + x2) / 2.0
+        return f"M {x1:.1f} {y1:.1f} H {mid:.1f} V {y2:.1f} H {x2:.1f}"
+
+    svg_paths: List[str] = []
+
+    def link_pairs(source_centers: Sequence[float], target_centers: Sequence[float], source_x: float, target_x: float) -> None:
+        for idx, target_y in enumerate(target_centers):
+            source_idx = idx * 2
+            if source_idx + 1 >= len(source_centers):
+                break
+            svg_paths.append(f"<path class=\"bracket-link\" d=\"{connector_path(source_x, source_centers[source_idx], target_x, target_y)}\" />")
+            svg_paths.append(f"<path class=\"bracket-link\" d=\"{connector_path(source_x, source_centers[source_idx + 1], target_x, target_y)}\" />")
+
+    link_pairs(left_r32_y, left_r16_y, right_edge(0), left_edge(1))
+    link_pairs(left_r16_y, left_qf_y, right_edge(1), left_edge(2))
+    link_pairs(left_qf_y, left_sf_y, right_edge(2), left_edge(3))
+    link_pairs(right_r32_y, right_r16_y, left_edge(8), right_edge(7))
+    link_pairs(right_r16_y, right_qf_y, left_edge(7), right_edge(6))
+    link_pairs(right_qf_y, right_sf_y, left_edge(6), right_edge(5))
+
+    if left_sf_y and final_y:
+        svg_paths.append(f"<path class=\"bracket-link bracket-link-strong\" d=\"{connector_path(right_edge(3), left_sf_y[0], left_edge(4), final_y[0])}\" />")
+    if right_sf_y and final_y:
+        svg_paths.append(f"<path class=\"bracket-link bracket-link-strong\" d=\"{connector_path(left_edge(5), right_sf_y[0], right_edge(4), final_y[0])}\" />")
+    if left_sf_y and third_y:
+        svg_paths.append(f"<path class=\"bracket-link bracket-link-secondary\" d=\"{connector_path(right_edge(3), left_sf_y[0], left_edge(4), third_y[0])}\" />")
+    if right_sf_y and third_y:
+        svg_paths.append(f"<path class=\"bracket-link bracket-link-secondary\" d=\"{connector_path(left_edge(5), right_sf_y[0], right_edge(4), third_y[0])}\" />")
+
+    bracket_svg = (
+        f"<svg class=\"bracket-svg\" viewBox=\"0 0 {board_width} {board_height}\" preserveAspectRatio=\"none\" aria-hidden=\"true\">"
+        "<defs>"
+        "<filter id=\"bracketGlow\" x=\"-20%\" y=\"-20%\" width=\"140%\" height=\"140%\">"
+        "<feDropShadow dx=\"0\" dy=\"0\" stdDeviation=\"2.5\" flood-color=\"rgba(15,109,102,0.16)\"/>"
+        "</filter>"
+        "</defs>"
+        f"{''.join(svg_paths)}"
+        "</svg>"
+    )
+
     subtitle = ""
     if iterations:
         subtitle = (
@@ -4759,8 +4836,11 @@ def build_bracket_visual_html(bracket_payload: dict) -> str:
         "</div>"
         "</div>"
         "<div class=\"bracket-shell\">"
+        "<div class=\"bracket-canvas\">"
+        f"{bracket_svg}"
         "<div class=\"bracket-grid bracket-board\">"
         f"{''.join(sections_html)}"
+        "</div>"
         "</div>"
         "</div>"
         "</section>"
@@ -5289,15 +5369,55 @@ def build_dashboard_html(
       padding-bottom: 22px;
     }}
     .bracket-shell {{
+      position: relative;
       overflow-x: auto;
       padding: 8px 4px 12px;
       margin: 0 -4px;
     }}
+    .bracket-canvas {{
+      --bracket-col: 196px;
+      --bracket-gap: 18px;
+      --bracket-board-width: 1908px;
+      --bracket-board-height: 1210px;
+      position: relative;
+      width: var(--bracket-board-width);
+      min-width: var(--bracket-board-width);
+      min-height: var(--bracket-board-height);
+    }}
+    .bracket-svg {{
+      position: absolute;
+      inset: 0;
+      width: var(--bracket-board-width);
+      height: var(--bracket-board-height);
+      pointer-events: none;
+      z-index: 0;
+      overflow: visible;
+    }}
+    .bracket-link {{
+      fill: none;
+      stroke: rgba(15, 109, 102, 0.34);
+      stroke-width: 3;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      filter: url(#bracketGlow);
+    }}
+    .bracket-link-strong {{
+      stroke: rgba(181, 131, 47, 0.62);
+      stroke-width: 3.6;
+    }}
+    .bracket-link-secondary {{
+      stroke: rgba(15, 109, 102, 0.20);
+      stroke-dasharray: 7 8;
+    }}
     .bracket-board {{
+      position: relative;
+      z-index: 1;
       display: grid;
       gap: 18px;
-      grid-template-columns: repeat(9, minmax(196px, 1fr));
-      min-width: 1860px;
+      grid-template-columns: repeat(9, var(--bracket-col));
+      width: var(--bracket-board-width);
+      min-width: var(--bracket-board-width);
+      min-height: var(--bracket-board-height);
       align-items: start;
     }}
     .bracket-column {{
@@ -5369,97 +5489,12 @@ def build_dashboard_html(
       gap: 20px;
     }}
     .bracket-match {{
-      position: relative;
       min-height: 126px;
       padding: 12px 12px 14px;
       border-radius: 14px;
       background: linear-gradient(180deg, rgba(255,253,246,0.99), rgba(245,239,225,0.97));
       border: 1px solid rgba(15,109,102,0.14);
       box-shadow: 0 14px 24px rgba(12, 41, 45, 0.09);
-    }}
-    .left-round32 .bracket-match::after,
-    .left-round16 .bracket-match::after,
-    .left-quarterfinal .bracket-match::after,
-    .left-semifinal .bracket-match::after {{
-      content: "";
-      position: absolute;
-      top: 50%;
-      right: -18px;
-      width: 18px;
-      border-top: 3px solid rgba(15,109,102,0.28);
-      transform: translateY(-50%);
-    }}
-    .left-round16 .bracket-match::before,
-    .left-quarterfinal .bracket-match::before,
-    .left-semifinal .bracket-match::before,
-    .center-final .bracket-match::before {{
-      content: "";
-      position: absolute;
-      left: -18px;
-      width: 18px;
-      background:
-        linear-gradient(rgba(15,109,102,0.28), rgba(15,109,102,0.28)) left center / 3px 100% no-repeat,
-        linear-gradient(rgba(15,109,102,0.28), rgba(15,109,102,0.28)) center center / 100% 3px no-repeat;
-    }}
-    .left-round16 .bracket-match::before {{
-      height: 134px;
-      top: calc(50% - 67px);
-    }}
-    .left-quarterfinal .bracket-match::before {{
-      height: 194px;
-      top: calc(50% - 97px);
-    }}
-    .left-semifinal .bracket-match::before {{
-      height: 352px;
-      top: calc(50% - 176px);
-    }}
-    .center-final .bracket-match::before {{
-      height: 622px;
-      top: calc(50% - 311px);
-    }}
-    .right-round32 .bracket-match::before,
-    .right-round16 .bracket-match::before,
-    .right-quarterfinal .bracket-match::before,
-    .right-semifinal .bracket-match::before {{
-      content: "";
-      position: absolute;
-      top: 50%;
-      left: -18px;
-      width: 18px;
-      border-top: 3px solid rgba(15,109,102,0.28);
-      transform: translateY(-50%);
-    }}
-    .right-round16 .bracket-match::after,
-    .right-quarterfinal .bracket-match::after,
-    .right-semifinal .bracket-match::after,
-    .center-final .bracket-match::after {{
-      content: "";
-      position: absolute;
-      right: -18px;
-      width: 18px;
-      background:
-        linear-gradient(rgba(15,109,102,0.28), rgba(15,109,102,0.28)) right center / 3px 100% no-repeat,
-        linear-gradient(rgba(15,109,102,0.28), rgba(15,109,102,0.28)) center center / 100% 3px no-repeat;
-    }}
-    .right-round16 .bracket-match::after {{
-      height: 134px;
-      top: calc(50% - 67px);
-    }}
-    .right-quarterfinal .bracket-match::after {{
-      height: 194px;
-      top: calc(50% - 97px);
-    }}
-    .right-semifinal .bracket-match::after {{
-      height: 352px;
-      top: calc(50% - 176px);
-    }}
-    .center-final .bracket-match::after {{
-      height: 622px;
-      top: calc(50% - 311px);
-    }}
-    .center-third_place .bracket-match::before,
-    .center-third_place .bracket-match::after {{
-      display: none;
     }}
     .match-teams {{
       display: grid;
@@ -5772,8 +5807,8 @@ def build_dashboard_html(
       .depth-grid {{
         grid-template-columns: 1fr;
       }}
-      .bracket-board {{
-        min-width: 1700px;
+      .bracket-canvas {{
+        --bracket-board-width: 1908px;
       }}
     }}
     @media (max-width: 640px) {{
@@ -5787,9 +5822,10 @@ def build_dashboard_html(
       .confidence-tiles {{
         grid-template-columns: 1fr;
       }}
-      .bracket-board {{
-        min-width: 1560px;
-        gap: 14px;
+      .bracket-canvas {{
+        --bracket-col: 188px;
+        --bracket-gap: 14px;
+        --bracket-board-width: 1804px;
       }}
       .stage-head {{
         padding: 12px 14px;
