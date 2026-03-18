@@ -1679,6 +1679,8 @@ def sample_knockout_resolution(
             "extra_time_score_b": 0,
             "went_extra_time": False,
             "went_penalties": False,
+            "penalty_score_a": None,
+            "penalty_score_b": None,
         }
     if score_b > score_a:
         return {
@@ -1690,6 +1692,8 @@ def sample_knockout_resolution(
             "extra_time_score_b": 0,
             "went_extra_time": False,
             "went_penalties": False,
+            "penalty_score_a": None,
+            "penalty_score_b": None,
         }
 
     et_mu_a, et_mu_b = extra_time_expected_goals(mu_a, mu_b, state_a=state_a, state_b=state_b)
@@ -1704,16 +1708,25 @@ def sample_knockout_resolution(
         winner = team_b.name
         loser = team_a.name
         went_penalties = False
+        penalty_score_a = None
+        penalty_score_b = None
     else:
-        penalties_a = penalties_probability(
+        shootout = simulate_penalty_shootout(
             team_a,
             team_b,
+            ctx,
             penalties_context_state(ctx.morale_a, state_a),
             penalties_context_state(ctx.morale_b, state_b),
+            a_starts=random.random() < 0.5,
         )
-        winner = team_a.name if random.random() < penalties_a else team_b.name
+        winner = shootout["winner"]
         loser = team_b.name if winner == team_a.name else team_a.name
         went_penalties = True
+        penalty_score_a = shootout["score_a"]
+        penalty_score_b = shootout["score_b"]
+    if not went_penalties:
+        penalty_score_a = None
+        penalty_score_b = None
 
     return {
         "winner": winner,
@@ -1724,6 +1737,8 @@ def sample_knockout_resolution(
         "extra_time_score_b": et_score_b,
         "went_extra_time": True,
         "went_penalties": went_penalties,
+        "penalty_score_a": penalty_score_a,
+        "penalty_score_b": penalty_score_b,
     }
 
 
@@ -3444,6 +3459,7 @@ def structured_match_projection(match_id: str, aggregate: dict, iterations: int)
             }
             for opponent, count in sorted(counts.items(), key=lambda item: item[1], reverse=True)[:3]
         ]
+    penalty_scores = sorted(aggregate.get("penalty_scores", {}).items(), key=lambda item: item[1], reverse=True)[:3]
     return {
         "match_id": match_id,
         "title": BRACKET_MATCH_TITLES.get(match_id, match_id),
@@ -3459,6 +3475,10 @@ def structured_match_projection(match_id: str, aggregate: dict, iterations: int)
         "appearance_probabilities": appearance_probabilities,
         "advance_probabilities": advance_probabilities,
         "opponent_map": opponent_map,
+        "top_penalty_scores": [
+            {"score": f"{score[0]}-{score[1]}", "prob": count / float(iterations)}
+            for score, count in penalty_scores
+        ],
     }
 
 
@@ -3485,6 +3505,12 @@ def format_match_projection(match_id: str, aggregate: dict, iterations: int) -> 
         lines.append(f"- Otros cruces que tambien aparecen seguido: {'; '.join(alternatives)}")
     if match_id != "M104":
         lines.append(f"- Va a proroga en {extra_time_prob:.1%} y a penales en {penalties_prob:.1%}")
+        penalty_scores = projection.get("top_penalty_scores", [])
+        if penalty_scores:
+            lines.append(
+                "- Marcadores de penales mas probables en este cruce: "
+                + "; ".join(f"{item['score']} ({item['prob']:.1%})" for item in penalty_scores)
+            )
     return lines
 
 
@@ -3500,6 +3526,7 @@ def command_project_bracket(args: argparse.Namespace, teams: Dict[str, Team]) ->
             "winner": {},
             "went_extra_time": 0,
             "went_penalties": 0,
+            "penalty_scores": {},
         }
         for match_id in bracket_match_order()
     }
@@ -3513,6 +3540,9 @@ def command_project_bracket(args: argparse.Namespace, teams: Dict[str, Team]) ->
             aggregate["winner"][match_result["winner"]] = aggregate["winner"].get(match_result["winner"], 0) + 1
             aggregate["went_extra_time"] += 1 if match_result.get("went_extra_time") else 0
             aggregate["went_penalties"] += 1 if match_result.get("went_penalties") else 0
+            if match_result.get("went_penalties") and match_result.get("penalty_score_a") is not None and match_result.get("penalty_score_b") is not None:
+                penalty_key = (int(match_result["penalty_score_a"]), int(match_result["penalty_score_b"]))
+                aggregate["penalty_scores"][penalty_key] = aggregate["penalty_scores"].get(penalty_key, 0) + 1
         if args.progress_every and iteration % args.progress_every == 0:
             print(f"Progreso llave: {iteration}/{args.iterations} iteraciones")
 
@@ -4571,6 +4601,19 @@ def build_bracket_visual_html(bracket_payload: dict) -> str:
                     f"<p class=\"mini\">Prórroga {format_pct(float(match.get('extra_time_prob', 0.0)))} | "
                     f"penales {format_pct(float(match.get('penalties_prob', 0.0)))}</p>"
                 )
+            penalty_html = ""
+            penalty_scores = match.get("top_penalty_scores", [])
+            if penalty_scores:
+                penalty_html = (
+                    "<p class=\"mini\"><strong>Si se define por penales:</strong> "
+                    + html.escape(
+                        "; ".join(
+                            f"{item['score']} ({format_pct(float(item['prob']))})"
+                            for item in penalty_scores[:2]
+                        )
+                    )
+                    + "</p>"
+                )
             match_cards.append(
                 "<article class=\"bracket-match\">"
                 f"<p class=\"match-kicker\">{html.escape(str(match.get('title', '')))}</p>"
@@ -4579,6 +4622,7 @@ def build_bracket_visual_html(bracket_payload: dict) -> str:
                 f"<p class=\"mini\"><strong>Probabilidad de que este cruce ocurra:</strong> {format_pct(float(match.get('matchup_prob', 0.0)))}</p>"
                 f"<p class=\"mini\"><strong>Probabilidad de que {html.escape(match.get('winner', '?'))} salga de esta llave:</strong> {format_pct(float(match.get('winner_prob', 0.0)))}</p>"
                 f"{timing_html}"
+                f"{penalty_html}"
                 f"{alt_lines}"
                 "</article>"
             )
