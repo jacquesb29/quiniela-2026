@@ -381,6 +381,39 @@ ABSENCE_SOFT_TOKENS = (
     "day-to-day",
 )
 
+NEWS_NEGATIVE_TOKENS = (
+    "injury",
+    "injured",
+    "out",
+    "ruled out",
+    "will miss",
+    "misses",
+    "suspended",
+    "ban",
+    "illness",
+    "doubtful",
+)
+
+NEWS_POSITIVE_TOKENS = (
+    "returns",
+    "return",
+    "back",
+    "available",
+    "fit",
+    "cleared",
+    "ready",
+    "boost",
+)
+
+NEWS_LINEUP_TOKENS = (
+    "lineup",
+    "starting xi",
+    "starts",
+    "starting",
+    "bench",
+    "rotation",
+)
+
 
 def nested_text(value) -> str:
     if value is None:
@@ -472,6 +505,86 @@ def extract_absence_data(summary_payload: dict) -> Dict[str, dict]:
     return absences
 
 
+def team_aliases(team_name: str) -> List[str]:
+    aliases = {team_name.lower()}
+    alias_map = {
+        "United States": {"usa", "usmnt", "united states"},
+        "Mexico": {"mexico", "el tri"},
+        "England": {"england", "three lions"},
+        "Argentina": {"argentina", "albiceleste"},
+        "Brazil": {"brazil", "brasil", "selecao"},
+    }
+    aliases.update(alias_map.get(team_name, set()))
+    return sorted(alias for alias in aliases if alias)
+
+
+def extract_news_enrichment(summary_payload: dict, team_a: str, team_b: str) -> dict:
+    aliases = {
+        "a": team_aliases(team_a),
+        "b": team_aliases(team_b),
+    }
+    seen = set()
+    headlines: List[str] = []
+    notes = {"a": [], "b": []}
+    morale = {"a": 0.0, "b": 0.0}
+    injury_bump = {"a": 0.0, "b": 0.0}
+
+    for obj in walk_objects(summary_payload):
+        if not isinstance(obj, dict):
+            continue
+        headline = obj.get("headline") or obj.get("shortHeadline") or obj.get("title")
+        if not headline:
+            continue
+        detail = obj.get("description") or obj.get("summary") or ""
+        text = str(headline).strip()
+        if not text:
+            continue
+        if detail:
+            combined = f"{text}: {str(detail).strip()}"
+        else:
+            combined = text
+        if combined in seen:
+            continue
+        seen.add(combined)
+        lowered = combined.lower()
+
+        relevant_sides = [
+            side
+            for side, side_aliases in aliases.items()
+            if any(alias in lowered for alias in side_aliases)
+        ]
+        has_signal = any(token in lowered for token in NEWS_NEGATIVE_TOKENS + NEWS_POSITIVE_TOKENS + NEWS_LINEUP_TOKENS)
+        if not relevant_sides and not has_signal:
+            continue
+
+        headlines.append(combined)
+        for side in relevant_sides:
+            if any(token in lowered for token in NEWS_NEGATIVE_TOKENS):
+                morale[side] -= 0.05
+                injury_bump[side] += 0.06
+                notes[side].append(text)
+            elif any(token in lowered for token in NEWS_POSITIVE_TOKENS):
+                morale[side] += 0.03
+                notes[side].append(text)
+            elif any(token in lowered for token in NEWS_LINEUP_TOKENS):
+                morale[side] += 0.01
+                notes[side].append(text)
+        if len(headlines) >= 6:
+            break
+
+    payload = {}
+    if headlines:
+        payload["news_headlines"] = headlines[:5]
+    for side, prefix in (("a", "a"), ("b", "b")):
+        if notes[side]:
+            payload[f"news_notes_{prefix}"] = notes[side][:4]
+        if abs(morale[side]) > 1e-9:
+            payload[f"morale_{prefix}"] = max(-0.18, min(0.18, round(morale[side], 3)))
+        if injury_bump[side] > 0.0:
+            payload[f"news_injury_bump_{prefix}"] = round(min(0.18, injury_bump[side]), 3)
+    return payload
+
+
 def summarize_market(odds_entry: dict) -> dict:
     home_line = odds_entry.get("homeTeamOdds", {}).get("moneyLine")
     away_line = odds_entry.get("awayTeamOdds", {}).get("moneyLine")
@@ -503,7 +616,7 @@ def summarize_market(odds_entry: dict) -> dict:
     }
 
 
-def summary_enrichment(event_id: str, kickoff: datetime, status_state: Optional[str]) -> dict:
+def summary_enrichment(event_id: str, kickoff: datetime, status_state: Optional[str], team_a: str, team_b: str) -> dict:
     if not should_fetch_summary(kickoff, status_state):
         return {}
     try:
@@ -538,6 +651,16 @@ def summary_enrichment(event_id: str, kickoff: datetime, status_state: Optional[
         enrichment[f"unavailable_count_{prefix}"] = int(absence_data["hard_count"])
         enrichment[f"questionable_count_{prefix}"] = int(absence_data["soft_count"])
         enrichment[f"unavailable_notes_{prefix}"] = absence_data["notes"]
+
+    news = extract_news_enrichment(payload, team_a, team_b)
+    enrichment.update(news)
+    for prefix in ("a", "b"):
+        injury_bump = float(enrichment.pop(f"news_injury_bump_{prefix}", 0.0) or 0.0)
+        if injury_bump > 0.0:
+            enrichment[f"injuries_{prefix}"] = round(
+                min(0.9, float(enrichment.get(f"injuries_{prefix}", 0.0)) + injury_bump),
+                3,
+            )
     return enrichment
 
 
@@ -863,7 +986,13 @@ def build_fixture_from_event(
     venue_country = canonical_country((venue.get("address") or {}).get("country")) or VENUE_DATA.get(venue_name, {}).get("country", "United States")
     weather = forecast_weather(venue_name, kickoff)
     unresolved = is_unresolved_placeholder(team_a, teams) or is_unresolved_placeholder(team_b, teams)
-    enrichment = summary_enrichment(str(event["id"]), kickoff, event.get("status", {}).get("type", {}).get("state"))
+    enrichment = summary_enrichment(
+        str(event["id"]),
+        kickoff,
+        event.get("status", {}).get("type", {}).get("state"),
+        team_a,
+        team_b,
+    )
 
     fixture = {
         "id": f"espn-{event['id']}",

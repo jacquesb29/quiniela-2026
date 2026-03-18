@@ -673,7 +673,7 @@ def top_factor_drivers(factors: Optional[Dict[str, float]], limit: int = 3) -> L
         "cards_diff": "Tarjetas y suspensiones",
         "group_pressure_diff": "Presión de grupo",
         "lineup_diff": "Alineaciones",
-        "market_prob_diff": "Mercado 1X2",
+        "market_prob_diff": "Mercado victoria/empate/derrota",
         "recent_form_diff": "Forma reciente",
         "attack_form_diff": "Forma ofensiva",
         "defense_form_diff": "Forma defensiva",
@@ -3328,15 +3328,15 @@ def format_match_projection(match_id: str, aggregate: dict, iterations: int) -> 
     penalties_prob = projection["penalties_prob"]
     lines = [
         f"### {BRACKET_MATCH_TITLES.get(match_id, match_id)}",
-        f"- Escenario modal: {team_a} vs {team_b} -> gana {winner} ({outcome_prob:.1%})",
-        f"- Ganador mas probable total: {winner} ({winner_prob:.1%})",
+        f"- Cruce proyectado mas probable: {team_a} vs {team_b} -> avanza {winner} ({outcome_prob:.1%})",
+        f"- Equipo con mayor probabilidad de avanzar: {winner} ({winner_prob:.1%})",
     ]
     alternatives = [
         f"{scenario['team_a']} vs {scenario['team_b']} -> {scenario['winner']} ({scenario['prob']:.1%})"
         for scenario in projection.get("top_scenarios", [])[1:]
     ]
     if alternatives:
-        lines.append(f"- Cruces alternativos mas probables: {'; '.join(alternatives)}")
+        lines.append(f"- Otras rutas probables de esta llave: {'; '.join(alternatives)}")
     if match_id != "M104":
         lines.append(f"- Va a proroga en {extra_time_prob:.1%} y a penales en {penalties_prob:.1%}")
     return lines
@@ -3535,6 +3535,9 @@ def dashboard_fixture_entries(
                 "questionable_count_b": int(fixture.get("questionable_count_b", 0)),
                 "unavailable_notes_a": fixture.get("unavailable_notes_a", []),
                 "unavailable_notes_b": fixture.get("unavailable_notes_b", []),
+                "news_headlines": fixture.get("news_headlines", []),
+                "news_notes_a": fixture.get("news_notes_a", []),
+                "news_notes_b": fixture.get("news_notes_b", []),
                 "market_provider": fixture.get("market_provider"),
                 "market_summary": fixture.get("market_summary"),
                 "market_prob_a": fixture.get("market_prob_a"),
@@ -3625,8 +3628,8 @@ def projected_bracket_entries(
                 "weather_summary": dashboard_weather_summary(base_fixture),
                 "projection": True,
                 "projection_note": (
-                    f"Emparejamiento modal de la llave {format_pct(match_projection['matchup_prob'])} | "
-                    f"ganador modal {match_projection['winner']} {format_pct(match_projection['winner_prob'])}"
+                    f"Cruce proyectado mas probable de esta llave {format_pct(match_projection['matchup_prob'])} | "
+                    f"equipo con mayor probabilidad de avanzar {match_projection['winner']} {format_pct(match_projection['winner_prob'])}"
                 ),
                 "projection_alternatives": match_projection.get("top_scenarios", [])[1:],
                 "projection_penalties": match_projection.get("penalties_prob", 0.0),
@@ -3639,6 +3642,9 @@ def projected_bracket_entries(
                 "questionable_count_b": int(base_fixture.get("questionable_count_b", 0)),
                 "unavailable_notes_a": base_fixture.get("unavailable_notes_a", []),
                 "unavailable_notes_b": base_fixture.get("unavailable_notes_b", []),
+                "news_headlines": base_fixture.get("news_headlines", []),
+                "news_notes_a": base_fixture.get("news_notes_a", []),
+                "news_notes_b": base_fixture.get("news_notes_b", []),
             }
         )
     return entries
@@ -3676,6 +3682,20 @@ def dashboard_absence_lines(entry: dict, team_a: str, team_b: str) -> List[str]:
     return lines
 
 
+def dashboard_news_lines(entry: dict, team_a: str, team_b: str) -> List[str]:
+    lines = []
+    headlines = entry.get("news_headlines") or []
+    notes_a = entry.get("news_notes_a") or []
+    notes_b = entry.get("news_notes_b") or []
+    if headlines:
+        lines.append(f"- Noticias relevantes: {'; '.join(headlines[:3])}")
+    if notes_a:
+        lines.append(f"- Impacto noticioso {team_a}: {'; '.join(notes_a[:2])}")
+    if notes_b:
+        lines.append(f"- Impacto noticioso {team_b}: {'; '.join(notes_b[:2])}")
+    return lines
+
+
 def goals_label(prediction: MatchPrediction) -> str:
     if prediction.live_phase == "regulation":
         return "Goles esperados al final del tiempo reglamentario"
@@ -3709,9 +3729,15 @@ def build_dashboard_markdown(
         f"Estado usado: {state_path}",
         f"Fixtures leidos: {fixtures_path}",
         "",
-        "## Llave actual",
+        "## Confianza global del tablero",
         "",
     ]
+    lines.extend(build_global_confidence_markdown(entries))
+    lines.extend([
+        "",
+        "## Llave actual",
+        "",
+    ])
     if bracket_text.strip():
         lines.append(bracket_text.strip())
     else:
@@ -3744,7 +3770,7 @@ def build_dashboard_markdown(
             lines.append(f"- Odds {provider}: {entry['market_summary']}")
         if entry.get("market_prob_a") is not None:
             lines.append(
-                f"- Prior de mercado 1X2: {prediction.team_a} {format_pct(float(entry['market_prob_a']))} | "
+                f"- Prior de mercado (victoria/empate/derrota): {prediction.team_a} {format_pct(float(entry['market_prob_a']))} | "
                 f"empate {format_pct(float(entry.get('market_prob_draw', 0.0)))} | "
                 f"{prediction.team_b} {format_pct(float(entry.get('market_prob_b', 0.0)))}"
             )
@@ -3759,12 +3785,13 @@ def build_dashboard_markdown(
                 f"{prediction.team_b} {entry.get('lineup_change_count_b', 0)}"
             )
         lines.extend(dashboard_absence_lines(entry, prediction.team_a, prediction.team_b))
+        lines.extend(dashboard_news_lines(entry, prediction.team_a, prediction.team_b))
         if entry.get("projection"):
             lines.append(f"- Proyeccion automatica: {entry.get('projection_note', '')}")
             alternatives = entry.get("projection_alternatives") or []
             if alternatives:
                 lines.append(
-                    "- Cruces alternativos: "
+                    "- Otras rutas probables: "
                     + "; ".join(
                         f"{scenario['team_a']} vs {scenario['team_b']} -> {scenario['winner']} {format_pct(float(scenario['prob']))}"
                         for scenario in alternatives
@@ -3858,7 +3885,7 @@ def statistical_depth_lines(prediction: MatchPrediction) -> List[str]:
         f"- Cobertura top-3 marcadores: {format_pct(top3_coverage)} | margen modal {modal_margin:+d} ({format_pct(modal_margin_prob)})"
     )
     if market_gap is not None:
-        lines.append(f"- Diferencia promedio vs mercado 1X2: {format_pct(float(market_gap))}")
+        lines.append(f"- Diferencia promedio vs mercado de victoria/empate/derrota: {format_pct(float(market_gap))}")
     drivers = top_factor_drivers(prediction.factors, limit=3)
     if drivers:
         lines.append(
@@ -3902,6 +3929,146 @@ def statistical_depth_html(prediction: MatchPrediction) -> str:
         "</div>"
         f"{drivers_html}"
         "</div>"
+    )
+
+
+def build_global_confidence_markdown(entries: Sequence[dict]) -> List[str]:
+    if not entries:
+        return ["_Sin partidos cargados para calcular confianza global._"]
+
+    ranked = []
+    ranked_market = []
+    live_matches = 0
+    for entry in entries:
+        prediction: MatchPrediction = entry["prediction"]
+        depth = prediction.statistical_depth or {}
+        confidence = float(depth.get("confidence_index", 0.0))
+        top3 = float(depth.get("top3_coverage", 0.0))
+        ranked.append((confidence, top3, entry))
+        market_gap = depth.get("market_gap")
+        if market_gap is not None:
+            ranked_market.append((abs(float(market_gap)), entry))
+        if entry.get("status_state") == "in":
+            live_matches += 1
+
+    avg_confidence = sum(item[0] for item in ranked) / len(ranked)
+    avg_top3 = sum(item[1] for item in ranked) / len(ranked)
+    strongest = sorted(ranked, key=lambda item: item[0], reverse=True)[:3]
+    most_open = sorted(ranked, key=lambda item: item[0])[:3]
+    market_edges = sorted(ranked_market, key=lambda item: item[0], reverse=True)[:3]
+
+    lines = [
+        f"- Confianza media del tablero: {format_pct(avg_confidence)}",
+        f"- Cobertura media de los 3 marcadores mas probables: {format_pct(avg_top3)}",
+        f"- Partidos en vivo ahora mismo: {live_matches}",
+        "- Como validar el refresh in-play: revisa la hora de publicacion de la portada, el badge 'En vivo', el minuto modelado y el archivo latest.json del sitio.",
+    ]
+    if strongest:
+        lines.append(
+            "- Pronosticos mas firmes: "
+            + "; ".join(f"{item[2]['title']} {format_pct(item[0])}" for item in strongest)
+        )
+    if most_open:
+        lines.append(
+            "- Partidos mas abiertos: "
+            + "; ".join(f"{item[2]['title']} {format_pct(item[0])}" for item in most_open)
+        )
+    if market_edges:
+        lines.append(
+            "- Mayor diferencia modelo vs mercado: "
+            + "; ".join(f"{item[1]['title']} {format_pct(item[0])}" for item in market_edges)
+        )
+    return lines
+
+
+def build_global_confidence_html(entries: Sequence[dict]) -> str:
+    if not entries:
+        return ""
+
+    ranked = []
+    ranked_market = []
+    live_matches = 0
+    for entry in entries:
+        prediction: MatchPrediction = entry["prediction"]
+        depth = prediction.statistical_depth or {}
+        confidence = float(depth.get("confidence_index", 0.0))
+        top3 = float(depth.get("top3_coverage", 0.0))
+        ranked.append((confidence, top3, entry))
+        market_gap = depth.get("market_gap")
+        if market_gap is not None:
+            ranked_market.append((abs(float(market_gap)), entry))
+        if entry.get("status_state") == "in":
+            live_matches += 1
+
+    avg_confidence = sum(item[0] for item in ranked) / len(ranked)
+    avg_top3 = sum(item[1] for item in ranked) / len(ranked)
+    strongest = sorted(ranked, key=lambda item: item[0], reverse=True)[:4]
+    most_open = sorted(ranked, key=lambda item: item[0])[:4]
+    market_edges = sorted(ranked_market, key=lambda item: item[0], reverse=True)[:4]
+
+    def bullet_list(items: Sequence[Tuple[float, float, dict]], mode: str) -> str:
+        rows = []
+        for confidence, _, entry in items:
+            prediction: MatchPrediction = entry["prediction"]
+            favorite = max(
+                (
+                    (prediction.win_a, f"Victoria {prediction.team_a}"),
+                    (prediction.draw, "Empate"),
+                    (prediction.win_b, f"Victoria {prediction.team_b}"),
+                ),
+                key=lambda item: item[0],
+            )
+            tail = (
+                f"Confianza {format_pct(confidence)} | resultado mas probable {favorite[1]} {format_pct(favorite[0])}"
+                if mode == "firm"
+                else f"Confianza {format_pct(confidence)} | partido mas abierto"
+            )
+            rows.append(
+                "<li>"
+                f"<strong>{html.escape(entry['title'])}</strong>"
+                f"<span>{html.escape(tail)}</span>"
+                "</li>"
+            )
+        return "".join(rows)
+
+    def market_list(items: Sequence[Tuple[float, dict]]) -> str:
+        rows = []
+        for gap, entry in items:
+            rows.append(
+                "<li>"
+                f"<strong>{html.escape(entry['title'])}</strong>"
+                f"<span>Diferencia media vs mercado {format_pct(gap)}</span>"
+                "</li>"
+            )
+        return "".join(rows)
+
+    return (
+        "<section class=\"panel confidence-panel\">"
+        "<div class=\"panel-head\">"
+        "<div>"
+        "<p class=\"eyebrow\">Lectura global</p>"
+        "<h2>Confianza global del pronostico</h2>"
+        "<p class=\"lede-tight\">Este bloque resume que tan estables son los picks publicados, cuales partidos estan mas abiertos y donde el modelo se separa mas del mercado.</p>"
+        "</div>"
+        "</div>"
+        "<div class=\"confidence-tiles\">"
+        f"<div class=\"summary-tile\"><span>Confianza media</span><strong>{format_pct(avg_confidence)}</strong></div>"
+        f"<div class=\"summary-tile\"><span>Cobertura top-3 media</span><strong>{format_pct(avg_top3)}</strong></div>"
+        f"<div class=\"summary-tile\"><span>Partidos en vivo</span><strong>{live_matches}</strong></div>"
+        "<div class=\"summary-tile\"><span>Como validar el refresh</span><strong><a href=\"latest.json\">latest.json</a> + badge En vivo + minuto modelado</strong></div>"
+        "</div>"
+        "<div class=\"confidence-grid\">"
+        "<article><h3>Pronosticos mas firmes</h3><ul>"
+        f"{bullet_list(strongest, 'firm')}"
+        "</ul></article>"
+        "<article><h3>Partidos mas abiertos</h3><ul>"
+        f"{bullet_list(most_open, 'open')}"
+        "</ul></article>"
+        "<article><h3>Modelo vs mercado</h3><ul>"
+        f"{market_list(market_edges) if market_edges else '<li><strong>Sin odds comparables</strong><span>Aun no llegaron cuotas utilizables del feed.</span></li>'}"
+        "</ul></article>"
+        "</div>"
+        "</section>"
     )
 
 
@@ -3955,8 +4122,8 @@ def build_bracket_visual_html(bracket_payload: dict) -> str:
                 f"<p class=\"match-kicker\">{html.escape(str(match.get('title', '')))}</p>"
                 f"<h4>{html.escape(match.get('team_a', '?'))} vs {html.escape(match.get('team_b', '?'))}</h4>"
                 f"<p class=\"winner-line\">Gana más probable: <strong>{html.escape(match.get('winner', '?'))}</strong></p>"
-                f"<p class=\"mini\">Cruce modal {format_pct(float(match.get('matchup_prob', 0.0)))} | "
-                f"ganador {format_pct(float(match.get('winner_prob', 0.0)))}</p>"
+                f"<p class=\"mini\">Cruce proyectado mas probable {format_pct(float(match.get('matchup_prob', 0.0)))} | "
+                f"equipo con mayor probabilidad de avanzar {format_pct(float(match.get('winner_prob', 0.0)))}</p>"
                 f"{timing_html}"
                 f"{alt_lines}"
                 "</article>"
@@ -4011,11 +4178,19 @@ def build_methodology_html(bracket_payload: dict) -> str:
         "</article>"
         "<article>"
         "<h3>Estado dinámico</h3>"
-        "<p>Actualiza Elo, forma, fatiga, disponibilidad, disciplina, clima, alineaciones y mercado a medida que aparecen datos nuevos.</p>"
+        "<p>Actualiza Elo, forma, fatiga, disponibilidad, disciplina, clima, alineaciones, bajas y mercado a medida que aparecen datos nuevos.</p>"
         "</article>"
         "<article>"
         "<h3>Modo in-play</h3>"
         "<p>Durante un partido, condiciona las probabilidades por minuto, marcador actual y fase del juego. No es evento por evento, pero sí cambia en vivo.</p>"
+        "</article>"
+        "<article>"
+        "<h3>Noticias y bajas</h3>"
+        "<p>Si el feed publica ausencias, cambios de XI o noticias relevantes del partido, esas señales entran como disponibilidad, moral o contexto adicional.</p>"
+        "</article>"
+        "<article>"
+        "<h3>Como validar el refresh</h3>"
+        "<p>La portada publica hora de actualizacion, badge En vivo, minuto modelado y un latest.json. Si esos campos cambian, el in-play se esta recalculando bien.</p>"
         "</article>"
         "</div>"
         "</section>"
@@ -4088,7 +4263,7 @@ def build_dashboard_html(
             market_html += f"<p class=\"meta\">Odds: {html.escape(market_text)}</p>"
         if entry.get("market_prob_a") is not None:
             market_html += (
-                f"<p class=\"meta\">Prior mercado 1X2: {html.escape(prediction.team_a)} {format_pct(float(entry['market_prob_a']))} | "
+                f"<p class=\"meta\">Prior de mercado (victoria/empate/derrota): {html.escape(prediction.team_a)} {format_pct(float(entry['market_prob_a']))} | "
                 f"empate {format_pct(float(entry.get('market_prob_draw', 0.0)))} | "
                 f"{html.escape(prediction.team_b)} {format_pct(float(entry.get('market_prob_b', 0.0)))}</p>"
             )
@@ -4109,13 +4284,17 @@ def build_dashboard_html(
         for line in dashboard_absence_lines(entry, prediction.team_a, prediction.team_b):
             absence_html += f"<p class=\"meta\">{html.escape(line[2:] if line.startswith('- ') else line)}</p>"
 
+        news_html = ""
+        for line in dashboard_news_lines(entry, prediction.team_a, prediction.team_b):
+            news_html += f"<p class=\"meta\">{html.escape(line[2:] if line.startswith('- ') else line)}</p>"
+
         projection_html = ""
         if entry.get("projection"):
             projection_html = f"<p class=\"meta\">{html.escape(entry.get('projection_note', ''))}</p>"
             alternatives = entry.get("projection_alternatives") or []
             if alternatives:
                 projection_html += (
-                    "<p class=\"meta\">Cruces alternativos: "
+                    "<p class=\"meta\">Otras rutas probables: "
                     + html.escape(
                         "; ".join(
                             f"{scenario['team_a']} vs {scenario['team_b']} -> {scenario['winner']} {format_pct(float(scenario['prob']))}"
@@ -4176,6 +4355,7 @@ def build_dashboard_html(
             f"{market_html}"
             f"{lineup_html}"
             f"{absence_html}"
+            f"{news_html}"
             f"{projection_html}"
             "<div class=\"hero-metrics\">"
             f"<div class=\"metric metric-score\"><span>{html.escape(goals_label(prediction))}</span><strong>{prediction.expected_goals_a:.2f} - {prediction.expected_goals_b:.2f}</strong></div>"
@@ -4198,6 +4378,7 @@ def build_dashboard_html(
     bracket_html = html.escape(bracket_text.strip() or "No hay llave generada todavia.")
     bracket_visual_html = build_bracket_visual_html(bracket_payload)
     methodology_html = build_methodology_html(bracket_payload)
+    global_confidence_html = build_global_confidence_html(entries)
     return f"""<!doctype html>
 <html lang="es">
 <head>
@@ -4421,6 +4602,57 @@ def build_dashboard_html(
       color: var(--muted);
       line-height: 1.45;
     }}
+    .confidence-panel a {{
+      color: var(--accent-dark);
+      text-decoration: none;
+      border-bottom: 1px dashed currentColor;
+    }}
+    .confidence-tiles {{
+      display: grid;
+      gap: 12px;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      margin-bottom: 14px;
+    }}
+    .confidence-grid {{
+      display: grid;
+      gap: 12px;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    }}
+    .confidence-grid article {{
+      border-radius: 18px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.68), rgba(181,131,47,0.05));
+      border: 1px solid var(--line);
+      padding: 14px;
+    }}
+    .confidence-grid ul {{
+      list-style: none;
+      padding: 0;
+      margin: 12px 0 0;
+      display: grid;
+      gap: 10px;
+    }}
+    .confidence-grid li {{
+      border-bottom: 1px dashed var(--line);
+      padding-bottom: 8px;
+    }}
+    .confidence-grid li span {{
+      text-transform: none;
+      letter-spacing: 0;
+      margin-top: 4px;
+      margin-bottom: 0;
+      font-size: 0.84rem;
+    }}
+    .confidence-panel .summary-tile {{
+      background: linear-gradient(180deg, rgba(255,255,255,0.76), rgba(15,109,102,0.06));
+      border: 1px solid var(--line);
+    }}
+    .confidence-panel .summary-tile span {{
+      color: var(--muted);
+    }}
+    .confidence-panel .summary-tile strong {{
+      color: var(--ink);
+      font-size: 1rem;
+    }}
     .cards {{
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
@@ -4563,7 +4795,8 @@ def build_dashboard_html(
       .panel, .card {{
         border-radius: 20px;
       }}
-      .summary-grid {{
+      .summary-grid,
+      .confidence-tiles {{
         grid-template-columns: 1fr;
       }}
     }}
@@ -4609,10 +4842,15 @@ def build_dashboard_html(
             <h3>Trazabilidad</h3>
             <p>Estado usado: {html.escape(str(state_path))}<br>Fixtures leídos: {html.escape(str(fixtures_path))}</p>
           </article>
+          <article class="hero-note">
+            <h3>Como validar el in-play</h3>
+            <p>Si el partido esta en vivo, revisa la hora superior, el badge En vivo, el minuto modelado y el archivo <a href="latest.json" style="color:#fff3d7;">latest.json</a>. Todo eso se regenera en cada corrida de GitHub Actions.</p>
+          </article>
         </div>
       </div>
     </section>
     {methodology_html}
+    {global_confidence_html}
     {bracket_visual_html}
     <section class="panel">
       <div class="panel-head">
@@ -5022,7 +5260,7 @@ def print_monte_carlo_summary(team_a: str, team_b: str, summary: dict) -> None:
         f"{team_b} {summary['avg_goals_b']:.2f}"
     )
     print(
-        f"    1X2 simulado: {summary['win_a']:.1%} / {summary['draw']:.1%} / {summary['win_b']:.1%}"
+        f"    Probabilidades simuladas de victoria/empate/derrota: {summary['win_a']:.1%} / {summary['draw']:.1%} / {summary['win_b']:.1%}"
     )
     if summary["advance_a"] is not None and summary["advance_b"] is not None:
         print(

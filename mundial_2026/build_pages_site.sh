@@ -24,6 +24,9 @@ script_dir = Path(os.environ["SCRIPT_DIR"])
 site_dir = script_dir / "site"
 payload = {
     "updated_at_utc": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+    "refresh_interval_minutes": 5,
+    "in_play_enabled": True,
+    "delivery": "github_actions_pages",
     "files": {
         "dashboard": "dashboard_actual_2026.html",
         "report": "reporte_actual_2026.md",
