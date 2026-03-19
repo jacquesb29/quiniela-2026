@@ -4105,7 +4105,7 @@ def dashboard_live_stats_lines(entry: dict, team_a: str, team_b: str) -> List[st
     xg_a = stats.get("xg_a", stats.get("xg_proxy_a"))
     xg_b = stats.get("xg_b", stats.get("xg_proxy_b"))
     if xg_a is not None or xg_b is not None:
-        label = "xG live" if stats.get("xg_a") is not None or stats.get("xg_b") is not None else "xG live proxy"
+        label = "Calidad de ocasiones en vivo" if stats.get("xg_a") is not None or stats.get("xg_b") is not None else "Calidad de ocasiones en vivo (estimada)"
         lines.append(
             f"- {label}: {team_a} {float(xg_a or 0.0):.2f} | {team_b} {float(xg_b or 0.0):.2f}"
         )
@@ -4120,7 +4120,7 @@ def dashboard_shot_timeline_lines(entry: dict, team_a: str, team_b: str) -> List
     lines = []
     provider = entry.get("live_feed_provider")
     if provider:
-        lines.append(f"- Feed live profundo: {provider}")
+        lines.append(f"- Datos en vivo enriquecidos: {provider}")
     for side, team_name in (("a", team_a), ("b", team_b)):
         shot_log = entry.get(f"live_shot_log_{side}") or []
         if not shot_log:
@@ -4408,9 +4408,9 @@ def projected_bracket_entries(
                 "weather_stress": base_fixture.get("weather_stress"),
                 "projection": True,
                 "projection_note": (
-                    f"Cruce que mas aparece hoy: {team_a} vs {team_b} | "
-                    f"probabilidad de que ese cruce ocurra {format_pct(match_projection['matchup_prob'])} | "
-                    f"equipo con mayor probabilidad de salir de esa llave {match_projection['winner']} {format_pct(match_projection['winner_prob'])}"
+                    f"Cruce mas probable hoy: {team_a} vs {team_b} | "
+                    f"probabilidad de que se de {format_pct(match_projection['matchup_prob'])} | "
+                    f"favorito para avanzar si se juega hoy: {match_projection['winner']} {format_pct(match_projection['winner_prob'])}"
                 ),
                 "projection_alternatives": match_projection.get("top_scenarios", [])[1:],
                 "projection_penalties": match_projection.get("penalties_prob", 0.0),
@@ -4489,7 +4489,7 @@ def dashboard_tactical_signature_lines(entry: dict, team_a: str, team_b: str) ->
     sample_b = int(entry.get("tactical_sample_matches_b", 0))
     if sample_a > 0 or sample_b > 0:
         lines.append(
-            f"- Firma tactica reciente: {team_a} {signature_a} (muestra {sample_a}) | {team_b} {signature_b} (muestra {sample_b})"
+            f"- Estilo reciente: {team_a} {signature_a} ({sample_a} partidos) | {team_b} {signature_b} ({sample_b} partidos)"
         )
     return lines
 
@@ -4498,34 +4498,34 @@ def adjustment_reason_lines(entry: dict, prediction: MatchPrediction) -> List[st
     lines = []
     if int(entry.get("tactical_sample_matches_a", 0)) > 0 or int(entry.get("tactical_sample_matches_b", 0)) > 0:
         lines.append(
-            f"- Ajuste por firma tactica reciente: {prediction.team_a} {entry.get('tactical_signature_a', 'sin muestra suficiente')} | "
+            f"- Cambio por el estilo reciente de cada equipo: {prediction.team_a} {entry.get('tactical_signature_a', 'sin muestra suficiente')} | "
             f"{prediction.team_b} {entry.get('tactical_signature_b', 'sin muestra suficiente')}."
         )
     if entry.get("status_state") == "in" and prediction.current_score_a is not None and prediction.current_score_b is not None:
         minute_text = f"{prediction.elapsed_minutes:.1f}" if prediction.elapsed_minutes is not None else "?"
         lines.append(
-            f"- Ajuste en vivo: marcador {prediction.team_a} {prediction.current_score_a} - {prediction.current_score_b} {prediction.team_b} en el minuto {minute_text}."
+            f"- Cambio por el partido en vivo: marcador {prediction.team_a} {prediction.current_score_a} - {prediction.current_score_b} {prediction.team_b} en el minuto {minute_text}."
         )
     if int(entry.get("unavailable_count_a", 0)) or int(entry.get("unavailable_count_b", 0)):
         lines.append(
-            f"- Ajuste por bajas confirmadas: {prediction.team_a} {int(entry.get('unavailable_count_a', 0))} | {prediction.team_b} {int(entry.get('unavailable_count_b', 0))}."
+            f"- Cambio por bajas confirmadas: {prediction.team_a} {int(entry.get('unavailable_count_a', 0))} | {prediction.team_b} {int(entry.get('unavailable_count_b', 0))}."
         )
     if int(entry.get("questionable_count_a", 0)) or int(entry.get("questionable_count_b", 0)):
         lines.append(
-            f"- Ajuste por dudas fisicas: {prediction.team_a} {int(entry.get('questionable_count_a', 0))} | {prediction.team_b} {int(entry.get('questionable_count_b', 0))}."
+            f"- Cambio por dudas fisicas: {prediction.team_a} {int(entry.get('questionable_count_a', 0))} | {prediction.team_b} {int(entry.get('questionable_count_b', 0))}."
         )
     if entry.get("lineup_status_a") == "confirmada" or entry.get("lineup_status_b") == "confirmada":
         lines.append(
-            f"- Ajuste por alineaciones: {prediction.team_a} {entry.get('lineup_status_a', 'sin confirmar')} | {prediction.team_b} {entry.get('lineup_status_b', 'sin confirmar')}."
+            f"- Cambio por alineaciones: {prediction.team_a} {entry.get('lineup_status_a', 'sin confirmar')} | {prediction.team_b} {entry.get('lineup_status_b', 'sin confirmar')}."
         )
     if entry.get("lineup_change_count_a") or entry.get("lineup_change_count_b"):
         lines.append(
-            f"- Ajuste por cambios en el XI: {prediction.team_a} {entry.get('lineup_change_count_a', 0)} | {prediction.team_b} {entry.get('lineup_change_count_b', 0)}."
+            f"- Cambio por cambios en el XI: {prediction.team_a} {entry.get('lineup_change_count_a', 0)} | {prediction.team_b} {entry.get('lineup_change_count_b', 0)}."
         )
     if entry.get("weather_stress") is not None and float(entry.get("weather_stress", 0.0)) >= 0.18:
-        lines.append(f"- Ajuste por clima exigente: estres climatico {float(entry.get('weather_stress', 0.0)):.2f}.")
+        lines.append(f"- Cambio por clima exigente: estres climatico {float(entry.get('weather_stress', 0.0)):.2f}.")
     if entry.get("market_prob_a") is not None:
-        lines.append("- Ajuste por mercado: el prior de cuotas se mezcla con la estimacion propia del modelo.")
+        lines.append("- Cambio por cuotas del mercado: se mezclan con la estimacion propia del modelo.")
     live_stats = extract_live_stats_payload(entry)
     if live_stats:
         shots_on_target_a = int(live_stats.get("shots_on_target_a", 0.0))
@@ -4536,29 +4536,29 @@ def adjustment_reason_lines(entry: dict, prediction: MatchPrediction) -> List[st
         red_b = int(live_stats.get("red_cards_b", 0.0))
         if shots_on_target_a or shots_on_target_b or xg_a or xg_b:
             lines.append(
-                f"- Ajuste por datos en vivo: tiros al arco {prediction.team_a} {shots_on_target_a} | {prediction.team_b} {shots_on_target_b}; "
-                f"xG live {prediction.team_a} {xg_a:.2f} | {prediction.team_b} {xg_b:.2f}."
+                f"- Cambio por lo que va pasando en la cancha: tiros al arco {prediction.team_a} {shots_on_target_a} | {prediction.team_b} {shots_on_target_b}; "
+                f"calidad de ocasiones en vivo {prediction.team_a} {xg_a:.2f} | {prediction.team_b} {xg_b:.2f}."
             )
         if red_a or red_b:
             lines.append(
-                f"- Ajuste por expulsiones en vivo: rojas {prediction.team_a} {red_a} | {prediction.team_b} {red_b}."
+                f"- Cambio por expulsiones en vivo: rojas {prediction.team_a} {red_a} | {prediction.team_b} {red_b}."
             )
     patterns = infer_entry_patterns(entry, prediction) or {}
     side_a = patterns.get("a")
     side_b = patterns.get("b")
     if side_a and side_b:
         lines.append(
-            f"- Ajuste por patrones de juego: {prediction.team_a} muestra {side_a.get('summary', 'sin patron claro')}; "
+            f"- Cambio por patrones de juego: {prediction.team_a} muestra {side_a.get('summary', 'sin patron claro')}; "
             f"{prediction.team_b} muestra {side_b.get('summary', 'sin patron claro')}."
         )
         if patterns.get("tempo_label"):
             lines.append(f"- Ritmo detectado del partido: {patterns['tempo_label']}.")
     if entry.get("news_headlines"):
-        lines.append("- Ajuste por noticias relevantes detectadas en el feed del partido.")
+        lines.append("- Cambio por noticias relevantes detectadas en el feed del partido.")
     drivers = top_factor_drivers(prediction.factors, limit=2)
     if drivers:
         lines.append(
-            "- Motores principales del pronostico ahora mismo: "
+            "- Factores que mas pesan ahora: "
             + "; ".join(f"{label} {value:+.3f}" for label, value in drivers)
         )
     return lines
@@ -4688,7 +4688,7 @@ def build_dashboard_markdown(
             lines.append(f"- Odds {provider}: {entry['market_summary']}")
         if entry.get("market_prob_a") is not None:
             lines.append(
-                f"- Prior de mercado (victoria/empate/derrota): {prediction.team_a} {format_pct(float(entry['market_prob_a']))} | "
+                f"- Referencia de cuotas (victoria/empate/derrota): {prediction.team_a} {format_pct(float(entry['market_prob_a']))} | "
                 f"empate {format_pct(float(entry.get('market_prob_draw', 0.0)))} | "
                 f"{prediction.team_b} {format_pct(float(entry.get('market_prob_b', 0.0)))}"
             )
@@ -4717,7 +4717,7 @@ def build_dashboard_markdown(
             alternatives = entry.get("projection_alternatives") or []
             if alternatives:
                 lines.append(
-                    "- Otras rutas probables: "
+                    "- Otras opciones de cruce: "
                     + "; ".join(
                         f"{scenario['team_a']} vs {scenario['team_b']} -> {scenario['winner']} {format_pct(float(scenario['prob']))}"
                         for scenario in alternatives
@@ -5573,7 +5573,7 @@ def build_dashboard_html(
             market_html += f"<p class=\"meta\">Odds: {html.escape(market_text)}</p>"
         if entry.get("market_prob_a") is not None:
             market_html += (
-                f"<p class=\"meta\">Prior de mercado (victoria/empate/derrota): {html.escape(prediction.team_a)} {format_pct(float(entry['market_prob_a']))} | "
+                f"<p class=\"meta\">Referencia de cuotas (victoria/empate/derrota): {html.escape(prediction.team_a)} {format_pct(float(entry['market_prob_a']))} | "
                 f"empate {format_pct(float(entry.get('market_prob_draw', 0.0)))} | "
                 f"{html.escape(prediction.team_b)} {format_pct(float(entry.get('market_prob_b', 0.0)))}</p>"
             )
@@ -5652,7 +5652,7 @@ def build_dashboard_html(
             alternatives = entry.get("projection_alternatives") or []
             if alternatives:
                 projection_html += (
-                    "<p class=\"meta\">Otras rutas probables: "
+                    "<p class=\"meta\">Otras opciones de cruce: "
                     + html.escape(
                         "; ".join(
                             f"{scenario['team_a']} vs {scenario['team_b']} -> {scenario['winner']} {format_pct(float(scenario['prob']))}"
