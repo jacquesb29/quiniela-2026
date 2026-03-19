@@ -4099,23 +4099,53 @@ def dashboard_live_stats_lines(entry: dict, team_a: str, team_b: str) -> List[st
     return lines
 
 
-def dashboard_pattern_lines(prediction: MatchPrediction) -> List[str]:
-    patterns = prediction.live_patterns or {}
-    side_a = patterns.get("a")
-    side_b = patterns.get("b")
+def dashboard_pattern_lines(entry: dict, prediction: MatchPrediction) -> List[str]:
+    return pattern_lines_from_payload(infer_entry_patterns(entry, prediction), prediction.team_a, prediction.team_b)
+
+
+def infer_entry_patterns(entry: dict, prediction: MatchPrediction) -> Optional[Dict[str, object]]:
+    if prediction.live_patterns:
+        return prediction.live_patterns
+    live_stats = extract_live_stats_payload(entry)
+    if not live_stats:
+        return None
+    score_a = (
+        int(entry["actual_score_a"])
+        if entry.get("actual_score_a") is not None
+        else int(entry.get("live_score_a", 0) or 0)
+    )
+    score_b = (
+        int(entry["actual_score_b"])
+        if entry.get("actual_score_b") is not None
+        else int(entry.get("live_score_b", 0) or 0)
+    )
+    phase = "extra_time" if entry.get("went_extra_time") else "regulation"
+    return detect_live_play_patterns(
+        live_stats,
+        1.0 if entry.get("actual_score_a") is not None else clamp((prediction.elapsed_minutes or 0.0) / 90.0, 0.0, 1.0),
+        phase,
+        score_a,
+        score_b,
+    )
+
+
+def pattern_lines_from_payload(patterns: Optional[Dict[str, object]], team_a: str, team_b: str) -> List[str]:
+    payload = patterns or {}
+    side_a = payload.get("a")
+    side_b = payload.get("b")
     if not side_a or not side_b:
         return []
     lines = [
-        f"- Patron de juego {prediction.team_a}: {side_a.get('summary', 'sin patron dominante claro')}.",
-        f"- Patron de juego {prediction.team_b}: {side_b.get('summary', 'sin patron dominante claro')}.",
-        f"- Ritmo detectado: {patterns.get('tempo_label', 'ritmo equilibrado')}.",
+        f"- Patron de juego {team_a}: {side_a.get('summary', 'sin patron dominante claro')}.",
+        f"- Patron de juego {team_b}: {side_b.get('summary', 'sin patron dominante claro')}.",
+        f"- Ritmo detectado: {payload.get('tempo_label', 'ritmo equilibrado')}.",
     ]
     signals_a = side_a.get("signals") or []
     signals_b = side_b.get("signals") or []
     if signals_a:
-        lines.append(f"- Senales {prediction.team_a}: {'; '.join(str(signal) for signal in signals_a[:3])}")
+        lines.append(f"- Senales {team_a}: {'; '.join(str(signal) for signal in signals_a[:3])}")
     if signals_b:
-        lines.append(f"- Senales {prediction.team_b}: {'; '.join(str(signal) for signal in signals_b[:3])}")
+        lines.append(f"- Senales {team_b}: {'; '.join(str(signal) for signal in signals_b[:3])}")
     return lines
 
 
@@ -4457,7 +4487,7 @@ def adjustment_reason_lines(entry: dict, prediction: MatchPrediction) -> List[st
             lines.append(
                 f"- Ajuste por expulsiones en vivo: rojas {prediction.team_a} {red_a} | {prediction.team_b} {red_b}."
             )
-    patterns = prediction.live_patterns or {}
+    patterns = infer_entry_patterns(entry, prediction) or {}
     side_a = patterns.get("a")
     side_b = patterns.get("b")
     if side_a and side_b:
@@ -4600,7 +4630,7 @@ def build_dashboard_markdown(
         lines.extend(dashboard_news_lines(entry, prediction.team_a, prediction.team_b))
         lines.extend(dashboard_tactical_signature_lines(entry, prediction.team_a, prediction.team_b))
         lines.extend(dashboard_live_stats_lines(entry, prediction.team_a, prediction.team_b))
-        lines.extend(dashboard_pattern_lines(prediction))
+        lines.extend(dashboard_pattern_lines(entry, prediction))
         lines.extend(adjustment_reason_lines(entry, prediction))
         next_round_note = next_round_projection_note(entry, prediction, bracket_payload)
         if next_round_note:
@@ -5497,7 +5527,7 @@ def build_dashboard_html(
         for line in dashboard_live_stats_lines(entry, prediction.team_a, prediction.team_b):
             live_stats_html += f"<p class=\"meta\">{html.escape(line[2:] if line.startswith('- ') else line)}</p>"
         pattern_html = ""
-        pattern_lines = dashboard_pattern_lines(prediction)
+        pattern_lines = dashboard_pattern_lines(entry, prediction)
         if pattern_lines:
             pattern_html = (
                 "<div class=\"reason-block\"><h4>Patrones de juego detectados</h4>"
@@ -7047,6 +7077,10 @@ def print_prediction(prediction: MatchPrediction, show_factors: bool = False) ->
             f"  Clasificar: {prediction.team_a} {prediction.advance_a:.1%} | "
             f"{prediction.team_b} {prediction.advance_b:.1%}"
         )
+    if prediction.live_patterns:
+        print("  Patrones detectados en el partido:")
+        for line in pattern_lines_from_payload(prediction.live_patterns, prediction.team_a, prediction.team_b):
+            print(f"    {line[2:] if line.startswith('- ') else line}")
     print("  Marcadores finales mas probables:" if prediction.advance_a is not None else "  Marcadores mas probables:")
     for score, prob in prediction.exact_scores:
         print(f"    {score}: {prob:.1%}")
@@ -7054,6 +7088,18 @@ def print_prediction(prediction: MatchPrediction, show_factors: bool = False) ->
         print("  Factores principales (A menos B):")
         for key in sorted(prediction.factors):
             print(f"    {key}: {prediction.factors[key]:+.3f}")
+
+
+def print_inferred_entry_patterns(entry: dict, prediction: MatchPrediction) -> None:
+    patterns = infer_entry_patterns(entry, prediction)
+    if not patterns or prediction.live_patterns:
+        return
+    lines = pattern_lines_from_payload(patterns, prediction.team_a, prediction.team_b)
+    if not lines:
+        return
+    print("  Patrones detectados en el partido:")
+    for line in lines:
+        print(f"    {line[2:] if line.startswith('- ') else line}")
 
 
 def print_monte_carlo_summary(team_a: str, team_b: str, summary: dict) -> None:
@@ -7357,6 +7403,7 @@ def command_fixtures(args: argparse.Namespace, teams: Dict[str, Team]) -> None:
             state_b=state_b,
         )
         print_prediction(prediction, show_factors=args.show_factors)
+        print_inferred_entry_patterns(fixture, prediction)
         result_ids = fixture_state_ids(fixture, fixture_path=fixture_path, index=index)
         result_id = result_ids[0]
         if fixture.get("update_state") and "actual_score_a" in fixture and "actual_score_b" in fixture:
