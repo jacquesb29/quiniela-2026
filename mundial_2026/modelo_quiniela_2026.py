@@ -1003,6 +1003,9 @@ def top_factor_drivers(factors: Optional[Dict[str, float]], limit: int = 3) -> L
         "recent_form_diff": "Forma reciente",
         "attack_form_diff": "Forma ofensiva",
         "defense_form_diff": "Forma defensiva",
+        "tactical_attack_diff": "Firma táctica ofensiva",
+        "tactical_defense_diff": "Firma táctica defensiva",
+        "tactical_tempo_diff": "Ritmo táctico reciente",
         "fatigue_diff": "Fatiga",
         "availability_diff": "Disponibilidad",
         "discipline_trend_diff": "Tendencia disciplinaria",
@@ -1711,6 +1714,8 @@ def attack_metric(team: Team, profile: TeamProfile, state: Optional[dict] = None
     value += team.attack_bias
     value += 0.28 * attack_form_signal(state)
     value += 0.16 * recent_form_signal(state)
+    value += 0.10 * tactical_attack_signal(state)
+    value += 0.04 * tactical_tempo_signal(state)
     value -= 0.12 * fatigue_level(state)
     value -= 0.22 * (1.0 - availability_level(state))
     return value
@@ -1731,6 +1736,8 @@ def defense_metric(team: Team, profile: TeamProfile, state: Optional[dict] = Non
     value += 0.30 * defense_form_signal(state)
     value += 0.14 * recent_form_signal(state)
     value += 0.08 * discipline_trend(state)
+    value += 0.08 * tactical_defense_signal(state)
+    value -= 0.03 * tactical_tempo_signal(state)
     value -= 0.10 * fatigue_level(state)
     value -= 0.20 * (1.0 - availability_level(state))
     return value
@@ -1776,6 +1783,8 @@ def expected_goals(
     delta_score += 0.14 * (recent_form_signal(state_a) - recent_form_signal(state_b))
     delta_score += 0.10 * (attack_form_signal(state_a) - attack_form_signal(state_b))
     delta_score += 0.08 * (defense_form_signal(state_a) - defense_form_signal(state_b))
+    delta_score += 0.06 * (tactical_attack_signal(state_a) - tactical_attack_signal(state_b))
+    delta_score += 0.04 * (tactical_defense_signal(state_a) - tactical_defense_signal(state_b))
     delta_score -= 0.10 * (fatigue_level(state_a) - fatigue_level(state_b))
     delta_score += 0.08 * (availability_level(state_a) - availability_level(state_b))
     if (
@@ -1813,6 +1822,9 @@ def expected_goals(
     total_goals += 0.03 * rivalry_intensity(team_a, team_b)
     total_goals += 0.08 * (attack_form_signal(state_a) + attack_form_signal(state_b))
     total_goals -= 0.05 * (defense_form_signal(state_a) + defense_form_signal(state_b))
+    total_goals += 0.06 * (tactical_tempo_signal(state_a) + tactical_tempo_signal(state_b))
+    total_goals += 0.03 * (tactical_attack_signal(state_a) + tactical_attack_signal(state_b))
+    total_goals -= 0.02 * (tactical_defense_signal(state_a) + tactical_defense_signal(state_b))
     total_goals -= 0.10 * (fatigue_level(state_a) + fatigue_level(state_b))
     total_goals -= 0.07 * ((1.0 - availability_level(state_a)) + (1.0 - availability_level(state_b)))
     if ctx.market_total_line is not None:
@@ -1865,6 +1877,9 @@ def factor_breakdown(
         "recent_form_diff": recent_form_signal(state_a) - recent_form_signal(state_b),
         "attack_form_diff": attack_form_signal(state_a) - attack_form_signal(state_b),
         "defense_form_diff": defense_form_signal(state_a) - defense_form_signal(state_b),
+        "tactical_attack_diff": tactical_attack_signal(state_a) - tactical_attack_signal(state_b),
+        "tactical_defense_diff": tactical_defense_signal(state_a) - tactical_defense_signal(state_b),
+        "tactical_tempo_diff": tactical_tempo_signal(state_a) - tactical_tempo_signal(state_b),
         "fatigue_diff": fatigue_level(state_a) - fatigue_level(state_b),
         "availability_diff": availability_level(state_a) - availability_level(state_b),
         "discipline_trend_diff": discipline_trend(state_a) - discipline_trend(state_b),
@@ -3203,6 +3218,7 @@ def update_simulation_state(
     winner: Optional[str] = None,
     went_extra_time: bool = False,
     went_penalties: bool = False,
+    live_stats: Optional[Dict[str, float]] = None,
 ) -> None:
     state_a = ensure_state(states, team_a)
     state_b = ensure_state(states, team_b)
@@ -3325,6 +3341,8 @@ def update_simulation_state(
     state_a["goals_against"] += score_b
     state_b["goals_for"] += score_b
     state_b["goals_against"] += score_a
+    update_tactical_signature_state(state_a, live_signature_metrics("a", live_stats or {}))
+    update_tactical_signature_state(state_b, live_signature_metrics("b", live_stats or {}))
 
     if stage == "group":
         state_a["group_matches_played"] += 1
@@ -4184,6 +4202,10 @@ def dashboard_fixture_entries(
                 "lineup_status_b": fixture.get("lineup_status_b"),
                 "lineup_change_count_a": int(fixture.get("lineup_change_count_a", 0)),
                 "lineup_change_count_b": int(fixture.get("lineup_change_count_b", 0)),
+                "tactical_signature_a": tactical_signature_text(state_a),
+                "tactical_signature_b": tactical_signature_text(state_b),
+                "tactical_sample_matches_a": int(state_a.get("tactical_sample_matches", 0)),
+                "tactical_sample_matches_b": int(state_b.get("tactical_sample_matches", 0)),
                 "injuries_a": fixture.get("injuries_a"),
                 "injuries_b": fixture.get("injuries_b"),
                 "unavailable_count_a": int(fixture.get("unavailable_count_a", 0)),
@@ -4307,6 +4329,10 @@ def projected_bracket_entries(
                 "projection_alternatives": match_projection.get("top_scenarios", [])[1:],
                 "projection_penalties": match_projection.get("penalties_prob", 0.0),
                 "projection_extra_time": match_projection.get("extra_time_prob", 0.0),
+                "tactical_signature_a": tactical_signature_text(state_a),
+                "tactical_signature_b": tactical_signature_text(state_b),
+                "tactical_sample_matches_a": int(state_a.get("tactical_sample_matches", 0)),
+                "tactical_sample_matches_b": int(state_b.get("tactical_sample_matches", 0)),
                 "injuries_a": base_fixture.get("injuries_a"),
                 "injuries_b": base_fixture.get("injuries_b"),
                 "unavailable_count_a": int(base_fixture.get("unavailable_count_a", 0)),
@@ -4369,8 +4395,26 @@ def dashboard_news_lines(entry: dict, team_a: str, team_b: str) -> List[str]:
     return lines
 
 
+def dashboard_tactical_signature_lines(entry: dict, team_a: str, team_b: str) -> List[str]:
+    lines = []
+    signature_a = str(entry.get("tactical_signature_a") or "sin muestra suficiente")
+    signature_b = str(entry.get("tactical_signature_b") or "sin muestra suficiente")
+    sample_a = int(entry.get("tactical_sample_matches_a", 0))
+    sample_b = int(entry.get("tactical_sample_matches_b", 0))
+    if sample_a > 0 or sample_b > 0:
+        lines.append(
+            f"- Firma tactica reciente: {team_a} {signature_a} (muestra {sample_a}) | {team_b} {signature_b} (muestra {sample_b})"
+        )
+    return lines
+
+
 def adjustment_reason_lines(entry: dict, prediction: MatchPrediction) -> List[str]:
     lines = []
+    if int(entry.get("tactical_sample_matches_a", 0)) > 0 or int(entry.get("tactical_sample_matches_b", 0)) > 0:
+        lines.append(
+            f"- Ajuste por firma tactica reciente: {prediction.team_a} {entry.get('tactical_signature_a', 'sin muestra suficiente')} | "
+            f"{prediction.team_b} {entry.get('tactical_signature_b', 'sin muestra suficiente')}."
+        )
     if entry.get("status_state") == "in" and prediction.current_score_a is not None and prediction.current_score_b is not None:
         minute_text = f"{prediction.elapsed_minutes:.1f}" if prediction.elapsed_minutes is not None else "?"
         lines.append(
@@ -4554,6 +4598,7 @@ def build_dashboard_markdown(
             )
         lines.extend(dashboard_absence_lines(entry, prediction.team_a, prediction.team_b))
         lines.extend(dashboard_news_lines(entry, prediction.team_a, prediction.team_b))
+        lines.extend(dashboard_tactical_signature_lines(entry, prediction.team_a, prediction.team_b))
         lines.extend(dashboard_live_stats_lines(entry, prediction.team_a, prediction.team_b))
         lines.extend(dashboard_pattern_lines(prediction))
         lines.extend(adjustment_reason_lines(entry, prediction))
@@ -5334,7 +5379,7 @@ def build_methodology_html(bracket_payload: dict, backtest: dict) -> str:
         "</article>"
         "<article>"
         "<h3>Estado dinámico</h3>"
-        "<p>Actualiza Elo, forma, fatiga, disponibilidad, disciplina, clima, alineaciones, bajas y mercado a medida que aparecen datos nuevos. Los puntos FIFA entran como señal estructural secundaria; si no los cargas de forma explícita, el modelo usa un proxy calibrado.</p>"
+        "<p>Actualiza Elo, forma, fatiga, disponibilidad, disciplina, clima, alineaciones, bajas y mercado a medida que aparecen datos nuevos. Ademas, acumula una firma tactica reciente por seleccion a partir de sus partidos previos para no arrancar cada cruce desde cero. Los puntos FIFA entran como señal estructural secundaria; si no los cargas de forma explícita, el modelo usa un proxy calibrado.</p>"
         "</article>"
         "<article>"
         "<h3>Modo in-play</h3>"
@@ -5445,6 +5490,9 @@ def build_dashboard_html(
         news_html = ""
         for line in dashboard_news_lines(entry, prediction.team_a, prediction.team_b):
             news_html += f"<p class=\"meta\">{html.escape(line[2:] if line.startswith('- ') else line)}</p>"
+        tactical_signature_html = ""
+        for line in dashboard_tactical_signature_lines(entry, prediction.team_a, prediction.team_b):
+            tactical_signature_html += f"<p class=\"meta\">{html.escape(line[2:] if line.startswith('- ') else line)}</p>"
         live_stats_html = ""
         for line in dashboard_live_stats_lines(entry, prediction.team_a, prediction.team_b):
             live_stats_html += f"<p class=\"meta\">{html.escape(line[2:] if line.startswith('- ') else line)}</p>"
@@ -5557,6 +5605,7 @@ def build_dashboard_html(
             f"{lineup_html}"
             f"{absence_html}"
             f"{news_html}"
+            f"{tactical_signature_html}"
             f"{live_stats_html}"
             f"{pattern_html}"
             f"{reason_html}"
@@ -6355,6 +6404,15 @@ def default_team_state() -> dict:
         "fatigue": 0.0,
         "availability": 1.0,
         "discipline_drift": 0.0,
+        "style_possession": 0.0,
+        "style_verticality": 0.0,
+        "style_pressure": 0.0,
+        "style_chance_quality": 0.0,
+        "style_tempo": 0.0,
+        "style_attack_bias": 0.0,
+        "style_defense_bias": 0.0,
+        "tactical_sample_matches": 0,
+        "tactical_signature": "sin muestra suficiente",
         "updated_at": None,
     }
 
@@ -6373,8 +6431,17 @@ def normalize_team_state(state: Optional[dict]) -> dict:
     normalized["attack_form"] = clamp(float(normalized["attack_form"]), -1.0, 1.0)
     normalized["defense_form"] = clamp(float(normalized["defense_form"]), -1.0, 1.0)
     normalized["discipline_drift"] = clamp(float(normalized["discipline_drift"]), -1.0, 0.5)
+    normalized["style_possession"] = clamp(float(normalized["style_possession"]), -1.0, 1.0)
+    normalized["style_verticality"] = clamp(float(normalized["style_verticality"]), -1.0, 1.0)
+    normalized["style_pressure"] = clamp(float(normalized["style_pressure"]), -1.0, 1.0)
+    normalized["style_chance_quality"] = clamp(float(normalized["style_chance_quality"]), -1.0, 1.0)
+    normalized["style_tempo"] = clamp(float(normalized["style_tempo"]), -1.0, 1.0)
+    normalized["style_attack_bias"] = clamp(float(normalized["style_attack_bias"]), -1.0, 1.0)
+    normalized["style_defense_bias"] = clamp(float(normalized["style_defense_bias"]), -1.0, 1.0)
+    normalized["tactical_sample_matches"] = max(0, int(normalized["tactical_sample_matches"]))
     normalized["yellow_load"] = clamp(float(normalized["yellow_load"]), 0.0, 6.0)
     normalized["morale"] = clamp(float(normalized["morale"]), -1.0, 1.0)
+    normalized["tactical_signature"] = str(normalized.get("tactical_signature") or "sin muestra suficiente")
     return normalized
 
 
@@ -6385,7 +6452,7 @@ def initial_team_states(teams: Dict[str, Team]) -> Dict[str, dict]:
 def empty_persistent_payload(teams: Dict[str, Team]) -> dict:
     return {
         "meta": {
-            "version": 2,
+            "version": 3,
             "updated_at": iso_timestamp(),
             "description": "Estado persistente del Mundial 2026 para actualizar automaticamente predicciones futuras.",
         },
@@ -6448,6 +6515,12 @@ def print_state(state_name: str, state: dict) -> None:
     print(f"  Fatiga: {state['fatigue']:.2f}")
     print(f"  Disponibilidad: {state['availability']:.2f}")
     print(f"  Tendencia disciplinaria: {state['discipline_drift']:+.2f}")
+    print(f"  Firma tactica reciente: {state['tactical_signature']}")
+    print(
+        f"  Rasgos tacticos: posesion {state['style_possession']:+.2f} | verticalidad {state['style_verticality']:+.2f} | "
+        f"presion {state['style_pressure']:+.2f} | calidad {state['style_chance_quality']:+.2f} | ritmo {state['style_tempo']:+.2f}"
+    )
+    print(f"  Muestra tactica acumulada: {state['tactical_sample_matches']}")
     print(f"  Amarillas acumuladas: {state['yellow_cards']}")
     print(f"  Carga disciplinaria reciente: {state['yellow_load']:.2f}")
     print(f"  Suspensiones por roja: {state['red_suspensions']}")
@@ -6474,7 +6547,121 @@ def state_has_activity(state: dict) -> bool:
             abs(state["discipline_drift"]) > 1e-9,
             abs(state["fatigue"]) > 1e-9,
             abs(state["availability"] - 1.0) > 1e-9,
+            state["tactical_sample_matches"] > 0,
         ]
+    )
+
+
+def tactical_state_value(state: Optional[dict], key: str, default: float = 0.0) -> float:
+    if not state:
+        return default
+    return float(normalize_team_state(state).get(key, default))
+
+
+def tactical_attack_signal(state: Optional[dict]) -> float:
+    return tactical_state_value(state, "style_attack_bias", 0.0)
+
+
+def tactical_defense_signal(state: Optional[dict]) -> float:
+    return tactical_state_value(state, "style_defense_bias", 0.0)
+
+
+def tactical_tempo_signal(state: Optional[dict]) -> float:
+    return tactical_state_value(state, "style_tempo", 0.0)
+
+
+def tactical_signature_text(state: Optional[dict]) -> str:
+    return str(normalize_team_state(state).get("tactical_signature", "sin muestra suficiente"))
+
+
+def tactical_signature_from_metrics(
+    style_possession: float,
+    style_verticality: float,
+    style_pressure: float,
+    style_chance_quality: float,
+    style_tempo: float,
+    style_attack_bias: float,
+    style_defense_bias: float,
+    sample_matches: int,
+) -> str:
+    if sample_matches <= 0:
+        return "sin muestra suficiente"
+    if style_possession >= 0.22 and style_pressure >= 0.14 and style_chance_quality >= -0.02:
+        return "control territorial"
+    if style_possession >= 0.22 and style_chance_quality < -0.08:
+        return "control esteril"
+    if style_possession <= -0.12 and style_verticality >= 0.12 and style_chance_quality >= 0.0:
+        return "transicion vertical"
+    if style_possession <= -0.18 and style_defense_bias >= 0.08 and style_attack_bias >= -0.02:
+        return "bloque bajo y contra"
+    if style_tempo >= 0.18 and style_pressure >= 0.05:
+        return "ritmo alto"
+    if abs(style_possession) < 0.12 and abs(style_verticality) < 0.12 and abs(style_pressure) < 0.12:
+        return "perfil mixto equilibrado"
+    return "perfil mixto"
+
+
+def live_signature_metrics(side: str, live_stats: Dict[str, float]) -> Optional[Dict[str, float]]:
+    other = "b" if side == "a" else "a"
+    shots = float(live_stats.get(f"shots_{side}", 0.0))
+    shots_opp = float(live_stats.get(f"shots_{other}", 0.0))
+    sot = float(live_stats.get(f"shots_on_target_{side}", 0.0))
+    sot_opp = float(live_stats.get(f"shots_on_target_{other}", 0.0))
+    poss = float(live_stats.get(f"possession_{side}", 50.0))
+    corners = float(live_stats.get(f"corners_{side}", 0.0))
+    corners_opp = float(live_stats.get(f"corners_{other}", 0.0))
+    fouls = float(live_stats.get(f"fouls_{side}", 0.0))
+    fouls_opp = float(live_stats.get(f"fouls_{other}", 0.0))
+    yellows = float(live_stats.get(f"yellow_cards_{side}", 0.0))
+    reds = float(live_stats.get(f"red_cards_{side}", 0.0))
+    reds_opp = float(live_stats.get(f"red_cards_{other}", 0.0))
+    xg = float(live_stats.get(f"xg_{side}", live_stats.get(f"xg_proxy_{side}", 0.0)))
+    xg_opp = float(live_stats.get(f"xg_{other}", live_stats.get(f"xg_proxy_{other}", 0.0)))
+
+    total_signal = shots + shots_opp + sot + sot_opp + corners + corners_opp + xg + xg_opp + fouls + fouls_opp + yellows
+    if total_signal <= 0.0:
+        return None
+
+    poss_norm = clamp((poss - 50.0) / 25.0, -1.0, 1.0)
+    shot_share = clamp((stat_share(shots, shots_opp) - 0.5) * 2.0, -1.0, 1.0)
+    sot_share = clamp((stat_share(sot, sot_opp) - 0.5) * 2.0, -1.0, 1.0)
+    corner_share = clamp((stat_share(corners, corners_opp) - 0.5) * 2.0, -1.0, 1.0)
+    xg_per_shot = xg / max(shots, 1.0)
+    chance_quality = clamp((xg_per_shot - 0.11) / 0.09, -1.0, 1.0)
+    verticality = clamp(0.48 * (-poss_norm) + 0.32 * chance_quality + 0.20 * shot_share, -1.0, 1.0)
+    pressure = clamp(0.45 * shot_share + 0.30 * corner_share + 0.25 * sot_share, -1.0, 1.0)
+    match_intensity = clamp(((shots + shots_opp) + 0.8 * (corners + corners_opp) + 3.0 * (xg + xg_opp)) / 24.0 - 1.0, -1.0, 1.0)
+    tempo = clamp(match_intensity + 0.20 * pressure - 0.10 * clamp((fouls + fouls_opp) / 24.0, 0.0, 1.0), -1.0, 1.0)
+    attack_bias = clamp(0.40 * pressure + 0.35 * chance_quality + 0.25 * verticality, -1.0, 1.0)
+    card_swing = 1.0 if reds_opp > reds else -1.0 if reds > reds_opp else 0.0
+    defense_bias = clamp(0.35 * poss_norm + 0.35 * pressure - 0.18 * tempo + 0.18 * card_swing, -1.0, 1.0)
+    return {
+        "style_possession": poss_norm,
+        "style_verticality": verticality,
+        "style_pressure": pressure,
+        "style_chance_quality": chance_quality,
+        "style_tempo": tempo,
+        "style_attack_bias": attack_bias,
+        "style_defense_bias": defense_bias,
+    }
+
+
+def update_tactical_signature_state(state: dict, metrics: Optional[Dict[str, float]]) -> None:
+    if not metrics:
+        return
+    alpha = 0.28
+    for key, value in metrics.items():
+        state[key] = clamp((1.0 - alpha) * float(state.get(key, 0.0)) + alpha * float(value), -1.0, 1.0)
+    state["tactical_sample_matches"] = int(state.get("tactical_sample_matches", 0)) + 1
+    state["tactical_signature"] = tactical_signature_from_metrics(
+        float(state.get("style_possession", 0.0)),
+        float(state.get("style_verticality", 0.0)),
+        float(state.get("style_pressure", 0.0)),
+        float(state.get("style_chance_quality", 0.0)),
+        float(state.get("style_tempo", 0.0)),
+        float(state.get("style_attack_bias", 0.0)),
+        float(state.get("style_defense_bias", 0.0)),
+        int(state.get("tactical_sample_matches", 0)),
     )
 
 
@@ -6547,6 +6734,7 @@ def apply_state_updates(
     reds_b = int(fixture.get("actual_reds_b", 0))
     stage = fixture_stage_name(fixture)
     winner = resolve_fixture_winner(fixture, teams, team_a, team_b)
+    live_stats = extract_live_stats_payload(fixture)
     update_simulation_state(
         teams,
         states,
@@ -6565,6 +6753,7 @@ def apply_state_updates(
         winner=winner,
         went_extra_time=bool(fixture.get("went_extra_time", False)),
         went_penalties=bool(fixture.get("went_penalties", False)),
+        live_stats=live_stats,
     )
     states[team_a]["updated_at"] = iso_timestamp()
     states[team_b]["updated_at"] = iso_timestamp()
