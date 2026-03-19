@@ -4610,6 +4610,26 @@ def result_prob_label(prediction: MatchPrediction) -> str:
     return "Probabilidades de resultado (90')"
 
 
+def top_result_label(prediction: MatchPrediction) -> str:
+    if prediction.live_phase == "regulation":
+        return "Desenlace mas probable al final del tiempo reglamentario"
+    if prediction.live_phase == "extra_time":
+        return "Desenlace mas probable al final de la prorroga"
+    if prediction.live_phase == "penalties":
+        return "Equipo con mayor probabilidad de clasificar en penales"
+    return "Desenlace mas probable en 90 minutos"
+
+
+def top_result_summary(prediction: MatchPrediction) -> str:
+    outcomes = [
+        (prediction.win_a, f"Gana {prediction.team_a}"),
+        (prediction.draw, "Empate"),
+        (prediction.win_b, f"Gana {prediction.team_b}"),
+    ]
+    best_prob, best_label = max(outcomes, key=lambda item: item[0])
+    return f"{best_label} {format_pct(best_prob)}"
+
+
 def build_dashboard_markdown(
     entries: Sequence[dict],
     bracket_text: str,
@@ -5712,7 +5732,7 @@ def build_dashboard_html(
             f"{projection_html}"
             "<div class=\"hero-metrics\">"
             f"<div class=\"metric metric-score\"><span>{html.escape(projected_score_label(prediction))}</span><strong>{html.escape(projected_score_value(prediction))}</strong></div>"
-            f"<div class=\"metric metric-probs\"><span>{html.escape(result_prob_label(prediction))}</span><strong>{html.escape(prediction.team_a)} / Empate / {html.escape(prediction.team_b)}</strong></div>"
+            f"<div class=\"metric metric-probs\"><span>{html.escape(top_result_label(prediction))}</span><strong>{html.escape(top_result_summary(prediction))}</strong></div>"
             "</div>"
             f"{average_goals_html}"
             f"<div class=\"prob-block\">{probability_rows_html}</div>"
