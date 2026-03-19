@@ -411,6 +411,8 @@ class Team:
     confederation: str
     status: str
     elo: float
+    fifa_points: Optional[float] = None
+    fifa_rank: Optional[int] = None
     host_country: Optional[str] = None
     resource_bias: float = 0.0
     heritage_bias: float = 0.0
@@ -448,6 +450,9 @@ class SquadAggregate:
 
 @dataclass(frozen=True)
 class TeamProfile:
+    fifa_points: float
+    fifa_rank: int
+    fifa_strength_index: float
     resource_index: float
     heritage_index: float
     world_cup_titles: int
@@ -749,6 +754,7 @@ def top_factor_drivers(factors: Optional[Dict[str, float]], limit: int = 3) -> L
         return []
     labels = {
         "elo_diff": "Elo dinámico",
+        "fifa_strength_diff": "Ranking FIFA / puntos FIFA",
         "resource_diff": "Recursos/PIB proxy",
         "heritage_diff": "Historia mundialista",
         "coach_diff": "Entrenador",
@@ -905,6 +911,8 @@ def load_teams() -> Dict[str, Team]:
             confederation=item["confederation"],
             status=item["status"],
             elo=float(item["elo"]),
+            fifa_points=float(item["fifa_points"]) if item.get("fifa_points") is not None else None,
+            fifa_rank=int(item["fifa_rank"]) if item.get("fifa_rank") is not None else None,
             host_country=item.get("host_country"),
             resource_bias=float(item.get("resource_bias", 0.0)),
             heritage_bias=float(item.get("heritage_bias", 0.0)),
@@ -920,6 +928,74 @@ def load_teams() -> Dict[str, Team]:
 
 def centered(value: float) -> float:
     return value - 0.5
+
+
+FIFA_CONFEDERATION_ADJUST = {
+    "UEFA": 16.0,
+    "CONMEBOL": 18.0,
+    "CAF": -6.0,
+    "AFC": -8.0,
+    "CONCACAF": -10.0,
+    "OFC": -28.0,
+}
+
+
+@lru_cache(maxsize=None)
+def estimated_fifa_points(team: Team) -> float:
+    value = 1050.0 + 0.82 * (team.elo - 1200.0)
+    value += 92.0 * centered(heritage_index(team))
+    value += 58.0 * centered(resource_index(team))
+    value += 34.0 * centered(trajectory_index(team))
+    value += 26.0 * centered(coach_index(team))
+    value += FIFA_CONFEDERATION_ADJUST.get(team.confederation, 0.0)
+    if team.is_host:
+        value += 8.0
+    return clamp(value, 820.0, 2250.0)
+
+
+@lru_cache(maxsize=1)
+def fifa_reference_table() -> Dict[str, Tuple[float, int, bool]]:
+    teams = load_teams()
+    rows = []
+    for team in teams.values():
+        points = float(team.fifa_points) if team.fifa_points is not None else estimated_fifa_points(team)
+        rows.append((team.name, points, team.fifa_rank, team.fifa_points is None))
+
+    rows.sort(key=lambda item: (-item[1], item[0]))
+    table: Dict[str, Tuple[float, int, bool]] = {}
+    for derived_rank, (name, points, explicit_rank, is_proxy) in enumerate(rows, start=1):
+        rank = int(explicit_rank) if explicit_rank is not None else derived_rank
+        table[name] = (points, rank, is_proxy)
+    return table
+
+
+@lru_cache(maxsize=None)
+def fifa_points_value(team: Team) -> float:
+    return fifa_reference_table()[team.name][0]
+
+
+@lru_cache(maxsize=None)
+def fifa_rank_value(team: Team) -> int:
+    return fifa_reference_table()[team.name][1]
+
+
+@lru_cache(maxsize=None)
+def fifa_points_are_proxy(team: Team) -> bool:
+    return fifa_reference_table()[team.name][2]
+
+
+@lru_cache(maxsize=1)
+def fifa_points_bounds() -> Tuple[float, float]:
+    values = [points for points, _, _ in fifa_reference_table().values()]
+    return (min(values), max(values))
+
+
+@lru_cache(maxsize=None)
+def fifa_strength_index(team: Team) -> float:
+    low, high = fifa_points_bounds()
+    if high <= low:
+        return 0.5
+    return clamp((fifa_points_value(team) - low) / (high - low), 0.0, 1.0)
 
 
 @lru_cache(maxsize=None)
@@ -1211,6 +1287,9 @@ def aggregate_squad(team: Team) -> SquadAggregate:
 @lru_cache(maxsize=None)
 def profile_for(team: Team) -> TeamProfile:
     return TeamProfile(
+        fifa_points=fifa_points_value(team),
+        fifa_rank=fifa_rank_value(team),
+        fifa_strength_index=fifa_strength_index(team),
         resource_index=resource_index(team),
         heritage_index=heritage_index(team),
         world_cup_titles=WORLD_CUP_TITLES.get(team.name, 0),
@@ -1395,6 +1474,7 @@ def context_components(
 def attack_metric(team: Team, profile: TeamProfile, state: Optional[dict] = None) -> float:
     strength = (effective_elo(team, state) - 1650.0) / 320.0
     value = 0.48 * strength
+    value += 0.05 * centered(profile.fifa_strength_index)
     value += 0.30 * centered(profile.squad.attack_unit)
     value += 0.18 * centered(profile.squad.midfield_unit)
     value += 0.14 * centered(profile.squad.finishing)
@@ -1413,6 +1493,7 @@ def attack_metric(team: Team, profile: TeamProfile, state: Optional[dict] = None
 def defense_metric(team: Team, profile: TeamProfile, state: Optional[dict] = None) -> float:
     strength = (effective_elo(team, state) - 1650.0) / 340.0
     value = 0.44 * strength
+    value += 0.04 * centered(profile.fifa_strength_index)
     value += 0.28 * centered(profile.squad.defense_unit)
     value += 0.14 * centered(profile.squad.goalkeeper_unit)
     value += 0.10 * centered(profile.squad.player_experience)
@@ -1450,9 +1531,11 @@ def expected_goals(
     attack_edge_a = attack_a - defense_b
     attack_edge_b = attack_b - defense_a
     elo_diff = effective_elo(team_a, state_a) - effective_elo(team_b, state_b)
+    fifa_diff = profile_a.fifa_strength_index - profile_b.fifa_strength_index
     history_weight = (0.11 if ctx.knockout else 0.06) * importance_scale
 
     delta_score = elo_diff / 255.0
+    delta_score += 0.16 * fifa_diff
     delta_score += 0.95 * (attack_edge_a - attack_edge_b)
     delta_score += history_weight * (profile_a.heritage_index - profile_b.heritage_index)
     delta_score += 0.07 * (profile_a.resource_index - profile_b.resource_index)
@@ -1483,6 +1566,7 @@ def expected_goals(
 
     total_goals = 2.28
     total_goals += 0.16 * abs(elo_diff) / 400.0
+    total_goals += 0.04 * abs(fifa_diff)
     total_goals += 0.18 * centered(profile_a.squad.attack_unit + profile_b.squad.attack_unit)
     total_goals += 0.12 * centered(profile_a.squad.shot_creation + profile_b.squad.shot_creation)
     total_goals -= 0.12 * centered(profile_a.squad.defense_unit + profile_b.squad.defense_unit)
@@ -1529,6 +1613,7 @@ def factor_breakdown(
     context_b = context_components(team_b, profile_b, team_a, ctx, "B", state_b)
     return {
         "elo_diff": effective_elo(team_a, state_a) - effective_elo(team_b, state_b),
+        "fifa_strength_diff": profile_a.fifa_strength_index - profile_b.fifa_strength_index,
         "resource_diff": profile_a.resource_index - profile_b.resource_index,
         "heritage_diff": profile_a.heritage_index - profile_b.heritage_index,
         "coach_diff": profile_a.coach_index - profile_b.coach_index,
@@ -4965,7 +5050,7 @@ def build_methodology_html(bracket_payload: dict, backtest: dict) -> str:
         "</article>"
         "<article>"
         "<h3>Estado dinámico</h3>"
-        "<p>Actualiza Elo, forma, fatiga, disponibilidad, disciplina, clima, alineaciones, bajas y mercado a medida que aparecen datos nuevos.</p>"
+        "<p>Actualiza Elo, forma, fatiga, disponibilidad, disciplina, clima, alineaciones, bajas y mercado a medida que aparecen datos nuevos. Los puntos FIFA entran como señal estructural secundaria; si no los cargas de forma explícita, el modelo usa un proxy calibrado.</p>"
         "</article>"
         "<article>"
         "<h3>Modo in-play</h3>"
@@ -5847,7 +5932,7 @@ def build_dashboard_html(
         <div>
           <p class="eyebrow">Modelo Dinámico | Mundial 2026</p>
           <h1>Pronóstico En Vivo y Hoja de Ruta</h1>
-          <p class="lede">Cada partido combina fortaleza base, forma reciente, clima, alineaciones, bajas, mercado y estado del torneo. Si un juego está en curso, las probabilidades ya se condicionan al minuto y al marcador actual.</p>
+          <p class="lede">Cada partido combina fortaleza base, Elo, puntos FIFA complementarios, forma reciente, clima, alineaciones, bajas, mercado y estado del torneo. Si un juego está en curso, las probabilidades ya se condicionan al minuto y al marcador actual.</p>
           <div class="summary-grid">
             <div class="summary-tile">
               <span>Última actualización</span>
@@ -5870,7 +5955,7 @@ def build_dashboard_html(
         <div class="hero-notes">
           <article class="hero-note">
             <h3>Qué significan las métricas</h3>
-            <p><strong>Marcador proyectado</strong> muestra el resultado entero mas probable. <strong>Promedio estimado de goles del modelo</strong> es una media probabilistica y por eso puede llevar decimales. <strong>Probabilidades de resultado</strong> es la chance de victoria, empate o derrota en ese mismo corte.</p>
+            <p><strong>Marcador proyectado</strong> muestra el resultado entero mas probable. <strong>Promedio estimado de goles del modelo</strong> es una media probabilistica y por eso puede llevar decimales. <strong>Probabilidades de resultado</strong> es la chance de victoria, empate o derrota en ese mismo corte. <strong>Puntos FIFA</strong> entran como señal estructural secundaria, con menos peso que Elo.</p>
           </article>
           <article class="hero-note">
             <h3>Durante un partido</h3>
@@ -6512,8 +6597,11 @@ def print_monte_carlo_summary(team_a: str, team_b: str, summary: dict) -> None:
 def print_team_profile(team: Team) -> None:
     profile = profile_for(team)
     squad = profile.squad
+    fifa_note = " (proxy calibrado)" if fifa_points_are_proxy(team) else ""
     print(f"{team.name} ({pretty_status(team.status)})")
     print(f"  Elo: {team.elo:.0f}")
+    print(f"  Puntos FIFA{fifa_note}: {profile.fifa_points:.1f}")
+    print(f"  Ranking FIFA{fifa_note}: {profile.fifa_rank}")
     print(f"  PIB/recursos proxy: {profile.resource_index:.2f}")
     print(f"  Historia mundialista: {profile.heritage_index:.2f}")
     print(f"  Titulos del mundo: {profile.world_cup_titles}")
