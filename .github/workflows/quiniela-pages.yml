@@ -34,6 +34,10 @@ jobs:
           chmod +x mundial_2026/build_pages_site.sh
 
       - name: Sync live data and rebuild model
+        env:
+          API_FOOTBALL_KEY: ${{ secrets.API_FOOTBALL_KEY }}
+          API_FOOTBALL_BASE_URL: ${{ vars.API_FOOTBALL_BASE_URL }}
+          API_FOOTBALL_HOST: ${{ vars.API_FOOTBALL_HOST }}
         run: |
           python3 mundial_2026/sync_live_data_2026.py
           python3 mundial_2026/modelo_quiniela_2026.py state-reset

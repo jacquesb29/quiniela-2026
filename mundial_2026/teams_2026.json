@@ -1,72 +1,589 @@
 {
   "meta": {
     "as_of": "2026-03-16",
-    "description": "Base inicial para modelar quinielas del Mundial 2026. Incluye 42 clasificados confirmados y 22 selecciones vivas por los 6 cupos restantes."
+    "description": "Base inicial para modelar quinielas del Mundial 2026. Incluye 42 clasificados confirmados y 22 selecciones vivas por los 6 cupos restantes.",
+    "fifa_rankings_as_of": "2026-01-19T16:51:00+00:00",
+    "fifa_rankings_source": "https://inside.fifa.com/api/rankings/by-country"
   },
   "teams": [
-    {"name": "Algeria", "confederation": "CAF", "status": "qualified", "elo": 1674},
-    {"name": "Argentina", "confederation": "CONMEBOL", "status": "qualified", "elo": 2113},
-    {"name": "Australia", "confederation": "AFC", "status": "qualified", "elo": 1774},
-    {"name": "Austria", "confederation": "UEFA", "status": "qualified", "elo": 1818},
-    {"name": "Belgium", "confederation": "UEFA", "status": "qualified", "elo": 1849},
-    {"name": "Brazil", "confederation": "CONMEBOL", "status": "qualified", "elo": 1978},
-    {"name": "Canada", "confederation": "CONCACAF", "status": "qualified", "elo": 1806, "host_country": "Canada"},
-    {"name": "Cape Verde", "confederation": "CAF", "status": "qualified", "elo": 1561},
-    {"name": "Colombia", "confederation": "CONMEBOL", "status": "qualified", "elo": 1998},
-    {"name": "Croatia", "confederation": "UEFA", "status": "qualified", "elo": 1932},
-    {"name": "Curacao", "confederation": "CONCACAF", "status": "qualified", "elo": 1467},
-    {"name": "Ecuador", "confederation": "CONMEBOL", "status": "qualified", "elo": 1933},
-    {"name": "Egypt", "confederation": "CAF", "status": "qualified", "elo": 1660},
-    {"name": "England", "confederation": "UEFA", "status": "qualified", "elo": 2042},
-    {"name": "France", "confederation": "UEFA", "status": "qualified", "elo": 2063},
-    {"name": "Germany", "confederation": "UEFA", "status": "qualified", "elo": 1910},
-    {"name": "Ghana", "confederation": "CAF", "status": "qualified", "elo": 1509},
-    {"name": "Haiti", "confederation": "CONCACAF", "status": "qualified", "elo": 1542},
-    {"name": "Iran", "confederation": "AFC", "status": "qualified", "elo": 1754},
-    {"name": "Ivory Coast", "confederation": "CAF", "status": "qualified", "elo": 1637},
-    {"name": "Japan", "confederation": "AFC", "status": "qualified", "elo": 1878},
-    {"name": "Jordan", "confederation": "AFC", "status": "qualified", "elo": 1691},
-    {"name": "Mexico", "confederation": "CONCACAF", "status": "qualified", "elo": 1853, "host_country": "Mexico"},
-    {"name": "Morocco", "confederation": "CAF", "status": "qualified", "elo": 1806},
-    {"name": "Netherlands", "confederation": "UEFA", "status": "qualified", "elo": 1959},
-    {"name": "New Zealand", "confederation": "OFC", "status": "qualified", "elo": 1586},
-    {"name": "Norway", "confederation": "UEFA", "status": "qualified", "elo": 1922},
-    {"name": "Panama", "confederation": "CONCACAF", "status": "qualified", "elo": 1733},
-    {"name": "Paraguay", "confederation": "CONMEBOL", "status": "qualified", "elo": 1833},
-    {"name": "Portugal", "confederation": "UEFA", "status": "qualified", "elo": 1976},
-    {"name": "Qatar", "confederation": "AFC", "status": "qualified", "elo": 1427},
-    {"name": "Saudi Arabia", "confederation": "AFC", "status": "qualified", "elo": 1593},
-    {"name": "Scotland", "confederation": "UEFA", "status": "qualified", "elo": 1790},
-    {"name": "Senegal", "confederation": "CAF", "status": "qualified", "elo": 1869},
-    {"name": "South Africa", "confederation": "CAF", "status": "qualified", "elo": 1529},
-    {"name": "South Korea", "confederation": "AFC", "status": "qualified", "elo": 1784},
-    {"name": "Spain", "confederation": "UEFA", "status": "qualified", "elo": 2171},
-    {"name": "Switzerland", "confederation": "UEFA", "status": "qualified", "elo": 1897},
-    {"name": "Tunisia", "confederation": "CAF", "status": "qualified", "elo": 1614},
-    {"name": "United States", "confederation": "CONCACAF", "status": "qualified", "elo": 1747, "host_country": "United States"},
-    {"name": "Uruguay", "confederation": "CONMEBOL", "status": "qualified", "elo": 1890},
-    {"name": "Uzbekistan", "confederation": "AFC", "status": "qualified", "elo": 1728},
-    {"name": "Albania", "confederation": "UEFA", "status": "uefa_playoff", "elo": 1664},
-    {"name": "Bosnia and Herzegovina", "confederation": "UEFA", "status": "uefa_playoff", "elo": 1571},
-    {"name": "Bolivia", "confederation": "CONMEBOL", "status": "fifa_playoff", "elo": 1656},
-    {"name": "Czech Republic", "confederation": "UEFA", "status": "uefa_playoff", "elo": 1731},
-    {"name": "Dem. Rep. of Congo", "confederation": "CAF", "status": "fifa_playoff", "elo": 1639},
-    {"name": "Denmark", "confederation": "UEFA", "status": "uefa_playoff", "elo": 1864},
-    {"name": "Iraq", "confederation": "AFC", "status": "fifa_playoff", "elo": 1583},
-    {"name": "Italy", "confederation": "UEFA", "status": "uefa_playoff", "elo": 1859},
-    {"name": "Jamaica", "confederation": "CONCACAF", "status": "fifa_playoff", "elo": 1530},
-    {"name": "Kosovo", "confederation": "UEFA", "status": "uefa_playoff", "elo": 1714},
-    {"name": "New Caledonia", "confederation": "OFC", "status": "fifa_playoff", "elo": 1296},
-    {"name": "North Macedonia", "confederation": "UEFA", "status": "uefa_playoff", "elo": 1593},
-    {"name": "Northern Ireland", "confederation": "UEFA", "status": "uefa_playoff", "elo": 1603},
-    {"name": "Poland", "confederation": "UEFA", "status": "uefa_playoff", "elo": 1735},
-    {"name": "Republic of Ireland", "confederation": "UEFA", "status": "uefa_playoff", "elo": 1688},
-    {"name": "Romania", "confederation": "UEFA", "status": "uefa_playoff", "elo": 1642},
-    {"name": "Slovakia", "confederation": "UEFA", "status": "uefa_playoff", "elo": 1687},
-    {"name": "Suriname", "confederation": "CONCACAF", "status": "fifa_playoff", "elo": 1441},
-    {"name": "Sweden", "confederation": "UEFA", "status": "uefa_playoff", "elo": 1660},
-    {"name": "Turkey", "confederation": "UEFA", "status": "uefa_playoff", "elo": 1880},
-    {"name": "Ukraine", "confederation": "UEFA", "status": "uefa_playoff", "elo": 1802},
-    {"name": "Wales", "confederation": "UEFA", "status": "uefa_playoff", "elo": 1715}
+    {
+      "name": "Algeria",
+      "confederation": "CAF",
+      "status": "qualified",
+      "elo": 1674,
+      "fifa_country_code": "ALG",
+      "fifa_points": 1560.91,
+      "fifa_rank": 28
+    },
+    {
+      "name": "Argentina",
+      "confederation": "CONMEBOL",
+      "status": "qualified",
+      "elo": 2113,
+      "fifa_country_code": "ARG",
+      "fifa_points": 1873.33,
+      "fifa_rank": 2
+    },
+    {
+      "name": "Australia",
+      "confederation": "AFC",
+      "status": "qualified",
+      "elo": 1774,
+      "fifa_country_code": "AUS",
+      "fifa_points": 1574.01,
+      "fifa_rank": 27
+    },
+    {
+      "name": "Austria",
+      "confederation": "UEFA",
+      "status": "qualified",
+      "elo": 1818,
+      "fifa_country_code": "AUT",
+      "fifa_points": 1585.51,
+      "fifa_rank": 24
+    },
+    {
+      "name": "Belgium",
+      "confederation": "UEFA",
+      "status": "qualified",
+      "elo": 1849,
+      "fifa_country_code": "BEL",
+      "fifa_points": 1730.71,
+      "fifa_rank": 9
+    },
+    {
+      "name": "Brazil",
+      "confederation": "CONMEBOL",
+      "status": "qualified",
+      "elo": 1978,
+      "fifa_country_code": "BRA",
+      "fifa_points": 1760.46,
+      "fifa_rank": 5
+    },
+    {
+      "name": "Canada",
+      "confederation": "CONCACAF",
+      "status": "qualified",
+      "elo": 1806,
+      "host_country": "Canada",
+      "fifa_country_code": "CAN",
+      "fifa_points": 1559.15,
+      "fifa_rank": 29
+    },
+    {
+      "name": "Cape Verde",
+      "confederation": "CAF",
+      "status": "qualified",
+      "elo": 1561,
+      "fifa_country_code": "CPV",
+      "fifa_points": 1370.49,
+      "fifa_rank": 67
+    },
+    {
+      "name": "Colombia",
+      "confederation": "CONMEBOL",
+      "status": "qualified",
+      "elo": 1998,
+      "fifa_country_code": "COL",
+      "fifa_points": 1701.3,
+      "fifa_rank": 14
+    },
+    {
+      "name": "Croatia",
+      "confederation": "UEFA",
+      "status": "qualified",
+      "elo": 1932,
+      "fifa_country_code": "CRO",
+      "fifa_points": 1716.88,
+      "fifa_rank": 11
+    },
+    {
+      "name": "Curacao",
+      "confederation": "CONCACAF",
+      "status": "qualified",
+      "elo": 1467,
+      "fifa_country_code": "CUW",
+      "fifa_points": 1302.7,
+      "fifa_rank": 81
+    },
+    {
+      "name": "Ecuador",
+      "confederation": "CONMEBOL",
+      "status": "qualified",
+      "elo": 1933,
+      "fifa_country_code": "ECU",
+      "fifa_points": 1591.73,
+      "fifa_rank": 23
+    },
+    {
+      "name": "Egypt",
+      "confederation": "CAF",
+      "status": "qualified",
+      "elo": 1660,
+      "fifa_country_code": "EGY",
+      "fifa_points": 1556.71,
+      "fifa_rank": 31
+    },
+    {
+      "name": "England",
+      "confederation": "UEFA",
+      "status": "qualified",
+      "elo": 2042,
+      "fifa_country_code": "ENG",
+      "fifa_points": 1834.12,
+      "fifa_rank": 4
+    },
+    {
+      "name": "France",
+      "confederation": "UEFA",
+      "status": "qualified",
+      "elo": 2063,
+      "fifa_country_code": "FRA",
+      "fifa_points": 1870.0,
+      "fifa_rank": 3
+    },
+    {
+      "name": "Germany",
+      "confederation": "UEFA",
+      "status": "qualified",
+      "elo": 1910,
+      "fifa_country_code": "GER",
+      "fifa_points": 1724.15,
+      "fifa_rank": 10
+    },
+    {
+      "name": "Ghana",
+      "confederation": "CAF",
+      "status": "qualified",
+      "elo": 1509,
+      "fifa_country_code": "GHA",
+      "fifa_points": 1351.09,
+      "fifa_rank": 72
+    },
+    {
+      "name": "Haiti",
+      "confederation": "CONCACAF",
+      "status": "qualified",
+      "elo": 1542,
+      "fifa_country_code": "HAI",
+      "fifa_points": 1294.49,
+      "fifa_rank": 83
+    },
+    {
+      "name": "Iran",
+      "confederation": "AFC",
+      "status": "qualified",
+      "elo": 1754,
+      "fifa_country_code": "IRN",
+      "fifa_points": 1617.02,
+      "fifa_rank": 20
+    },
+    {
+      "name": "Ivory Coast",
+      "confederation": "CAF",
+      "status": "qualified",
+      "elo": 1637,
+      "fifa_country_code": "CIV",
+      "fifa_points": 1522.48,
+      "fifa_rank": 37
+    },
+    {
+      "name": "Japan",
+      "confederation": "AFC",
+      "status": "qualified",
+      "elo": 1878,
+      "fifa_country_code": "JPN",
+      "fifa_points": 1650.12,
+      "fifa_rank": 19
+    },
+    {
+      "name": "Jordan",
+      "confederation": "AFC",
+      "status": "qualified",
+      "elo": 1691,
+      "fifa_country_code": "JOR",
+      "fifa_points": 1388.93,
+      "fifa_rank": 64
+    },
+    {
+      "name": "Mexico",
+      "confederation": "CONCACAF",
+      "status": "qualified",
+      "elo": 1853,
+      "host_country": "Mexico",
+      "fifa_country_code": "MEX",
+      "fifa_points": 1675.75,
+      "fifa_rank": 16
+    },
+    {
+      "name": "Morocco",
+      "confederation": "CAF",
+      "status": "qualified",
+      "elo": 1806,
+      "fifa_country_code": "MAR",
+      "fifa_points": 1736.57,
+      "fifa_rank": 8
+    },
+    {
+      "name": "Netherlands",
+      "confederation": "UEFA",
+      "status": "qualified",
+      "elo": 1959,
+      "fifa_country_code": "NED",
+      "fifa_points": 1756.27,
+      "fifa_rank": 7
+    },
+    {
+      "name": "New Zealand",
+      "confederation": "OFC",
+      "status": "qualified",
+      "elo": 1586,
+      "fifa_country_code": "NZL",
+      "fifa_points": 1279.25,
+      "fifa_rank": 85
+    },
+    {
+      "name": "Norway",
+      "confederation": "UEFA",
+      "status": "qualified",
+      "elo": 1922,
+      "fifa_country_code": "NOR",
+      "fifa_points": 1553.14,
+      "fifa_rank": 32
+    },
+    {
+      "name": "Panama",
+      "confederation": "CONCACAF",
+      "status": "qualified",
+      "elo": 1733,
+      "fifa_country_code": "PAN",
+      "fifa_points": 1539.47,
+      "fifa_rank": 33
+    },
+    {
+      "name": "Paraguay",
+      "confederation": "CONMEBOL",
+      "status": "qualified",
+      "elo": 1833,
+      "fifa_country_code": "PAR",
+      "fifa_points": 1501.5,
+      "fifa_rank": 40
+    },
+    {
+      "name": "Portugal",
+      "confederation": "UEFA",
+      "status": "qualified",
+      "elo": 1976,
+      "fifa_country_code": "POR",
+      "fifa_points": 1760.38,
+      "fifa_rank": 6
+    },
+    {
+      "name": "Qatar",
+      "confederation": "AFC",
+      "status": "qualified",
+      "elo": 1427,
+      "fifa_country_code": "QAT",
+      "fifa_points": 1454.96,
+      "fifa_rank": 56
+    },
+    {
+      "name": "Saudi Arabia",
+      "confederation": "AFC",
+      "status": "qualified",
+      "elo": 1593,
+      "fifa_country_code": "KSA",
+      "fifa_points": 1429.48,
+      "fifa_rank": 61
+    },
+    {
+      "name": "Scotland",
+      "confederation": "UEFA",
+      "status": "qualified",
+      "elo": 1790,
+      "fifa_country_code": "SCO",
+      "fifa_points": 1506.77,
+      "fifa_rank": 38
+    },
+    {
+      "name": "Senegal",
+      "confederation": "CAF",
+      "status": "qualified",
+      "elo": 1869,
+      "fifa_country_code": "SEN",
+      "fifa_points": 1706.83,
+      "fifa_rank": 12
+    },
+    {
+      "name": "South Africa",
+      "confederation": "CAF",
+      "status": "qualified",
+      "elo": 1529,
+      "fifa_country_code": "RSA",
+      "fifa_points": 1432.76,
+      "fifa_rank": 60
+    },
+    {
+      "name": "South Korea",
+      "confederation": "AFC",
+      "status": "qualified",
+      "elo": 1784,
+      "fifa_country_code": "KOR",
+      "fifa_points": 1599.45,
+      "fifa_rank": 22
+    },
+    {
+      "name": "Spain",
+      "confederation": "UEFA",
+      "status": "qualified",
+      "elo": 2171,
+      "fifa_country_code": "ESP",
+      "fifa_points": 1877.18,
+      "fifa_rank": 1
+    },
+    {
+      "name": "Switzerland",
+      "confederation": "UEFA",
+      "status": "qualified",
+      "elo": 1897,
+      "fifa_country_code": "SUI",
+      "fifa_points": 1654.69,
+      "fifa_rank": 18
+    },
+    {
+      "name": "Tunisia",
+      "confederation": "CAF",
+      "status": "qualified",
+      "elo": 1614,
+      "fifa_country_code": "TUN",
+      "fifa_points": 1479.04,
+      "fifa_rank": 47
+    },
+    {
+      "name": "United States",
+      "confederation": "CONCACAF",
+      "status": "qualified",
+      "elo": 1747,
+      "host_country": "United States",
+      "fifa_country_code": "USA",
+      "fifa_points": 1681.88,
+      "fifa_rank": 15
+    },
+    {
+      "name": "Uruguay",
+      "confederation": "CONMEBOL",
+      "status": "qualified",
+      "elo": 1890,
+      "fifa_country_code": "URU",
+      "fifa_points": 1672.62,
+      "fifa_rank": 17
+    },
+    {
+      "name": "Uzbekistan",
+      "confederation": "AFC",
+      "status": "qualified",
+      "elo": 1728,
+      "fifa_country_code": "UZB",
+      "fifa_points": 1462.03,
+      "fifa_rank": 52
+    },
+    {
+      "name": "Albania",
+      "confederation": "UEFA",
+      "status": "uefa_playoff",
+      "elo": 1664,
+      "fifa_country_code": "ALB",
+      "fifa_points": 1401.07,
+      "fifa_rank": 63
+    },
+    {
+      "name": "Bosnia and Herzegovina",
+      "confederation": "UEFA",
+      "status": "uefa_playoff",
+      "elo": 1571,
+      "fifa_country_code": "BIH",
+      "fifa_points": 1362.37,
+      "fifa_rank": 71
+    },
+    {
+      "name": "Bolivia",
+      "confederation": "CONMEBOL",
+      "status": "fifa_playoff",
+      "elo": 1656,
+      "fifa_country_code": "BOL",
+      "fifa_points": 1330.52,
+      "fifa_rank": 76
+    },
+    {
+      "name": "Czech Republic",
+      "confederation": "UEFA",
+      "status": "uefa_playoff",
+      "elo": 1731,
+      "fifa_country_code": "CZE",
+      "fifa_points": 1487.0,
+      "fifa_rank": 43
+    },
+    {
+      "name": "Dem. Rep. of Congo",
+      "confederation": "CAF",
+      "status": "fifa_playoff",
+      "elo": 1639,
+      "fifa_country_code": "COD",
+      "fifa_points": 1468.22,
+      "fifa_rank": 48
+    },
+    {
+      "name": "Denmark",
+      "confederation": "UEFA",
+      "status": "uefa_playoff",
+      "elo": 1864,
+      "fifa_country_code": "DEN",
+      "fifa_points": 1616.75,
+      "fifa_rank": 21
+    },
+    {
+      "name": "Iraq",
+      "confederation": "AFC",
+      "status": "fifa_playoff",
+      "elo": 1583,
+      "fifa_country_code": "IRQ",
+      "fifa_points": 1436.94,
+      "fifa_rank": 58
+    },
+    {
+      "name": "Italy",
+      "confederation": "UEFA",
+      "status": "uefa_playoff",
+      "elo": 1859,
+      "fifa_country_code": "ITA",
+      "fifa_points": 1702.06,
+      "fifa_rank": 13
+    },
+    {
+      "name": "Jamaica",
+      "confederation": "CONCACAF",
+      "status": "fifa_playoff",
+      "elo": 1530,
+      "fifa_country_code": "JAM",
+      "fifa_points": 1362.46,
+      "fifa_rank": 70
+    },
+    {
+      "name": "Kosovo",
+      "confederation": "UEFA",
+      "status": "uefa_playoff",
+      "elo": 1714,
+      "fifa_country_code": "KOS",
+      "fifa_points": 1308.84,
+      "fifa_rank": 79
+    },
+    {
+      "name": "New Caledonia",
+      "confederation": "OFC",
+      "status": "fifa_playoff",
+      "elo": 1296,
+      "fifa_country_code": "NCL",
+      "fifa_points": 1042.62,
+      "fifa_rank": 150
+    },
+    {
+      "name": "North Macedonia",
+      "confederation": "UEFA",
+      "status": "uefa_playoff",
+      "elo": 1593,
+      "fifa_country_code": "MKD",
+      "fifa_points": 1378.57,
+      "fifa_rank": 66
+    },
+    {
+      "name": "Northern Ireland",
+      "confederation": "UEFA",
+      "status": "uefa_playoff",
+      "elo": 1603,
+      "fifa_country_code": "NIR",
+      "fifa_points": 1366.02,
+      "fifa_rank": 69
+    },
+    {
+      "name": "Poland",
+      "confederation": "UEFA",
+      "status": "uefa_playoff",
+      "elo": 1735,
+      "fifa_country_code": "POL",
+      "fifa_points": 1532.04,
+      "fifa_rank": 34
+    },
+    {
+      "name": "Republic of Ireland",
+      "confederation": "UEFA",
+      "status": "uefa_playoff",
+      "elo": 1688,
+      "fifa_country_code": "IRL",
+      "fifa_points": 1436.04,
+      "fifa_rank": 59
+    },
+    {
+      "name": "Romania",
+      "confederation": "UEFA",
+      "status": "uefa_playoff",
+      "elo": 1642,
+      "fifa_country_code": "ROU",
+      "fifa_points": 1465.78,
+      "fifa_rank": 49
+    },
+    {
+      "name": "Slovakia",
+      "confederation": "UEFA",
+      "status": "uefa_playoff",
+      "elo": 1687,
+      "fifa_country_code": "SVK",
+      "fifa_points": 1485.65,
+      "fifa_rank": 44
+    },
+    {
+      "name": "Suriname",
+      "confederation": "CONCACAF",
+      "status": "fifa_playoff",
+      "elo": 1441,
+      "fifa_country_code": "SUR",
+      "fifa_points": 1140.54,
+      "fifa_rank": 123
+    },
+    {
+      "name": "Sweden",
+      "confederation": "UEFA",
+      "status": "uefa_playoff",
+      "elo": 1660,
+      "fifa_country_code": "SWE",
+      "fifa_points": 1487.13,
+      "fifa_rank": 42
+    },
+    {
+      "name": "Turkey",
+      "confederation": "UEFA",
+      "status": "uefa_playoff",
+      "elo": 1880,
+      "fifa_country_code": "TUR",
+      "fifa_points": 1582.69,
+      "fifa_rank": 25
+    },
+    {
+      "name": "Ukraine",
+      "confederation": "UEFA",
+      "status": "uefa_playoff",
+      "elo": 1802,
+      "fifa_country_code": "UKR",
+      "fifa_points": 1557.47,
+      "fifa_rank": 30
+    },
+    {
+      "name": "Wales",
+      "confederation": "UEFA",
+      "status": "uefa_playoff",
+      "elo": 1715,
+      "fifa_country_code": "WAL",
+      "fifa_points": 1529.71,
+      "fifa_rank": 35
+    }
   ]
 }

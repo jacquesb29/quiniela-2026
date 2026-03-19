@@ -6,6 +6,7 @@ La nueva version ya incorpora variables macro, historicas, tacticas, disciplinar
 ## Que modela
 
 - Fuerza base por seleccion usando Elo internacional.
+- Puntos FIFA y ranking FIFA oficiales como senal estructural secundaria.
 - PIB/recursos del pais como proxy de capacidad de preparacion.
 - Historial de Copas del Mundo y trayectoria futbolistica.
 - Experiencia proxy del entrenador.
@@ -34,8 +35,9 @@ La nueva version ya incorpora variables macro, historicas, tacticas, disciplinar
 
 ## Archivos
 
-- `teams_2026.json`: dataset base de selecciones y rating Elo.
+- `teams_2026.json`: dataset base de selecciones, Elo y ranking FIFA oficial.
 - `modelo_quiniela_2026.py`: CLI para prediccion, perfiles internos y simulacion Monte Carlo del torneo.
+- `sync_fifa_rankings.py`: refresca `fifa_points` y `fifa_rank` desde el endpoint oficial de FIFA.
 - `fixtures_template.json`: ejemplo de formato para cargar partidos con estado dinamico.
 - `tournament_2026_draw.json`: draw oficial del Mundial 2026 con placeholders de repechaje.
 - `tournament_state_2026.json`: estado persistente que el modelo actualiza automaticamente entre ejecuciones.
@@ -174,6 +176,12 @@ Inspeccionar todas las variables internas de una seleccion:
 python3 mundial_2026/modelo_quiniela_2026.py team-profile Argentina
 ```
 
+Refrescar puntos y ranking FIFA oficiales en `teams_2026.json`:
+
+```bash
+python3 mundial_2026/sync_fifa_rankings.py
+```
+
 ## Notas
 
 - Esta version no intenta decir que ya existen los 48 participantes finales: al 16 de marzo de 2026 todavia faltan por definirse 6 cupos.
@@ -188,7 +196,9 @@ python3 mundial_2026/modelo_quiniela_2026.py team-profile Argentina
 - En knockout, `predict` ya modela empate en 90', proroga, probabilidad de penales y probabilidad total de clasificar.
 - En knockout, el dashboard ya muestra tambien un marcador esperado de la tanda de penales y los resultados de penales mas probables.
 - `sync_live_data_2026.py` ya mete clima por sede y, cuando el feed lo expone cerca del partido, odds de mercado como prior externo.
+- El dataset ya trae `fifa_points`, `fifa_rank` y `fifa_country_code` oficiales; si quieres refrescarlos mas adelante, usa `sync_fifa_rankings.py`.
 - Alineaciones confirmadas, cambios de XI, arbitro y bajas/ausencias estan preparados en modo best-effort: se cargan automaticamente si el feed publico los expone para ese partido.
+- `sync_live_data_2026.py` tambien puede enriquecer partidos en vivo con un proveedor mas profundo de eventos y estadisticas. Si defines `API_FOOTBALL_KEY`, el pipeline intenta usar API-Football para lineups, eventos y stats live, manteniendo ESPN como base y fallback.
 - La llave publicada en el dashboard cloud ahora usa 1200 iteraciones por defecto para reducir ruido Monte Carlo frente a 300.
 - Si un partido real se va a proroga o penales y lo marcas en el JSON, el estado acumula fatiga adicional y baja de disponibilidad para el siguiente partido.
 - Si corriges un resultado viejo, lo correcto es ejecutar `state-reset` y luego volver a correr `fixtures` sobre el archivo completo en orden cronologico.
@@ -233,9 +243,16 @@ Y un empaquetador del sitio en:
 Ese flujo:
 
 1. sincroniza fixture/resultados/clima
-2. recompone el estado
-3. recalcula la llave y el dashboard
-4. publica un sitio estatico para abrirlo desde Safari en iPhone
+2. usa ESPN como base y, si existe `API_FOOTBALL_KEY`, anade un feed live mas profundo
+3. recompone el estado
+4. recalcula la llave y el dashboard
+5. publica un sitio estatico para abrirlo desde Safari en iPhone
+
+Secrets/vars opcionales del workflow:
+
+- `API_FOOTBALL_KEY`: API key del proveedor live profundo
+- `API_FOOTBALL_BASE_URL`: override del endpoint base si lo necesitas
+- `API_FOOTBALL_HOST`: host header del proveedor, por defecto `v3.football.api-sports.io`
 
 Archivos publicados en el sitio:
 

@@ -4050,6 +4050,11 @@ def extract_live_stats_payload(source: dict) -> Dict[str, float]:
     stat_names = (
         "shots",
         "shots_on_target",
+        "shots_off_target",
+        "blocked_shots",
+        "shots_inside_box",
+        "shots_outside_box",
+        "big_chances",
         "possession",
         "corners",
         "fouls",
@@ -4081,6 +4086,18 @@ def dashboard_live_stats_lines(entry: dict, team_a: str, team_b: str) -> List[st
         lines.append(
             f"- Tiros al arco: {team_a} {int(stats.get('shots_on_target_a', 0.0))} | {team_b} {int(stats.get('shots_on_target_b', 0.0))}"
         )
+    if stats.get("shots_off_target_a") is not None or stats.get("shots_off_target_b") is not None:
+        lines.append(
+            f"- Tiros fuera: {team_a} {int(stats.get('shots_off_target_a', 0.0))} | {team_b} {int(stats.get('shots_off_target_b', 0.0))}"
+        )
+    if stats.get("blocked_shots_a") is not None or stats.get("blocked_shots_b") is not None:
+        lines.append(
+            f"- Tiros bloqueados: {team_a} {int(stats.get('blocked_shots_a', 0.0))} | {team_b} {int(stats.get('blocked_shots_b', 0.0))}"
+        )
+    if stats.get("big_chances_a") is not None or stats.get("big_chances_b") is not None:
+        lines.append(
+            f"- Grandes ocasiones: {team_a} {int(stats.get('big_chances_a', 0.0))} | {team_b} {int(stats.get('big_chances_b', 0.0))}"
+        )
     if stats.get("possession_a") is not None or stats.get("possession_b") is not None:
         lines.append(
             f"- Posesion: {team_a} {stats.get('possession_a', 0.0):.0f}% | {team_b} {stats.get('possession_b', 0.0):.0f}%"
@@ -4096,6 +4113,28 @@ def dashboard_live_stats_lines(entry: dict, team_a: str, team_b: str) -> List[st
         lines.append(
             f"- Rojas en vivo: {team_a} {int(stats.get('red_cards_a', 0.0))} | {team_b} {int(stats.get('red_cards_b', 0.0))}"
         )
+    return lines
+
+
+def dashboard_shot_timeline_lines(entry: dict, team_a: str, team_b: str) -> List[str]:
+    lines = []
+    provider = entry.get("live_feed_provider")
+    if provider:
+        lines.append(f"- Feed live profundo: {provider}")
+    for side, team_name in (("a", team_a), ("b", team_b)):
+        shot_log = entry.get(f"live_shot_log_{side}") or []
+        if not shot_log:
+            continue
+        pieces = []
+        for event in shot_log[-6:]:
+            minute = event.get("minute")
+            detail = event.get("detail") or event.get("type") or "evento"
+            player = event.get("player")
+            label = f"{minute}' {detail}" if minute is not None else str(detail)
+            if player:
+                label += f" ({player})"
+            pieces.append(label)
+        lines.append(f"- Cronologia de disparos {team_name}: {'; '.join(pieces)}")
     return lines
 
 
@@ -4247,10 +4286,27 @@ def dashboard_fixture_entries(
                 "news_headlines": fixture.get("news_headlines", []),
                 "news_notes_a": fixture.get("news_notes_a", []),
                 "news_notes_b": fixture.get("news_notes_b", []),
+                "live_feed_provider": fixture.get("live_feed_provider"),
+                "live_feed_depth": fixture.get("live_feed_depth"),
+                "provider_fixture_id": fixture.get("provider_fixture_id"),
                 "live_shots_a": fixture.get("live_shots_a"),
                 "live_shots_b": fixture.get("live_shots_b"),
                 "live_shots_on_target_a": fixture.get("live_shots_on_target_a"),
                 "live_shots_on_target_b": fixture.get("live_shots_on_target_b"),
+                "live_shots_off_target_a": fixture.get("live_shots_off_target_a"),
+                "live_shots_off_target_b": fixture.get("live_shots_off_target_b"),
+                "live_blocked_shots_a": fixture.get("live_blocked_shots_a"),
+                "live_blocked_shots_b": fixture.get("live_blocked_shots_b"),
+                "live_shots_inside_box_a": fixture.get("live_shots_inside_box_a"),
+                "live_shots_inside_box_b": fixture.get("live_shots_inside_box_b"),
+                "live_shots_outside_box_a": fixture.get("live_shots_outside_box_a"),
+                "live_shots_outside_box_b": fixture.get("live_shots_outside_box_b"),
+                "live_big_chances_a": fixture.get("live_big_chances_a"),
+                "live_big_chances_b": fixture.get("live_big_chances_b"),
+                "live_shot_events_a": fixture.get("live_shot_events_a"),
+                "live_shot_events_b": fixture.get("live_shot_events_b"),
+                "live_shot_log_a": fixture.get("live_shot_log_a", []),
+                "live_shot_log_b": fixture.get("live_shot_log_b", []),
                 "live_possession_a": fixture.get("live_possession_a"),
                 "live_possession_b": fixture.get("live_possession_b"),
                 "live_corners_a": fixture.get("live_corners_a"),
@@ -4630,6 +4686,7 @@ def build_dashboard_markdown(
         lines.extend(dashboard_news_lines(entry, prediction.team_a, prediction.team_b))
         lines.extend(dashboard_tactical_signature_lines(entry, prediction.team_a, prediction.team_b))
         lines.extend(dashboard_live_stats_lines(entry, prediction.team_a, prediction.team_b))
+        lines.extend(dashboard_shot_timeline_lines(entry, prediction.team_a, prediction.team_b))
         lines.extend(dashboard_pattern_lines(entry, prediction))
         lines.extend(adjustment_reason_lines(entry, prediction))
         next_round_note = next_round_projection_note(entry, prediction, bracket_payload)
@@ -5526,6 +5583,17 @@ def build_dashboard_html(
         live_stats_html = ""
         for line in dashboard_live_stats_lines(entry, prediction.team_a, prediction.team_b):
             live_stats_html += f"<p class=\"meta\">{html.escape(line[2:] if line.startswith('- ') else line)}</p>"
+        shot_timeline_html = ""
+        shot_timeline_lines = dashboard_shot_timeline_lines(entry, prediction.team_a, prediction.team_b)
+        if shot_timeline_lines:
+            shot_timeline_html = (
+                "<div class=\"reason-block\"><h4>Cronologia de disparos y eventos</h4>"
+                + "".join(
+                    f"<p class=\"meta\">{html.escape(line[2:] if line.startswith('- ') else line)}</p>"
+                    for line in shot_timeline_lines
+                )
+                + "</div>"
+            )
         pattern_html = ""
         pattern_lines = dashboard_pattern_lines(entry, prediction)
         if pattern_lines:
@@ -5637,6 +5705,7 @@ def build_dashboard_html(
             f"{news_html}"
             f"{tactical_signature_html}"
             f"{live_stats_html}"
+            f"{shot_timeline_html}"
             f"{pattern_html}"
             f"{reason_html}"
             f"{next_round_html}"

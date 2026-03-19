@@ -3,11 +3,13 @@ from __future__ import annotations
 
 import json
 import math
+import os
 import subprocess
 from collections import defaultdict, deque
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Dict, List, Optional, Sequence, Tuple
+from urllib.parse import urlencode
 
 from modelo_quiniela_2026 import BRACKET_MATCH_TITLES, load_teams, profile_for, qualification_probabilities, resolve_team_name
 
@@ -20,6 +22,9 @@ SCOREBOARD_URL = (
 )
 SUMMARY_URL_TEMPLATE = "https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/summary?event={event_id}"
 SUMMARY_FETCH_WINDOW_DAYS = 10
+API_FOOTBALL_KEY = os.environ.get("API_FOOTBALL_KEY", "").strip()
+API_FOOTBALL_BASE_URL = (os.environ.get("API_FOOTBALL_BASE_URL") or "https://v3.football.api-sports.io").rstrip("/")
+API_FOOTBALL_HOST = os.environ.get("API_FOOTBALL_HOST", "v3.football.api-sports.io").strip()
 
 COUNTRY_MAP = {
     "USA": "United States",
@@ -45,6 +50,30 @@ PLACEHOLDER_PATHS = {
     "FIFA_1": ["Dem. Rep. of Congo", "Jamaica", "New Caledonia"],
     "FIFA_2": ["Iraq", "Bolivia", "Suriname"],
 }
+
+API_FOOTBALL_STAT_MAP = {
+    "ball possession": "possession",
+    "shots on goal": "shots_on_target",
+    "shots off goal": "shots_off_target",
+    "total shots": "shots",
+    "blocked shots": "blocked_shots",
+    "shots insidebox": "shots_inside_box",
+    "shots outsidebox": "shots_outside_box",
+    "corner kicks": "corners",
+    "fouls": "fouls",
+    "yellow cards": "yellow_cards",
+    "red cards": "red_cards",
+    "expected goals": "xg",
+}
+
+SHOT_EVENT_POSITIVE_TOKENS = (
+    "goal",
+    "shot on goal",
+    "shot off goal",
+    "blocked shot",
+    "missed penalty",
+    "penalty",
+)
 
 TOURNAMENT_STAGE_ORDER = (
     [("group", None)] * 72
@@ -250,14 +279,50 @@ def load_previous_fixtures() -> Dict[str, dict]:
     return {str(item.get("id")): item for item in payload if item.get("id")}
 
 
-def run_curl_json(url: str) -> dict:
+def run_curl_json(url: str, headers: Optional[Dict[str, str]] = None) -> dict:
+    command = ["curl", "-sL", "--max-time", "30"]
+    for key, value in (headers or {}).items():
+        command.extend(["-H", f"{key}: {value}"])
+    command.append(url)
     result = subprocess.run(
-        ["curl", "-sL", "--max-time", "30", url],
+        command,
         check=True,
         capture_output=True,
         text=True,
     )
     return json.loads(result.stdout)
+
+
+def provider_enabled() -> bool:
+    return bool(API_FOOTBALL_KEY)
+
+
+def api_football_headers() -> Dict[str, str]:
+    headers = {"x-apisports-key": API_FOOTBALL_KEY}
+    if API_FOOTBALL_HOST:
+        headers["x-rapidapi-host"] = API_FOOTBALL_HOST
+    return headers
+
+
+def api_football_url(path: str, **params: object) -> str:
+    query = {key: value for key, value in params.items() if value not in (None, "", [])}
+    return f"{API_FOOTBALL_BASE_URL}{path}?{urlencode(query, doseq=True)}"
+
+
+def normalize_key(value: str) -> str:
+    return "".join(char for char in value.lower() if char.isalnum())
+
+
+def provider_team_name(raw_name: str, teams: Dict[str, object]) -> str:
+    try:
+        return resolve_team_name(raw_name, teams)
+    except SystemExit:
+        return raw_name
+
+
+def match_lookup_key(team_a: str, team_b: str) -> Tuple[str, str]:
+    normalized = sorted((normalize_key(team_a), normalize_key(team_b)))
+    return normalized[0], normalized[1]
 
 
 def should_fetch_summary(kickoff: datetime, status_state: Optional[str]) -> bool:
@@ -709,6 +774,225 @@ def extract_live_statistics(summary_payload: dict) -> dict:
     return enrichment
 
 
+def api_football_stat_key(label: str) -> Optional[str]:
+    normalized = normalize_stat_label(label)
+    return API_FOOTBALL_STAT_MAP.get(normalized)
+
+
+def api_football_side(home_first: bool, index: int) -> str:
+    return "a" if (index == 0 and home_first) or (index == 1 and not home_first) else "b"
+
+
+def parse_api_football_statistics(payload: dict, home_name: str, away_name: str, team_a: str, team_b: str) -> dict:
+    enrichment: Dict[str, object] = {}
+    stats_rows = payload.get("response") or []
+    home_first = normalize_key(team_a) == normalize_key(home_name)
+    by_side: Dict[str, Dict[str, float]] = {"a": {}, "b": {}}
+
+    for index, row in enumerate(stats_rows[:2]):
+        side = api_football_side(home_first, index)
+        for stat in row.get("statistics", []):
+            key = api_football_stat_key(str(stat.get("type") or ""))
+            if not key:
+                continue
+            parsed = parse_numeric_stat(stat.get("value"))
+            if parsed is None:
+                continue
+            by_side[side][key] = parsed
+
+    for side in ("a", "b"):
+        stats = by_side[side]
+        for stat_key, value in stats.items():
+            enrichment[f"live_{stat_key}_{side}"] = value
+
+        xg = stats.get("xg")
+        if xg is not None:
+            enrichment[f"live_xg_{side}"] = round(float(xg), 3)
+
+        shots = float(stats.get("shots", 0.0))
+        shots_on_target = float(stats.get("shots_on_target", 0.0))
+        shots_off_target = float(stats.get("shots_off_target", max(shots - shots_on_target, 0.0)))
+        blocked = float(stats.get("blocked_shots", 0.0))
+        inside_box = float(stats.get("shots_inside_box", 0.0))
+        outside_box = float(stats.get("shots_outside_box", 0.0))
+        if enrichment.get(f"live_xg_{side}") is None:
+            deeper_proxy = (
+                0.14 * shots_on_target
+                + 0.05 * shots_off_target
+                + 0.04 * blocked
+                + 0.05 * inside_box
+                + 0.015 * outside_box
+            )
+            if deeper_proxy > 0.0:
+                enrichment[f"live_xg_proxy_{side}"] = round(deeper_proxy, 3)
+
+    return enrichment
+
+
+def is_shot_event(event_type: str, detail: str) -> bool:
+    normalized = f"{event_type} {detail}".lower()
+    return any(token in normalized for token in SHOT_EVENT_POSITIVE_TOKENS)
+
+
+def infer_shot_xg(detail: str) -> float:
+    normalized = detail.lower()
+    if "missed penalty" in normalized or normalized == "penalty":
+        return 0.76
+    if "goal" in normalized:
+        return 0.30
+    if "blocked" in normalized:
+        return 0.06
+    if "on goal" in normalized:
+        return 0.12
+    if "off goal" in normalized:
+        return 0.05
+    return 0.07
+
+
+def parse_api_football_events(payload: dict, home_name: str, away_name: str, team_a: str, team_b: str) -> dict:
+    enrichment: Dict[str, object] = {}
+    shot_logs = {"a": [], "b": []}
+    shot_counts = {"a": 0, "b": 0}
+    shot_xg = {"a": 0.0, "b": 0.0}
+    big_chances = {"a": 0, "b": 0}
+    red_cards = {"a": 0, "b": 0}
+    yellow_cards = {"a": 0, "b": 0}
+
+    for event in payload.get("response") or []:
+        raw_team = (event.get("team") or {}).get("name")
+        if not raw_team:
+            continue
+        canonical = provider_team_name(str(raw_team), {team_a: None, team_b: None})
+        if normalize_key(canonical) == normalize_key(team_a):
+            side = "a"
+        elif normalize_key(canonical) == normalize_key(team_b):
+            side = "b"
+        else:
+            continue
+
+        event_type = str(event.get("type") or "")
+        detail = str(event.get("detail") or "")
+        minute = int((event.get("time") or {}).get("elapsed") or 0)
+        player_name = ((event.get("player") or {}).get("name") or "").strip()
+        comments = (event.get("comments") or "").strip()
+
+        if event_type.lower() == "card":
+            normalized = detail.lower()
+            if "yellow" in normalized:
+                yellow_cards[side] += 1
+            if "red" in normalized:
+                red_cards[side] += 1
+
+        if not is_shot_event(event_type, detail):
+            continue
+
+        shot_counts[side] += 1
+        xg_value = infer_shot_xg(detail)
+        shot_xg[side] += xg_value
+        if "penalty" in detail.lower() or "goal" in detail.lower():
+            big_chances[side] += 1
+        shot_logs[side].append(
+            {
+                "minute": minute,
+                "player": player_name or None,
+                "type": event_type,
+                "detail": detail,
+                "comments": comments or None,
+                "xg_proxy": round(xg_value, 3),
+            }
+        )
+
+    for side in ("a", "b"):
+        if shot_counts[side] > 0:
+            enrichment[f"live_shot_events_{side}"] = shot_counts[side]
+            enrichment[f"live_big_chances_{side}"] = big_chances[side]
+            enrichment[f"live_shot_log_{side}"] = shot_logs[side][-12:]
+            if enrichment.get(f"live_xg_{side}") is None:
+                enrichment[f"live_xg_proxy_{side}"] = round(shot_xg[side], 3)
+        if yellow_cards[side] > 0 and enrichment.get(f"live_yellow_cards_{side}") is None:
+            enrichment[f"live_yellow_cards_{side}"] = yellow_cards[side]
+        if red_cards[side] > 0 and enrichment.get(f"live_red_cards_{side}") is None:
+            enrichment[f"live_red_cards_{side}"] = red_cards[side]
+    return enrichment
+
+
+def extract_api_football_lineups(payload: dict, home_name: str, away_name: str, team_a: str, team_b: str) -> dict:
+    enrichment: Dict[str, object] = {}
+    for row in payload.get("response") or []:
+        raw_team = (row.get("team") or {}).get("name") or ""
+        canonical = provider_team_name(str(raw_team), {team_a: None, team_b: None})
+        if normalize_key(canonical) == normalize_key(team_a):
+            side = "a"
+        elif normalize_key(canonical) == normalize_key(team_b):
+            side = "b"
+        else:
+            continue
+
+        starters = []
+        for player in row.get("startXI") or []:
+            name = ((player.get("player") or {}).get("name") or "").strip()
+            if name:
+                starters.append(name)
+
+        if starters:
+            enrichment[f"lineup_confirmed_{side}"] = True
+            enrichment[f"starting_xi_{side}"] = starters[:11]
+            enrichment[f"lineup_status_{side}"] = "confirmada"
+    return enrichment
+
+
+def fetch_api_football_fixture_details(fixture_id: int, home_name: str, away_name: str, team_a: str, team_b: str) -> dict:
+    enrichment: Dict[str, object] = {
+        "live_feed_provider": "api_football",
+        "live_feed_depth": "eventos_y_estadisticas",
+    }
+    headers = api_football_headers()
+    detail_calls = (
+        ("/fixtures/statistics", parse_api_football_statistics),
+        ("/fixtures/events", parse_api_football_events),
+        ("/fixtures/lineups", extract_api_football_lineups),
+    )
+    for path, parser in detail_calls:
+        try:
+            payload = run_curl_json(api_football_url(path, fixture=fixture_id), headers=headers)
+        except Exception:
+            continue
+        enrichment.update(parser(payload, home_name, away_name, team_a, team_b))
+    return enrichment
+
+
+def fetch_provider_live_index(teams: Dict[str, object]) -> Dict[Tuple[str, str], dict]:
+    if not provider_enabled():
+        return {}
+    try:
+        payload = run_curl_json(api_football_url("/fixtures", live="all"), headers=api_football_headers())
+    except Exception:
+        return {}
+
+    index: Dict[Tuple[str, str], dict] = {}
+    for row in payload.get("response") or []:
+        home_raw = (((row.get("teams") or {}).get("home") or {}).get("name") or "").strip()
+        away_raw = (((row.get("teams") or {}).get("away") or {}).get("name") or "").strip()
+        if not home_raw or not away_raw:
+            continue
+        team_a = provider_team_name(home_raw, teams)
+        team_b = provider_team_name(away_raw, teams)
+        match_key = match_lookup_key(team_a, team_b)
+        fixture_id = int(((row.get("fixture") or {}).get("id")) or 0)
+        if fixture_id <= 0:
+            continue
+
+        enrichment = {
+            "live_feed_provider": "api_football",
+            "live_feed_depth": "eventos_y_estadisticas",
+            "live_elapsed_minutes": ((row.get("fixture") or {}).get("status") or {}).get("elapsed"),
+            "provider_fixture_id": fixture_id,
+        }
+        enrichment.update(fetch_api_football_fixture_details(fixture_id, home_raw, away_raw, team_a, team_b))
+        index[match_key] = enrichment
+    return index
+
+
 def summary_enrichment(event_id: str, kickoff: datetime, status_state: Optional[str], team_a: str, team_b: str) -> dict:
     if not should_fetch_summary(kickoff, status_state):
         return {}
@@ -1060,6 +1344,7 @@ def build_fixture_from_event(
     qual_probs: Dict[str, float],
     stage: str,
     match_id: Optional[str],
+    provider_live_index: Dict[Tuple[str, str], dict],
 ) -> Optional[dict]:
     competition = event.get("competitions", [{}])[0]
     competitors = competition.get("competitors", [])
@@ -1087,6 +1372,7 @@ def build_fixture_from_event(
         team_a,
         team_b,
     )
+    provider_enrichment = provider_live_index.get(match_lookup_key(team_a, team_b), {})
 
     fixture = {
         "id": f"espn-{event['id']}",
@@ -1123,6 +1409,9 @@ def build_fixture_from_event(
         "lineup_change_count_b": 0,
     }
     fixture.update(enrichment)
+    if provider_enrichment:
+        fixture.update(provider_enrichment)
+        fixture["source"] = "espn_scoreboard+api_football"
     if unresolved:
         fixture["projection_only"] = True
         fixture["slot_team_a"] = raw_team_a
@@ -1191,11 +1480,12 @@ def build_live_fixtures(scoreboard_payload: dict) -> List[dict]:
     teams = load_teams()
     qual_probs = qualification_probabilities(teams)
     previous_by_id = load_previous_fixtures()
+    provider_live_index = fetch_provider_live_index(teams)
     fixtures = []
     sorted_events = sorted(scoreboard_payload.get("events", []), key=lambda item: item.get("date", ""))
     for index, event in enumerate(sorted_events):
         stage, match_id = stage_and_match_id_for_index(index)
-        fixture = build_fixture_from_event(event, teams, qual_probs, stage, match_id)
+        fixture = build_fixture_from_event(event, teams, qual_probs, stage, match_id, provider_live_index)
         if fixture is not None:
             fixtures.append(fixture)
 
@@ -1211,6 +1501,7 @@ def main() -> None:
     OUTPUT_FILE.write_text(json.dumps(fixtures, indent=2, ensure_ascii=True))
     print(f"Fixtures vivos guardados en {OUTPUT_FILE}")
     print(f"Partidos sincronizados: {len(fixtures)}")
+    print(f"Proveedor live profundo activo: {'si' if provider_enabled() else 'no'}")
     print(f"Actualizado: {iso_now()}")
 
 
