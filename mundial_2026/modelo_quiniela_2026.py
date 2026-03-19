@@ -526,6 +526,7 @@ class MatchPrediction:
     elapsed_minutes: Optional[float] = None
     live_phase: Optional[str] = None
     statistical_depth: Optional[Dict[str, object]] = None
+    live_patterns: Optional[Dict[str, object]] = None
 
 
 def clamp(value: float, low: float, high: float) -> float:
@@ -671,6 +672,231 @@ def live_stats_adjustment(
 
     mu_a *= adjustment_a * tempo_adjustment
     mu_b *= adjustment_b * tempo_adjustment
+    return clamp(mu_a, 0.01, 4.2), clamp(mu_b, 0.01, 4.2)
+
+
+def stat_share(value: float, other: float, neutral: float = 0.5) -> float:
+    total = value + other
+    if total <= 0.0:
+        return neutral
+    return value / total
+
+
+def format_pattern_signal(label: str, value: float, integer: bool = False, suffix: str = "") -> str:
+    if integer:
+        return f"{label} {int(round(value))}{suffix}"
+    return f"{label} {value:.2f}{suffix}"
+
+
+def derive_team_live_pattern(
+    side: str,
+    live_stats: Dict[str, float],
+    progress: float,
+    score_for: int,
+    score_against: int,
+) -> Dict[str, object]:
+    other = "b" if side == "a" else "a"
+    shots = float(live_stats.get(f"shots_{side}", 0.0))
+    shots_opp = float(live_stats.get(f"shots_{other}", 0.0))
+    sot = float(live_stats.get(f"shots_on_target_{side}", 0.0))
+    sot_opp = float(live_stats.get(f"shots_on_target_{other}", 0.0))
+    poss = float(live_stats.get(f"possession_{side}", 50.0))
+    corners = float(live_stats.get(f"corners_{side}", 0.0))
+    corners_opp = float(live_stats.get(f"corners_{other}", 0.0))
+    fouls = float(live_stats.get(f"fouls_{side}", 0.0))
+    yellows = float(live_stats.get(f"yellow_cards_{side}", 0.0))
+    reds = float(live_stats.get(f"red_cards_{side}", 0.0))
+    reds_opp = float(live_stats.get(f"red_cards_{other}", 0.0))
+    xg = float(live_stats.get(f"xg_{side}", live_stats.get(f"xg_proxy_{side}", 0.0)))
+    xg_opp = float(live_stats.get(f"xg_{other}", live_stats.get(f"xg_proxy_{other}", 0.0)))
+
+    shot_share = stat_share(shots, shots_opp)
+    sot_share = stat_share(sot, sot_opp)
+    xg_share = stat_share(xg, xg_opp)
+    corner_share = stat_share(corners, corners_opp)
+    xg_per_shot = xg / max(shots, 1.0)
+    on_target_rate = sot / max(shots, 1.0)
+    score_diff = score_for - score_against
+
+    primary = "sin patron dominante claro"
+    secondary = "ritmo equilibrado"
+    attack_bias = 0.0
+    defense_bias = 0.0
+    tempo_bias = 0.0
+
+    if reds > reds_opp:
+        primary = "inferioridad numerica"
+        secondary = "resistencia y repliegue"
+        attack_bias = -0.18
+        defense_bias = -0.06
+        tempo_bias = -0.03
+    elif score_diff > 0 and poss <= 45.0 and shot_share <= 0.46:
+        primary = "bloque bajo y contra"
+        secondary = "protege la ventaja"
+        attack_bias = -0.03
+        defense_bias = 0.10
+        tempo_bias = -0.08
+    elif score_diff < 0 and shot_share >= 0.57 and corner_share >= 0.56:
+        primary = "asedio del empate"
+        secondary = "empuja la ultima linea"
+        attack_bias = 0.12
+        defense_bias = -0.01
+        tempo_bias = 0.10
+    elif poss >= 58.0 and shot_share >= 0.57 and (xg_share >= 0.56 or sot_share >= 0.56):
+        if progress >= 0.30 and corner_share >= 0.55:
+            primary = "dominio territorial"
+            secondary = "asedio sostenido"
+            attack_bias = 0.13
+            defense_bias = 0.05
+            tempo_bias = 0.07
+        else:
+            primary = "control con llegada"
+            secondary = "empuja al rival"
+            attack_bias = 0.09
+            defense_bias = 0.03
+            tempo_bias = 0.03
+    elif poss >= 58.0 and xg_share <= 0.48 and sot <= max(1.0, sot_opp):
+        primary = "control esteril"
+        secondary = "maneja la pelota pero llega poco"
+        attack_bias = -0.06
+        defense_bias = 0.02
+        tempo_bias = -0.05
+    elif poss <= 46.0 and (xg_per_shot >= 0.12 or xg_share >= 0.50) and sot_share >= 0.45:
+        primary = "transicion vertical"
+        secondary = "amenaza al espacio"
+        attack_bias = 0.09
+        defense_bias = 0.00
+        tempo_bias = 0.03
+    elif xg <= 0.15 and shots <= 3.0 and progress >= 0.30:
+        primary = "poca amenaza"
+        secondary = "le cuesta progresar"
+        attack_bias = -0.12
+        defense_bias = -0.01
+        tempo_bias = -0.04
+    elif fouls + yellows >= 8.0 and shots <= 5.0:
+        primary = "presion fisica"
+        secondary = "corta el ritmo"
+        attack_bias = -0.04
+        defense_bias = 0.03
+        tempo_bias = -0.06
+
+    signals = []
+    if abs(poss - 50.0) >= 6.0:
+        signals.append(format_pattern_signal("posesion", poss, suffix="%"))
+    if shots > 0.0:
+        signals.append(format_pattern_signal("tiros", shots, integer=True))
+    if sot > 0.0:
+        signals.append(format_pattern_signal("al arco", sot, integer=True))
+    if xg > 0.0:
+        signals.append(format_pattern_signal("xG live", xg))
+    if corners >= 3.0:
+        signals.append(format_pattern_signal("corners", corners, integer=True))
+    if reds > 0.0:
+        signals.append(format_pattern_signal("rojas", reds, integer=True))
+    if not signals:
+        signals.append("sin señales en vivo suficientes")
+
+    return {
+        "primary": primary,
+        "secondary": secondary,
+        "summary": f"{primary} | {secondary}",
+        "attack_bias": attack_bias,
+        "defense_bias": defense_bias,
+        "tempo_bias": tempo_bias,
+        "signals": signals[:4],
+    }
+
+
+def detect_live_play_patterns(
+    live_stats: Optional[Dict[str, float]],
+    progress: float,
+    phase: str,
+    score_a: int,
+    score_b: int,
+) -> Optional[Dict[str, object]]:
+    if not live_stats:
+        return None
+    total_signal = sum(
+        float(live_stats.get(key, 0.0))
+        for key in (
+            "shots_a",
+            "shots_b",
+            "shots_on_target_a",
+            "shots_on_target_b",
+            "corners_a",
+            "corners_b",
+            "red_cards_a",
+            "red_cards_b",
+            "yellow_cards_a",
+            "yellow_cards_b",
+        )
+    )
+    total_xg = float(live_stats.get("xg_a", live_stats.get("xg_proxy_a", 0.0))) + float(
+        live_stats.get("xg_b", live_stats.get("xg_proxy_b", 0.0))
+    )
+    if total_signal <= 0.0 and total_xg <= 0.0:
+        return None
+
+    side_a = derive_team_live_pattern("a", live_stats, progress, score_a, score_b)
+    side_b = derive_team_live_pattern("b", live_stats, progress, score_b, score_a)
+
+    shots_total = float(live_stats.get("shots_a", 0.0)) + float(live_stats.get("shots_b", 0.0))
+    sot_total = float(live_stats.get("shots_on_target_a", 0.0)) + float(live_stats.get("shots_on_target_b", 0.0))
+    fouls_total = float(live_stats.get("fouls_a", 0.0)) + float(live_stats.get("fouls_b", 0.0))
+    yellows_total = float(live_stats.get("yellow_cards_a", 0.0)) + float(live_stats.get("yellow_cards_b", 0.0))
+    red_total = float(live_stats.get("red_cards_a", 0.0)) + float(live_stats.get("red_cards_b", 0.0))
+    poss_gap = abs(float(live_stats.get("possession_a", 50.0)) - float(live_stats.get("possession_b", 50.0)))
+
+    if red_total > 0.0 and shots_total >= 10.0:
+        tempo_label = "partido roto"
+        global_tempo_bias = 0.08
+    elif total_xg >= 1.6 or shots_total >= 18.0 or sot_total >= 7.0:
+        tempo_label = "ida y vuelta"
+        global_tempo_bias = 0.07
+    elif (fouls_total >= 22.0 or yellows_total >= 5.0) and total_xg <= 1.0:
+        tempo_label = "trabado y cortado"
+        global_tempo_bias = -0.08
+    elif poss_gap >= 14.0 and shots_total >= 8.0:
+        tempo_label = "control territorial"
+        global_tempo_bias = -0.01
+    elif phase == "extra_time":
+        tempo_label = "prorroga de desgaste"
+        global_tempo_bias = -0.03
+    else:
+        tempo_label = "ritmo equilibrado"
+        global_tempo_bias = 0.0
+
+    return {
+        "a": side_a,
+        "b": side_b,
+        "tempo_label": tempo_label,
+        "global_tempo_bias": global_tempo_bias,
+    }
+
+
+def apply_live_pattern_adjustment(
+    mu_a: float,
+    mu_b: float,
+    patterns: Optional[Dict[str, object]],
+    phase: str,
+) -> Tuple[float, float]:
+    if not patterns:
+        return mu_a, mu_b
+
+    scale = 0.11 if phase == "extra_time" else 0.16
+    side_a = patterns.get("a", {})
+    side_b = patterns.get("b", {})
+    tempo_bias = float(patterns.get("global_tempo_bias", 0.0))
+    tempo_bias += 0.5 * (float(side_a.get("tempo_bias", 0.0)) + float(side_b.get("tempo_bias", 0.0)))
+
+    attack_factor_a = clamp(1.0 + scale * float(side_a.get("attack_bias", 0.0)), 0.86, 1.18)
+    attack_factor_b = clamp(1.0 + scale * float(side_b.get("attack_bias", 0.0)), 0.86, 1.18)
+    defense_factor_a = clamp(1.0 - scale * float(side_b.get("defense_bias", 0.0)), 0.84, 1.18)
+    defense_factor_b = clamp(1.0 - scale * float(side_a.get("defense_bias", 0.0)), 0.84, 1.18)
+    tempo_factor = clamp(1.0 + scale * tempo_bias, 0.88, 1.14)
+
+    mu_a *= attack_factor_a * defense_factor_a * tempo_factor
+    mu_b *= attack_factor_b * defense_factor_b * tempo_factor
     return clamp(mu_a, 0.01, 4.2), clamp(mu_b, 0.01, 4.2)
 
 
@@ -1921,8 +2147,16 @@ def predict_match_live(
     team_b = teams[team_b_name]
     base_mu_a, base_mu_b = expected_goals(team_a, team_b, ctx, state_a=state_a, state_b=state_b)
     elapsed_minutes, phase = parse_elapsed_minutes(status_detail, ctx.knockout)
+    patterns = None
 
     if phase == "penalties":
+        patterns = detect_live_play_patterns(
+            live_stats,
+            1.0,
+            phase,
+            current_score_a,
+            current_score_b,
+        )
         penalties_a = penalties_probability(
             team_a,
             team_b,
@@ -1974,6 +2208,7 @@ def predict_match_live(
             elapsed_minutes=elapsed_minutes,
             live_phase=phase,
             statistical_depth=compute_statistical_depth(final_dist, 0.0, 1.0, 0.0, ctx),
+            live_patterns=patterns,
         )
 
     if phase == "extra_time":
@@ -1996,6 +2231,14 @@ def predict_match_live(
             "extra_time",
             live_stats=live_stats,
         )
+        patterns = detect_live_play_patterns(
+            live_stats,
+            progress,
+            phase,
+            current_score_a,
+            current_score_b,
+        )
+        rem_mu_a, rem_mu_b = apply_live_pattern_adjustment(rem_mu_a, rem_mu_b, patterns, "extra_time")
         remainder_dist = score_distribution(rem_mu_a, rem_mu_b, max_goals=4)
         final_dist = combine_current_score_distribution(current_score_a, current_score_b, remainder_dist)
         win_a = 0.0
@@ -2063,6 +2306,7 @@ def predict_match_live(
             elapsed_minutes=elapsed_minutes,
             live_phase=phase,
             statistical_depth=compute_statistical_depth(final_dist, win_a, draw, win_b, ctx),
+            live_patterns=patterns,
         )
 
     remaining_fraction = 1.0 if elapsed_minutes is None else clamp((90.0 - elapsed_minutes) / 90.0, 0.0, 1.0)
@@ -2083,6 +2327,14 @@ def predict_match_live(
         "regulation",
         live_stats=live_stats,
     )
+    patterns = detect_live_play_patterns(
+        live_stats,
+        progress,
+        phase,
+        current_score_a,
+        current_score_b,
+    )
+    rem_mu_a, rem_mu_b = apply_live_pattern_adjustment(rem_mu_a, rem_mu_b, patterns, "regulation")
     remainder_dist = score_distribution(rem_mu_a, rem_mu_b, max_goals=6)
     final_dist = combine_current_score_distribution(current_score_a, current_score_b, remainder_dist)
 
@@ -2147,6 +2399,7 @@ def predict_match_live(
         elapsed_minutes=elapsed_minutes,
         live_phase="regulation",
         statistical_depth=compute_statistical_depth(final_dist, win_a, draw, win_b, ctx),
+        live_patterns=patterns,
     )
 
 
@@ -3828,6 +4081,26 @@ def dashboard_live_stats_lines(entry: dict, team_a: str, team_b: str) -> List[st
     return lines
 
 
+def dashboard_pattern_lines(prediction: MatchPrediction) -> List[str]:
+    patterns = prediction.live_patterns or {}
+    side_a = patterns.get("a")
+    side_b = patterns.get("b")
+    if not side_a or not side_b:
+        return []
+    lines = [
+        f"- Patron de juego {prediction.team_a}: {side_a.get('summary', 'sin patron dominante claro')}.",
+        f"- Patron de juego {prediction.team_b}: {side_b.get('summary', 'sin patron dominante claro')}.",
+        f"- Ritmo detectado: {patterns.get('tempo_label', 'ritmo equilibrado')}.",
+    ]
+    signals_a = side_a.get("signals") or []
+    signals_b = side_b.get("signals") or []
+    if signals_a:
+        lines.append(f"- Senales {prediction.team_a}: {'; '.join(str(signal) for signal in signals_a[:3])}")
+    if signals_b:
+        lines.append(f"- Senales {prediction.team_b}: {'; '.join(str(signal) for signal in signals_b[:3])}")
+    return lines
+
+
 def dashboard_weather_summary(fixture: dict) -> Optional[str]:
     if fixture.get("weather_temperature_c") is None:
         return None
@@ -4140,6 +4413,16 @@ def adjustment_reason_lines(entry: dict, prediction: MatchPrediction) -> List[st
             lines.append(
                 f"- Ajuste por expulsiones en vivo: rojas {prediction.team_a} {red_a} | {prediction.team_b} {red_b}."
             )
+    patterns = prediction.live_patterns or {}
+    side_a = patterns.get("a")
+    side_b = patterns.get("b")
+    if side_a and side_b:
+        lines.append(
+            f"- Ajuste por patrones de juego: {prediction.team_a} muestra {side_a.get('summary', 'sin patron claro')}; "
+            f"{prediction.team_b} muestra {side_b.get('summary', 'sin patron claro')}."
+        )
+        if patterns.get("tempo_label"):
+            lines.append(f"- Ritmo detectado del partido: {patterns['tempo_label']}.")
     if entry.get("news_headlines"):
         lines.append("- Ajuste por noticias relevantes detectadas en el feed del partido.")
     drivers = top_factor_drivers(prediction.factors, limit=2)
@@ -4272,6 +4555,7 @@ def build_dashboard_markdown(
         lines.extend(dashboard_absence_lines(entry, prediction.team_a, prediction.team_b))
         lines.extend(dashboard_news_lines(entry, prediction.team_a, prediction.team_b))
         lines.extend(dashboard_live_stats_lines(entry, prediction.team_a, prediction.team_b))
+        lines.extend(dashboard_pattern_lines(prediction))
         lines.extend(adjustment_reason_lines(entry, prediction))
         next_round_note = next_round_projection_note(entry, prediction, bracket_payload)
         if next_round_note:
@@ -5054,7 +5338,7 @@ def build_methodology_html(bracket_payload: dict, backtest: dict) -> str:
         "</article>"
         "<article>"
         "<h3>Modo in-play</h3>"
-        "<p>Durante un partido, condiciona las probabilidades por minuto, marcador actual y fase del juego. Ademas, cuando el feed lo trae, suma tiros, tiros al arco, posesion, xG live o proxy y expulsiones para recalcular probabilidades y marcadores finales mas probables.</p>"
+        "<p>Durante un partido, condiciona las probabilidades por minuto, marcador actual y fase del juego. Ademas, cuando el feed lo trae, suma tiros, tiros al arco, posesion, xG live o proxy, corners, disciplina y expulsiones para recalcular probabilidades, marcadores finales mas probables y patrones de juego como dominio territorial, transicion vertical o control esteril.</p>"
         "</article>"
         "<article>"
         "<h3>Noticias y bajas</h3>"
@@ -5164,6 +5448,17 @@ def build_dashboard_html(
         live_stats_html = ""
         for line in dashboard_live_stats_lines(entry, prediction.team_a, prediction.team_b):
             live_stats_html += f"<p class=\"meta\">{html.escape(line[2:] if line.startswith('- ') else line)}</p>"
+        pattern_html = ""
+        pattern_lines = dashboard_pattern_lines(prediction)
+        if pattern_lines:
+            pattern_html = (
+                "<div class=\"reason-block\"><h4>Patrones de juego detectados</h4>"
+                + "".join(
+                    f"<p class=\"meta\">{html.escape(line[2:] if line.startswith('- ') else line)}</p>"
+                    for line in pattern_lines
+                )
+                + "</div>"
+            )
 
         reason_html = ""
         reason_lines = adjustment_reason_lines(entry, prediction)
@@ -5263,6 +5558,7 @@ def build_dashboard_html(
             f"{absence_html}"
             f"{news_html}"
             f"{live_stats_html}"
+            f"{pattern_html}"
             f"{reason_html}"
             f"{next_round_html}"
             f"{projection_html}"
