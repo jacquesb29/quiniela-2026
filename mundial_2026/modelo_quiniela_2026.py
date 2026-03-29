@@ -527,6 +527,7 @@ class MatchPrediction:
     live_phase: Optional[str] = None
     statistical_depth: Optional[Dict[str, object]] = None
     live_patterns: Optional[Dict[str, object]] = None
+    model_stack: Optional[Dict[str, object]] = None
 
 
 def clamp(value: float, low: float, high: float) -> float:
@@ -918,6 +919,7 @@ def compute_statistical_depth(
     draw: float,
     win_b: float,
     ctx: Optional[MatchContext] = None,
+    model_stack: Optional[Dict[str, object]] = None,
 ) -> Dict[str, object]:
     result_probs = [max(win_a, 1e-12), max(draw, 1e-12), max(win_b, 1e-12)]
     entropy = -sum(prob * math.log(prob) for prob in result_probs) / math.log(3.0)
@@ -933,6 +935,7 @@ def compute_statistical_depth(
     sorted_results = sorted(result_probs, reverse=True)
     top_outcome_prob = sorted_results[0]
     second_outcome_prob = sorted_results[1]
+    model_agreement = float((model_stack or {}).get("agreement", 0.0)) if model_stack else None
     confidence = clamp(
         0.10
         + 0.60 * top_outcome_prob
@@ -942,6 +945,8 @@ def compute_statistical_depth(
         0.05,
         0.99,
     )
+    if model_agreement is not None:
+        confidence = clamp(confidence + 0.12 * (model_agreement - 0.5), 0.05, 0.99)
     margin_dist: Dict[int, float] = {}
     for (goals_a, goals_b), prob in final_dist.items():
         margin = goals_a - goals_b
@@ -972,6 +977,19 @@ def compute_statistical_depth(
         "modal_margin": modal_margin,
         "modal_margin_prob": modal_margin_prob,
         "market_gap": market_gap,
+        "model_agreement": model_agreement,
+        "model_stack_names": (
+            [
+                str((model_stack or {}).get("primary_name", "")),
+                str((model_stack or {}).get("contrast_name", "")),
+                str((model_stack or {}).get("low_score_name", "")),
+                str((model_stack or {}).get("final_name", "")),
+            ]
+            if model_stack
+            else []
+        ),
+        "model_stack_weights": dict((model_stack or {}).get("weights", {})) if model_stack else {},
+        "market_shrink": float((model_stack or {}).get("market_shrink", 0.0)) if model_stack else 0.0,
     }
 
 
@@ -1900,6 +1918,14 @@ def bivariate_poisson_prob(x: int, y: int, lambda1: float, lambda2: float, lambd
     return exp_term * total
 
 
+def poisson_prob(goals: int, mu: float) -> float:
+    if goals < 0:
+        return 0.0
+    mu = max(mu, 0.001)
+    factorial = FACTORIALS[goals] if goals < len(FACTORIALS) else math.factorial(goals)
+    return math.exp(-mu) * (mu ** goals) / factorial
+
+
 def score_distribution(mu_a: float, mu_b: float, max_goals: int = 10) -> Dict[Tuple[int, int], float]:
     lambda3 = min(0.10, mu_a * 0.18, mu_b * 0.18)
     lambda3 = max(lambda3, 0.0)
@@ -1917,6 +1943,286 @@ def score_distribution(mu_a: float, mu_b: float, max_goals: int = 10) -> Dict[Tu
     for key in list(dist):
         dist[key] /= total
     return dist
+
+
+def independent_score_distribution(mu_a: float, mu_b: float, max_goals: int = 10) -> Dict[Tuple[int, int], float]:
+    dist: Dict[Tuple[int, int], float] = {}
+    total = 0.0
+    for goals_a in range(max_goals + 1):
+        prob_a = poisson_prob(goals_a, mu_a)
+        for goals_b in range(max_goals + 1):
+            prob = prob_a * poisson_prob(goals_b, mu_b)
+            dist[(goals_a, goals_b)] = prob
+            total += prob
+    if total == 0.0:
+        return dist
+    for key in list(dist):
+        dist[key] /= total
+    return dist
+
+
+def low_score_rho(mu_a: float, mu_b: float, ctx: Optional[MatchContext] = None) -> float:
+    closeness = clamp(1.0 - abs(mu_a - mu_b) / max(mu_a + mu_b, 1.0), 0.0, 1.0)
+    draw_signal = 0.0
+    if ctx and ctx.market_prob_draw is not None:
+        draw_signal = clamp(float(ctx.market_prob_draw) - 0.27, -0.08, 0.12)
+    rho = -0.16 * closeness - 0.55 * max(draw_signal, 0.0) + 0.20 * min(draw_signal, 0.0)
+    if ctx and ctx.knockout:
+        rho -= 0.02
+    return clamp(rho, -0.22, 0.08)
+
+
+def dixon_coles_tau(x: int, y: int, mu_a: float, mu_b: float, rho: float) -> float:
+    if x == 0 and y == 0:
+        return max(0.05, 1.0 - mu_a * mu_b * rho)
+    if x == 0 and y == 1:
+        return max(0.05, 1.0 + mu_a * rho)
+    if x == 1 and y == 0:
+        return max(0.05, 1.0 + mu_b * rho)
+    if x == 1 and y == 1:
+        return max(0.05, 1.0 - rho)
+    return 1.0
+
+
+def low_score_adjusted_distribution(
+    mu_a: float,
+    mu_b: float,
+    ctx: Optional[MatchContext] = None,
+    max_goals: int = 10,
+) -> Dict[Tuple[int, int], float]:
+    rho = low_score_rho(mu_a, mu_b, ctx)
+    base = independent_score_distribution(mu_a, mu_b, max_goals=max_goals)
+    total = 0.0
+    for (goals_a, goals_b), prob in list(base.items()):
+        adjusted = prob * dixon_coles_tau(goals_a, goals_b, mu_a, mu_b, rho)
+        base[(goals_a, goals_b)] = max(adjusted, 0.0)
+        total += base[(goals_a, goals_b)]
+    if total == 0.0:
+        return base
+    for key in list(base):
+        base[key] /= total
+    return base
+
+
+def outcome_probabilities_from_distribution(dist: Dict[Tuple[int, int], float]) -> Dict[str, float]:
+    win_a = 0.0
+    draw = 0.0
+    win_b = 0.0
+    for (goals_a, goals_b), prob in dist.items():
+        if goals_a > goals_b:
+            win_a += prob
+        elif goals_a == goals_b:
+            draw += prob
+        else:
+            win_b += prob
+    return {"a": win_a, "draw": draw, "b": win_b}
+
+
+def blend_distributions(
+    weighted_distributions: Sequence[Tuple[float, Dict[Tuple[int, int], float]]]
+) -> Dict[Tuple[int, int], float]:
+    dist: Dict[Tuple[int, int], float] = {}
+    total_weight = 0.0
+    for weight, current in weighted_distributions:
+        if weight <= 0.0:
+            continue
+        total_weight += weight
+        for score, prob in current.items():
+            dist[score] = dist.get(score, 0.0) + weight * prob
+    if total_weight <= 0.0:
+        return {}
+    for key in list(dist):
+        dist[key] /= total_weight
+    total = sum(dist.values())
+    if total > 0.0:
+        for key in list(dist):
+            dist[key] /= total
+    return dist
+
+
+def apply_outcome_target_shrink(
+    dist: Dict[Tuple[int, int], float],
+    target_a: float,
+    target_draw: float,
+    target_b: float,
+    strength: float,
+) -> Dict[Tuple[int, int], float]:
+    strength = clamp(strength, 0.0, 1.0)
+    if strength <= 0.0:
+        return dict(dist)
+    current = outcome_probabilities_from_distribution(dist)
+    targets = {"a": max(target_a, 1e-6), "draw": max(target_draw, 1e-6), "b": max(target_b, 1e-6)}
+    scales = {
+        key: (targets[key] / max(current.get(key, 1e-6), 1e-6)) ** strength
+        for key in ("a", "draw", "b")
+    }
+    adjusted: Dict[Tuple[int, int], float] = {}
+    total = 0.0
+    for (goals_a, goals_b), prob in dist.items():
+        outcome = "a" if goals_a > goals_b else ("draw" if goals_a == goals_b else "b")
+        scaled = prob * scales[outcome]
+        adjusted[(goals_a, goals_b)] = scaled
+        total += scaled
+    if total <= 0.0:
+        return dict(dist)
+    for key in list(adjusted):
+        adjusted[key] /= total
+    return adjusted
+
+
+def model_blend_weights(mu_a: float, mu_b: float, ctx: Optional[MatchContext] = None) -> Dict[str, float]:
+    closeness = clamp(1.0 - abs(mu_a - mu_b) / max(mu_a + mu_b, 1.0), 0.0, 1.0)
+    draw_signal = 0.0
+    if ctx and ctx.market_prob_draw is not None:
+        draw_signal = clamp(float(ctx.market_prob_draw) - 0.27, -0.08, 0.12)
+    contrast = 0.18
+    low_score = clamp(
+        0.12 + 0.08 * closeness + 0.45 * max(draw_signal, 0.0) + (0.03 if ctx and ctx.knockout else 0.0),
+        0.12,
+        0.28,
+    )
+    primary = max(0.40, 1.0 - contrast - low_score)
+    total = primary + contrast + low_score
+    return {
+        "primary": primary / total,
+        "contrast": contrast / total,
+        "low_score": low_score / total,
+    }
+
+
+def pairwise_model_agreement(prob_sets: Sequence[Dict[str, float]]) -> float:
+    if len(prob_sets) < 2:
+        return 1.0
+    distances = []
+    for index in range(len(prob_sets)):
+        for other in range(index + 1, len(prob_sets)):
+            distance = 0.5 * sum(
+                abs(float(prob_sets[index].get(key, 0.0)) - float(prob_sets[other].get(key, 0.0)))
+                for key in ("a", "draw", "b")
+            )
+            distances.append(distance)
+    if not distances:
+        return 1.0
+    return clamp(1.0 - (sum(distances) / len(distances)), 0.0, 1.0)
+
+
+def build_model_stack(
+    mu_a: float,
+    mu_b: float,
+    ctx: Optional[MatchContext] = None,
+    *,
+    max_goals: int = 10,
+    market_strength: float = 0.28,
+) -> Tuple[Dict[Tuple[int, int], float], Dict[str, object]]:
+    primary = score_distribution(mu_a, mu_b, max_goals=max_goals)
+    contrast = independent_score_distribution(mu_a, mu_b, max_goals=max_goals)
+    low_score = low_score_adjusted_distribution(mu_a, mu_b, ctx, max_goals=max_goals)
+    weights = model_blend_weights(mu_a, mu_b, ctx)
+    ensemble = blend_distributions(
+        [
+            (weights["primary"], primary),
+            (weights["contrast"], contrast),
+            (weights["low_score"], low_score),
+        ]
+    )
+    market_used = False
+    if (
+        ctx
+        and ctx.market_prob_a is not None
+        and ctx.market_prob_draw is not None
+        and ctx.market_prob_b is not None
+    ):
+        ensemble = apply_outcome_target_shrink(
+            ensemble,
+            float(ctx.market_prob_a),
+            float(ctx.market_prob_draw),
+            float(ctx.market_prob_b),
+            strength=market_strength,
+        )
+        market_used = market_strength > 0.0
+
+    primary_probs = outcome_probabilities_from_distribution(primary)
+    contrast_probs = outcome_probabilities_from_distribution(contrast)
+    low_score_probs = outcome_probabilities_from_distribution(low_score)
+    ensemble_probs = outcome_probabilities_from_distribution(ensemble)
+    agreement = pairwise_model_agreement([primary_probs, contrast_probs, low_score_probs])
+    meta = {
+        "primary_name": "Bivariante Poisson",
+        "contrast_name": "Poisson independiente",
+        "low_score_name": "Ajuste de baja anotacion",
+        "final_name": "Ensamble ligero",
+        "weights": weights,
+        "agreement": agreement,
+        "market_shrink": clamp(market_strength, 0.0, 1.0) if market_used else 0.0,
+        "primary_probs": primary_probs,
+        "contrast_probs": contrast_probs,
+        "low_score_probs": low_score_probs,
+        "ensemble_probs": ensemble_probs,
+    }
+    return ensemble, meta
+
+
+def _sample_from_distribution(dist: Dict[Tuple[int, int], float]) -> Tuple[int, int]:
+    roll = random.random()
+    cumulative = 0.0
+    last_score = (0, 0)
+    for score, prob in dist.items():
+        cumulative += prob
+        last_score = score
+        if roll <= cumulative:
+            return score
+    return last_score
+
+
+def correlated_sample_score(mu_a: float, mu_b: float) -> Tuple[int, int]:
+    lambda3 = min(0.08, mu_a * 0.18, mu_b * 0.18)
+    shared = poisson_sample(lambda3)
+    goals_a = poisson_sample(max(mu_a - lambda3, 0.001)) + shared
+    goals_b = poisson_sample(max(mu_b - lambda3, 0.001)) + shared
+    return goals_a, goals_b
+
+
+def independent_sample_score(mu_a: float, mu_b: float) -> Tuple[int, int]:
+    return poisson_sample(max(mu_a, 0.001)), poisson_sample(max(mu_b, 0.001))
+
+
+@lru_cache(maxsize=4096)
+def cached_low_score_distribution(
+    mu_a_key: int,
+    mu_b_key: int,
+    rho_key: int,
+    max_goals: int,
+) -> Dict[Tuple[int, int], float]:
+    mu_a = mu_a_key / 20.0
+    mu_b = mu_b_key / 20.0
+    rho = rho_key / 100.0
+    base = independent_score_distribution(mu_a, mu_b, max_goals=max_goals)
+    total = 0.0
+    for (goals_a, goals_b), prob in list(base.items()):
+        adjusted = prob * dixon_coles_tau(goals_a, goals_b, mu_a, mu_b, rho)
+        base[(goals_a, goals_b)] = max(adjusted, 0.0)
+        total += base[(goals_a, goals_b)]
+    if total > 0.0:
+        for key in list(base):
+            base[key] /= total
+    return base
+
+
+def sample_score(mu_a: float, mu_b: float, ctx: Optional[MatchContext] = None) -> Tuple[int, int]:
+    weights = model_blend_weights(mu_a, mu_b, ctx)
+    roll = random.random()
+    if roll < weights["primary"]:
+        return correlated_sample_score(mu_a, mu_b)
+    if roll < weights["primary"] + weights["contrast"]:
+        return independent_sample_score(mu_a, mu_b)
+    rho = low_score_rho(mu_a, mu_b, ctx)
+    low_score_dist = cached_low_score_distribution(
+        int(round(mu_a * 20.0)),
+        int(round(mu_b * 20.0)),
+        int(round(rho * 100.0)),
+        7,
+    )
+    return _sample_from_distribution(low_score_dist)
 
 
 def penalties_context_state(ctx_morale: float, state: Optional[dict]) -> dict:
@@ -1951,7 +2257,7 @@ def knockout_resolution_detail(
     state_b: Optional[dict] = None,
 ) -> Dict[str, float]:
     et_mu_a, et_mu_b = extra_time_expected_goals(mu_a, mu_b, state_a=state_a, state_b=state_b)
-    et_dist = score_distribution(et_mu_a, et_mu_b, max_goals=5)
+    et_dist, _ = build_model_stack(et_mu_a, et_mu_b, None, max_goals=5, market_strength=0.0)
     et_win_a = 0.0
     et_draw = 0.0
     et_win_b = 0.0
@@ -2023,7 +2329,7 @@ def sample_knockout_resolution(
         }
 
     et_mu_a, et_mu_b = extra_time_expected_goals(mu_a, mu_b, state_a=state_a, state_b=state_b)
-    et_score_a, et_score_b = sample_score(et_mu_a, et_mu_b)
+    et_score_a, et_score_b = sample_score(et_mu_a, et_mu_b, ctx)
     total_a = score_a + et_score_a
     total_b = score_b + et_score_b
     if et_score_a > et_score_b:
@@ -2083,7 +2389,7 @@ def predict_match(
     team_a = teams[team_a_name]
     team_b = teams[team_b_name]
     mu_a, mu_b = expected_goals(team_a, team_b, ctx, state_a=state_a, state_b=state_b)
-    dist = score_distribution(mu_a, mu_b)
+    dist, model_stack = build_model_stack(mu_a, mu_b, ctx, max_goals=10, market_strength=0.30)
 
     win_a = 0.0
     draw = 0.0
@@ -2139,7 +2445,8 @@ def predict_match(
         knockout_detail=knockout_detail,
         penalty_shootout=penalty_shootout,
         factors=factors,
-        statistical_depth=compute_statistical_depth(dist, win_a, draw, win_b, ctx),
+        statistical_depth=compute_statistical_depth(dist, win_a, draw, win_b, ctx, model_stack=model_stack),
+        model_stack=model_stack,
     )
 
 
@@ -2254,7 +2561,7 @@ def predict_match_live(
             current_score_b,
         )
         rem_mu_a, rem_mu_b = apply_live_pattern_adjustment(rem_mu_a, rem_mu_b, patterns, "extra_time")
-        remainder_dist = score_distribution(rem_mu_a, rem_mu_b, max_goals=4)
+        remainder_dist, model_stack = build_model_stack(rem_mu_a, rem_mu_b, None, max_goals=4, market_strength=0.0)
         final_dist = combine_current_score_distribution(current_score_a, current_score_b, remainder_dist)
         win_a = 0.0
         draw = 0.0
@@ -2320,8 +2627,9 @@ def predict_match_live(
             current_score_b=current_score_b,
             elapsed_minutes=elapsed_minutes,
             live_phase=phase,
-            statistical_depth=compute_statistical_depth(final_dist, win_a, draw, win_b, ctx),
+            statistical_depth=compute_statistical_depth(final_dist, win_a, draw, win_b, ctx, model_stack=model_stack),
             live_patterns=patterns,
+            model_stack=model_stack,
         )
 
     remaining_fraction = 1.0 if elapsed_minutes is None else clamp((90.0 - elapsed_minutes) / 90.0, 0.0, 1.0)
@@ -2350,7 +2658,8 @@ def predict_match_live(
         current_score_b,
     )
     rem_mu_a, rem_mu_b = apply_live_pattern_adjustment(rem_mu_a, rem_mu_b, patterns, "regulation")
-    remainder_dist = score_distribution(rem_mu_a, rem_mu_b, max_goals=6)
+    live_market_strength = 0.08 if progress > 0.0 else 0.20
+    remainder_dist, model_stack = build_model_stack(rem_mu_a, rem_mu_b, ctx, max_goals=6, market_strength=live_market_strength)
     final_dist = combine_current_score_distribution(current_score_a, current_score_b, remainder_dist)
 
     win_a = 0.0
@@ -2413,8 +2722,9 @@ def predict_match_live(
         current_score_b=current_score_b,
         elapsed_minutes=elapsed_minutes,
         live_phase="regulation",
-        statistical_depth=compute_statistical_depth(final_dist, win_a, draw, win_b, ctx),
+        statistical_depth=compute_statistical_depth(final_dist, win_a, draw, win_b, ctx, model_stack=model_stack),
         live_patterns=patterns,
+        model_stack=model_stack,
     )
 
 
@@ -2446,7 +2756,7 @@ def monte_carlo_match_summary(
     penalties_count = 0
 
     for _ in range(iterations):
-        goals_a, goals_b = sample_score(mu_a, mu_b)
+        goals_a, goals_b = sample_score(mu_a, mu_b, ctx)
         if goals_a > goals_b:
             counts[(goals_a, goals_b)] = counts.get((goals_a, goals_b), 0) + 1
             total_goals_a += goals_a
@@ -2676,17 +2986,9 @@ def qualification_probabilities(teams: Dict[str, Team]) -> Dict[str, float]:
     return probabilities
 
 
-def sample_score(mu_a: float, mu_b: float) -> Tuple[int, int]:
-    lambda3 = min(0.08, mu_a * 0.18, mu_b * 0.18)
-    shared = poisson_sample(lambda3)
-    goals_a = poisson_sample(max(mu_a - lambda3, 0.001)) + shared
-    goals_b = poisson_sample(max(mu_b - lambda3, 0.001)) + shared
-    return goals_a, goals_b
-
-
 def sample_knockout_winner(teams: Dict[str, Team], team_a: str, team_b: str, ctx: MatchContext) -> str:
     mu_a, mu_b = expected_goals(teams[team_a], teams[team_b], ctx)
-    goals_a, goals_b = sample_score(mu_a, mu_b)
+    goals_a, goals_b = sample_score(mu_a, mu_b, ctx)
     return sample_knockout_resolution(
         teams[team_a],
         teams[team_b],
@@ -3376,7 +3678,7 @@ def simulate_match_sample(
     state_a = ensure_state(states, team_a)
     state_b = ensure_state(states, team_b)
     mu_a, mu_b = expected_goals(teams[team_a], teams[team_b], ctx, state_a=state_a, state_b=state_b)
-    score_a, score_b = sample_score(mu_a, mu_b)
+    score_a, score_b = sample_score(mu_a, mu_b, ctx)
     yellows_a, reds_a, yellows_b, reds_b = sample_cards(
         teams,
         team_a,
@@ -4827,6 +5129,7 @@ def statistical_depth_lines(prediction: MatchPrediction) -> List[str]:
     clean_sheet_a = float(depth.get("clean_sheet_a", 0.0))
     clean_sheet_b = float(depth.get("clean_sheet_b", 0.0))
     market_gap = depth.get("market_gap")
+    model_agreement = depth.get("model_agreement")
     modal_margin = int(depth.get("modal_margin", 0))
     modal_margin_prob = float(depth.get("modal_margin_prob", 0.0))
 
@@ -4842,8 +5145,13 @@ def statistical_depth_lines(prediction: MatchPrediction) -> List[str]:
     lines.append(
         f"- Cuanta probabilidad cubren los 3 marcadores mas probables: {format_pct(top3_coverage)} | ventaja final mas probable {modal_margin:+d} ({format_pct(modal_margin_prob)})"
     )
+    if model_agreement is not None:
+        lines.append(f"- Que tanto coinciden los modelos entre si: {format_pct(float(model_agreement))}")
     if market_gap is not None:
         lines.append(f"- Diferencia frente a las cuotas de mercado: {format_pct(float(market_gap))}")
+    stack_names = [name for name in depth.get("model_stack_names", []) if name]
+    if stack_names:
+        lines.append(f"- Stack estadistico usado: {' + '.join(stack_names)}")
     drivers = top_factor_drivers(prediction.factors, limit=3)
     if drivers:
         lines.append(
@@ -4860,17 +5168,29 @@ def statistical_depth_html(prediction: MatchPrediction) -> str:
     confidence = float(depth.get("confidence_index", 0.0))
     pick_label, pick_prob = pick_summary(prediction)
     market_gap = depth.get("market_gap")
+    model_agreement = depth.get("model_agreement")
     market_html = ""
     if market_gap is not None:
         market_html = (
             f"<div><span>Diferencia vs mercado</span><strong>{format_pct(float(market_gap))}</strong></div>"
         )
+    agreement_html = ""
+    if model_agreement is not None:
+        agreement_html = f"<div><span>Coincidencia entre modelos</span><strong>{format_pct(float(model_agreement))}</strong></div>"
     drivers = top_factor_drivers(prediction.factors, limit=3)
     drivers_html = ""
     if drivers:
         drivers_html = (
             "<p class=\"meta\"><strong>Factores dominantes:</strong> "
             + html.escape("; ".join(f"{label} {value:+.3f}" for label, value in drivers))
+            + "</p>"
+        )
+    stack_names = [name for name in depth.get("model_stack_names", []) if name]
+    stack_html = ""
+    if stack_names:
+        stack_html = (
+            "<p class=\"meta\"><strong>Stack estadistico:</strong> "
+            + html.escape(" + ".join(stack_names))
             + "</p>"
         )
     return (
@@ -4886,8 +5206,10 @@ def statistical_depth_html(prediction: MatchPrediction) -> str:
         f"<div><span>Prob. de que {html.escape(prediction.team_b)} no reciba goles</span><strong>{format_pct(float(depth.get('clean_sheet_b', 0.0)))}</strong></div>"
         f"<div><span>Ventaja final mas probable</span><strong>{int(depth.get('modal_margin', 0)):+d}</strong></div>"
         f"<div><span>Probabilidad de esa ventaja</span><strong>{format_pct(float(depth.get('modal_margin_prob', 0.0)))}</strong></div>"
+        f"{agreement_html}"
         f"{market_html}"
         "</div>"
+        f"{stack_html}"
         f"{drivers_html}"
         "</div>"
     )
@@ -5465,7 +5787,7 @@ def build_backtesting_html(backtest: dict) -> str:
 
 def build_methodology_html(bracket_payload: dict, backtest: dict) -> str:
     iterations = int(bracket_payload.get("iterations", 0) or 0)
-    montecarlo_line = f"{iterations} iteraciones" if iterations else "iteraciones variables"
+    montecarlo_line = f"{iterations:,}".replace(",", ".") + " iteraciones" if iterations else "iteraciones variables"
     return (
         "<section class=\"panel methodology\">"
         "<div class=\"panel-head\">"
@@ -5478,11 +5800,15 @@ def build_methodology_html(bracket_payload: dict, backtest: dict) -> str:
         "<div class=\"method-grid\">"
         "<article>"
         "<h3>Partido a partido</h3>"
-        "<p>Combina fuerza de cada seleccion, contexto del partido y distribucion de goles para estimar marcador final y probabilidades de victoria, empate y derrota.</p>"
+        "<p>Combina fuerza de cada seleccion, contexto del partido y un stack de modelos para estimar marcador final y probabilidades de victoria, empate y derrota.</p>"
         "</article>"
         "<article>"
         "<h3>Cuadro completo</h3>"
-        f"<p>La llave publicada se construye con Monte Carlo dinamico y {html.escape(montecarlo_line)} para que el cuadro no cambie solo por ruido de simulacion.</p>"
+        f"<p>La llave publicada se construye con Monte Carlo dinamico de {html.escape(montecarlo_line)} por corrida para que el cuadro no cambie solo por ruido de simulacion.</p>"
+        "</article>"
+        "<article>"
+        "<h3>Stack estadistico</h3>"
+        "<p>La capa prepartido mezcla el modelo principal Bivariante Poisson, un modelo de contraste Poisson independiente, un ajuste de baja anotacion y un ensamble ligero final. Si las cuotas son confiables, tambien se usan como referencia suave y no como sustituto del modelo.</p>"
         "</article>"
         "<article>"
         "<h3>Estado dinámico</h3>"
@@ -6396,7 +6722,7 @@ def build_dashboard_html(
         <div>
           <p class="eyebrow">Modelo Dinámico | Mundial 2026</p>
           <h1>Pronóstico En Vivo y Hoja de Ruta</h1>
-          <p class="lede">Cada partido combina fortaleza base, Elo, puntos FIFA complementarios, forma reciente, clima, alineaciones, bajas, mercado y estado del torneo. Si un juego está en curso, las probabilidades ya se condicionan al minuto y al marcador actual.</p>
+          <p class="lede">Cada partido mezcla un stack estadistico con modelo principal, contraste, ajuste de baja anotacion, Elo, puntos FIFA complementarios, forma reciente, clima, alineaciones, bajas, mercado y estado del torneo. Si un juego está en curso, las probabilidades ya se condicionan al minuto y al marcador actual.</p>
           <div class="summary-grid">
             <div class="summary-tile">
               <span>Última actualización</span>
@@ -6419,7 +6745,7 @@ def build_dashboard_html(
         <div class="hero-notes">
           <article class="hero-note">
             <h3>Qué significan las métricas</h3>
-            <p><strong>Marcador proyectado</strong> muestra el resultado entero mas probable. <strong>Promedio estimado de goles del modelo</strong> es una media probabilistica y por eso puede llevar decimales. <strong>Probabilidades de resultado</strong> es la chance de victoria, empate o derrota en ese mismo corte. <strong>Puntos FIFA</strong> entran como señal estructural secundaria, con menos peso que Elo.</p>
+            <p><strong>Marcador proyectado</strong> muestra el resultado entero mas probable. <strong>Promedio estimado de goles del modelo</strong> es una media probabilistica y por eso puede llevar decimales. <strong>Probabilidades de resultado</strong> es la chance de victoria, empate o derrota en ese mismo corte. <strong>Puntos FIFA</strong> entran como señal estructural secundaria, con menos peso que Elo. <strong>Coincidencia entre modelos</strong> ayuda a separar picks claros de partidos realmente parejos.</p>
           </article>
           <article class="hero-note">
             <h3>Durante un partido</h3>
@@ -7170,6 +7496,14 @@ def print_prediction(prediction: MatchPrediction, show_factors: bool = False) ->
         print("  Patrones detectados en el partido:")
         for line in pattern_lines_from_payload(prediction.live_patterns, prediction.team_a, prediction.team_b):
             print(f"    {line[2:] if line.startswith('- ') else line}")
+    if prediction.model_stack:
+        agreement = float(prediction.model_stack.get("agreement", 0.0))
+        print(
+            "  Stack estadistico: "
+            f"{prediction.model_stack.get('primary_name')} + {prediction.model_stack.get('contrast_name')} + "
+            f"{prediction.model_stack.get('low_score_name')} + {prediction.model_stack.get('final_name')} "
+            f"| coincidencia entre modelos {agreement:.1%}"
+        )
     print("  Marcadores finales mas probables:" if prediction.advance_a is not None else "  Marcadores mas probables:")
     for score, prob in prediction.exact_scores:
         print(f"    {score}: {prob:.1%}")
@@ -7362,7 +7696,13 @@ def command_score_prob(args: argparse.Namespace, teams: Dict[str, Team]) -> None
         importance=STAGE_IMPORTANCE[stage],
     )
     mu_a, mu_b = expected_goals(teams[team_a_name], teams[team_b_name], ctx, state_a=state_a, state_b=state_b)
-    distribution = score_distribution(mu_a, mu_b, max_goals=max(args.goals_a, args.goals_b, 10))
+    distribution, _ = build_model_stack(
+        mu_a,
+        mu_b,
+        ctx,
+        max_goals=max(args.goals_a, args.goals_b, 10),
+        market_strength=0.30,
+    )
     probability = distribution.get((args.goals_a, args.goals_b), 0.0)
     print(f"{team_a_name} vs {team_b_name}")
     print(f"  Promedio estimado de goles del modelo: {team_a_name} {mu_a:.2f} | {team_b_name} {mu_b:.2f}")
@@ -7630,7 +7970,7 @@ def build_parser() -> argparse.ArgumentParser:
         default=str(TOURNAMENT_CONFIG_FILE),
         help="Ruta al JSON del cuadro del torneo.",
     )
-    project.add_argument("--iterations", type=int, default=1000)
+    project.add_argument("--iterations", type=int, default=15000)
     project.add_argument("--seed", type=int, default=None)
     project.add_argument("--progress-every", type=int, default=0)
     project.add_argument("--output", default=str(BRACKET_FILE))

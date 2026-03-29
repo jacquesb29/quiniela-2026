@@ -199,7 +199,7 @@ python3 mundial_2026/sync_fifa_rankings.py
 - El dataset ya trae `fifa_points`, `fifa_rank` y `fifa_country_code` oficiales; si quieres refrescarlos mas adelante, usa `sync_fifa_rankings.py`.
 - Alineaciones confirmadas, cambios de XI, arbitro y bajas/ausencias estan preparados en modo best-effort: se cargan automaticamente si el feed publico los expone para ese partido.
 - `sync_live_data_2026.py` tambien puede enriquecer partidos en vivo con un proveedor mas profundo de eventos y estadisticas. Si defines `API_FOOTBALL_KEY`, el pipeline intenta usar API-Football para lineups, eventos y stats live, manteniendo ESPN como base y fallback.
-- La llave publicada en el dashboard cloud ahora usa 1200 iteraciones por defecto para reducir ruido Monte Carlo frente a 300.
+- La llave publicada en el dashboard cloud ahora usa 15000 iteraciones por defecto para reducir ruido Monte Carlo frente a configuraciones mas chicas.
 - Si un partido real se va a proroga o penales y lo marcas en el JSON, el estado acumula fatiga adicional y baja de disponibilidad para el siguiente partido.
 - Si corriges un resultado viejo, lo correcto es ejecutar `state-reset` y luego volver a correr `fixtures` sobre el archivo completo en orden cronologico.
 - Conviene poner un `id` estable en cada partido del JSON para que el script no aplique dos veces el mismo resultado.
