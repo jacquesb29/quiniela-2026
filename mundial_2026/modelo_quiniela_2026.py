@@ -4645,11 +4645,11 @@ def build_dashboard_markdown(
         f"Estado usado: {state_path}",
         f"Fixtures leidos: {fixtures_path}",
         "",
-        "## Lectura global del tablero",
+        "## Resumen rapido del torneo",
         "",
     ]
     lines.extend(build_global_confidence_markdown(entries))
-    lines.extend(["", "## Calibracion historica y backtesting", ""])
+    lines.extend(["", "## Como viene acertando el modelo", ""])
     lines.extend(build_backtesting_markdown(backtest))
     lines.extend([
         "",
@@ -4754,28 +4754,28 @@ def build_dashboard_markdown(
         if prediction.advance_a is not None and prediction.advance_b is not None:
             detail = prediction.knockout_detail or {}
             lines.append(
-                f"- Clasificar: {prediction.team_a} {format_pct(prediction.advance_a)} | {prediction.team_b} {format_pct(prediction.advance_b)}"
+                f"- Quien tiene mas probabilidad de avanzar: {prediction.team_a} {format_pct(prediction.advance_a)} | {prediction.team_b} {format_pct(prediction.advance_b)}"
             )
             lines.append(
-                f"- Si empatan en 90': proroga {prediction.team_a} {format_pct(detail.get('et_win_a', 0.0))} | "
-                f"seguir empatados {format_pct(detail.get('et_draw', 0.0))} | {prediction.team_b} {format_pct(detail.get('et_win_b', 0.0))}"
+                f"- Si empatan tras 90': gana en prorroga {prediction.team_a} {format_pct(detail.get('et_win_a', 0.0))} | "
+                f"siguen empatados {format_pct(detail.get('et_draw', 0.0))} | {prediction.team_b} {format_pct(detail.get('et_win_b', 0.0))}"
             )
             lines.append(
-                f"- Penales si llegan: {prediction.team_a} {format_pct(detail.get('penalties_a', 0.0))} | "
+                f"- Si llegan a penales: {prediction.team_a} {format_pct(detail.get('penalties_a', 0.0))} | "
                 f"{prediction.team_b} {format_pct(detail.get('penalties_b', 0.0))}"
             )
             if prediction.penalty_shootout:
                 shootout = prediction.penalty_shootout
                 projected_shootout = (shootout.get("top_scores") or [("5-4", 0.0)])[0][0]
                 lines.append(
-                    f"- Tanda de penales proyectada: {projected_shootout}"
+                    f"- Marcador mas probable de la tanda: {projected_shootout}"
                 )
                 lines.append(
-                    f"- Promedio estimado de goles en la tanda: {prediction.team_a} {shootout.get('avg_score_a', 0.0):.2f} | "
+                    f"- Marcador medio esperado en la tanda: {prediction.team_a} {shootout.get('avg_score_a', 0.0):.2f} | "
                     f"{prediction.team_b} {shootout.get('avg_score_b', 0.0):.2f}"
                 )
                 lines.append(
-                    "- Marcadores de penales mas probables: "
+                    "- Marcadores de tanda mas probables: "
                     + ", ".join(
                         f"{score} {format_pct(prob)}" for score, prob in shootout.get("top_scores", [])
                     )
@@ -4831,19 +4831,19 @@ def statistical_depth_lines(prediction: MatchPrediction) -> List[str]:
     modal_margin_prob = float(depth.get("modal_margin_prob", 0.0))
 
     lines.append(
-        f"- Diagnóstico estadístico: {confidence_tier(confidence)} | pick actual {pick_label} {format_pct(pick_prob)} | confianza {format_pct(confidence)}"
+        f"- Lectura estadistica: {confidence_tier(confidence)} | pick actual {pick_label} {format_pct(pick_prob)} | confianza {format_pct(confidence)}"
     )
     lines.append(
-        f"- Produccion ofensiva esperada: ambos marcan {format_pct(both_score)} | over 2.5 {format_pct(over_2_5)}"
+        f"- Escenario de goles: ambos marcan {format_pct(both_score)} | mas de 2.5 goles {format_pct(over_2_5)}"
     )
     lines.append(
         f"- Probabilidad de que no reciba goles: {prediction.team_a} {format_pct(clean_sheet_a)} | {prediction.team_b} {format_pct(clean_sheet_b)}"
     )
     lines.append(
-        f"- Probabilidad acumulada de los 3 marcadores mas probables: {format_pct(top3_coverage)} | diferencia de goles mas probable {modal_margin:+d} ({format_pct(modal_margin_prob)})"
+        f"- Cuanta probabilidad cubren los 3 marcadores mas probables: {format_pct(top3_coverage)} | ventaja final mas probable {modal_margin:+d} ({format_pct(modal_margin_prob)})"
     )
     if market_gap is not None:
-        lines.append(f"- Diferencia promedio vs mercado de victoria/empate/derrota: {format_pct(float(market_gap))}")
+        lines.append(f"- Diferencia frente a las cuotas de mercado: {format_pct(float(market_gap))}")
     drivers = top_factor_drivers(prediction.factors, limit=3)
     if drivers:
         lines.append(
@@ -4880,12 +4880,12 @@ def statistical_depth_html(prediction: MatchPrediction) -> str:
         "<div class=\"depth-grid\">"
         f"<div><span>Confianza del pronóstico</span><strong>{format_pct(confidence)}</strong></div>"
         f"<div><span>Ambos marcan</span><strong>{format_pct(float(depth.get('both_teams_score', 0.0)))}</strong></div>"
-        f"<div><span>Over 2.5 goles</span><strong>{format_pct(float(depth.get('over_2_5', 0.0)))}</strong></div>"
-        f"<div><span>Probabilidad acumulada del top-3 de marcadores</span><strong>{format_pct(float(depth.get('top3_coverage', 0.0)))}</strong></div>"
+        f"<div><span>Mas de 2.5 goles</span><strong>{format_pct(float(depth.get('over_2_5', 0.0)))}</strong></div>"
+        f"<div><span>Probabilidad cubierta por los 3 marcadores mas probables</span><strong>{format_pct(float(depth.get('top3_coverage', 0.0)))}</strong></div>"
         f"<div><span>Prob. de que {html.escape(prediction.team_a)} no reciba goles</span><strong>{format_pct(float(depth.get('clean_sheet_a', 0.0)))}</strong></div>"
         f"<div><span>Prob. de que {html.escape(prediction.team_b)} no reciba goles</span><strong>{format_pct(float(depth.get('clean_sheet_b', 0.0)))}</strong></div>"
-        f"<div><span>Diferencia de goles mas probable</span><strong>{int(depth.get('modal_margin', 0)):+d}</strong></div>"
-        f"<div><span>Probabilidad de esa diferencia</span><strong>{format_pct(float(depth.get('modal_margin_prob', 0.0)))}</strong></div>"
+        f"<div><span>Ventaja final mas probable</span><strong>{int(depth.get('modal_margin', 0)):+d}</strong></div>"
+        f"<div><span>Probabilidad de esa ventaja</span><strong>{format_pct(float(depth.get('modal_margin_prob', 0.0)))}</strong></div>"
         f"{market_html}"
         "</div>"
         f"{drivers_html}"
@@ -4895,7 +4895,7 @@ def statistical_depth_html(prediction: MatchPrediction) -> str:
 
 def build_global_confidence_markdown(entries: Sequence[dict]) -> List[str]:
     if not entries:
-        return ["_Sin partidos cargados para calcular la lectura global del tablero._"]
+        return ["_Sin partidos cargados para armar el resumen rapido del torneo._"]
 
     ranked = []
     ranked_market = []
@@ -4919,20 +4919,20 @@ def build_global_confidence_markdown(entries: Sequence[dict]) -> List[str]:
     market_edges = sorted(ranked_market, key=lambda item: item[0], reverse=True)[:3]
 
     lines = [
-        "- Que significa esta seccion: resume que tan claro o incierto esta el tablero hoy. No mide si el modelo es 'bueno' o 'malo' en abstracto; mide si los picks actuales salen con ventaja clara o si hay mucha dispersion entre escenarios.",
-        f"- Certeza media del pick principal: {format_pct(avg_confidence)}",
-        f"- Concentracion media de los 3 marcadores mas probables: {format_pct(avg_top3)}",
+        "- Que significa esta seccion: resume si hoy el torneo se ve mas claro o mas incierto. No es una nota del modelo; es una foto de que tan firmes o parejos salen los partidos publicados.",
+        f"- Que tan claro sale, en promedio, el pick principal: {format_pct(avg_confidence)}",
+        f"- Cuanta probabilidad concentran, en promedio, los 3 marcadores mas probables: {format_pct(avg_top3)}",
         f"- Partidos en vivo ahora mismo: {live_matches}",
-        "- Como validar el refresh in-play: revisa la hora de publicacion de la portada, el badge 'En vivo', el minuto modelado y el archivo latest.json del sitio.",
+        "- Como validar la actualizacion en vivo: revisa la hora de publicacion de la portada, el badge 'En vivo', el minuto modelado y el archivo latest.json del sitio.",
     ]
     if strongest:
         lines.append(
-            "- Picks con ventaja mas clara: "
+            "- Partidos con favorito mas claro: "
             + "; ".join(f"{item[2]['title']} {format_pct(item[0])}" for item in strongest)
         )
     if most_open:
         lines.append(
-            "- Partidos mas parejos: "
+            "- Partidos mas cerrados o parejos: "
             + "; ".join(f"{item[2]['title']} {format_pct(item[0])}" for item in most_open)
         )
     group_metrics = {}
@@ -4958,14 +4958,14 @@ def build_global_confidence_markdown(entries: Sequence[dict]) -> List[str]:
         balanced_groups = sorted(group_rows, key=lambda row: (row[3], row[2]), reverse=True)
         favorite_groups = sorted(group_rows, key=lambda row: (row[1], -row[2]), reverse=True)
         lines.append(
-            "- Grupos mas parejos: "
+            "- Grupos mas parejos hasta ahora: "
             + "; ".join(
                 f"{label} | equilibrio {format_pct(balance)} | empate medio {format_pct(avg_draw)} | partidos {matches}"
                 for label, avg_conf, avg_draw, balance, matches in balanced_groups
             )
         )
         lines.append(
-            "- Grupos con favoritos mas claros: "
+            "- Grupos con favoritos mas claros hasta ahora: "
             + "; ".join(
                 f"{label} | certeza media {format_pct(avg_conf)} | empate medio {format_pct(avg_draw)} | partidos {matches}"
                 for label, avg_conf, avg_draw, balance, matches in favorite_groups
@@ -4973,7 +4973,7 @@ def build_global_confidence_markdown(entries: Sequence[dict]) -> List[str]:
         )
     if market_edges:
         lines.append(
-            "- Mayor diferencia modelo vs mercado: "
+            "- Partidos donde mas se separan modelo y cuotas: "
             + "; ".join(f"{item[1]['title']} {format_pct(item[0])}" for item in market_edges)
         )
     return lines
@@ -5095,24 +5095,24 @@ def build_global_confidence_html(entries: Sequence[dict]) -> str:
         "<div class=\"panel-head\">"
         "<div>"
         "<p class=\"eyebrow\">Lectura global</p>"
-        "<h2>Lectura global del tablero</h2>"
-        "<p class=\"lede-tight\">Este bloque resume que tan claros estan los picks publicados, donde los partidos se ven mas parejos y en que zonas el modelo se separa mas del mercado. No es una nota de calidad del modelo; es una lectura de certeza e incertidumbre del tablero actual.</p>"
+        "<h2>Resumen rapido del torneo</h2>"
+        "<p class=\"lede-tight\">Este bloque te deja ver rapido donde hay favoritos mas claros, donde los cruces se ven mas parejos y en que partidos el modelo se aleja mas de las cuotas. No es una nota del modelo; es una foto del tablero de hoy.</p>"
         "</div>"
         "</div>"
         "<div class=\"confidence-tiles\">"
-        f"<div class=\"summary-tile\"><span>Certeza media del pick principal</span><strong>{format_pct(avg_confidence)}</strong></div>"
-        f"<div class=\"summary-tile\"><span>Concentracion media de los 3 marcadores mas probables</span><strong>{format_pct(avg_top3)}</strong></div>"
+        f"<div class=\"summary-tile\"><span>Claridad media del pick principal</span><strong>{format_pct(avg_confidence)}</strong></div>"
+        f"<div class=\"summary-tile\"><span>Probabilidad media cubierta por los 3 marcadores mas probables</span><strong>{format_pct(avg_top3)}</strong></div>"
         f"<div class=\"summary-tile\"><span>Partidos en vivo detectados</span><strong>{live_matches}</strong></div>"
-        "<div class=\"summary-tile\"><span>Como comprobar actualizacion</span><strong><a href=\"latest.json\">latest.json</a> + badge En vivo + minuto modelado</strong></div>"
+        "<div class=\"summary-tile\"><span>Como comprobar actualizacion</span><strong><a href=\"latest.json\">latest.json</a> + badge En vivo + minuto</strong></div>"
         "</div>"
         "<div class=\"confidence-grid\">"
-        "<article><h3>Picks con ventaja mas clara</h3><ul>"
+        "<article><h3>Partidos con favorito mas claro</h3><ul>"
         f"{bullet_list(strongest, 'firm')}"
         "</ul></article>"
-        "<article><h3>Partidos mas parejos</h3><ul>"
+        "<article><h3>Partidos mas cerrados o parejos</h3><ul>"
         f"{bullet_list(most_open, 'open')}"
         "</ul></article>"
-        "<article><h3>Modelo vs mercado</h3><ul>"
+        "<article><h3>Modelo vs cuotas</h3><ul>"
         f"{market_list(market_edges) if market_edges else '<li><strong>Sin odds comparables</strong><span>Aun no llegaron cuotas utilizables del feed.</span></li>'}"
         "</ul></article>"
         f"{group_closed_html}"
@@ -5370,32 +5370,32 @@ def build_bracket_visual_html(bracket_payload: dict) -> str:
 
 def build_backtesting_markdown(backtest: dict) -> List[str]:
     if not backtest or not backtest.get("completed_matches"):
-        return ["_Sin partidos cerrados todavia para calibracion historica y backtesting._"]
+        return ["_Todavia no hay suficientes partidos terminados para medir como viene acertando el modelo._"]
 
     lines = [
         f"- Partidos cerrados analizados: {int(backtest.get('completed_matches', 0))}",
-        f"- Muestra evaluable en tiempo reglamentario: {int(backtest.get('regular_time_samples', 0))}",
+        f"- Partidos comparables en 90 minutos: {int(backtest.get('regular_time_samples', 0))}",
     ]
     if backtest.get("favorite_hit_rate") is not None:
-        lines.append(f"- Tasa de acierto del resultado mas probable: {format_pct(float(backtest['favorite_hit_rate']))}")
+        lines.append(f"- Cuantas veces acertamos el resultado mas probable: {format_pct(float(backtest['favorite_hit_rate']))}")
     if backtest.get("top1_score_hit_rate") is not None:
-        lines.append(f"- Acierto exacto del marcador mas probable: {format_pct(float(backtest['top1_score_hit_rate']))}")
+        lines.append(f"- Cuantas veces acertamos exactamente el marcador principal: {format_pct(float(backtest['top1_score_hit_rate']))}")
     if backtest.get("top3_score_hit_rate") is not None:
-        lines.append(f"- Acierto del marcador dentro del top-3: {format_pct(float(backtest['top3_score_hit_rate']))}")
+        lines.append(f"- Cuantas veces el marcador real estuvo dentro de nuestros 3 resultados principales: {format_pct(float(backtest['top3_score_hit_rate']))}")
     if backtest.get("logloss_result") is not None:
-        lines.append(f"- Log-loss resultado: {float(backtest['logloss_result']):.3f}")
+        lines.append(f"- Error log-loss en resultado: {float(backtest['logloss_result']):.3f}")
     if backtest.get("brier_result") is not None:
-        lines.append(f"- Brier resultado: {float(backtest['brier_result']):.3f}")
+        lines.append(f"- Error Brier en resultado: {float(backtest['brier_result']):.3f}")
     if backtest.get("logloss_advance") is not None:
-        lines.append(f"- Log-loss clasificacion en knockout: {float(backtest['logloss_advance']):.3f}")
+        lines.append(f"- Error log-loss en clasificacion knockout: {float(backtest['logloss_advance']):.3f}")
     if backtest.get("brier_advance") is not None:
-        lines.append(f"- Brier clasificacion en knockout: {float(backtest['brier_advance']):.3f}")
+        lines.append(f"- Error Brier en clasificacion knockout: {float(backtest['brier_advance']):.3f}")
     if backtest.get("market_logloss_result") is not None:
-        lines.append(f"- Log-loss de mercado en esos mismos partidos: {float(backtest['market_logloss_result']):.3f}")
+        lines.append(f"- Error log-loss de las cuotas en esos mismos partidos: {float(backtest['market_logloss_result']):.3f}")
     buckets = backtest.get("calibration_buckets") or []
     if buckets:
         lines.append(
-            "- Calibracion por buckets: "
+            "- Si el modelo dice una probabilidad parecida, esto es lo que paso en la realidad: "
             + "; ".join(
                 f"{bucket['bucket']} -> confianza media {format_pct(float(bucket['avg_confidence']))}, acierto real {format_pct(float(bucket['hit_rate']))}, n={int(bucket['matches'])}"
                 for bucket in buckets
@@ -5408,8 +5408,8 @@ def build_backtesting_html(backtest: dict) -> str:
     if not backtest or not backtest.get("completed_matches"):
         return (
             "<section class=\"panel backtest-panel\">"
-            "<div class=\"panel-head\"><div><p class=\"eyebrow\">Validacion</p><h2>Calibracion historica y backtesting</h2>"
-            "<p class=\"lede-tight\">Todavia no hay partidos cerrados suficientes en el torneo para medir calibracion real. Esta seccion se llenara sola cuando existan resultados.</p>"
+            "<div class=\"panel-head\"><div><p class=\"eyebrow\">Validacion</p><h2>Como viene acertando el modelo</h2>"
+            "<p class=\"lede-tight\">Todavia no hay suficientes partidos terminados en el torneo para medir con datos reales como viene rindiendo el modelo. Esta seccion se llenara sola cuando aparezcan resultados.</p>"
             "</div></div></section>"
         )
 
@@ -5447,15 +5447,15 @@ def build_backtesting_html(backtest: dict) -> str:
 
     return (
         "<section class=\"panel backtest-panel\">"
-        "<div class=\"panel-head\"><div><p class=\"eyebrow\">Validacion</p><h2>Calibracion historica y backtesting</h2>"
-        "<p class=\"lede-tight\">Se reconstruye el torneo partido por partido en orden cronologico, pronosticando antes de aplicar cada resultado real. Asi se mide si el modelo estuvo bien calibrado de verdad.</p>"
+        "<div class=\"panel-head\"><div><p class=\"eyebrow\">Validacion</p><h2>Como viene acertando el modelo</h2>"
+        "<p class=\"lede-tight\">Aqui reconstruimos el torneo partido por partido, siempre pronosticando antes de cargar el resultado real. Asi medimos con justicia si el modelo esta bien calibrado y cuanto se acerca a lo que termino pasando.</p>"
         "</div></div>"
         f"<div class=\"confidence-tiles\">{''.join(metrics)}</div>"
         "<div class=\"confidence-grid\">"
-        "<article><h3>Calidad predictiva</h3><ul>"
+        "<article><h3>Errores del modelo</h3><ul>"
         f"{''.join(quality_rows) if quality_rows else '<li><strong>Sin muestra suficiente</strong><span>Aun no hay datos comparables.</span></li>'}"
         "</ul></article>"
-        "<article><h3>Calibracion por buckets</h3><ul>"
+        "<article><h3>Cuando el modelo dice X, que tanto se cumple</h3><ul>"
         f"{''.join(calibration_rows) if calibration_rows else '<li><strong>Sin buckets</strong><span>Aun no hay suficientes partidos.</span></li>'}"
         "</ul></article>"
         "</div>"
@@ -5471,26 +5471,26 @@ def build_methodology_html(bracket_payload: dict, backtest: dict) -> str:
         "<div class=\"panel-head\">"
         "<div>"
         "<p class=\"eyebrow\">Cómo Leer Esto</p>"
-        "<h2>Profundidad Estadística</h2>"
-        "<p class=\"lede-tight\">El modelo ya es robusto para quiniela. Más que agregar proxies nuevos, lo que más aporta ahora es calibración, backtesting y mejores feeds en vivo.</p>"
+        "<h2>Como esta armado el modelo</h2>"
+        "<p class=\"lede-tight\">La idea aqui no es complicar por complicar. El modelo ya es fuerte para quiniela; lo que mas valor agrega ahora es que explique bien por que cambia y que luego podamos medir con datos reales si viene acertando.</p>"
         "</div>"
         "</div>"
         "<div class=\"method-grid\">"
         "<article>"
         "<h3>Partido a partido</h3>"
-        "<p>Usa Poisson bivariante para estimar el marcador final y probabilidades de victoria, empate y derrota.</p>"
+        "<p>Combina fuerza de cada seleccion, contexto del partido y distribucion de goles para estimar marcador final y probabilidades de victoria, empate y derrota.</p>"
         "</article>"
         "<article>"
         "<h3>Cuadro completo</h3>"
-        f"<p>La llave publicada se construye con Monte Carlo dinámico y {html.escape(montecarlo_line)} para reducir ruido de simulación.</p>"
+        f"<p>La llave publicada se construye con Monte Carlo dinamico y {html.escape(montecarlo_line)} para que el cuadro no cambie solo por ruido de simulacion.</p>"
         "</article>"
         "<article>"
         "<h3>Estado dinámico</h3>"
-        "<p>Actualiza Elo, forma, fatiga, disponibilidad, disciplina, clima, alineaciones, bajas y mercado a medida que aparecen datos nuevos. Ademas, acumula una firma tactica reciente por seleccion a partir de sus partidos previos para no arrancar cada cruce desde cero. Los puntos FIFA entran como señal estructural secundaria; si no los cargas de forma explícita, el modelo usa un proxy calibrado.</p>"
+        "<p>Actualiza Elo, forma, fatiga, disponibilidad, disciplina, clima, alineaciones, bajas y mercado a medida que aparecen datos nuevos. Ademas, acumula el estilo reciente de cada seleccion para no arrancar cada cruce desde cero.</p>"
         "</article>"
         "<article>"
         "<h3>Modo in-play</h3>"
-        "<p>Durante un partido, condiciona las probabilidades por minuto, marcador actual y fase del juego. Ademas, cuando el feed lo trae, suma tiros, tiros al arco, posesion, xG live o proxy, corners, disciplina y expulsiones para recalcular probabilidades, marcadores finales mas probables y patrones de juego como dominio territorial, transicion vertical o control esteril.</p>"
+        "<p>Durante un partido, condiciona las probabilidades por minuto, marcador actual y fase del juego. Si el feed trae datos mas ricos, tambien usa tiros, tiros al arco, posesion, calidad de ocasiones, corners, disciplina y expulsiones para recalcular todo.</p>"
         "</article>"
         "<article>"
         "<h3>Noticias y bajas</h3>"
@@ -5674,19 +5674,19 @@ def build_dashboard_html(
                     for score, prob in prediction.penalty_shootout.get("top_scores", [])
                 )
                 shootout_html = (
-                    f"<div><span>Tanda de penales proyectada</span><strong>{html.escape(projected_shootout)}</strong></div>"
-                    f"<div><span>Promedio estimado de goles en penales</span><strong>{prediction.team_a} {prediction.penalty_shootout.get('avg_score_a', 0.0):.2f} | "
+                    f"<div><span>Marcador mas probable de la tanda</span><strong>{html.escape(projected_shootout)}</strong></div>"
+                    f"<div><span>Marcador medio esperado en la tanda</span><strong>{prediction.team_a} {prediction.penalty_shootout.get('avg_score_a', 0.0):.2f} | "
                     f"{prediction.team_b} {prediction.penalty_shootout.get('avg_score_b', 0.0):.2f}</strong></div>"
-                    "<div class=\"scores\"><h4>Marcadores de penales mas probables</h4>"
+                    "<div class=\"scores\"><h4>Marcadores de tanda mas probables</h4>"
                     f"<ul>{shootout_scores}</ul></div>"
                 )
             knockout_html = (
                 "<div class=\"subgrid\">"
-                f"<div><span>Clasificar</span><strong>{html.escape(prediction.team_a)} {format_pct(prediction.advance_a)} | "
+                f"<div><span>Quien tiene mas probabilidad de avanzar</span><strong>{html.escape(prediction.team_a)} {format_pct(prediction.advance_a)} | "
                 f"{html.escape(prediction.team_b)} {format_pct(prediction.advance_b)}</strong></div>"
-                f"<div><span>Proroga si empatan</span><strong>{html.escape(prediction.team_a)} {format_pct(detail.get('et_win_a', 0.0))} | "
-                f"seguir empatados {format_pct(detail.get('et_draw', 0.0))} | {html.escape(prediction.team_b)} {format_pct(detail.get('et_win_b', 0.0))}</strong></div>"
-                f"<div><span>Penales si llegan</span><strong>{html.escape(prediction.team_a)} {format_pct(detail.get('penalties_a', 0.0))} | "
+                f"<div><span>Si empatan tras 90'</span><strong>{html.escape(prediction.team_a)} {format_pct(detail.get('et_win_a', 0.0))} | "
+                f"siguen empatados {format_pct(detail.get('et_draw', 0.0))} | {html.escape(prediction.team_b)} {format_pct(detail.get('et_win_b', 0.0))}</strong></div>"
+                f"<div><span>Si llegan a penales</span><strong>{html.escape(prediction.team_a)} {format_pct(detail.get('penalties_a', 0.0))} | "
                 f"{html.escape(prediction.team_b)} {format_pct(detail.get('penalties_b', 0.0))}</strong></div>"
                 f"{shootout_html}"
                 "</div>"
