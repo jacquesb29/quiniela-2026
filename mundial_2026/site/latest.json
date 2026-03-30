@@ -1,5 +1,13 @@
 {
-  "updated_at_utc": "2026-03-18T15:01:08+00:00",
+  "updated_at_utc": "2026-03-30T16:32:52+00:00",
+  "refresh_interval_minutes": 5,
+  "in_play_enabled": true,
+  "delivery": "github_actions_pages",
+  "live_feed_stack": [
+    "espn_scoreboard"
+  ],
+  "live_feed_providers": [],
+  "official_fifa_rankings_as_of": "2026-01-19T16:51:00+00:00",
   "files": {
     "dashboard": "dashboard_actual_2026.html",
     "report": "reporte_actual_2026.md",
