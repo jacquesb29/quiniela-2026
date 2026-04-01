@@ -1,16 +1,16 @@
 {
   "meta": {
-    "name": "Mundial 2026 - cuadro oficial con placeholders de repechaje",
-    "as_of": "2026-03-16",
+    "name": "Mundial 2026 - cuadro oficial base actualizado",
+    "as_of": "2026-04-01",
     "format": "fifa_2026"
   },
   "groups": {
-    "A": ["Mexico", "South Africa", "South Korea", {"placeholder": "UEFA_D"}],
-    "B": ["Canada", {"placeholder": "UEFA_A"}, "Qatar", "Switzerland"],
+    "A": ["Mexico", "South Africa", "South Korea", "Czech Republic"],
+    "B": ["Canada", "Bosnia and Herzegovina", "Qatar", "Switzerland"],
     "C": ["Haiti", "Scotland", "Brazil", "Morocco"],
-    "D": ["United States", "Paraguay", "Australia", {"placeholder": "UEFA_C"}],
+    "D": ["United States", "Paraguay", "Australia", "Turkey"],
     "E": ["Ivory Coast", "Ecuador", "Germany", "Curacao"],
-    "F": ["Netherlands", "Japan", {"placeholder": "UEFA_B"}, "Tunisia"],
+    "F": ["Netherlands", "Japan", "Sweden", "Tunisia"],
     "G": ["Iran", "New Zealand", "Belgium", "Egypt"],
     "H": ["Saudi Arabia", "Uruguay", "Spain", "Cape Verde"],
     "I": ["France", "Senegal", {"placeholder": "FIFA_2"}, "Norway"],

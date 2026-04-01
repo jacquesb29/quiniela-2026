@@ -196,10 +196,18 @@ TEAM_NAME_ALIASES = {
     "argelia": "Algeria",
     "egipto": "Egypt",
     "turquia": "Turkey",
+    "turkiye": "Turkey",
     "republicacheca": "Czech Republic",
+    "chequia": "Czech Republic",
+    "czechia": "Czech Republic",
     "irlanda": "Republic of Ireland",
     "irlandadelnorte": "Northern Ireland",
+    "bosnia": "Bosnia and Herzegovina",
+    "bosniaherzegovina": "Bosnia and Herzegovina",
+    "bosniayherzegovina": "Bosnia and Herzegovina",
     "congord": "Dem. Rep. of Congo",
+    "congodr": "Dem. Rep. of Congo",
+    "drcongo": "Dem. Rep. of Congo",
     "rdcongo": "Dem. Rep. of Congo",
     "iriran": "Iran",
     "irak": "Iraq",
@@ -2818,7 +2826,43 @@ def pretty_status(status: str) -> str:
         "qualified": "Clasificado",
         "uefa_playoff": "Repechaje UEFA",
         "fifa_playoff": "Repechaje FIFA",
-    }[status]
+        "eliminated": "Eliminado",
+    }.get(status, status)
+
+
+UEFA_PLAYOFF_PATHS = {
+    "UEFA_A": {
+        "semi_1": ("Italy", "Northern Ireland"),
+        "semi_2": ("Wales", "Bosnia and Herzegovina"),
+        "final_host": "semi_2",
+    },
+    "UEFA_B": {
+        "semi_1": ("Ukraine", "Sweden"),
+        "semi_2": ("Poland", "Albania"),
+        "final_host": "semi_1",
+    },
+    "UEFA_C": {
+        "semi_1": ("Turkey", "Romania"),
+        "semi_2": ("Slovakia", "Kosovo"),
+        "final_host": "semi_2",
+    },
+    "UEFA_D": {
+        "semi_1": ("Denmark", "North Macedonia"),
+        "semi_2": ("Czech Republic", "Republic of Ireland"),
+        "final_host": "semi_2",
+    },
+}
+
+
+def resolved_uefa_path_winners(teams: Dict[str, Team]) -> Dict[str, str]:
+    resolved: Dict[str, str] = {}
+    for placeholder, path in UEFA_PLAYOFF_PATHS.items():
+        candidates = list(path["semi_1"] + path["semi_2"])
+        qualified = [name for name in candidates if name in teams and teams[name].status == "qualified"]
+        pending = [name for name in candidates if name in teams and teams[name].status == "uefa_playoff"]
+        if len(qualified) == 1 and not pending:
+            resolved[placeholder] = qualified[0]
+    return resolved
 
 
 def confirmed_teams(teams: Dict[str, Team]) -> List[Team]:
@@ -2851,30 +2895,13 @@ def average_opponent_metrics(team: Team, opponents: Sequence[Team]) -> Tuple[flo
 
 def uefa_playoff_probabilities(teams: Dict[str, Team]) -> Dict[str, float]:
     probabilities = {name: 0.0 for name in teams}
-    paths = [
-        {
-            "semi_1": ("Italy", "Northern Ireland"),
-            "semi_2": ("Wales", "Bosnia and Herzegovina"),
-            "final_host": "semi_2",
-        },
-        {
-            "semi_1": ("Ukraine", "Sweden"),
-            "semi_2": ("Poland", "Albania"),
-            "final_host": "semi_1",
-        },
-        {
-            "semi_1": ("Turkey", "Romania"),
-            "semi_2": ("Slovakia", "Kosovo"),
-            "final_host": "semi_2",
-        },
-        {
-            "semi_1": ("Denmark", "North Macedonia"),
-            "semi_2": ("Czech Republic", "Republic of Ireland"),
-            "final_host": "semi_2",
-        },
-    ]
+    resolved = resolved_uefa_path_winners(teams)
+    for winner in resolved.values():
+        probabilities[winner] = 1.0
 
-    for path in paths:
+    for placeholder, path in UEFA_PLAYOFF_PATHS.items():
+        if placeholder in resolved:
+            continue
         semi_1 = predict_match(
             teams,
             path["semi_1"][0],
@@ -3002,57 +3029,70 @@ def sample_knockout_winner(teams: Dict[str, Team], team_a: str, team_b: str, ctx
 
 def simulate_playoffs(teams: Dict[str, Team], iterations: int) -> Dict[str, float]:
     counts = {name: 0 for name in teams}
+    resolved = resolved_uefa_path_winners(teams)
     for _ in range(iterations):
-        semi_a_1 = sample_knockout_winner(
-            teams, "Italy", "Northern Ireland", MatchContext(neutral=False, home_team="Italy", knockout=True)
-        )
-        semi_a_2 = sample_knockout_winner(
-            teams, "Wales", "Bosnia and Herzegovina", MatchContext(neutral=False, home_team="Wales", knockout=True)
-        )
-        counts[
-            sample_knockout_winner(
-                teams, semi_a_1, semi_a_2, MatchContext(neutral=False, home_team=semi_a_2, knockout=True)
+        if "UEFA_A" in resolved:
+            counts[resolved["UEFA_A"]] += 1
+        else:
+            semi_a_1 = sample_knockout_winner(
+                teams, "Italy", "Northern Ireland", MatchContext(neutral=False, home_team="Italy", knockout=True)
             )
-        ] += 1
+            semi_a_2 = sample_knockout_winner(
+                teams, "Wales", "Bosnia and Herzegovina", MatchContext(neutral=False, home_team="Wales", knockout=True)
+            )
+            counts[
+                sample_knockout_winner(
+                    teams, semi_a_1, semi_a_2, MatchContext(neutral=False, home_team=semi_a_2, knockout=True)
+                )
+            ] += 1
 
-        semi_b_1 = sample_knockout_winner(
-            teams, "Ukraine", "Sweden", MatchContext(neutral=False, home_team="Ukraine", knockout=True)
-        )
-        semi_b_2 = sample_knockout_winner(
-            teams, "Poland", "Albania", MatchContext(neutral=False, home_team="Poland", knockout=True)
-        )
-        counts[
-            sample_knockout_winner(
-                teams, semi_b_1, semi_b_2, MatchContext(neutral=False, home_team=semi_b_1, knockout=True)
+        if "UEFA_B" in resolved:
+            counts[resolved["UEFA_B"]] += 1
+        else:
+            semi_b_1 = sample_knockout_winner(
+                teams, "Ukraine", "Sweden", MatchContext(neutral=False, home_team="Ukraine", knockout=True)
             )
-        ] += 1
+            semi_b_2 = sample_knockout_winner(
+                teams, "Poland", "Albania", MatchContext(neutral=False, home_team="Poland", knockout=True)
+            )
+            counts[
+                sample_knockout_winner(
+                    teams, semi_b_1, semi_b_2, MatchContext(neutral=False, home_team=semi_b_1, knockout=True)
+                )
+            ] += 1
 
-        semi_c_1 = sample_knockout_winner(
-            teams, "Turkey", "Romania", MatchContext(neutral=False, home_team="Turkey", knockout=True)
-        )
-        semi_c_2 = sample_knockout_winner(
-            teams, "Slovakia", "Kosovo", MatchContext(neutral=False, home_team="Slovakia", knockout=True)
-        )
-        counts[
-            sample_knockout_winner(
-                teams, semi_c_1, semi_c_2, MatchContext(neutral=False, home_team=semi_c_2, knockout=True)
+        if "UEFA_C" in resolved:
+            counts[resolved["UEFA_C"]] += 1
+        else:
+            semi_c_1 = sample_knockout_winner(
+                teams, "Turkey", "Romania", MatchContext(neutral=False, home_team="Turkey", knockout=True)
             )
-        ] += 1
+            semi_c_2 = sample_knockout_winner(
+                teams, "Slovakia", "Kosovo", MatchContext(neutral=False, home_team="Slovakia", knockout=True)
+            )
+            counts[
+                sample_knockout_winner(
+                    teams, semi_c_1, semi_c_2, MatchContext(neutral=False, home_team=semi_c_2, knockout=True)
+                )
+            ] += 1
 
-        semi_d_1 = sample_knockout_winner(
-            teams, "Denmark", "North Macedonia", MatchContext(neutral=False, home_team="Denmark", knockout=True)
-        )
-        semi_d_2 = sample_knockout_winner(
-            teams,
-            "Czech Republic",
-            "Republic of Ireland",
-            MatchContext(neutral=False, home_team="Czech Republic", knockout=True),
-        )
-        counts[
-            sample_knockout_winner(
-                teams, semi_d_1, semi_d_2, MatchContext(neutral=False, home_team=semi_d_2, knockout=True)
+        if "UEFA_D" in resolved:
+            counts[resolved["UEFA_D"]] += 1
+        else:
+            semi_d_1 = sample_knockout_winner(
+                teams, "Denmark", "North Macedonia", MatchContext(neutral=False, home_team="Denmark", knockout=True)
             )
-        ] += 1
+            semi_d_2 = sample_knockout_winner(
+                teams,
+                "Czech Republic",
+                "Republic of Ireland",
+                MatchContext(neutral=False, home_team="Czech Republic", knockout=True),
+            )
+            counts[
+                sample_knockout_winner(
+                    teams, semi_d_1, semi_d_2, MatchContext(neutral=False, home_team=semi_d_2, knockout=True)
+                )
+            ] += 1
 
         fifa_1 = sample_knockout_winner(
             teams, "Jamaica", "New Caledonia", MatchContext(neutral=True, venue_country="Mexico", knockout=True)
@@ -3110,26 +3150,31 @@ def sample_uefa_path_winner(
 
 
 def sample_playoff_placeholders(teams: Dict[str, Team]) -> Dict[str, str]:
+    resolved = resolved_uefa_path_winners(teams)
     return {
-        "UEFA_A": sample_uefa_path_winner(
+        "UEFA_A": resolved.get("UEFA_A")
+        or sample_uefa_path_winner(
             teams,
             ("Italy", "Northern Ireland"),
             ("Wales", "Bosnia and Herzegovina"),
             "semi_2",
         ),
-        "UEFA_B": sample_uefa_path_winner(
+        "UEFA_B": resolved.get("UEFA_B")
+        or sample_uefa_path_winner(
             teams,
             ("Ukraine", "Sweden"),
             ("Poland", "Albania"),
             "semi_1",
         ),
-        "UEFA_C": sample_uefa_path_winner(
+        "UEFA_C": resolved.get("UEFA_C")
+        or sample_uefa_path_winner(
             teams,
             ("Turkey", "Romania"),
             ("Slovakia", "Kosovo"),
             "semi_2",
         ),
-        "UEFA_D": sample_uefa_path_winner(
+        "UEFA_D": resolved.get("UEFA_D")
+        or sample_uefa_path_winner(
             teams,
             ("Denmark", "North Macedonia"),
             ("Czech Republic", "Republic of Ireland"),
@@ -7779,7 +7824,7 @@ def command_power_table(args: argparse.Namespace, teams: Dict[str, Team]) -> Non
 def command_playoffs(args: argparse.Namespace, teams: Dict[str, Team]) -> None:
     exact = qualification_probabilities(teams)
     simulated = simulate_playoffs(teams, args.iterations) if args.iterations > 0 else {}
-    contenders = [team for team in teams.values() if team.status != "qualified"]
+    contenders = [team for team in teams.values() if team.status in {"uefa_playoff", "fifa_playoff"}]
     contenders.sort(key=lambda team: exact[team.name], reverse=True)
     print("Equipo                     Estado             Exacta    Simulada")
     print("-" * 62)

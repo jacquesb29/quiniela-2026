@@ -43,10 +43,10 @@ CONFED_TRAVEL_BASELINE_KM = {
 }
 
 PLACEHOLDER_PATHS = {
-    "UEFA_A": ["Italy", "Northern Ireland", "Wales", "Bosnia and Herzegovina"],
-    "UEFA_B": ["Ukraine", "Sweden", "Poland", "Albania"],
-    "UEFA_C": ["Turkey", "Romania", "Slovakia", "Kosovo"],
-    "UEFA_D": ["Denmark", "North Macedonia", "Czech Republic", "Republic of Ireland"],
+    "UEFA_A": ["Bosnia and Herzegovina"],
+    "UEFA_B": ["Sweden"],
+    "UEFA_C": ["Turkey"],
+    "UEFA_D": ["Czech Republic"],
     "FIFA_1": ["Dem. Rep. of Congo", "Jamaica", "New Caledonia"],
     "FIFA_2": ["Iraq", "Bolivia", "Suriname"],
 }

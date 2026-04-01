@@ -1,7 +1,7 @@
 {
   "meta": {
-    "as_of": "2026-03-16",
-    "description": "Base inicial para modelar quinielas del Mundial 2026. Incluye 42 clasificados confirmados y 22 selecciones vivas por los 6 cupos restantes.",
+    "as_of": "2026-04-01",
+    "description": "Base actualizada para modelar quinielas del Mundial 2026. Las rutas UEFA ya quedaron resueltas; Bosnia and Herzegovina, Sweden, Turkey y Czech Republic entran al torneo y el Play-Off Tournament FIFA sigue pendiente.",
     "fifa_rankings_as_of": "2026-01-19T16:51:00+00:00",
     "fifa_rankings_source": "https://inside.fifa.com/api/rankings/by-country"
   },
@@ -390,7 +390,7 @@
     {
       "name": "Albania",
       "confederation": "UEFA",
-      "status": "uefa_playoff",
+      "status": "eliminated",
       "elo": 1664,
       "fifa_country_code": "ALB",
       "fifa_points": 1401.07,
@@ -399,7 +399,7 @@
     {
       "name": "Bosnia and Herzegovina",
       "confederation": "UEFA",
-      "status": "uefa_playoff",
+      "status": "qualified",
       "elo": 1571,
       "fifa_country_code": "BIH",
       "fifa_points": 1362.37,
@@ -417,7 +417,7 @@
     {
       "name": "Czech Republic",
       "confederation": "UEFA",
-      "status": "uefa_playoff",
+      "status": "qualified",
       "elo": 1731,
       "fifa_country_code": "CZE",
       "fifa_points": 1487.0,
@@ -435,7 +435,7 @@
     {
       "name": "Denmark",
       "confederation": "UEFA",
-      "status": "uefa_playoff",
+      "status": "eliminated",
       "elo": 1864,
       "fifa_country_code": "DEN",
       "fifa_points": 1616.75,
@@ -453,7 +453,7 @@
     {
       "name": "Italy",
       "confederation": "UEFA",
-      "status": "uefa_playoff",
+      "status": "eliminated",
       "elo": 1859,
       "fifa_country_code": "ITA",
       "fifa_points": 1702.06,
@@ -471,7 +471,7 @@
     {
       "name": "Kosovo",
       "confederation": "UEFA",
-      "status": "uefa_playoff",
+      "status": "eliminated",
       "elo": 1714,
       "fifa_country_code": "KOS",
       "fifa_points": 1308.84,
@@ -489,7 +489,7 @@
     {
       "name": "North Macedonia",
       "confederation": "UEFA",
-      "status": "uefa_playoff",
+      "status": "eliminated",
       "elo": 1593,
       "fifa_country_code": "MKD",
       "fifa_points": 1378.57,
@@ -498,7 +498,7 @@
     {
       "name": "Northern Ireland",
       "confederation": "UEFA",
-      "status": "uefa_playoff",
+      "status": "eliminated",
       "elo": 1603,
       "fifa_country_code": "NIR",
       "fifa_points": 1366.02,
@@ -507,7 +507,7 @@
     {
       "name": "Poland",
       "confederation": "UEFA",
-      "status": "uefa_playoff",
+      "status": "eliminated",
       "elo": 1735,
       "fifa_country_code": "POL",
       "fifa_points": 1532.04,
@@ -516,7 +516,7 @@
     {
       "name": "Republic of Ireland",
       "confederation": "UEFA",
-      "status": "uefa_playoff",
+      "status": "eliminated",
       "elo": 1688,
       "fifa_country_code": "IRL",
       "fifa_points": 1436.04,
@@ -525,7 +525,7 @@
     {
       "name": "Romania",
       "confederation": "UEFA",
-      "status": "uefa_playoff",
+      "status": "eliminated",
       "elo": 1642,
       "fifa_country_code": "ROU",
       "fifa_points": 1465.78,
@@ -534,7 +534,7 @@
     {
       "name": "Slovakia",
       "confederation": "UEFA",
-      "status": "uefa_playoff",
+      "status": "eliminated",
       "elo": 1687,
       "fifa_country_code": "SVK",
       "fifa_points": 1485.65,
@@ -552,7 +552,7 @@
     {
       "name": "Sweden",
       "confederation": "UEFA",
-      "status": "uefa_playoff",
+      "status": "qualified",
       "elo": 1660,
       "fifa_country_code": "SWE",
       "fifa_points": 1487.13,
@@ -561,7 +561,7 @@
     {
       "name": "Turkey",
       "confederation": "UEFA",
-      "status": "uefa_playoff",
+      "status": "qualified",
       "elo": 1880,
       "fifa_country_code": "TUR",
       "fifa_points": 1582.69,
@@ -570,7 +570,7 @@
     {
       "name": "Ukraine",
       "confederation": "UEFA",
-      "status": "uefa_playoff",
+      "status": "eliminated",
       "elo": 1802,
       "fifa_country_code": "UKR",
       "fifa_points": 1557.47,
@@ -579,7 +579,7 @@
     {
       "name": "Wales",
       "confederation": "UEFA",
-      "status": "uefa_playoff",
+      "status": "eliminated",
       "elo": 1715,
       "fifa_country_code": "WAL",
       "fifa_points": 1529.71,
