@@ -1,7 +1,7 @@
 {
   "meta": {
-    "as_of": "2026-04-01",
-    "description": "Base actualizada para modelar quinielas del Mundial 2026. Las rutas UEFA ya quedaron resueltas; Bosnia and Herzegovina, Sweden, Turkey y Czech Republic entran al torneo y el Play-Off Tournament FIFA sigue pendiente.",
+    "as_of": "2026-04-02",
+    "description": "Base actualizada para modelar quinielas del Mundial 2026. Las rutas UEFA ya quedaron resueltas; Bosnia and Herzegovina, Sweden, Turkey y Czech Republic entran al torneo. El Play-Off Tournament FIFA tambien ya quedo cerrado con Dem. Rep. of Congo e Iraq clasificados.",
     "fifa_rankings_as_of": "2026-01-19T16:51:00+00:00",
     "fifa_rankings_source": "https://inside.fifa.com/api/rankings/by-country"
   },
@@ -408,7 +408,7 @@
     {
       "name": "Bolivia",
       "confederation": "CONMEBOL",
-      "status": "fifa_playoff",
+      "status": "eliminated",
       "elo": 1656,
       "fifa_country_code": "BOL",
       "fifa_points": 1330.52,
@@ -426,7 +426,7 @@
     {
       "name": "Dem. Rep. of Congo",
       "confederation": "CAF",
-      "status": "fifa_playoff",
+      "status": "qualified",
       "elo": 1639,
       "fifa_country_code": "COD",
       "fifa_points": 1468.22,
@@ -444,7 +444,7 @@
     {
       "name": "Iraq",
       "confederation": "AFC",
-      "status": "fifa_playoff",
+      "status": "qualified",
       "elo": 1583,
       "fifa_country_code": "IRQ",
       "fifa_points": 1436.94,
@@ -462,7 +462,7 @@
     {
       "name": "Jamaica",
       "confederation": "CONCACAF",
-      "status": "fifa_playoff",
+      "status": "eliminated",
       "elo": 1530,
       "fifa_country_code": "JAM",
       "fifa_points": 1362.46,
@@ -480,7 +480,7 @@
     {
       "name": "New Caledonia",
       "confederation": "OFC",
-      "status": "fifa_playoff",
+      "status": "eliminated",
       "elo": 1296,
       "fifa_country_code": "NCL",
       "fifa_points": 1042.62,
@@ -543,7 +543,7 @@
     {
       "name": "Suriname",
       "confederation": "CONCACAF",
-      "status": "fifa_playoff",
+      "status": "eliminated",
       "elo": 1441,
       "fifa_country_code": "SUR",
       "fifa_points": 1140.54,

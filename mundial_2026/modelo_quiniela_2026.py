@@ -2853,6 +2853,17 @@ UEFA_PLAYOFF_PATHS = {
     },
 }
 
+FIFA_PLAYOFF_PATHS = {
+    "FIFA_1": {
+        "host": "Dem. Rep. of Congo",
+        "semi": ("Jamaica", "New Caledonia"),
+    },
+    "FIFA_2": {
+        "host": "Iraq",
+        "semi": ("Bolivia", "Suriname"),
+    },
+}
+
 
 def resolved_uefa_path_winners(teams: Dict[str, Team]) -> Dict[str, str]:
     resolved: Dict[str, str] = {}
@@ -2860,6 +2871,17 @@ def resolved_uefa_path_winners(teams: Dict[str, Team]) -> Dict[str, str]:
         candidates = list(path["semi_1"] + path["semi_2"])
         qualified = [name for name in candidates if name in teams and teams[name].status == "qualified"]
         pending = [name for name in candidates if name in teams and teams[name].status == "uefa_playoff"]
+        if len(qualified) == 1 and not pending:
+            resolved[placeholder] = qualified[0]
+    return resolved
+
+
+def resolved_fifa_path_winners(teams: Dict[str, Team]) -> Dict[str, str]:
+    resolved: Dict[str, str] = {}
+    for placeholder, path in FIFA_PLAYOFF_PATHS.items():
+        candidates = [path["host"], *path["semi"]]
+        qualified = [name for name in candidates if name in teams and teams[name].status == "qualified"]
+        pending = [name for name in candidates if name in teams and teams[name].status == "fifa_playoff"]
         if len(qualified) == 1 and not pending:
             resolved[placeholder] = qualified[0]
     return resolved
@@ -2947,52 +2969,59 @@ def uefa_playoff_probabilities(teams: Dict[str, Team]) -> Dict[str, float]:
 
 def fifa_playoff_probabilities(teams: Dict[str, Team]) -> Dict[str, float]:
     probabilities = {name: 0.0 for name in teams}
+    resolved = resolved_fifa_path_winners(teams)
+    for winner in resolved.values():
+        probabilities[winner] = 1.0
 
-    path_1_semi = predict_match(
-        teams,
-        "Jamaica",
-        "New Caledonia",
-        MatchContext(neutral=True, venue_country="Mexico", knockout=True),
-        include_advancement=True,
-    )
-    path_2_semi = predict_match(
-        teams,
-        "Bolivia",
-        "Suriname",
-        MatchContext(neutral=True, venue_country="Mexico", knockout=True),
-        include_advancement=True,
-    )
-
-    path_1_adv = {
-        "Jamaica": path_1_semi.advance_a or 0.0,
-        "New Caledonia": path_1_semi.advance_b or 0.0,
-    }
-    path_2_adv = {
-        "Bolivia": path_2_semi.advance_a or 0.0,
-        "Suriname": path_2_semi.advance_b or 0.0,
-    }
-
-    for finalist, finalist_prob in path_1_adv.items():
-        final_prediction = predict_match(
+    if "FIFA_1" not in resolved:
+        path_1_semi = predict_match(
             teams,
-            "Dem. Rep. of Congo",
-            finalist,
+            "Jamaica",
+            "New Caledonia",
             MatchContext(neutral=True, venue_country="Mexico", knockout=True),
             include_advancement=True,
         )
-        probabilities["Dem. Rep. of Congo"] += finalist_prob * (final_prediction.advance_a or 0.0)
-        probabilities[finalist] += finalist_prob * (final_prediction.advance_b or 0.0)
 
-    for finalist, finalist_prob in path_2_adv.items():
-        final_prediction = predict_match(
+        path_1_adv = {
+            "Jamaica": path_1_semi.advance_a or 0.0,
+            "New Caledonia": path_1_semi.advance_b or 0.0,
+        }
+
+        for finalist, finalist_prob in path_1_adv.items():
+            final_prediction = predict_match(
+                teams,
+                "Dem. Rep. of Congo",
+                finalist,
+                MatchContext(neutral=True, venue_country="Mexico", knockout=True),
+                include_advancement=True,
+            )
+            probabilities["Dem. Rep. of Congo"] += finalist_prob * (final_prediction.advance_a or 0.0)
+            probabilities[finalist] += finalist_prob * (final_prediction.advance_b or 0.0)
+
+    if "FIFA_2" not in resolved:
+        path_2_semi = predict_match(
             teams,
-            "Iraq",
-            finalist,
+            "Bolivia",
+            "Suriname",
             MatchContext(neutral=True, venue_country="Mexico", knockout=True),
             include_advancement=True,
         )
-        probabilities["Iraq"] += finalist_prob * (final_prediction.advance_a or 0.0)
-        probabilities[finalist] += finalist_prob * (final_prediction.advance_b or 0.0)
+
+        path_2_adv = {
+            "Bolivia": path_2_semi.advance_a or 0.0,
+            "Suriname": path_2_semi.advance_b or 0.0,
+        }
+
+        for finalist, finalist_prob in path_2_adv.items():
+            final_prediction = predict_match(
+                teams,
+                "Iraq",
+                finalist,
+                MatchContext(neutral=True, venue_country="Mexico", knockout=True),
+                include_advancement=True,
+            )
+            probabilities["Iraq"] += finalist_prob * (final_prediction.advance_a or 0.0)
+            probabilities[finalist] += finalist_prob * (final_prediction.advance_b or 0.0)
 
     return probabilities
 
@@ -3030,6 +3059,7 @@ def sample_knockout_winner(teams: Dict[str, Team], team_a: str, team_b: str, ctx
 def simulate_playoffs(teams: Dict[str, Team], iterations: int) -> Dict[str, float]:
     counts = {name: 0 for name in teams}
     resolved = resolved_uefa_path_winners(teams)
+    resolved_fifa = resolved_fifa_path_winners(teams)
     for _ in range(iterations):
         if "UEFA_A" in resolved:
             counts[resolved["UEFA_A"]] += 1
@@ -3094,26 +3124,32 @@ def simulate_playoffs(teams: Dict[str, Team], iterations: int) -> Dict[str, floa
                 )
             ] += 1
 
-        fifa_1 = sample_knockout_winner(
-            teams, "Jamaica", "New Caledonia", MatchContext(neutral=True, venue_country="Mexico", knockout=True)
-        )
-        counts[
-            sample_knockout_winner(
-                teams,
-                "Dem. Rep. of Congo",
-                fifa_1,
-                MatchContext(neutral=True, venue_country="Mexico", knockout=True),
+        if "FIFA_1" in resolved_fifa:
+            counts[resolved_fifa["FIFA_1"]] += 1
+        else:
+            fifa_1 = sample_knockout_winner(
+                teams, "Jamaica", "New Caledonia", MatchContext(neutral=True, venue_country="Mexico", knockout=True)
             )
-        ] += 1
+            counts[
+                sample_knockout_winner(
+                    teams,
+                    "Dem. Rep. of Congo",
+                    fifa_1,
+                    MatchContext(neutral=True, venue_country="Mexico", knockout=True),
+                )
+            ] += 1
 
-        fifa_2 = sample_knockout_winner(
-            teams, "Bolivia", "Suriname", MatchContext(neutral=True, venue_country="Mexico", knockout=True)
-        )
-        counts[
-            sample_knockout_winner(
-                teams, "Iraq", fifa_2, MatchContext(neutral=True, venue_country="Mexico", knockout=True)
+        if "FIFA_2" in resolved_fifa:
+            counts[resolved_fifa["FIFA_2"]] += 1
+        else:
+            fifa_2 = sample_knockout_winner(
+                teams, "Bolivia", "Suriname", MatchContext(neutral=True, venue_country="Mexico", knockout=True)
             )
-        ] += 1
+            counts[
+                sample_knockout_winner(
+                    teams, "Iraq", fifa_2, MatchContext(neutral=True, venue_country="Mexico", knockout=True)
+                )
+            ] += 1
 
     return {name: count / float(iterations) for name, count in counts.items()}
 
@@ -3151,6 +3187,7 @@ def sample_uefa_path_winner(
 
 def sample_playoff_placeholders(teams: Dict[str, Team]) -> Dict[str, str]:
     resolved = resolved_uefa_path_winners(teams)
+    resolved_fifa = resolved_fifa_path_winners(teams)
     return {
         "UEFA_A": resolved.get("UEFA_A")
         or sample_uefa_path_winner(
@@ -3180,7 +3217,8 @@ def sample_playoff_placeholders(teams: Dict[str, Team]) -> Dict[str, str]:
             ("Czech Republic", "Republic of Ireland"),
             "semi_2",
         ),
-        "FIFA_1": sample_knockout_winner(
+        "FIFA_1": resolved_fifa.get("FIFA_1")
+        or sample_knockout_winner(
             teams,
             "Dem. Rep. of Congo",
             sample_knockout_winner(
@@ -3191,7 +3229,8 @@ def sample_playoff_placeholders(teams: Dict[str, Team]) -> Dict[str, str]:
             ),
             MatchContext(neutral=True, venue_country="Mexico", knockout=True, importance=1.25),
         ),
-        "FIFA_2": sample_knockout_winner(
+        "FIFA_2": resolved_fifa.get("FIFA_2")
+        or sample_knockout_winner(
             teams,
             "Iraq",
             sample_knockout_winner(
