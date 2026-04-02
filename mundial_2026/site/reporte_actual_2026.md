@@ -1,6 +1,6 @@
 # Reporte actual del Mundial 2026
 
-Actualizado: 2026-04-02T18:34:33
+Actualizado: 2026-04-02T18:40:33
 Estado usado: /Users/jacquesbentata/Documents/New project/mundial_2026/tournament_state_2026.json
 Fixtures leidos: /Users/jacquesbentata/Documents/New project/mundial_2026/fixtures_live_2026.json
 
@@ -18,7 +18,7 @@ Fixtures leidos: /Users/jacquesbentata/Documents/New project/mundial_2026/fixtur
 
 ## Que cambio desde la ultima actualizacion
 
-- Comparado contra la publicacion anterior de: 2026-04-02T18:56:23+00:00
+- Comparado contra la publicacion anterior de: 2026-04-02T22:40:29+00:00
 - Esta seccion muestra solo movimientos reales frente a la version anterior ya publicada: picks que cambiaron, marcadores nuevos y cruces que entran o salen de la llave principal.
 - Todavia no hay un cambio grande frente a la publicacion anterior.
 
@@ -2039,8 +2039,8 @@ _Todavia no hay suficientes partidos terminados para medir como viene acertando 
 - Si empatan tras 90': gana en prorroga South Korea 17.8% | siguen empatados 60.8% | Canada 21.4%
 - Si llegan a penales: South Korea 51.6% | Canada 48.4%
 - Marcador mas probable de la tanda: 4-3
-- Marcador medio esperado en la tanda: South Korea 3.77 | Canada 3.75
-- Marcadores de tanda mas probables: 4-3 10.1%, 4-5 9.9%, 4-2 9.2%, 3-4 8.9%, 2-4 8.6%
+- Marcador medio esperado en la tanda: South Korea 3.81 | Canada 3.77
+- Marcadores de tanda mas probables: 4-3 10.0%, 3-4 9.8%, 2-4 9.1%, 5-4 8.8%, 4-2 8.7%
 - Marcadores mas probables: 1-1 13.8%, 0-1 12.2%, 0-0 11.6%, 1-0 10.4%, 1-2 8.0%
 
 ### Dieciseisavos 2: Germany vs Bosnia and Herzegovina
@@ -2071,9 +2071,9 @@ _Todavia no hay suficientes partidos terminados para medir como viene acertando 
 - Quien tiene mas probabilidad de avanzar: Germany 95.8% | Bosnia and Herzegovina 4.2%
 - Si empatan tras 90': gana en prorroga Germany 46.1% | siguen empatados 52.1% | Bosnia and Herzegovina 1.8%
 - Si llegan a penales: Germany 59.9% | Bosnia and Herzegovina 40.1%
-- Marcador mas probable de la tanda: 4-3
-- Marcador medio esperado en la tanda: Germany 3.94 | Bosnia and Herzegovina 3.42
-- Marcadores de tanda mas probables: 4-3 12.6%, 4-2 11.4%, 5-4 11.4%, 4-5 7.1%, 5-3 6.8%
+- Marcador mas probable de la tanda: 4-2
+- Marcador medio esperado en la tanda: Germany 3.89 | Bosnia and Herzegovina 3.35
+- Marcadores de tanda mas probables: 4-2 12.1%, 4-3 11.9%, 5-4 10.8%, 3-4 7.6%, 4-5 6.6%
 - Marcadores mas probables: 2-0 23.5%, 1-0 21.3%, 3-0 17.3%, 0-0 9.7%, 4-0 9.5%
 
 ### Dieciseisavos 3: Netherlands vs Morocco
@@ -2103,9 +2103,9 @@ _Todavia no hay suficientes partidos terminados para medir como viene acertando 
 - Quien tiene mas probabilidad de avanzar: Netherlands 82.7% | Morocco 17.3%
 - Si empatan tras 90': gana en prorroga Netherlands 35.1% | siguen empatados 56.9% | Morocco 8.0%
 - Si llegan a penales: Netherlands 54.5% | Morocco 45.5%
-- Marcador mas probable de la tanda: 5-4
-- Marcador medio esperado en la tanda: Netherlands 3.87 | Morocco 3.74
-- Marcadores de tanda mas probables: 5-4 10.2%, 4-5 9.6%, 4-2 9.5%, 4-3 9.4%, 3-4 8.8%
+- Marcador mas probable de la tanda: 4-3
+- Marcador medio esperado en la tanda: Netherlands 3.90 | Morocco 3.76
+- Marcadores de tanda mas probables: 4-3 11.9%, 4-5 9.7%, 4-2 9.6%, 5-4 9.0%, 2-4 8.9%
 - Marcadores mas probables: 1-0 17.9%, 2-0 15.4%, 0-0 10.7%, 1-1 9.4%, 3-0 8.8%
 
 ### Dieciseisavos 4: Brazil vs Japan
@@ -2136,9 +2136,9 @@ _Todavia no hay suficientes partidos terminados para medir como viene acertando 
 - Quien tiene mas probabilidad de avanzar: Brazil 78.2% | Japan 21.8%
 - Si empatan tras 90': gana en prorroga Brazil 32.1% | siguen empatados 58.1% | Japan 9.9%
 - Si llegan a penales: Brazil 57.2% | Japan 42.8%
-- Marcador mas probable de la tanda: 4-2
-- Marcador medio esperado en la tanda: Brazil 3.94 | Japan 3.62
-- Marcadores de tanda mas probables: 4-2 11.6%, 5-4 10.8%, 4-3 9.9%, 3-4 7.9%, 2-4 7.5%
+- Marcador mas probable de la tanda: 4-3
+- Marcador medio esperado en la tanda: Brazil 3.99 | Japan 3.75
+- Marcadores de tanda mas probables: 4-3 11.1%, 5-4 10.4%, 4-2 9.8%, 3-4 9.2%, 4-5 8.1%
 - Marcadores mas probables: 1-0 16.9%, 2-0 13.5%, 0-0 11.0%, 1-1 10.8%, 2-1 8.9%
 
 ### Dieciseisavos 5: France vs Egypt
@@ -2169,9 +2169,9 @@ _Todavia no hay suficientes partidos terminados para medir como viene acertando 
 - Quien tiene mas probabilidad de avanzar: France 96.6% | Egypt 3.4%
 - Si empatan tras 90': gana en prorroga France 47.7% | siguen empatados 51.0% | Egypt 1.3%
 - Si llegan a penales: France 58.6% | Egypt 41.4%
-- Marcador mas probable de la tanda: 4-3
-- Marcador medio esperado en la tanda: France 3.99 | Egypt 3.55
-- Marcadores de tanda mas probables: 4-3 13.2%, 4-2 12.0%, 5-4 11.6%, 3-4 8.0%, 2-4 6.2%
+- Marcador mas probable de la tanda: 4-2
+- Marcador medio esperado en la tanda: France 3.96 | Egypt 3.50
+- Marcadores de tanda mas probables: 4-2 12.1%, 4-3 10.8%, 5-4 10.7%, 4-5 7.4%, 5-3 7.0%
 - Marcadores mas probables: 2-0 24.1%, 1-0 20.9%, 3-0 18.4%, 4-0 10.6%, 0-0 9.1%
 
 ### Dieciseisavos 6: Ecuador vs Norway
@@ -2203,7 +2203,7 @@ _Todavia no hay suficientes partidos terminados para medir como viene acertando 
 - Si llegan a penales: Ecuador 47.1% | Norway 52.9%
 - Marcador mas probable de la tanda: 3-4
 - Marcador medio esperado en la tanda: Ecuador 3.73 | Norway 3.85
-- Marcadores de tanda mas probables: 3-4 11.2%, 4-5 9.7%, 2-4 9.7%, 4-3 9.3%, 5-4 8.6%
+- Marcadores de tanda mas probables: 3-4 10.8%, 2-4 10.1%, 4-3 9.6%, 4-5 9.4%, 5-4 8.1%
 - Marcadores mas probables: 1-1 13.9%, 0-0 11.8%, 0-1 11.4%, 1-0 11.3%, 1-2 7.5%
 
 ### Dieciseisavos 7: Mexico vs Scotland
@@ -2233,9 +2233,9 @@ _Todavia no hay suficientes partidos terminados para medir como viene acertando 
 - Quien tiene mas probabilidad de avanzar: Mexico 68.2% | Scotland 31.8%
 - Si empatan tras 90': gana en prorroga Mexico 28.0% | siguen empatados 58.5% | Scotland 13.5%
 - Si llegan a penales: Mexico 51.2% | Scotland 48.8%
-- Marcador mas probable de la tanda: 4-5
-- Marcador medio esperado en la tanda: Mexico 3.83 | Scotland 3.78
-- Marcadores de tanda mas probables: 4-5 10.4%, 3-4 10.4%, 5-4 10.4%, 4-3 9.6%, 4-2 8.8%
+- Marcador mas probable de la tanda: 5-4
+- Marcador medio esperado en la tanda: Mexico 3.93 | Scotland 3.84
+- Marcadores de tanda mas probables: 5-4 11.9%, 4-3 10.1%, 3-4 9.5%, 4-2 8.8%, 4-5 8.4%
 - Marcadores mas probables: 1-0 14.1%, 1-1 12.4%, 2-0 10.4%, 0-0 10.3%, 2-1 9.2%
 
 ### Dieciseisavos 8: England vs Uzbekistan
@@ -2267,8 +2267,8 @@ _Todavia no hay suficientes partidos terminados para medir como viene acertando 
 - Si empatan tras 90': gana en prorroga England 45.2% | siguen empatados 52.4% | Uzbekistan 2.4%
 - Si llegan a penales: England 54.6% | Uzbekistan 45.4%
 - Marcador mas probable de la tanda: 4-2
-- Marcador medio esperado en la tanda: England 3.93 | Uzbekistan 3.61
-- Marcadores de tanda mas probables: 4-2 12.4%, 4-3 10.8%, 5-4 10.2%, 4-5 8.6%, 3-4 8.2%
+- Marcador medio esperado en la tanda: England 3.83 | Uzbekistan 3.54
+- Marcadores de tanda mas probables: 4-2 12.1%, 4-3 11.9%, 5-4 9.3%, 3-4 8.2%, 4-5 7.8%
 - Marcadores mas probables: 2-0 22.5%, 1-0 20.7%, 3-0 16.3%, 0-0 9.6%, 4-0 8.8%
 
 ### Dieciseisavos 9: Turkey vs Bosnia and Herzegovina
@@ -2299,8 +2299,8 @@ _Todavia no hay suficientes partidos terminados para medir como viene acertando 
 - Si empatan tras 90': gana en prorroga Turkey 44.0% | siguen empatados 53.0% | Bosnia and Herzegovina 2.9%
 - Si llegan a penales: Turkey 53.1% | Bosnia and Herzegovina 46.9%
 - Marcador mas probable de la tanda: 4-3
-- Marcador medio esperado en la tanda: Turkey 3.76 | Bosnia and Herzegovina 3.51
-- Marcadores de tanda mas probables: 4-3 11.5%, 4-2 10.2%, 5-4 9.3%, 3-4 7.9%, 2-4 7.7%
+- Marcador medio esperado en la tanda: Turkey 3.85 | Bosnia and Herzegovina 3.59
+- Marcadores de tanda mas probables: 4-3 11.3%, 4-2 9.9%, 5-4 8.5%, 3-4 8.3%, 4-5 8.2%
 - Marcadores mas probables: 2-0 21.7%, 1-0 20.5%, 3-0 15.3%, 0-0 9.7%, 4-0 8.1%
 
 ### Dieciseisavos 10: Belgium vs Czech Republic
@@ -2330,9 +2330,9 @@ _Todavia no hay suficientes partidos terminados para medir como viene acertando 
 - Quien tiene mas probabilidad de avanzar: Belgium 76.6% | Czech Republic 23.4%
 - Si empatan tras 90': gana en prorroga Belgium 31.8% | siguen empatados 58.0% | Czech Republic 10.2%
 - Si llegan a penales: Belgium 51.5% | Czech Republic 48.5%
-- Marcador mas probable de la tanda: 3-4
-- Marcador medio esperado en la tanda: Belgium 3.81 | Czech Republic 3.78
-- Marcadores de tanda mas probables: 3-4 10.1%, 5-4 10.0%, 4-2 9.8%, 4-3 9.6%, 4-5 9.0%
+- Marcador mas probable de la tanda: 4-3
+- Marcador medio esperado en la tanda: Belgium 3.85 | Czech Republic 3.78
+- Marcadores de tanda mas probables: 4-3 11.1%, 4-5 9.6%, 5-4 9.2%, 4-2 9.1%, 3-4 8.9%
 - Marcadores mas probables: 1-0 16.5%, 2-0 13.2%, 1-1 11.0%, 0-0 10.8%, 2-1 9.0%
 
 ### Dieciseisavos 11: Portugal vs Croatia
@@ -2362,9 +2362,9 @@ _Todavia no hay suficientes partidos terminados para medir como viene acertando 
 - Quien tiene mas probabilidad de avanzar: Portugal 60.4% | Croatia 39.6%
 - Si empatan tras 90': gana en prorroga Portugal 23.8% | siguen empatados 60.4% | Croatia 15.9%
 - Si llegan a penales: Portugal 51.5% | Croatia 48.5%
-- Marcador mas probable de la tanda: 5-4
-- Marcador medio esperado en la tanda: Portugal 3.82 | Croatia 3.90
-- Marcadores de tanda mas probables: 5-4 10.1%, 3-4 9.9%, 2-4 8.9%, 4-2 8.8%, 4-5 8.7%
+- Marcador mas probable de la tanda: 4-5
+- Marcador medio esperado en la tanda: Portugal 3.85 | Croatia 3.88
+- Marcadores de tanda mas probables: 4-5 9.9%, 4-3 9.8%, 3-4 9.7%, 4-2 9.1%, 2-4 8.6%
 - Marcadores mas probables: 1-1 13.4%, 1-0 13.3%, 0-0 11.4%, 0-1 9.4%, 2-0 8.6%
 
 ### Dieciseisavos 12: Spain vs Austria
@@ -2394,9 +2394,9 @@ _Todavia no hay suficientes partidos terminados para medir como viene acertando 
 - Quien tiene mas probabilidad de avanzar: Spain 94.9% | Austria 5.1%
 - Si empatan tras 90': gana en prorroga Spain 45.9% | siguen empatados 51.8% | Austria 2.2%
 - Si llegan a penales: Spain 53.5% | Austria 46.5%
-- Marcador mas probable de la tanda: 4-2
-- Marcador medio esperado en la tanda: Spain 3.87 | Austria 3.65
-- Marcadores de tanda mas probables: 4-2 11.8%, 5-4 10.1%, 4-3 9.1%, 4-5 8.9%, 3-4 7.1%
+- Marcador mas probable de la tanda: 4-3
+- Marcador medio esperado en la tanda: Spain 3.96 | Austria 3.77
+- Marcadores de tanda mas probables: 4-3 10.7%, 4-2 10.3%, 5-4 9.6%, 4-5 9.1%, 3-4 8.4%
 - Marcadores mas probables: 2-0 22.6%, 1-0 20.4%, 3-0 16.7%, 4-0 9.2%, 0-0 9.2%
 
 ### Dieciseisavos 13: Switzerland vs Egypt
@@ -2426,9 +2426,9 @@ _Todavia no hay suficientes partidos terminados para medir como viene acertando 
 - Quien tiene mas probabilidad de avanzar: Switzerland 90.7% | Egypt 9.3%
 - Si empatan tras 90': gana en prorroga Switzerland 41.1% | siguen empatados 54.4% | Egypt 4.5%
 - Si llegan a penales: Switzerland 55.2% | Egypt 44.8%
-- Marcador mas probable de la tanda: 5-4
-- Marcador medio esperado en la tanda: Switzerland 3.97 | Egypt 3.62
-- Marcadores de tanda mas probables: 5-4 12.3%, 4-2 11.1%, 4-3 10.8%, 3-4 8.4%, 4-5 8.2%
+- Marcador mas probable de la tanda: 4-3
+- Marcador medio esperado en la tanda: Switzerland 3.92 | Egypt 3.60
+- Marcadores de tanda mas probables: 4-3 12.9%, 4-2 10.7%, 5-4 10.6%, 3-4 8.4%, 4-5 6.9%
 - Marcadores mas probables: 1-0 19.7%, 2-0 19.6%, 3-0 12.9%, 0-0 10.1%, 4-0 6.4%
 
 ### Dieciseisavos 14: Argentina vs Uruguay
@@ -2460,8 +2460,8 @@ _Todavia no hay suficientes partidos terminados para medir como viene acertando 
 - Si empatan tras 90': gana en prorroga Argentina 39.3% | siguen empatados 55.3% | Uruguay 5.4%
 - Si llegan a penales: Argentina 52.1% | Uruguay 47.9%
 - Marcador mas probable de la tanda: 4-3
-- Marcador medio esperado en la tanda: Argentina 3.88 | Uruguay 3.75
-- Marcadores de tanda mas probables: 4-3 10.8%, 5-4 9.4%, 4-2 9.2%, 2-4 8.4%, 4-5 8.2%
+- Marcador medio esperado en la tanda: Argentina 3.82 | Uruguay 3.76
+- Marcadores de tanda mas probables: 4-3 10.9%, 3-4 10.6%, 4-2 8.8%, 5-4 8.6%, 4-5 8.6%
 - Marcadores mas probables: 1-0 19.4%, 2-0 18.5%, 3-0 11.7%, 0-0 10.3%, 1-1 7.1%
 
 ### Dieciseisavos 15: Colombia vs Panama
@@ -2492,9 +2492,9 @@ _Todavia no hay suficientes partidos terminados para medir como viene acertando 
 - Quien tiene mas probabilidad de avanzar: Colombia 91.6% | Panama 8.4%
 - Si empatan tras 90': gana en prorroga Colombia 42.0% | siguen empatados 54.1% | Panama 3.9%
 - Si llegan a penales: Colombia 53.1% | Panama 46.9%
-- Marcador mas probable de la tanda: 4-3
-- Marcador medio esperado en la tanda: Colombia 3.79 | Panama 3.62
-- Marcadores de tanda mas probables: 4-3 10.3%, 4-2 9.8%, 3-4 9.2%, 4-5 8.8%, 5-4 8.8%
+- Marcador mas probable de la tanda: 4-2
+- Marcador medio esperado en la tanda: Colombia 3.76 | Panama 3.61
+- Marcadores de tanda mas probables: 4-2 10.8%, 4-3 10.6%, 3-4 9.1%, 5-4 8.3%, 2-4 8.2%
 - Marcadores mas probables: 2-0 20.5%, 1-0 20.2%, 3-0 13.8%, 0-0 10.1%, 4-0 7.0%
 
 ### Dieciseisavos 16: Turkey vs Iran
@@ -2525,8 +2525,8 @@ _Todavia no hay suficientes partidos terminados para medir como viene acertando 
 - Si empatan tras 90': gana en prorroga Turkey 32.7% | siguen empatados 58.2% | Iran 9.1%
 - Si llegan a penales: Turkey 53.9% | Iran 46.1%
 - Marcador mas probable de la tanda: 4-3
-- Marcador medio esperado en la tanda: Turkey 3.75 | Iran 3.47
-- Marcadores de tanda mas probables: 4-3 10.9%, 4-2 10.9%, 5-4 9.8%, 3-4 8.6%, 2-4 7.9%
+- Marcador medio esperado en la tanda: Turkey 3.74 | Iran 3.46
+- Marcadores de tanda mas probables: 4-3 11.2%, 5-4 10.4%, 4-2 10.4%, 3-4 9.8%, 4-5 7.7%
 - Marcadores mas probables: 1-0 17.7%, 2-0 14.3%, 0-0 11.4%, 1-1 10.4%, 2-1 8.7%
 
 ### Octavos 1: Canada vs Germany
@@ -2557,9 +2557,9 @@ _Todavia no hay suficientes partidos terminados para medir como viene acertando 
 - Quien tiene mas probabilidad de avanzar: Canada 18.1% | Germany 81.9%
 - Si empatan tras 90': gana en prorroga Canada 8.6% | siguen empatados 57.7% | Germany 33.8%
 - Si llegan a penales: Canada 38.9% | Germany 61.1%
-- Marcador mas probable de la tanda: 3-4
-- Marcador medio esperado en la tanda: Canada 3.50 | Germany 4.01
-- Marcadores de tanda mas probables: 3-4 13.4%, 2-4 13.1%, 4-5 10.4%, 5-4 7.7%, 4-2 6.2%
+- Marcador mas probable de la tanda: 2-4
+- Marcador medio esperado en la tanda: Canada 3.50 | Germany 3.96
+- Marcadores de tanda mas probables: 2-4 12.5%, 3-4 11.2%, 4-5 10.2%, 4-3 8.3%, 5-4 7.4%
 - Marcadores mas probables: 0-1 17.9%, 0-2 14.8%, 0-0 11.2%, 1-1 9.9%, 1-2 8.6%
 
 ### Octavos 2: Netherlands vs Brazil
@@ -2590,8 +2590,8 @@ _Todavia no hay suficientes partidos terminados para medir como viene acertando 
 - Si empatan tras 90': gana en prorroga Netherlands 15.8% | siguen empatados 60.6% | Brazil 23.7%
 - Si llegan a penales: Netherlands 45.7% | Brazil 54.3%
 - Marcador mas probable de la tanda: 3-4
-- Marcador medio esperado en la tanda: Netherlands 3.71 | Brazil 3.91
-- Marcadores de tanda mas probables: 3-4 10.9%, 5-4 10.4%, 2-4 9.4%, 4-5 9.2%, 4-3 8.1%
+- Marcador medio esperado en la tanda: Netherlands 3.78 | Brazil 3.98
+- Marcadores de tanda mas probables: 3-4 10.8%, 4-5 10.4%, 2-4 10.2%, 5-4 8.4%, 4-3 8.2%
 - Marcadores mas probables: 1-1 13.5%, 0-1 13.4%, 0-0 11.6%, 1-0 9.5%, 0-2 8.6%
 
 ### Octavos 3: France vs Norway
@@ -2621,9 +2621,9 @@ _Todavia no hay suficientes partidos terminados para medir como viene acertando 
 - Quien tiene mas probabilidad de avanzar: France 82.9% | Norway 17.1%
 - Si empatan tras 90': gana en prorroga France 35.3% | siguen empatados 56.8% | Norway 7.9%
 - Si llegan a penales: France 53.2% | Norway 46.8%
-- Marcador mas probable de la tanda: 4-2
-- Marcador medio esperado en la tanda: France 3.98 | Norway 3.79
-- Marcadores de tanda mas probables: 4-2 10.9%, 5-4 10.6%, 4-3 10.2%, 4-5 9.1%, 3-4 7.6%
+- Marcador mas probable de la tanda: 5-4
+- Marcador medio esperado en la tanda: France 4.00 | Norway 3.81
+- Marcadores de tanda mas probables: 5-4 10.6%, 4-3 10.4%, 4-2 9.5%, 3-4 9.2%, 4-5 9.0%
 - Marcadores mas probables: 1-0 18.0%, 2-0 15.6%, 0-0 10.7%, 1-1 9.3%, 3-0 9.0%
 
 ### Octavos 4: Mexico vs England
@@ -2653,9 +2653,9 @@ _Todavia no hay suficientes partidos terminados para medir como viene acertando 
 - Quien tiene mas probabilidad de avanzar: Mexico 14.4% | England 85.6%
 - Si empatan tras 90': gana en prorroga Mexico 7.0% | siguen empatados 55.0% | England 38.0%
 - Si llegan a penales: Mexico 48.7% | England 51.3%
-- Marcador mas probable de la tanda: 4-5
-- Marcador medio esperado en la tanda: Mexico 3.83 | England 3.89
-- Marcadores de tanda mas probables: 4-5 9.9%, 5-4 9.6%, 2-4 9.4%, 4-2 9.0%, 3-4 9.0%
+- Marcador mas probable de la tanda: 3-4
+- Marcador medio esperado en la tanda: Mexico 3.80 | England 3.89
+- Marcadores de tanda mas probables: 3-4 11.1%, 2-4 10.0%, 4-5 9.4%, 5-4 9.1%, 4-3 8.1%
 - Marcadores mas probables: 0-1 17.5%, 0-2 16.5%, 0-3 10.3%, 0-0 9.6%, 1-1 8.3%
 
 ### Octavos 5: Turkey vs Belgium
@@ -2686,9 +2686,9 @@ _Todavia no hay suficientes partidos terminados para medir como viene acertando 
 - Quien tiene mas probabilidad de avanzar: Turkey 54.9% | Belgium 45.1%
 - Si empatan tras 90': gana en prorroga Turkey 21.3% | siguen empatados 61.1% | Belgium 17.6%
 - Si llegan a penales: Turkey 50.4% | Belgium 49.6%
-- Marcador mas probable de la tanda: 4-3
-- Marcador medio esperado en la tanda: Turkey 3.73 | Belgium 3.65
-- Marcadores de tanda mas probables: 4-3 11.4%, 4-2 9.8%, 2-4 9.3%, 4-5 9.3%, 3-4 9.1%
+- Marcador mas probable de la tanda: 4-5
+- Marcador medio esperado en la tanda: Turkey 3.78 | Belgium 3.73
+- Marcadores de tanda mas probables: 4-5 9.9%, 4-2 9.8%, 3-4 9.5%, 5-4 9.2%, 4-3 9.1%
 - Marcadores mas probables: 1-1 13.8%, 1-0 12.4%, 0-0 11.9%, 0-1 10.6%, 2-1 8.0%
 
 ### Octavos 6: Croatia vs Spain
@@ -2718,9 +2718,9 @@ _Todavia no hay suficientes partidos terminados para medir como viene acertando 
 - Quien tiene mas probabilidad de avanzar: Croatia 10.5% | Spain 89.5%
 - Si empatan tras 90': gana en prorroga Croatia 5.0% | siguen empatados 54.5% | Spain 40.5%
 - Si llegan a penales: Croatia 47.4% | Spain 52.6%
-- Marcador mas probable de la tanda: 3-4
-- Marcador medio esperado en la tanda: Croatia 3.87 | Spain 3.98
-- Marcadores de tanda mas probables: 3-4 10.9%, 4-5 10.4%, 5-4 9.6%, 2-4 9.2%, 4-3 8.4%
+- Marcador mas probable de la tanda: 5-4
+- Marcador medio esperado en la tanda: Croatia 3.98 | Spain 3.95
+- Marcadores de tanda mas probables: 5-4 10.8%, 4-3 10.0%, 4-5 9.1%, 3-4 8.9%, 2-4 8.5%
 - Marcadores mas probables: 0-1 19.2%, 0-2 18.9%, 0-3 12.4%, 0-0 9.9%, 1-2 6.8%
 
 ### Octavos 7: Switzerland vs Argentina
@@ -2752,8 +2752,8 @@ _Todavia no hay suficientes partidos terminados para medir como viene acertando 
 - Si empatan tras 90': gana en prorroga Switzerland 5.4% | siguen empatados 55.3% | Argentina 39.2%
 - Si llegan a penales: Switzerland 45.3% | Argentina 54.7%
 - Marcador mas probable de la tanda: 3-4
-- Marcador medio esperado en la tanda: Switzerland 3.69 | Argentina 3.79
-- Marcadores de tanda mas probables: 3-4 9.9%, 2-4 9.7%, 4-2 9.3%, 4-5 8.7%, 4-3 8.6%
+- Marcador medio esperado en la tanda: Switzerland 3.78 | Argentina 3.77
+- Marcadores de tanda mas probables: 3-4 10.2%, 4-2 9.4%, 4-3 9.4%, 4-5 8.9%, 5-4 8.8%
 - Marcadores mas probables: 0-1 19.4%, 0-2 18.4%, 0-3 11.7%, 0-0 10.4%, 1-1 7.1%
 
 ### Octavos 8: Colombia vs Paraguay
@@ -2784,8 +2784,8 @@ _Todavia no hay suficientes partidos terminados para medir como viene acertando 
 - Si empatan tras 90': gana en prorroga Colombia 35.2% | siguen empatados 56.7% | Paraguay 8.1%
 - Si llegan a penales: Colombia 50.3% | Paraguay 49.7%
 - Marcador mas probable de la tanda: 3-4
-- Marcador medio esperado en la tanda: Colombia 3.90 | Paraguay 3.86
-- Marcadores de tanda mas probables: 3-4 9.6%, 5-4 9.4%, 4-2 9.4%, 4-5 9.3%, 4-3 9.3%
+- Marcador medio esperado en la tanda: Colombia 3.81 | Paraguay 3.81
+- Marcadores de tanda mas probables: 3-4 10.9%, 4-2 10.3%, 5-4 9.5%, 4-5 9.1%, 4-3 9.1%
 - Marcadores mas probables: 1-0 17.7%, 2-0 15.4%, 0-0 10.6%, 1-1 9.4%, 3-0 8.9%
 
 ### Cuartos 1: Germany vs Brazil
@@ -2815,9 +2815,9 @@ _Todavia no hay suficientes partidos terminados para medir como viene acertando 
 - Quien tiene mas probabilidad de avanzar: Germany 37.0% | Brazil 63.0%
 - Si empatan tras 90': gana en prorroga Germany 14.8% | siguen empatados 60.0% | Brazil 25.2%
 - Si llegan a penales: Germany 51.3% | Brazil 48.7%
-- Marcador mas probable de la tanda: 4-3
-- Marcador medio esperado en la tanda: Germany 4.00 | Brazil 3.98
-- Marcadores de tanda mas probables: 4-3 9.9%, 5-4 9.7%, 3-4 9.6%, 4-5 9.4%, 4-2 8.0%
+- Marcador mas probable de la tanda: 4-5
+- Marcador medio esperado en la tanda: Germany 4.02 | Brazil 3.99
+- Marcadores de tanda mas probables: 4-5 11.0%, 5-4 9.8%, 4-3 9.6%, 3-4 8.8%, 4-2 7.9%
 - Marcadores mas probables: 0-1 13.9%, 1-1 13.2%, 0-0 11.4%, 0-2 9.4%, 1-0 8.8%
 
 ### Cuartos 2: France vs England
@@ -2848,8 +2848,8 @@ _Todavia no hay suficientes partidos terminados para medir como viene acertando 
 - Si empatan tras 90': gana en prorroga France 22.5% | siguen empatados 60.6% | England 16.8%
 - Si llegan a penales: France 52.9% | England 47.1%
 - Marcador mas probable de la tanda: 5-4
-- Marcador medio esperado en la tanda: France 4.09 | England 3.93
-- Marcadores de tanda mas probables: 5-4 11.1%, 4-5 9.9%, 4-2 9.8%, 4-3 9.1%, 3-4 8.4%
+- Marcador medio esperado en la tanda: France 4.04 | England 3.95
+- Marcadores de tanda mas probables: 5-4 10.5%, 4-5 9.8%, 4-3 9.5%, 4-2 9.2%, 3-4 9.1%
 - Marcadores mas probables: 1-1 13.6%, 1-0 12.8%, 0-0 11.5%, 0-1 9.9%, 2-1 8.3%
 
 ### Cuartos 3: Belgium vs Spain
@@ -2880,9 +2880,9 @@ _Todavia no hay suficientes partidos terminados para medir como viene acertando 
 - Quien tiene mas probabilidad de avanzar: Belgium 6.6% | Spain 93.4%
 - Si empatan tras 90': gana en prorroga Belgium 2.9% | siguen empatados 53.2% | Spain 43.9%
 - Si llegan a penales: Belgium 47.6% | Spain 52.4%
-- Marcador mas probable de la tanda: 4-5
-- Marcador medio esperado en la tanda: Belgium 3.71 | Spain 3.88
-- Marcadores de tanda mas probables: 4-5 10.8%, 3-4 9.8%, 2-4 9.7%, 4-3 8.6%, 5-4 8.5%
+- Marcador mas probable de la tanda: 3-4
+- Marcador medio esperado en la tanda: Belgium 3.71 | Spain 3.81
+- Marcadores de tanda mas probables: 3-4 10.4%, 2-4 10.3%, 4-5 9.8%, 4-3 9.2%, 4-2 9.0%
 - Marcadores mas probables: 0-2 21.7%, 0-1 20.6%, 0-3 15.3%, 0-0 9.8%, 0-4 8.0%
 
 ### Cuartos 4: Argentina vs Colombia
@@ -2912,9 +2912,9 @@ _Todavia no hay suficientes partidos terminados para medir como viene acertando 
 - Quien tiene mas probabilidad de avanzar: Argentina 80.1% | Colombia 19.9%
 - Si empatan tras 90': gana en prorroga Argentina 33.1% | siguen empatados 57.8% | Colombia 9.1%
 - Si llegan a penales: Argentina 56.7% | Colombia 43.3%
-- Marcador mas probable de la tanda: 4-2
-- Marcador medio esperado en la tanda: Argentina 3.96 | Colombia 3.73
-- Marcadores de tanda mas probables: 4-2 11.7%, 4-3 10.6%, 5-4 9.9%, 3-4 8.9%, 4-5 8.2%
+- Marcador mas probable de la tanda: 5-4
+- Marcador medio esperado en la tanda: Argentina 3.96 | Colombia 3.72
+- Marcadores de tanda mas probables: 5-4 10.8%, 4-3 10.3%, 4-2 10.1%, 3-4 9.7%, 4-5 7.8%
 - Marcadores mas probables: 1-0 17.4%, 2-0 14.3%, 0-0 11.1%, 1-1 10.3%, 2-1 8.8%
 
 ### Semifinal 1: Brazil vs France
@@ -2946,8 +2946,8 @@ _Todavia no hay suficientes partidos terminados para medir como viene acertando 
 - Si empatan tras 90': gana en prorroga Brazil 13.6% | siguen empatados 59.7% | France 26.7%
 - Si llegan a penales: Brazil 52.4% | France 47.6%
 - Marcador mas probable de la tanda: 5-4
-- Marcador medio esperado en la tanda: Brazil 4.03 | France 3.95
-- Marcadores de tanda mas probables: 5-4 10.8%, 3-4 9.2%, 4-2 8.9%, 4-5 8.8%, 4-3 8.5%
+- Marcador medio esperado en la tanda: Brazil 3.96 | France 3.86
+- Marcadores de tanda mas probables: 5-4 11.6%, 4-3 10.0%, 4-2 9.7%, 3-4 9.2%, 4-5 8.9%
 - Marcadores mas probables: 0-1 14.7%, 1-1 12.8%, 0-0 11.4%, 0-2 10.3%, 1-2 8.9%
 
 ### Semifinal 2: Spain vs Argentina
@@ -2978,9 +2978,9 @@ _Todavia no hay suficientes partidos terminados para medir como viene acertando 
 - Quien tiene mas probabilidad de avanzar: Spain 60.4% | Argentina 39.6%
 - Si empatan tras 90': gana en prorroga Spain 23.9% | siguen empatados 60.7% | Argentina 15.4%
 - Si llegan a penales: Spain 47.5% | Argentina 52.5%
-- Marcador mas probable de la tanda: 3-4
-- Marcador medio esperado en la tanda: Spain 3.83 | Argentina 3.87
-- Marcadores de tanda mas probables: 3-4 10.6%, 5-4 9.9%, 4-5 9.9%, 4-3 9.2%, 4-2 8.5%
+- Marcador mas probable de la tanda: 2-4
+- Marcador medio esperado en la tanda: Spain 3.74 | Argentina 3.86
+- Marcadores de tanda mas probables: 2-4 10.5%, 4-5 9.8%, 4-3 8.9%, 5-4 8.4%, 3-4 8.2%
 - Marcadores mas probables: 1-0 13.7%, 1-1 13.4%, 0-0 11.8%, 0-1 9.4%, 2-0 8.8%
 
 ### Final: France vs Spain
@@ -3010,9 +3010,9 @@ _Todavia no hay suficientes partidos terminados para medir como viene acertando 
 - Quien tiene mas probabilidad de avanzar: France 30.5% | Spain 69.5%
 - Si empatan tras 90': gana en prorroga France 12.5% | siguen empatados 59.3% | Spain 28.2%
 - Si llegan a penales: France 51.3% | Spain 48.7%
-- Marcador mas probable de la tanda: 4-5
-- Marcador medio esperado en la tanda: France 3.92 | Spain 3.89
-- Marcadores de tanda mas probables: 4-5 10.3%, 5-4 10.0%, 4-2 10.0%, 4-3 9.2%, 3-4 7.8%
+- Marcador mas probable de la tanda: 5-4
+- Marcador medio esperado en la tanda: France 3.96 | Spain 3.91
+- Marcadores de tanda mas probables: 5-4 11.3%, 4-3 9.6%, 2-4 9.2%, 4-5 8.8%, 3-4 8.4%
 - Marcadores mas probables: 0-1 15.3%, 1-1 12.3%, 0-0 11.3%, 0-2 11.1%, 1-2 9.0%
 
 ### Tercer puesto: Brazil vs Argentina
@@ -3043,7 +3043,7 @@ _Todavia no hay suficientes partidos terminados para medir como viene acertando 
 - Quien tiene mas probabilidad de avanzar: Brazil 25.4% | Argentina 74.6%
 - Si empatan tras 90': gana en prorroga Brazil 10.7% | siguen empatados 58.5% | Argentina 30.8%
 - Si llegan a penales: Brazil 51.2% | Argentina 48.8%
-- Marcador mas probable de la tanda: 4-5
-- Marcador medio esperado en la tanda: Brazil 3.84 | Argentina 3.87
-- Marcadores de tanda mas probables: 4-5 9.8%, 4-3 9.4%, 2-4 9.2%, 3-4 9.0%, 4-2 8.8%
+- Marcador mas probable de la tanda: 4-3
+- Marcador medio esperado en la tanda: Brazil 3.90 | Argentina 3.83
+- Marcadores de tanda mas probables: 4-3 10.2%, 5-4 9.8%, 3-4 9.4%, 4-5 9.0%, 2-4 8.8%
 - Marcadores mas probables: 0-1 16.4%, 0-2 12.7%, 1-1 11.4%, 0-0 11.1%, 1-2 9.0%

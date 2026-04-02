@@ -5719,8 +5719,8 @@ def model_comparison_html(prediction: MatchPrediction) -> str:
 
     return (
         "<div class=\"reason-block model-compare-block\">"
-        "<h4>Comparativa entre modelos</h4>"
-        "<p class=\"meta\">Aqui puedes ver que dice cada capa del stack antes del resultado final publicado.</p>"
+        "<h4>Que dice cada modelo</h4>"
+        "<p class=\"meta\">Aqui se ven por separado el modelo principal, el contraste, el ajuste de baja anotacion y el ensamble final que termina publicandose.</p>"
         "<div class=\"model-compare-grid\">"
         f"{card('primary_name', 'primary_probs', 'primary_top_score', 'primary')}"
         f"{card('contrast_name', 'contrast_probs', 'contrast_top_score', 'contrast')}"
@@ -6325,6 +6325,10 @@ def build_methodology_html(bracket_payload: dict, backtest: dict) -> str:
         "<article>"
         "<h3>Stack estadistico</h3>"
         "<p>La capa prepartido mezcla el modelo principal Bivariante Poisson, un modelo de contraste Poisson independiente, un ajuste de baja anotacion y un ensamble ligero final. Si las cuotas son confiables, tambien se usan como referencia suave y no como sustituto del modelo.</p>"
+        "</article>"
+        "<article>"
+        "<h3>Modelos visibles en la web</h3>"
+        "<p>En cada tarjeta de partido veras por separado que dice Bivariante Poisson, que dice Poisson independiente, que dice el ajuste de baja anotacion y cual es el ensamble final publicado. Asi puedes comparar si coinciden o si hay dispersion entre modelos.</p>"
         "</article>"
         "<article>"
         "<h3>Estado dinámico</h3>"
