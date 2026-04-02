@@ -1,6 +1,6 @@
 # Reporte actual del Mundial 2026
 
-Actualizado: 2026-04-02T14:55:13
+Actualizado: 2026-04-02T18:34:33
 Estado usado: /Users/jacquesbentata/Documents/New project/mundial_2026/tournament_state_2026.json
 Fixtures leidos: /Users/jacquesbentata/Documents/New project/mundial_2026/fixtures_live_2026.json
 
@@ -18,7 +18,7 @@ Fixtures leidos: /Users/jacquesbentata/Documents/New project/mundial_2026/fixtur
 
 ## Que cambio desde la ultima actualizacion
 
-- Comparado contra la publicacion anterior de: 2026-04-02T18:52:30+00:00
+- Comparado contra la publicacion anterior de: 2026-04-02T18:56:23+00:00
 - Esta seccion muestra solo movimientos reales frente a la version anterior ya publicada: picks que cambiaron, marcadores nuevos y cruces que entran o salen de la llave principal.
 - Todavia no hay un cambio grande frente a la publicacion anterior.
 
@@ -278,6 +278,11 @@ _Todavia no hay suficientes partidos terminados para medir como viene acertando 
 - Que tanto coinciden los modelos entre si: 99.7%
 - Stack estadistico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotacion + Ensamble ligero
 - Factores dominantes: Elo dinámico +324.000; Recursos/PIB proxy +0.332; Ranking FIFA / puntos FIFA +0.291
+- Comparativa entre modelos:
+- Bivariante Poisson: victoria Mexico 86.5% | empate 11.8% | victoria South Africa 1.7% | marcador mas probable 2-0 (22.0%)
+- Poisson independiente: victoria Mexico 86.1% | empate 11.9% | victoria South Africa 2.0% | marcador mas probable 2-0 (21.9%)
+- Ajuste de baja anotacion: victoria Mexico 86.0% | empate 12.1% | victoria South Africa 1.9% | marcador mas probable 2-0 (21.9%)
+- Ensamble ligero: victoria Mexico 86.3% | empate 11.9% | victoria South Africa 1.8% | marcador mas probable 2-0 (21.9%)
 - Marcadores mas probables: 2-0 21.9%, 1-0 18.9%, 3-0 16.9%, 4-0 9.8%, 0-0 8.2%
 
 ### South Korea vs Czech Republic
@@ -297,6 +302,11 @@ _Todavia no hay suficientes partidos terminados para medir como viene acertando 
 - Que tanto coinciden los modelos entre si: 97.8%
 - Stack estadistico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotacion + Ensamble ligero
 - Factores dominantes: Elo dinámico +53.000; Historia mundialista -0.160; Ranking FIFA / puntos FIFA +0.135
+- Comparativa entre modelos:
+- Bivariante Poisson: victoria South Korea 46.1% | empate 28.4% | victoria Czech Republic 25.5% | marcador mas probable 1-0 (13.2%)
+- Poisson independiente: victoria South Korea 46.4% | empate 27.0% | victoria Czech Republic 26.6% | marcador mas probable 1-0 (12.8%)
+- Ajuste de baja anotacion: victoria South Korea 44.7% | empate 30.4% | victoria Czech Republic 24.9% | marcador mas probable 1-1 (14.4%)
+- Ensamble ligero: victoria South Korea 45.9% | empate 28.5% | victoria Czech Republic 25.6% | marcador mas probable 1-1 (13.0%)
 - Marcadores mas probables: 1-1 13.0%, 1-0 12.7%, 0-0 10.1%, 2-1 8.9%, 0-1 8.7%
 
 ### Canada vs Bosnia and Herzegovina
@@ -316,6 +326,11 @@ _Todavia no hay suficientes partidos terminados para medir como viene acertando 
 - Que tanto coinciden los modelos entre si: 99.2%
 - Stack estadistico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotacion + Ensamble ligero
 - Factores dominantes: Elo dinámico +235.000; Recursos/PIB proxy +0.433; Ranking FIFA / puntos FIFA +0.236
+- Comparativa entre modelos:
+- Bivariante Poisson: victoria Canada 79.0% | empate 16.7% | victoria Bosnia and Herzegovina 4.3% | marcador mas probable 2-0 (19.1%)
+- Poisson independiente: victoria Canada 78.4% | empate 16.5% | victoria Bosnia and Herzegovina 5.1% | marcador mas probable 2-0 (19.0%)
+- Ajuste de baja anotacion: victoria Canada 78.1% | empate 17.1% | victoria Bosnia and Herzegovina 4.8% | marcador mas probable 2-0 (19.0%)
+- Ensamble ligero: victoria Canada 78.7% | empate 16.7% | victoria Bosnia and Herzegovina 4.5% | marcador mas probable 2-0 (19.1%)
 - Marcadores mas probables: 2-0 19.1%, 1-0 18.7%, 3-0 12.9%, 0-0 9.2%, 2-1 6.7%
 
 ### United States vs Paraguay
@@ -335,6 +350,11 @@ _Todavia no hay suficientes partidos terminados para medir como viene acertando 
 - Que tanto coinciden los modelos entre si: 97.9%
 - Stack estadistico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotacion + Ensamble ligero
 - Factores dominantes: Elo dinámico -86.000; Recursos/PIB proxy +0.442; Ranking FIFA / puntos FIFA +0.216
+- Comparativa entre modelos:
+- Bivariante Poisson: victoria United States 23.8% | empate 28.2% | victoria Paraguay 48.0% | marcador mas probable 0-1 (13.7%)
+- Poisson independiente: victoria United States 24.9% | empate 26.9% | victoria Paraguay 48.2% | marcador mas probable 0-1 (13.3%)
+- Ajuste de baja anotacion: victoria United States 23.3% | empate 30.1% | victoria Paraguay 46.6% | marcador mas probable 1-1 (14.2%)
+- Ensamble ligero: victoria United States 23.9% | empate 28.3% | victoria Paraguay 47.8% | marcador mas probable 0-1 (13.3%)
 - Marcadores mas probables: 0-1 13.3%, 1-1 12.9%, 0-0 10.3%, 0-2 9.2%, 1-2 9.0%
 
 ### Qatar vs Switzerland
@@ -354,6 +374,11 @@ _Todavia no hay suficientes partidos terminados para medir como viene acertando 
 - Que tanto coinciden los modelos entre si: 99.9%
 - Stack estadistico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotacion + Ensamble ligero
 - Factores dominantes: Elo dinámico -470.000; Profundidad de banco -0.407; Historia mundialista -0.270
+- Comparativa entre modelos:
+- Bivariante Poisson: victoria Qatar 0.6% | empate 10.1% | victoria Switzerland 89.3% | marcador mas probable 0-2 (24.3%)
+- Poisson independiente: victoria Qatar 0.7% | empate 10.1% | victoria Switzerland 89.2% | marcador mas probable 0-2 (24.3%)
+- Ajuste de baja anotacion: victoria Qatar 0.7% | empate 10.1% | victoria Switzerland 89.2% | marcador mas probable 0-2 (24.3%)
+- Ensamble ligero: victoria Qatar 0.6% | empate 10.1% | victoria Switzerland 89.3% | marcador mas probable 0-2 (24.3%)
 - Marcadores mas probables: 0-2 24.3%, 0-1 20.4%, 0-3 19.3%, 0-4 11.5%, 0-0 8.6%
 
 ### Brazil vs Morocco
@@ -373,6 +398,11 @@ _Todavia no hay suficientes partidos terminados para medir como viene acertando 
 - Que tanto coinciden los modelos entre si: 98.9%
 - Stack estadistico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotacion + Ensamble ligero
 - Factores dominantes: Elo dinámico +172.000; Historia mundialista +0.710; Trayectoria futbolística +0.311
+- Comparativa entre modelos:
+- Bivariante Poisson: victoria Brazil 73.7% | empate 19.7% | victoria Morocco 6.6% | marcador mas probable 1-0 (18.6%)
+- Poisson independiente: victoria Brazil 73.1% | empate 19.2% | victoria Morocco 7.7% | marcador mas probable 1-0 (17.9%)
+- Ajuste de baja anotacion: victoria Brazil 72.6% | empate 20.2% | victoria Morocco 7.2% | marcador mas probable 1-0 (17.4%)
+- Ensamble ligero: victoria Brazil 73.4% | empate 19.7% | victoria Morocco 6.9% | marcador mas probable 1-0 (18.3%)
 - Marcadores mas probables: 1-0 18.3%, 2-0 17.2%, 3-0 10.7%, 0-0 9.9%, 1-1 7.9%
 
 ### Haiti vs Scotland
@@ -392,6 +422,11 @@ _Todavia no hay suficientes partidos terminados para medir como viene acertando 
 - Que tanto coinciden los modelos entre si: 99.4%
 - Stack estadistico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotacion + Ensamble ligero
 - Factores dominantes: Elo dinámico -248.000; Recursos/PIB proxy -0.355; Ranking FIFA / puntos FIFA -0.254
+- Comparativa entre modelos:
+- Bivariante Poisson: victoria Haiti 3.6% | empate 15.8% | victoria Scotland 80.6% | marcador mas probable 0-2 (19.9%)
+- Poisson independiente: victoria Haiti 4.3% | empate 15.6% | victoria Scotland 80.1% | marcador mas probable 0-2 (19.8%)
+- Ajuste de baja anotacion: victoria Haiti 4.0% | empate 16.1% | victoria Scotland 79.8% | marcador mas probable 0-2 (19.8%)
+- Ensamble ligero: victoria Haiti 3.8% | empate 15.8% | victoria Scotland 80.4% | marcador mas probable 0-2 (19.9%)
 - Marcadores mas probables: 0-2 19.9%, 0-1 19.1%, 0-3 13.8%, 0-0 9.3%, 0-4 7.1%
 
 ### Australia vs Turkey
@@ -411,6 +446,11 @@ _Todavia no hay suficientes partidos terminados para medir como viene acertando 
 - Que tanto coinciden los modelos entre si: 98.4%
 - Stack estadistico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotacion + Ensamble ligero
 - Factores dominantes: Elo dinámico -106.000; Historia mundialista -0.190; Disciplina estructural +0.105
+- Comparativa entre modelos:
+- Bivariante Poisson: victoria Australia 15.3% | empate 26.1% | victoria Turkey 58.6% | marcador mas probable 0-1 (16.3%)
+- Poisson independiente: victoria Australia 16.7% | empate 24.9% | victoria Turkey 58.5% | marcador mas probable 0-1 (15.7%)
+- Ajuste de baja anotacion: victoria Australia 15.5% | empate 27.1% | victoria Turkey 57.3% | marcador mas probable 0-1 (14.6%)
+- Ensamble ligero: victoria Australia 15.6% | empate 26.0% | victoria Turkey 58.4% | marcador mas probable 0-1 (15.9%)
 - Marcadores mas probables: 0-1 15.9%, 0-2 12.3%, 1-1 11.4%, 0-0 10.7%, 1-2 9.1%
 
 ### Germany vs Curacao
@@ -431,6 +471,11 @@ _Todavia no hay suficientes partidos terminados para medir como viene acertando 
 - Que tanto coinciden los modelos entre si: 99.9%
 - Stack estadistico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotacion + Ensamble ligero
 - Factores dominantes: Elo dinámico +443.000; Historia mundialista +0.730; Recursos/PIB proxy +0.654
+- Comparativa entre modelos:
+- Bivariante Poisson: victoria Germany 89.6% | empate 9.9% | victoria Curacao 0.5% | marcador mas probable 2-0 (24.4%)
+- Poisson independiente: victoria Germany 89.5% | empate 9.9% | victoria Curacao 0.7% | marcador mas probable 2-0 (24.3%)
+- Ajuste de baja anotacion: victoria Germany 89.4% | empate 9.9% | victoria Curacao 0.6% | marcador mas probable 2-0 (24.3%)
+- Ensamble ligero: victoria Germany 89.6% | empate 9.9% | victoria Curacao 0.6% | marcador mas probable 2-0 (24.4%)
 - Marcadores mas probables: 2-0 24.4%, 1-0 20.3%, 3-0 19.5%, 4-0 11.7%, 0-0 8.5%
 
 ### Netherlands vs Japan
@@ -451,6 +496,11 @@ _Todavia no hay suficientes partidos terminados para medir como viene acertando 
 - Que tanto coinciden los modelos entre si: 98.2%
 - Stack estadistico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotacion + Ensamble ligero
 - Factores dominantes: Elo dinámico +81.000; Historia mundialista +0.250; Ranking FIFA / puntos FIFA +0.127
+- Comparativa entre modelos:
+- Bivariante Poisson: victoria Netherlands 53.9% | empate 27.4% | victoria Japan 18.7% | marcador mas probable 1-0 (15.5%)
+- Poisson independiente: victoria Netherlands 53.9% | empate 26.1% | victoria Japan 20.0% | marcador mas probable 1-0 (15.0%)
+- Ajuste de baja anotacion: victoria Netherlands 52.6% | empate 28.8% | victoria Japan 18.6% | marcador mas probable 1-0 (13.6%)
+- Ensamble ligero: victoria Netherlands 53.7% | empate 27.4% | victoria Japan 18.9% | marcador mas probable 1-0 (15.0%)
 - Marcadores mas probables: 1-0 15.0%, 1-1 12.2%, 2-0 11.0%, 0-0 10.8%, 2-1 9.1%
 
 ### Ivory Coast vs Ecuador
@@ -470,6 +520,11 @@ _Todavia no hay suficientes partidos terminados para medir como viene acertando 
 - Que tanto coinciden los modelos entre si: 99.5%
 - Stack estadistico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotacion + Ensamble ligero
 - Factores dominantes: Elo dinámico -296.000; Profundidad de banco -0.243; Recursos/PIB proxy -0.200
+- Comparativa entre modelos:
+- Bivariante Poisson: victoria Ivory Coast 2.8% | empate 14.6% | victoria Ecuador 82.6% | marcador mas probable 0-2 (20.9%)
+- Poisson independiente: victoria Ivory Coast 3.3% | empate 14.6% | victoria Ecuador 82.1% | marcador mas probable 0-2 (20.9%)
+- Ajuste de baja anotacion: victoria Ivory Coast 3.2% | empate 14.9% | victoria Ecuador 81.9% | marcador mas probable 0-2 (20.9%)
+- Ensamble ligero: victoria Ivory Coast 2.9% | empate 14.6% | victoria Ecuador 82.4% | marcador mas probable 0-2 (20.9%)
 - Marcadores mas probables: 0-2 20.9%, 0-1 19.6%, 0-3 14.8%, 0-0 9.3%, 0-4 7.9%
 
 ### Sweden vs Tunisia
@@ -490,6 +545,11 @@ _Todavia no hay suficientes partidos terminados para medir como viene acertando 
 - Que tanto coinciden los modelos entre si: 97.9%
 - Stack estadistico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotacion + Ensamble ligero
 - Factores dominantes: Elo dinámico +46.000; Historia mundialista +0.250; Recursos/PIB proxy +0.185
+- Comparativa entre modelos:
+- Bivariante Poisson: victoria Sweden 47.8% | empate 29.1% | victoria Tunisia 23.1% | marcador mas probable 1-0 (14.7%)
+- Poisson independiente: victoria Sweden 48.1% | empate 27.6% | victoria Tunisia 24.3% | marcador mas probable 1-0 (14.3%)
+- Ajuste de baja anotacion: victoria Sweden 46.5% | empate 30.8% | victoria Tunisia 22.7% | marcador mas probable 1-1 (14.3%)
+- Ensamble ligero: victoria Sweden 47.6% | empate 29.2% | victoria Tunisia 23.3% | marcador mas probable 1-0 (14.2%)
 - Marcadores mas probables: 1-0 14.2%, 1-1 13.0%, 0-0 11.4%, 2-0 9.5%, 0-1 8.9%
 
 ### Spain vs Cape Verde
@@ -510,6 +570,11 @@ _Todavia no hay suficientes partidos terminados para medir como viene acertando 
 - Que tanto coinciden los modelos entre si: 99.9%
 - Stack estadistico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotacion + Ensamble ligero
 - Factores dominantes: Elo dinámico +610.000; Recursos/PIB proxy +0.641; Ranking FIFA / puntos FIFA +0.607
+- Comparativa entre modelos:
+- Bivariante Poisson: victoria Spain 90.6% | empate 8.9% | victoria Cape Verde 0.5% | marcador mas probable 2-0 (23.9%)
+- Poisson independiente: victoria Spain 90.5% | empate 8.9% | victoria Cape Verde 0.6% | marcador mas probable 2-0 (23.8%)
+- Ajuste de baja anotacion: victoria Spain 90.5% | empate 9.0% | victoria Cape Verde 0.6% | marcador mas probable 2-0 (23.8%)
+- Ensamble ligero: victoria Spain 90.6% | empate 8.9% | victoria Cape Verde 0.5% | marcador mas probable 2-0 (23.9%)
 - Marcadores mas probables: 2-0 23.9%, 3-0 20.0%, 1-0 19.1%, 4-0 12.5%, 0-0 7.6%
 
 ### Belgium vs Egypt
@@ -529,6 +594,11 @@ _Todavia no hay suficientes partidos terminados para medir como viene acertando 
 - Que tanto coinciden los modelos entre si: 99.0%
 - Stack estadistico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotacion + Ensamble ligero
 - Factores dominantes: Elo dinámico +189.000; Historia mundialista +0.240; Ranking FIFA / puntos FIFA +0.208
+- Comparativa entre modelos:
+- Bivariante Poisson: victoria Belgium 74.5% | empate 19.3% | victoria Egypt 6.2% | marcador mas probable 1-0 (18.8%)
+- Poisson independiente: victoria Belgium 73.8% | empate 18.9% | victoria Egypt 7.2% | marcador mas probable 1-0 (18.2%)
+- Ajuste de baja anotacion: victoria Belgium 73.4% | empate 19.8% | victoria Egypt 6.8% | marcador mas probable 1-0 (17.7%)
+- Ensamble ligero: victoria Belgium 74.2% | empate 19.3% | victoria Egypt 6.5% | marcador mas probable 1-0 (18.5%)
 - Marcadores mas probables: 1-0 18.5%, 2-0 17.6%, 3-0 11.1%, 0-0 9.9%, 2-1 7.6%
 
 ### Saudi Arabia vs Uruguay
@@ -549,6 +619,11 @@ _Todavia no hay suficientes partidos terminados para medir como viene acertando 
 - Que tanto coinciden los modelos entre si: 99.5%
 - Stack estadistico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotacion + Ensamble ligero
 - Factores dominantes: Elo dinámico -297.000; Historia mundialista -0.480; Ranking FIFA / puntos FIFA -0.291
+- Comparativa entre modelos:
+- Bivariante Poisson: victoria Saudi Arabia 2.6% | empate 14.6% | victoria Uruguay 82.8% | marcador mas probable 0-2 (21.3%)
+- Poisson independiente: victoria Saudi Arabia 3.1% | empate 14.5% | victoria Uruguay 82.4% | marcador mas probable 0-2 (21.3%)
+- Ajuste de baja anotacion: victoria Saudi Arabia 3.0% | empate 14.8% | victoria Uruguay 82.2% | marcador mas probable 0-2 (21.3%)
+- Ensamble ligero: victoria Saudi Arabia 2.7% | empate 14.6% | victoria Uruguay 82.7% | marcador mas probable 0-2 (21.3%)
 - Marcadores mas probables: 0-2 21.3%, 0-1 20.1%, 0-3 15.0%, 0-0 9.5%, 0-4 8.0%
 
 ### Iran vs New Zealand
@@ -568,6 +643,11 @@ _Todavia no hay suficientes partidos terminados para medir como viene acertando 
 - Que tanto coinciden los modelos entre si: 98.7%
 - Stack estadistico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotacion + Ensamble ligero
 - Factores dominantes: Elo dinámico +168.000; Ranking FIFA / puntos FIFA +0.405; Profundidad de banco +0.111
+- Comparativa entre modelos:
+- Bivariante Poisson: victoria Iran 68.7% | empate 22.5% | victoria New Zealand 8.8% | marcador mas probable 1-0 (18.7%)
+- Poisson independiente: victoria Iran 68.2% | empate 21.7% | victoria New Zealand 10.1% | marcador mas probable 1-0 (18.0%)
+- Ajuste de baja anotacion: victoria Iran 67.5% | empate 23.0% | victoria New Zealand 9.4% | marcador mas probable 1-0 (17.3%)
+- Ensamble ligero: victoria Iran 68.5% | empate 22.4% | victoria New Zealand 9.1% | marcador mas probable 1-0 (18.3%)
 - Marcadores mas probables: 1-0 18.3%, 2-0 15.8%, 0-0 10.9%, 1-1 9.1%, 3-0 9.0%
 
 ### France vs Senegal
@@ -587,6 +667,11 @@ _Todavia no hay suficientes partidos terminados para medir como viene acertando 
 - Que tanto coinciden los modelos entre si: 99.1%
 - Stack estadistico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotacion + Ensamble ligero
 - Factores dominantes: Elo dinámico +194.000; Recursos/PIB proxy +0.509; Historia mundialista +0.450
+- Comparativa entre modelos:
+- Bivariante Poisson: victoria France 76.6% | empate 18.2% | victoria Senegal 5.2% | marcador mas probable 1-0 (19.1%)
+- Poisson independiente: victoria France 76.0% | empate 17.9% | victoria Senegal 6.1% | marcador mas probable 1-0 (18.5%)
+- Ajuste de baja anotacion: victoria France 75.6% | empate 18.6% | victoria Senegal 5.7% | marcador mas probable 2-0 (18.4%)
+- Ensamble ligero: victoria France 76.4% | empate 18.2% | victoria Senegal 5.4% | marcador mas probable 1-0 (18.9%)
 - Marcadores mas probables: 1-0 18.9%, 2-0 18.4%, 3-0 11.9%, 0-0 9.8%, 2-1 7.1%
 
 ### Iraq vs Norway
@@ -606,6 +691,11 @@ _Todavia no hay suficientes partidos terminados para medir como viene acertando 
 - Que tanto coinciden los modelos entre si: 99.7%
 - Stack estadistico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotacion + Ensamble ligero
 - Factores dominantes: Elo dinámico -339.000; Historia mundialista -0.250; Profundidad de banco -0.223
+- Comparativa entre modelos:
+- Bivariante Poisson: victoria Iraq 1.8% | empate 13.0% | victoria Norway 85.2% | marcador mas probable 0-2 (22.4%)
+- Poisson independiente: victoria Iraq 2.2% | empate 13.1% | victoria Norway 84.8% | marcador mas probable 0-2 (22.3%)
+- Ajuste de baja anotacion: victoria Iraq 2.1% | empate 13.2% | victoria Norway 84.7% | marcador mas probable 0-2 (22.3%)
+- Ensamble ligero: victoria Iraq 1.9% | empate 13.1% | victoria Norway 85.0% | marcador mas probable 0-2 (22.4%)
 - Marcadores mas probables: 0-2 22.4%, 0-1 20.3%, 0-3 16.4%, 0-0 9.3%, 0-4 9.0%
 
 ### Argentina vs Algeria
@@ -625,6 +715,11 @@ _Todavia no hay suficientes partidos terminados para medir como viene acertando 
 - Que tanto coinciden los modelos entre si: 99.9%
 - Stack estadistico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotacion + Ensamble ligero
 - Factores dominantes: Elo dinámico +439.000; Historia mundialista +0.570; Ranking FIFA / puntos FIFA +0.374
+- Comparativa entre modelos:
+- Bivariante Poisson: victoria Argentina 89.0% | empate 10.3% | victoria Algeria 0.7% | marcador mas probable 2-0 (24.0%)
+- Poisson independiente: victoria Argentina 88.8% | empate 10.3% | victoria Algeria 0.9% | marcador mas probable 2-0 (24.0%)
+- Ajuste de baja anotacion: victoria Argentina 88.8% | empate 10.4% | victoria Algeria 0.8% | marcador mas probable 2-0 (24.0%)
+- Ensamble ligero: victoria Argentina 89.0% | empate 10.3% | victoria Algeria 0.8% | marcador mas probable 2-0 (24.0%)
 - Marcadores mas probables: 2-0 24.0%, 1-0 20.2%, 3-0 19.0%, 4-0 11.3%, 0-0 8.5%
 
 ### Austria vs Jordan
@@ -644,6 +739,11 @@ _Todavia no hay suficientes partidos terminados para medir como viene acertando 
 - Que tanto coinciden los modelos entre si: 98.6%
 - Stack estadistico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotacion + Ensamble ligero
 - Factores dominantes: Elo dinámico +127.000; Historia mundialista +0.260; Ranking FIFA / puntos FIFA +0.236
+- Comparativa entre modelos:
+- Bivariante Poisson: victoria Austria 65.7% | empate 23.5% | victoria Jordan 10.7% | marcador mas probable 1-0 (17.6%)
+- Poisson independiente: victoria Austria 65.2% | empate 22.6% | victoria Jordan 12.2% | marcador mas probable 1-0 (16.9%)
+- Ajuste de baja anotacion: victoria Austria 64.4% | empate 24.2% | victoria Jordan 11.3% | marcador mas probable 1-0 (16.1%)
+- Ensamble ligero: victoria Austria 65.4% | empate 23.5% | victoria Jordan 11.1% | marcador mas probable 1-0 (17.2%)
 - Marcadores mas probables: 1-0 17.2%, 2-0 14.5%, 0-0 10.5%, 1-1 10.0%, 2-1 8.8%
 
 ### Portugal vs Dem. Rep. of Congo
@@ -664,6 +764,11 @@ _Todavia no hay suficientes partidos terminados para medir como viene acertando 
 - Que tanto coinciden los modelos entre si: 99.7%
 - Stack estadistico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotacion + Ensamble ligero
 - Factores dominantes: Elo dinámico +337.000; Recursos/PIB proxy +0.364; Ranking FIFA / puntos FIFA +0.350
+- Comparativa entre modelos:
+- Bivariante Poisson: victoria Portugal 85.6% | empate 12.8% | victoria Dem. Rep. of Congo 1.6% | marcador mas probable 2-0 (22.8%)
+- Poisson independiente: victoria Portugal 85.2% | empate 12.8% | victoria Dem. Rep. of Congo 1.9% | marcador mas probable 2-0 (22.7%)
+- Ajuste de baja anotacion: victoria Portugal 85.2% | empate 13.0% | victoria Dem. Rep. of Congo 1.9% | marcador mas probable 2-0 (22.7%)
+- Ensamble ligero: victoria Portugal 85.5% | empate 12.8% | victoria Dem. Rep. of Congo 1.7% | marcador mas probable 2-0 (22.7%)
 - Marcadores mas probables: 2-0 22.7%, 1-0 20.6%, 3-0 16.7%, 0-0 9.4%, 4-0 9.2%
 
 ### England vs Croatia
@@ -684,6 +789,11 @@ _Todavia no hay suficientes partidos terminados para medir como viene acertando 
 - Que tanto coinciden los modelos entre si: 98.4%
 - Stack estadistico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotacion + Ensamble ligero
 - Factores dominantes: Elo dinámico +110.000; Recursos/PIB proxy +0.241; Ranking FIFA / puntos FIFA +0.140
+- Comparativa entre modelos:
+- Bivariante Poisson: victoria England 60.2% | empate 25.3% | victoria Croatia 14.5% | marcador mas probable 1-0 (16.2%)
+- Poisson independiente: victoria England 60.0% | empate 24.2% | victoria Croatia 15.8% | marcador mas probable 1-0 (15.6%)
+- Ajuste de baja anotacion: victoria England 58.9% | empate 26.3% | victoria Croatia 14.8% | marcador mas probable 1-0 (14.5%)
+- Ensamble ligero: victoria England 60.0% | empate 25.3% | victoria Croatia 14.8% | marcador mas probable 1-0 (15.8%)
 - Marcadores mas probables: 1-0 15.8%, 2-0 12.7%, 1-1 11.1%, 0-0 10.3%, 2-1 9.2%
 
 ### Ghana vs Panama
@@ -703,6 +813,11 @@ _Todavia no hay suficientes partidos terminados para medir como viene acertando 
 - Que tanto coinciden los modelos entre si: 99.1%
 - Stack estadistico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotacion + Ensamble ligero
 - Factores dominantes: Elo dinámico -224.000; Ranking FIFA / puntos FIFA -0.226; Profundidad de banco -0.188
+- Comparativa entre modelos:
+- Bivariante Poisson: victoria Ghana 5.5% | empate 18.5% | victoria Panama 76.0% | marcador mas probable 0-1 (19.0%)
+- Poisson independiente: victoria Ghana 6.4% | empate 18.1% | victoria Panama 75.4% | marcador mas probable 0-1 (18.3%)
+- Ajuste de baja anotacion: victoria Ghana 6.1% | empate 18.9% | victoria Panama 75.0% | marcador mas probable 0-2 (18.1%)
+- Ensamble ligero: victoria Ghana 5.7% | empate 18.5% | victoria Panama 75.8% | marcador mas probable 0-1 (18.7%)
 - Marcadores mas probables: 0-1 18.7%, 0-2 18.1%, 0-3 11.7%, 0-0 9.8%, 1-2 7.3%
 
 ### Uzbekistan vs Colombia
@@ -722,6 +837,11 @@ _Todavia no hay suficientes partidos terminados para medir como viene acertando 
 - Que tanto coinciden los modelos entre si: 99.4%
 - Stack estadistico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotacion + Ensamble ligero
 - Factores dominantes: Elo dinámico -270.000; Ranking FIFA / puntos FIFA -0.287; Historia mundialista -0.260
+- Comparativa entre modelos:
+- Bivariante Poisson: victoria Uzbekistan 3.2% | empate 14.7% | victoria Colombia 82.0% | marcador mas probable 0-2 (20.0%)
+- Poisson independiente: victoria Uzbekistan 3.9% | empate 14.7% | victoria Colombia 81.5% | marcador mas probable 0-2 (19.9%)
+- Ajuste de baja anotacion: victoria Uzbekistan 3.6% | empate 15.1% | victoria Colombia 81.3% | marcador mas probable 0-2 (19.9%)
+- Ensamble ligero: victoria Uzbekistan 3.4% | empate 14.8% | victoria Colombia 81.8% | marcador mas probable 0-2 (20.0%)
 - Marcadores mas probables: 0-2 20.0%, 0-1 18.5%, 0-3 14.4%, 0-0 8.6%, 0-4 7.7%
 
 ### Czech Republic vs South Africa
@@ -742,6 +862,11 @@ _Todavia no hay suficientes partidos terminados para medir como viene acertando 
 - Que tanto coinciden los modelos entre si: 99.0%
 - Stack estadistico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotacion + Ensamble ligero
 - Factores dominantes: Elo dinámico +202.000; Historia mundialista +0.250; Profundidad de banco +0.165
+- Comparativa entre modelos:
+- Bivariante Poisson: victoria Czech Republic 75.0% | empate 19.0% | victoria South Africa 6.0% | marcador mas probable 1-0 (18.8%)
+- Poisson independiente: victoria Czech Republic 74.4% | empate 18.6% | victoria South Africa 7.0% | marcador mas probable 1-0 (18.1%)
+- Ajuste de baja anotacion: victoria Czech Republic 73.9% | empate 19.5% | victoria South Africa 6.6% | marcador mas probable 2-0 (17.7%)
+- Ensamble ligero: victoria Czech Republic 74.7% | empate 19.0% | victoria South Africa 6.2% | marcador mas probable 1-0 (18.5%)
 - Marcadores mas probables: 1-0 18.5%, 2-0 17.7%, 3-0 11.3%, 0-0 9.8%, 2-1 7.5%
 
 ### Switzerland vs Bosnia and Herzegovina
@@ -761,6 +886,11 @@ _Todavia no hay suficientes partidos terminados para medir como viene acertando 
 - Que tanto coinciden los modelos entre si: 99.6%
 - Stack estadistico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotacion + Ensamble ligero
 - Factores dominantes: Elo dinámico +326.000; Ranking FIFA / puntos FIFA +0.350; Recursos/PIB proxy +0.293
+- Comparativa entre modelos:
+- Bivariante Poisson: victoria Switzerland 85.4% | empate 12.7% | victoria Bosnia and Herzegovina 1.9% | marcador mas probable 2-0 (21.9%)
+- Poisson independiente: victoria Switzerland 85.0% | empate 12.7% | victoria Bosnia and Herzegovina 2.3% | marcador mas probable 2-0 (21.9%)
+- Ajuste de baja anotacion: victoria Switzerland 84.9% | empate 12.9% | victoria Bosnia and Herzegovina 2.2% | marcador mas probable 2-0 (21.9%)
+- Ensamble ligero: victoria Switzerland 85.3% | empate 12.7% | victoria Bosnia and Herzegovina 2.0% | marcador mas probable 2-0 (21.9%)
 - Marcadores mas probables: 2-0 21.9%, 1-0 19.5%, 3-0 16.4%, 4-0 9.2%, 0-0 8.7%
 
 ### Canada vs Qatar
@@ -780,6 +910,11 @@ _Todavia no hay suficientes partidos terminados para medir como viene acertando 
 - Que tanto coinciden los modelos entre si: 99.7%
 - Stack estadistico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotacion + Ensamble ligero
 - Factores dominantes: Elo dinámico +379.000; Profundidad de banco +0.309; Recursos/PIB proxy +0.298
+- Comparativa entre modelos:
+- Bivariante Poisson: victoria Canada 87.3% | empate 11.4% | victoria Qatar 1.3% | marcador mas probable 2-0 (22.9%)
+- Poisson independiente: victoria Canada 87.0% | empate 11.5% | victoria Qatar 1.6% | marcador mas probable 2-0 (22.8%)
+- Ajuste de baja anotacion: victoria Canada 86.9% | empate 11.6% | victoria Qatar 1.5% | marcador mas probable 2-0 (22.8%)
+- Ensamble ligero: victoria Canada 87.2% | empate 11.4% | victoria Qatar 1.4% | marcador mas probable 2-0 (22.8%)
 - Marcadores mas probables: 2-0 22.8%, 1-0 19.7%, 3-0 17.7%, 4-0 10.2%, 0-0 8.5%
 
 ### Mexico vs South Korea
@@ -799,6 +934,11 @@ _Todavia no hay suficientes partidos terminados para medir como viene acertando 
 - Que tanto coinciden los modelos entre si: 98.2%
 - Stack estadistico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotacion + Ensamble ligero
 - Factores dominantes: Elo dinámico +69.000; Localía/sede +0.140; Disciplina estructural -0.138
+- Comparativa entre modelos:
+- Bivariante Poisson: victoria Mexico 54.7% | empate 26.2% | victoria South Korea 19.1% | marcador mas probable 1-0 (14.1%)
+- Poisson independiente: victoria Mexico 54.7% | empate 25.0% | victoria South Korea 20.3% | marcador mas probable 1-0 (13.6%)
+- Ajuste de baja anotacion: victoria Mexico 53.4% | empate 27.7% | victoria South Korea 19.0% | marcador mas probable 1-1 (13.1%)
+- Ensamble ligero: victoria Mexico 54.5% | empate 26.2% | victoria South Korea 19.3% | marcador mas probable 1-0 (13.7%)
 - Marcadores mas probables: 1-0 13.7%, 1-1 12.0%, 2-0 10.7%, 2-1 9.5%, 0-0 9.3%
 
 ### United States vs Australia
@@ -818,6 +958,11 @@ _Todavia no hay suficientes partidos terminados para medir como viene acertando 
 - Que tanto coinciden los modelos entre si: 97.3%
 - Stack estadistico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotacion + Ensamble ligero
 - Factores dominantes: Elo dinámico -27.000; Recursos/PIB proxy +0.178; Disciplina estructural -0.161
+- Comparativa entre modelos:
+- Bivariante Poisson: victoria United States 33.3% | empate 29.5% | victoria Australia 37.2% | marcador mas probable 1-1 (13.2%)
+- Poisson independiente: victoria United States 34.2% | empate 27.9% | victoria Australia 37.9% | marcador mas probable 1-1 (13.1%)
+- Ajuste de baja anotacion: victoria United States 32.1% | empate 32.0% | victoria Australia 35.9% | marcador mas probable 1-1 (15.2%)
+- Ensamble ligero: victoria United States 33.2% | empate 29.7% | victoria Australia 37.1% | marcador mas probable 1-1 (13.6%)
 - Marcadores mas probables: 1-1 13.6%, 0-1 11.2%, 0-0 10.5%, 1-0 10.5%, 1-2 8.0%
 
 ### Scotland vs Morocco
@@ -837,6 +982,11 @@ _Todavia no hay suficientes partidos terminados para medir como viene acertando 
 - Que tanto coinciden los modelos entre si: 97.4%
 - Stack estadistico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotacion + Ensamble ligero
 - Factores dominantes: Elo dinámico -16.000; Ranking FIFA / puntos FIFA -0.275; Disciplina estructural +0.145
+- Comparativa entre modelos:
+- Bivariante Poisson: victoria Scotland 31.5% | empate 29.2% | victoria Morocco 39.3% | marcador mas probable 1-1 (13.1%)
+- Poisson independiente: victoria Scotland 32.4% | empate 27.7% | victoria Morocco 39.9% | marcador mas probable 1-1 (13.0%)
+- Ajuste de baja anotacion: victoria Scotland 30.4% | empate 31.6% | victoria Morocco 38.0% | marcador mas probable 1-1 (15.0%)
+- Ensamble ligero: victoria Scotland 31.5% | empate 29.4% | victoria Morocco 39.2% | marcador mas probable 1-1 (13.5%)
 - Marcadores mas probables: 1-1 13.5%, 0-1 11.5%, 0-0 10.2%, 1-0 10.0%, 1-2 8.3%
 
 ### Brazil vs Haiti
@@ -856,6 +1006,11 @@ _Todavia no hay suficientes partidos terminados para medir como viene acertando 
 - Que tanto coinciden los modelos entre si: 99.9%
 - Stack estadistico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotacion + Ensamble ligero
 - Factores dominantes: Elo dinámico +436.000; Historia mundialista +0.820; Ranking FIFA / puntos FIFA +0.558
+- Comparativa entre modelos:
+- Bivariante Poisson: victoria Brazil 90.1% | empate 9.4% | victoria Haiti 0.5% | marcador mas probable 2-0 (24.1%)
+- Poisson independiente: victoria Brazil 90.0% | empate 9.4% | victoria Haiti 0.7% | marcador mas probable 2-0 (24.0%)
+- Ajuste de baja anotacion: victoria Brazil 89.9% | empate 9.4% | victoria Haiti 0.6% | marcador mas probable 2-0 (24.0%)
+- Ensamble ligero: victoria Brazil 90.1% | empate 9.4% | victoria Haiti 0.6% | marcador mas probable 2-0 (24.1%)
 - Marcadores mas probables: 2-0 24.1%, 3-0 19.7%, 1-0 19.6%, 4-0 12.1%, 0-0 8.0%
 
 ### Turkey vs Paraguay
@@ -875,6 +1030,11 @@ _Todavia no hay suficientes partidos terminados para medir como viene acertando 
 - Que tanto coinciden los modelos entre si: 97.9%
 - Stack estadistico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotacion + Ensamble ligero
 - Factores dominantes: Elo dinámico +47.000; Recursos/PIB proxy +0.255; Ranking FIFA / puntos FIFA +0.097
+- Comparativa entre modelos:
+- Bivariante Poisson: victoria Turkey 47.9% | empate 28.3% | victoria Paraguay 23.9% | marcador mas probable 1-0 (13.7%)
+- Poisson independiente: victoria Turkey 48.1% | empate 26.9% | victoria Paraguay 25.0% | marcador mas probable 1-0 (13.3%)
+- Ajuste de baja anotacion: victoria Turkey 46.5% | empate 30.1% | victoria Paraguay 23.4% | marcador mas probable 1-1 (14.2%)
+- Ensamble ligero: victoria Turkey 47.7% | empate 28.4% | victoria Paraguay 24.0% | marcador mas probable 1-0 (13.3%)
 - Marcadores mas probables: 1-0 13.3%, 1-1 12.9%, 0-0 10.3%, 2-0 9.2%, 2-1 9.0%
 
 ### Netherlands vs Sweden
@@ -895,6 +1055,11 @@ _Todavia no hay suficientes partidos terminados para medir como viene acertando 
 - Que tanto coinciden los modelos entre si: 99.5%
 - Stack estadistico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotacion + Ensamble ligero
 - Factores dominantes: Elo dinámico +299.000; Ranking FIFA / puntos FIFA +0.322; Profundidad de banco +0.161
+- Comparativa entre modelos:
+- Bivariante Poisson: victoria Netherlands 83.5% | empate 14.0% | victoria Sweden 2.5% | marcador mas probable 2-0 (21.2%)
+- Poisson independiente: victoria Netherlands 83.1% | empate 13.9% | victoria Sweden 3.0% | marcador mas probable 2-0 (21.1%)
+- Ajuste de baja anotacion: victoria Netherlands 82.9% | empate 14.2% | victoria Sweden 2.9% | marcador mas probable 2-0 (21.1%)
+- Ensamble ligero: victoria Netherlands 83.4% | empate 14.0% | victoria Sweden 2.6% | marcador mas probable 2-0 (21.1%)
 - Marcadores mas probables: 2-0 21.1%, 1-0 19.4%, 3-0 15.3%, 0-0 9.0%, 4-0 8.3%
 
 ### Germany vs Ivory Coast
@@ -914,6 +1079,11 @@ _Todavia no hay suficientes partidos terminados para medir como viene acertando 
 - Que tanto coinciden los modelos entre si: 99.6%
 - Stack estadistico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotacion + Ensamble ligero
 - Factores dominantes: Elo dinámico +273.000; Historia mundialista +0.650; Recursos/PIB proxy +0.547
+- Comparativa entre modelos:
+- Bivariante Poisson: victoria Germany 84.8% | empate 13.1% | victoria Ivory Coast 2.1% | marcador mas probable 2-0 (21.7%)
+- Poisson independiente: victoria Germany 84.4% | empate 13.1% | victoria Ivory Coast 2.5% | marcador mas probable 2-0 (21.6%)
+- Ajuste de baja anotacion: victoria Germany 84.3% | empate 13.3% | victoria Ivory Coast 2.4% | marcador mas probable 2-0 (21.6%)
+- Ensamble ligero: victoria Germany 84.6% | empate 13.1% | victoria Ivory Coast 2.2% | marcador mas probable 2-0 (21.7%)
 - Marcadores mas probables: 2-0 21.7%, 1-0 19.5%, 3-0 16.0%, 4-0 8.9%, 0-0 8.8%
 
 ### Ecuador vs Curacao
@@ -933,6 +1103,11 @@ _Todavia no hay suficientes partidos terminados para medir como viene acertando 
 - Que tanto coinciden los modelos entre si: 99.9%
 - Stack estadistico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotacion + Ensamble ligero
 - Factores dominantes: Elo dinámico +466.000; Profundidad de banco +0.384; Ranking FIFA / puntos FIFA +0.346
+- Comparativa entre modelos:
+- Bivariante Poisson: victoria Ecuador 89.6% | empate 9.7% | victoria Curacao 0.6% | marcador mas probable 2-0 (24.0%)
+- Poisson independiente: victoria Ecuador 89.5% | empate 9.8% | victoria Curacao 0.8% | marcador mas probable 2-0 (23.9%)
+- Ajuste de baja anotacion: victoria Ecuador 89.4% | empate 9.8% | victoria Curacao 0.7% | marcador mas probable 2-0 (23.9%)
+- Ensamble ligero: victoria Ecuador 89.6% | empate 9.8% | victoria Curacao 0.7% | marcador mas probable 2-0 (24.0%)
 - Marcadores mas probables: 2-0 24.0%, 1-0 19.8%, 3-0 19.4%, 4-0 11.7%, 0-0 8.2%
 
 ### Tunisia vs Japan
@@ -953,6 +1128,11 @@ _Todavia no hay suficientes partidos terminados para medir como viene acertando 
 - Que tanto coinciden los modelos entre si: 99.4%
 - Stack estadistico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotacion + Ensamble ligero
 - Factores dominantes: Elo dinámico -264.000; Recursos/PIB proxy -0.306; Profundidad de banco -0.281
+- Comparativa entre modelos:
+- Bivariante Poisson: victoria Tunisia 3.2% | empate 15.1% | victoria Japan 81.7% | marcador mas probable 0-2 (20.3%)
+- Poisson independiente: victoria Tunisia 3.8% | empate 15.0% | victoria Japan 81.1% | marcador mas probable 0-2 (20.3%)
+- Ajuste de baja anotacion: victoria Tunisia 3.6% | empate 15.4% | victoria Japan 80.9% | marcador mas probable 0-2 (20.3%)
+- Ensamble ligero: victoria Tunisia 3.4% | empate 15.1% | victoria Japan 81.5% | marcador mas probable 0-2 (20.3%)
 - Marcadores mas probables: 0-2 20.3%, 0-1 19.2%, 0-3 14.3%, 0-0 9.1%, 0-4 7.5%
 
 ### Spain vs Saudi Arabia
@@ -973,6 +1153,11 @@ _Todavia no hay suficientes partidos terminados para medir como viene acertando 
 - Que tanto coinciden los modelos entre si: 99.9%
 - Stack estadistico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotacion + Ensamble ligero
 - Factores dominantes: Elo dinámico +578.000; Ranking FIFA / puntos FIFA +0.536; Historia mundialista +0.380
+- Comparativa entre modelos:
+- Bivariante Poisson: victoria Spain 90.9% | empate 8.6% | victoria Saudi Arabia 0.5% | marcador mas probable 2-0 (23.8%)
+- Poisson independiente: victoria Spain 90.7% | empate 8.7% | victoria Saudi Arabia 0.6% | marcador mas probable 2-0 (23.7%)
+- Ajuste de baja anotacion: victoria Spain 90.7% | empate 8.7% | victoria Saudi Arabia 0.6% | marcador mas probable 2-0 (23.7%)
+- Ensamble ligero: victoria Spain 90.8% | empate 8.6% | victoria Saudi Arabia 0.5% | marcador mas probable 2-0 (23.7%)
 - Marcadores mas probables: 2-0 23.7%, 3-0 20.1%, 1-0 18.7%, 4-0 12.7%, 0-0 7.4%
 
 ### Belgium vs Iran
@@ -992,6 +1177,11 @@ _Todavia no hay suficientes partidos terminados para medir como viene acertando 
 - Que tanto coinciden los modelos entre si: 98.4%
 - Stack estadistico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotacion + Ensamble ligero
 - Factores dominantes: Elo dinámico +95.000; Historia mundialista +0.260; Recursos/PIB proxy +0.200
+- Comparativa entre modelos:
+- Bivariante Poisson: victoria Belgium 61.0% | empate 25.0% | victoria Iran 14.0% | marcador mas probable 1-0 (16.3%)
+- Poisson independiente: victoria Belgium 60.7% | empate 24.0% | victoria Iran 15.4% | marcador mas probable 1-0 (15.7%)
+- Ajuste de baja anotacion: victoria Belgium 59.6% | empate 26.0% | victoria Iran 14.3% | marcador mas probable 1-0 (14.6%)
+- Ensamble ligero: victoria Belgium 60.7% | empate 25.0% | victoria Iran 14.3% | marcador mas probable 1-0 (15.9%)
 - Marcadores mas probables: 1-0 15.9%, 2-0 12.8%, 1-1 11.0%, 0-0 10.2%, 2-1 9.2%
 
 ### Uruguay vs Cape Verde
@@ -1012,6 +1202,11 @@ _Todavia no hay suficientes partidos terminados para medir como viene acertando 
 - Que tanto coinciden los modelos entre si: 99.7%
 - Stack estadistico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotacion + Ensamble ligero
 - Factores dominantes: Elo dinámico +329.000; Historia mundialista +0.520; Ranking FIFA / puntos FIFA +0.362
+- Comparativa entre modelos:
+- Bivariante Poisson: victoria Uruguay 86.5% | empate 12.0% | victoria Cape Verde 1.5% | marcador mas probable 2-0 (22.6%)
+- Poisson independiente: victoria Uruguay 86.1% | empate 12.1% | victoria Cape Verde 1.8% | marcador mas probable 2-0 (22.5%)
+- Ajuste de baja anotacion: victoria Uruguay 86.1% | empate 12.2% | victoria Cape Verde 1.7% | marcador mas probable 2-0 (22.5%)
+- Ensamble ligero: victoria Uruguay 86.4% | empate 12.1% | victoria Cape Verde 1.6% | marcador mas probable 2-0 (22.6%)
 - Marcadores mas probables: 2-0 22.6%, 1-0 19.8%, 3-0 17.1%, 4-0 9.8%, 0-0 8.7%
 
 ### New Zealand vs Egypt
@@ -1031,6 +1226,11 @@ _Todavia no hay suficientes partidos terminados para medir como viene acertando 
 - Que tanto coinciden los modelos entre si: 98.2%
 - Stack estadistico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotacion + Ensamble ligero
 - Factores dominantes: Elo dinámico -74.000; Ranking FIFA / puntos FIFA -0.332; Disciplina estructural +0.093
+- Comparativa entre modelos:
+- Bivariante Poisson: victoria New Zealand 19.3% | empate 27.2% | victoria Egypt 53.4% | marcador mas probable 0-1 (14.9%)
+- Poisson independiente: victoria New Zealand 20.6% | empate 25.9% | victoria Egypt 53.5% | marcador mas probable 0-1 (14.4%)
+- Ajuste de baja anotacion: victoria New Zealand 19.2% | empate 28.6% | victoria Egypt 52.1% | marcador mas probable 1-1 (13.4%)
+- Ensamble ligero: victoria New Zealand 19.6% | empate 27.2% | victoria Egypt 53.2% | marcador mas probable 0-1 (14.5%)
 - Marcadores mas probables: 0-1 14.5%, 1-1 12.2%, 0-2 10.7%, 0-0 10.3%, 1-2 9.2%
 
 ### Argentina vs Austria
@@ -1051,6 +1251,11 @@ _Todavia no hay suficientes partidos terminados para medir como viene acertando 
 - Que tanto coinciden los modelos entre si: 99.5%
 - Stack estadistico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotacion + Ensamble ligero
 - Factores dominantes: Elo dinámico +295.000; Historia mundialista +0.400; Ranking FIFA / puntos FIFA +0.345
+- Comparativa entre modelos:
+- Bivariante Poisson: victoria Argentina 83.6% | empate 13.9% | victoria Austria 2.5% | marcador mas probable 2-0 (21.1%)
+- Poisson independiente: victoria Argentina 83.1% | empate 13.9% | victoria Austria 3.0% | marcador mas probable 2-0 (21.0%)
+- Ajuste de baja anotacion: victoria Argentina 82.9% | empate 14.2% | victoria Austria 2.9% | marcador mas probable 2-0 (21.0%)
+- Ensamble ligero: victoria Argentina 83.4% | empate 13.9% | victoria Austria 2.7% | marcador mas probable 2-0 (21.0%)
 - Marcadores mas probables: 2-0 21.0%, 1-0 19.3%, 3-0 15.3%, 0-0 8.9%, 4-0 8.3%
 
 ### France vs Iraq
@@ -1070,6 +1275,11 @@ _Todavia no hay suficientes partidos terminados para medir como viene acertando 
 - Que tanto coinciden los modelos entre si: 99.9%
 - Stack estadistico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotacion + Ensamble ligero
 - Factores dominantes: Elo dinámico +480.000; Historia mundialista +0.550; Ranking FIFA / puntos FIFA +0.519
+- Comparativa entre modelos:
+- Bivariante Poisson: victoria France 90.4% | empate 9.1% | victoria Iraq 0.5% | marcador mas probable 2-0 (24.0%)
+- Poisson independiente: victoria France 90.3% | empate 9.1% | victoria Iraq 0.6% | marcador mas probable 2-0 (23.9%)
+- Ajuste de baja anotacion: victoria France 90.3% | empate 9.1% | victoria Iraq 0.6% | marcador mas probable 2-0 (23.9%)
+- Ensamble ligero: victoria France 90.4% | empate 9.1% | victoria Iraq 0.5% | marcador mas probable 2-0 (24.0%)
 - Marcadores mas probables: 2-0 24.0%, 3-0 19.9%, 1-0 19.3%, 4-0 12.3%, 0-0 7.8%
 
 ### Norway vs Senegal
@@ -1089,6 +1299,11 @@ _Todavia no hay suficientes partidos terminados para medir como viene acertando 
 - Que tanto coinciden los modelos entre si: 97.9%
 - Stack estadistico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotacion + Ensamble ligero
 - Factores dominantes: Elo dinámico +53.000; Recursos/PIB proxy +0.315; Ranking FIFA / puntos FIFA -0.184
+- Comparativa entre modelos:
+- Bivariante Poisson: victoria Norway 49.1% | empate 28.1% | victoria Senegal 22.8% | marcador mas probable 1-0 (14.0%)
+- Poisson independiente: victoria Norway 49.3% | empate 26.7% | victoria Senegal 24.0% | marcador mas probable 1-0 (13.6%)
+- Ajuste de baja anotacion: victoria Norway 47.7% | empate 29.8% | victoria Senegal 22.5% | marcador mas probable 1-1 (14.0%)
+- Ensamble ligero: victoria Norway 48.9% | empate 28.2% | victoria Senegal 23.0% | marcador mas probable 1-0 (13.5%)
 - Marcadores mas probables: 1-0 13.5%, 1-1 12.8%, 0-0 10.3%, 2-0 9.5%, 2-1 9.1%
 
 ### Jordan vs Algeria
@@ -1108,6 +1323,11 @@ _Todavia no hay suficientes partidos terminados para medir como viene acertando 
 - Que tanto coinciden los modelos entre si: 97.2%
 - Stack estadistico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotacion + Ensamble ligero
 - Factores dominantes: Elo dinámico +17.000; Ranking FIFA / puntos FIFA -0.206; Disciplina estructural +0.119
+- Comparativa entre modelos:
+- Bivariante Poisson: victoria Jordan 35.7% | empate 29.5% | victoria Algeria 34.7% | marcador mas probable 1-1 (13.2%)
+- Poisson independiente: victoria Jordan 36.5% | empate 28.0% | victoria Algeria 35.5% | marcador mas probable 1-1 (13.2%)
+- Ajuste de baja anotacion: victoria Jordan 34.4% | empate 32.2% | victoria Algeria 33.4% | marcador mas probable 1-1 (15.3%)
+- Ensamble ligero: victoria Jordan 35.6% | empate 29.8% | victoria Algeria 34.6% | marcador mas probable 1-1 (13.6%)
 - Marcadores mas probables: 1-1 13.6%, 1-0 11.0%, 0-1 10.8%, 0-0 10.6%, 2-1 7.8%
 
 ### Portugal vs Uzbekistan
@@ -1128,6 +1348,11 @@ _Todavia no hay suficientes partidos terminados para medir como viene acertando 
 - Que tanto coinciden los modelos entre si: 99.4%
 - Stack estadistico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotacion + Ensamble ligero
 - Factores dominantes: Elo dinámico +248.000; Ranking FIFA / puntos FIFA +0.357; Historia mundialista +0.350
+- Comparativa entre modelos:
+- Bivariante Poisson: victoria Portugal 80.9% | empate 15.6% | victoria Uzbekistan 3.5% | marcador mas probable 2-0 (20.1%)
+- Poisson independiente: victoria Portugal 80.3% | empate 15.5% | victoria Uzbekistan 4.1% | marcador mas probable 2-0 (20.0%)
+- Ajuste de baja anotacion: victoria Portugal 80.1% | empate 16.0% | victoria Uzbekistan 3.9% | marcador mas probable 2-0 (20.0%)
+- Ensamble ligero: victoria Portugal 80.7% | empate 15.7% | victoria Uzbekistan 3.7% | marcador mas probable 2-0 (20.0%)
 - Marcadores mas probables: 2-0 20.0%, 1-0 19.2%, 3-0 13.9%, 0-0 9.3%, 4-0 7.2%
 
 ### England vs Ghana
@@ -1147,6 +1372,11 @@ _Todavia no hay suficientes partidos terminados para medir como viene acertando 
 - Que tanto coinciden los modelos entre si: 99.9%
 - Stack estadistico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotacion + Ensamble ligero
 - Factores dominantes: Elo dinámico +533.000; Ranking FIFA / puntos FIFA +0.579; Recursos/PIB proxy +0.513
+- Comparativa entre modelos:
+- Bivariante Poisson: victoria England 90.7% | empate 8.8% | victoria Ghana 0.5% | marcador mas probable 2-0 (23.9%)
+- Poisson independiente: victoria England 90.6% | empate 8.8% | victoria Ghana 0.6% | marcador mas probable 2-0 (23.8%)
+- Ajuste de baja anotacion: victoria England 90.6% | empate 8.9% | victoria Ghana 0.6% | marcador mas probable 2-0 (23.8%)
+- Ensamble ligero: victoria England 90.7% | empate 8.8% | victoria Ghana 0.5% | marcador mas probable 2-0 (23.8%)
 - Marcadores mas probables: 2-0 23.8%, 3-0 20.0%, 1-0 18.9%, 4-0 12.6%, 0-0 7.5%
 
 ### Panama vs Croatia
@@ -1166,6 +1396,11 @@ _Todavia no hay suficientes partidos terminados para medir como viene acertando 
 - Que tanto coinciden los modelos entre si: 99.1%
 - Stack estadistico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotacion + Ensamble ligero
 - Factores dominantes: Elo dinámico -199.000; Historia mundialista -0.340; Recursos/PIB proxy -0.310
+- Comparativa entre modelos:
+- Bivariante Poisson: victoria Panama 5.3% | empate 17.8% | victoria Croatia 76.9% | marcador mas probable 0-1 (18.4%)
+- Poisson independiente: victoria Panama 6.2% | empate 17.5% | victoria Croatia 76.3% | marcador mas probable 0-2 (18.1%)
+- Ajuste de baja anotacion: victoria Panama 5.9% | empate 18.3% | victoria Croatia 75.9% | marcador mas probable 0-2 (18.1%)
+- Ensamble ligero: victoria Panama 5.6% | empate 17.8% | victoria Croatia 76.6% | marcador mas probable 0-1 (18.2%)
 - Marcadores mas probables: 0-1 18.2%, 0-2 18.1%, 0-3 12.0%, 0-0 9.2%, 1-2 7.3%
 
 ### Colombia vs Dem. Rep. of Congo
@@ -1185,6 +1420,11 @@ _Todavia no hay suficientes partidos terminados para medir como viene acertando 
 - Que tanto coinciden los modelos entre si: 99.7%
 - Stack estadistico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotacion + Ensamble ligero
 - Factores dominantes: Elo dinámico +359.000; Ranking FIFA / puntos FIFA +0.279; Recursos/PIB proxy +0.256
+- Comparativa entre modelos:
+- Bivariante Poisson: victoria Colombia 87.6% | empate 11.0% | victoria Dem. Rep. of Congo 1.4% | marcador mas probable 2-0 (22.1%)
+- Poisson independiente: victoria Colombia 87.2% | empate 11.1% | victoria Dem. Rep. of Congo 1.7% | marcador mas probable 2-0 (22.0%)
+- Ajuste de baja anotacion: victoria Colombia 87.2% | empate 11.2% | victoria Dem. Rep. of Congo 1.7% | marcador mas probable 2-0 (22.0%)
+- Ensamble ligero: victoria Colombia 87.5% | empate 11.0% | victoria Dem. Rep. of Congo 1.5% | marcador mas probable 2-0 (22.1%)
 - Marcadores mas probables: 2-0 22.1%, 1-0 18.5%, 3-0 17.5%, 4-0 10.5%, 0-0 7.8%
 
 ### Bosnia and Herzegovina vs Qatar
@@ -1204,6 +1444,11 @@ _Todavia no hay suficientes partidos terminados para medir como viene acertando 
 - Que tanto coinciden los modelos entre si: 98.5%
 - Stack estadistico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotacion + Ensamble ligero
 - Factores dominantes: Elo dinámico +144.000; Historia mundialista +0.170; Recursos/PIB proxy -0.136
+- Comparativa entre modelos:
+- Bivariante Poisson: victoria Bosnia and Herzegovina 64.4% | empate 23.8% | victoria Qatar 11.8% | marcador mas probable 1-0 (16.9%)
+- Poisson independiente: victoria Bosnia and Herzegovina 64.0% | empate 22.9% | victoria Qatar 13.2% | marcador mas probable 1-0 (16.2%)
+- Ajuste de baja anotacion: victoria Bosnia and Herzegovina 63.1% | empate 24.6% | victoria Qatar 12.3% | marcador mas probable 1-0 (15.3%)
+- Ensamble ligero: victoria Bosnia and Herzegovina 64.1% | empate 23.8% | victoria Qatar 12.1% | marcador mas probable 1-0 (16.5%)
 - Marcadores mas probables: 1-0 16.5%, 2-0 13.9%, 1-1 10.3%, 0-0 10.1%, 2-1 9.0%
 
 ### Switzerland vs Canada
@@ -1223,6 +1468,11 @@ _Todavia no hay suficientes partidos terminados para medir como viene acertando 
 - Que tanto coinciden los modelos entre si: 98.3%
 - Stack estadistico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotacion + Ensamble ligero
 - Factores dominantes: Elo dinámico +91.000; Historia mundialista +0.260; Recursos/PIB proxy -0.141
+- Comparativa entre modelos:
+- Bivariante Poisson: victoria Switzerland 56.5% | empate 26.1% | victoria Canada 17.4% | marcador mas probable 1-0 (15.0%)
+- Poisson independiente: victoria Switzerland 56.4% | empate 24.9% | victoria Canada 18.7% | marcador mas probable 1-0 (14.4%)
+- Ajuste de baja anotacion: victoria Switzerland 55.2% | empate 27.4% | victoria Canada 17.4% | marcador mas probable 1-0 (13.2%)
+- Ensamble ligero: victoria Switzerland 56.3% | empate 26.1% | victoria Canada 17.6% | marcador mas probable 1-0 (14.6%)
 - Marcadores mas probables: 1-0 14.6%, 1-1 11.8%, 2-0 11.4%, 0-0 9.8%, 2-1 9.4%
 
 ### Morocco vs Haiti
@@ -1243,6 +1493,11 @@ _Todavia no hay suficientes partidos terminados para medir como viene acertando 
 - Que tanto coinciden los modelos entre si: 99.4%
 - Stack estadistico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotacion + Ensamble ligero
 - Factores dominantes: Elo dinámico +264.000; Ranking FIFA / puntos FIFA +0.530; Recursos/PIB proxy +0.286
+- Comparativa entre modelos:
+- Bivariante Poisson: victoria Morocco 82.2% | empate 14.8% | victoria Haiti 3.0% | marcador mas probable 2-0 (20.5%)
+- Poisson independiente: victoria Morocco 81.7% | empate 14.7% | victoria Haiti 3.6% | marcador mas probable 2-0 (20.5%)
+- Ajuste de baja anotacion: victoria Morocco 81.5% | empate 15.1% | victoria Haiti 3.4% | marcador mas probable 2-0 (20.5%)
+- Ensamble ligero: victoria Morocco 82.0% | empate 14.8% | victoria Haiti 3.2% | marcador mas probable 2-0 (20.5%)
 - Marcadores mas probables: 2-0 20.5%, 1-0 19.2%, 3-0 14.6%, 0-0 9.1%, 4-0 7.8%
 
 ### Scotland vs Brazil
@@ -1263,6 +1518,11 @@ _Todavia no hay suficientes partidos terminados para medir como viene acertando 
 - Que tanto coinciden los modelos entre si: 99.0%
 - Stack estadistico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotacion + Ensamble ligero
 - Factores dominantes: Elo dinámico -188.000; Historia mundialista -0.570; Ranking FIFA / puntos FIFA -0.304
+- Comparativa entre modelos:
+- Bivariante Poisson: victoria Scotland 5.8% | empate 18.5% | victoria Brazil 75.8% | marcador mas probable 0-1 (18.5%)
+- Poisson independiente: victoria Scotland 6.7% | empate 18.1% | victoria Brazil 75.1% | marcador mas probable 0-1 (17.8%)
+- Ajuste de baja anotacion: victoria Scotland 6.3% | empate 19.0% | victoria Brazil 74.7% | marcador mas probable 0-2 (17.8%)
+- Ensamble ligero: victoria Scotland 6.0% | empate 18.5% | victoria Brazil 75.5% | marcador mas probable 0-1 (18.2%)
 - Marcadores mas probables: 0-1 18.2%, 0-2 17.8%, 0-3 11.5%, 0-0 9.5%, 1-2 7.5%
 
 ### Czech Republic vs Mexico
@@ -1282,6 +1542,11 @@ _Todavia no hay suficientes partidos terminados para medir como viene acertando 
 - Que tanto coinciden los modelos entre si: 98.5%
 - Stack estadistico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotacion + Ensamble ligero
 - Factores dominantes: Elo dinámico -122.000; Ranking FIFA / puntos FIFA -0.226; Recursos/PIB proxy -0.192
+- Comparativa entre modelos:
+- Bivariante Poisson: victoria Czech Republic 12.3% | empate 23.1% | victoria Mexico 64.6% | marcador mas probable 0-1 (15.6%)
+- Poisson independiente: victoria Czech Republic 13.6% | empate 22.2% | victoria Mexico 64.2% | marcador mas probable 0-1 (15.0%)
+- Ajuste de baja anotacion: victoria Czech Republic 12.7% | empate 24.0% | victoria Mexico 63.3% | marcador mas probable 0-1 (14.1%)
+- Ensamble ligero: victoria Czech Republic 12.6% | empate 23.1% | victoria Mexico 64.3% | marcador mas probable 0-1 (15.2%)
 - Marcadores mas probables: 0-1 15.2%, 0-2 13.4%, 1-1 10.3%, 1-2 9.3%, 0-0 9.0%
 
 ### South Africa vs South Korea
@@ -1302,6 +1567,11 @@ _Todavia no hay suficientes partidos terminados para medir como viene acertando 
 - Que tanto coinciden los modelos entre si: 99.3%
 - Stack estadistico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotacion + Ensamble ligero
 - Factores dominantes: Elo dinámico -255.000; Recursos/PIB proxy -0.255; Ranking FIFA / puntos FIFA -0.200
+- Comparativa entre modelos:
+- Bivariante Poisson: victoria South Africa 3.8% | empate 16.0% | victoria South Korea 80.2% | marcador mas probable 0-2 (19.7%)
+- Poisson independiente: victoria South Africa 4.5% | empate 15.9% | victoria South Korea 79.6% | marcador mas probable 0-2 (19.7%)
+- Ajuste de baja anotacion: victoria South Africa 4.2% | empate 16.4% | victoria South Korea 79.4% | marcador mas probable 0-2 (19.7%)
+- Ensamble ligero: victoria South Africa 3.9% | empate 16.1% | victoria South Korea 80.0% | marcador mas probable 0-2 (19.7%)
 - Marcadores mas probables: 0-2 19.7%, 0-1 19.1%, 0-3 13.6%, 0-0 9.3%, 0-4 7.0%
 
 ### Curacao vs Ivory Coast
@@ -1321,6 +1591,11 @@ _Todavia no hay suficientes partidos terminados para medir como viene acertando 
 - Que tanto coinciden los modelos entre si: 98.7%
 - Stack estadistico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotacion + Ensamble ligero
 - Factores dominantes: Elo dinámico -170.000; Ranking FIFA / puntos FIFA -0.263; Profundidad de banco -0.141
+- Comparativa entre modelos:
+- Bivariante Poisson: victoria Curacao 8.2% | empate 21.1% | victoria Ivory Coast 70.7% | marcador mas probable 0-1 (17.9%)
+- Poisson independiente: victoria Curacao 9.5% | empate 20.5% | victoria Ivory Coast 70.1% | marcador mas probable 0-1 (17.1%)
+- Ajuste de baja anotacion: victoria Curacao 8.9% | empate 21.7% | victoria Ivory Coast 69.4% | marcador mas probable 0-1 (16.5%)
+- Ensamble ligero: victoria Curacao 8.5% | empate 21.1% | victoria Ivory Coast 70.4% | marcador mas probable 0-1 (17.5%)
 - Marcadores mas probables: 0-1 17.5%, 0-2 15.9%, 0-0 9.8%, 0-3 9.6%, 1-1 8.8%
 
 ### Ecuador vs Germany
@@ -1340,6 +1615,11 @@ _Todavia no hay suficientes partidos terminados para medir como viene acertando 
 - Que tanto coinciden los modelos entre si: 97.6%
 - Stack estadistico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotacion + Ensamble ligero
 - Factores dominantes: Elo dinámico +23.000; Historia mundialista -0.490; Recursos/PIB proxy -0.348
+- Comparativa entre modelos:
+- Bivariante Poisson: victoria Ecuador 28.3% | empate 29.0% | victoria Germany 42.6% | marcador mas probable 1-1 (13.0%)
+- Poisson independiente: victoria Ecuador 29.3% | empate 27.6% | victoria Germany 43.1% | marcador mas probable 1-1 (13.0%)
+- Ajuste de baja anotacion: victoria Ecuador 27.5% | empate 31.2% | victoria Germany 41.3% | marcador mas probable 1-1 (14.8%)
+- Ensamble ligero: victoria Ecuador 28.3% | empate 29.2% | victoria Germany 42.5% | marcador mas probable 1-1 (13.3%)
 - Marcadores mas probables: 1-1 13.3%, 0-1 12.3%, 0-0 10.4%, 1-0 9.4%, 1-2 8.6%
 
 ### Japan vs Sweden
@@ -1360,6 +1640,11 @@ _Todavia no hay suficientes partidos terminados para medir como viene acertando 
 - Que tanto coinciden los modelos entre si: 99.1%
 - Stack estadistico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotacion + Ensamble ligero
 - Factores dominantes: Elo dinámico +218.000; Ranking FIFA / puntos FIFA +0.195; Profundidad de banco +0.163
+- Comparativa entre modelos:
+- Bivariante Poisson: victoria Japan 76.2% | empate 18.2% | victoria Sweden 5.6% | marcador mas probable 1-0 (18.5%)
+- Poisson independiente: victoria Japan 75.6% | empate 17.9% | victoria Sweden 6.5% | marcador mas probable 2-0 (17.9%)
+- Ajuste de baja anotacion: victoria Japan 75.2% | empate 18.7% | victoria Sweden 6.1% | marcador mas probable 2-0 (17.9%)
+- Ensamble ligero: victoria Japan 76.0% | empate 18.2% | victoria Sweden 5.8% | marcador mas probable 1-0 (18.3%)
 - Marcadores mas probables: 1-0 18.3%, 2-0 17.9%, 3-0 11.7%, 0-0 9.4%, 2-1 7.4%
 
 ### Tunisia vs Netherlands
@@ -1379,6 +1664,11 @@ _Todavia no hay suficientes partidos terminados para medir como viene acertando 
 - Que tanto coinciden los modelos entre si: 99.7%
 - Stack estadistico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotacion + Ensamble ligero
 - Factores dominantes: Elo dinámico -345.000; Historia mundialista -0.350; Ranking FIFA / puntos FIFA -0.332
+- Comparativa entre modelos:
+- Bivariante Poisson: victoria Tunisia 1.5% | empate 12.0% | victoria Netherlands 86.5% | marcador mas probable 0-2 (22.7%)
+- Poisson independiente: victoria Tunisia 1.8% | empate 12.0% | victoria Netherlands 86.2% | marcador mas probable 0-2 (22.6%)
+- Ajuste de baja anotacion: victoria Tunisia 1.7% | empate 12.2% | victoria Netherlands 86.1% | marcador mas probable 0-2 (22.6%)
+- Ensamble ligero: victoria Tunisia 1.6% | empate 12.0% | victoria Netherlands 86.4% | marcador mas probable 0-2 (22.6%)
 - Marcadores mas probables: 0-2 22.6%, 0-1 19.9%, 0-3 17.2%, 0-4 9.8%, 0-0 8.7%
 
 ### Paraguay vs Australia
@@ -1398,6 +1688,11 @@ _Todavia no hay suficientes partidos terminados para medir como viene acertando 
 - Que tanto coinciden los modelos entre si: 97.7%
 - Stack estadistico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotacion + Ensamble ligero
 - Factores dominantes: Elo dinámico +59.000; Recursos/PIB proxy -0.264; Disciplina estructural -0.198
+- Comparativa entre modelos:
+- Bivariante Poisson: victoria Paraguay 45.9% | empate 28.5% | victoria Australia 25.6% | marcador mas probable 1-0 (13.3%)
+- Poisson independiente: victoria Paraguay 46.2% | empate 27.1% | victoria Australia 26.6% | marcador mas probable 1-0 (12.9%)
+- Ajuste de baja anotacion: victoria Paraguay 44.6% | empate 30.5% | victoria Australia 25.0% | marcador mas probable 1-1 (14.4%)
+- Ensamble ligero: victoria Paraguay 45.7% | empate 28.6% | victoria Australia 25.7% | marcador mas probable 1-1 (13.1%)
 - Marcadores mas probables: 1-1 13.1%, 1-0 12.8%, 0-0 10.2%, 2-1 8.9%, 0-1 8.8%
 
 ### Turkey vs United States
@@ -1417,6 +1712,11 @@ _Todavia no hay suficientes partidos terminados para medir como viene acertando 
 - Que tanto coinciden los modelos entre si: 98.4%
 - Stack estadistico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotacion + Ensamble ligero
 - Factores dominantes: Elo dinámico +133.000; Recursos/PIB proxy -0.187; Localía/sede -0.140
+- Comparativa entre modelos:
+- Bivariante Poisson: victoria Turkey 60.7% | empate 25.0% | victoria United States 14.3% | marcador mas probable 1-0 (15.9%)
+- Poisson independiente: victoria Turkey 60.4% | empate 23.9% | victoria United States 15.7% | marcador mas probable 1-0 (15.3%)
+- Ajuste de baja anotacion: victoria Turkey 59.4% | empate 26.0% | victoria United States 14.6% | marcador mas probable 1-0 (14.3%)
+- Ensamble ligero: victoria Turkey 60.4% | empate 24.9% | victoria United States 14.6% | marcador mas probable 1-0 (15.6%)
 - Marcadores mas probables: 1-0 15.6%, 2-0 12.7%, 1-1 11.1%, 0-0 10.0%, 2-1 9.3%
 
 ### Norway vs France
@@ -1436,6 +1736,11 @@ _Todavia no hay suficientes partidos terminados para medir como viene acertando 
 - Que tanto coinciden los modelos entre si: 98.7%
 - Stack estadistico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotacion + Ensamble ligero
 - Factores dominantes: Elo dinámico -141.000; Ranking FIFA / puntos FIFA -0.380; Historia mundialista -0.300
+- Comparativa entre modelos:
+- Bivariante Poisson: victoria Norway 9.2% | empate 21.6% | victoria France 69.2% | marcador mas probable 0-1 (17.1%)
+- Poisson independiente: victoria Norway 10.6% | empate 20.9% | victoria France 68.6% | marcador mas probable 0-1 (16.4%)
+- Ajuste de baja anotacion: victoria Norway 9.9% | empate 22.3% | victoria France 67.9% | marcador mas probable 0-1 (15.7%)
+- Ensamble ligero: victoria Norway 9.6% | empate 21.6% | victoria France 68.9% | marcador mas probable 0-1 (16.8%)
 - Marcadores mas probables: 0-1 16.8%, 0-2 15.1%, 0-0 9.5%, 1-1 9.2%, 0-3 9.1%
 
 ### Senegal vs Iraq
@@ -1455,6 +1760,11 @@ _Todavia no hay suficientes partidos terminados para medir como viene acertando 
 - Que tanto coinciden los modelos entre si: 99.4%
 - Stack estadistico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotacion + Ensamble ligero
 - Factores dominantes: Elo dinámico +286.000; Ranking FIFA / puntos FIFA +0.323; Profundidad de banco +0.173
+- Comparativa entre modelos:
+- Bivariante Poisson: victoria Senegal 82.2% | empate 14.7% | victoria Iraq 3.1% | marcador mas probable 2-0 (20.4%)
+- Poisson independiente: victoria Senegal 81.6% | empate 14.7% | victoria Iraq 3.7% | marcador mas probable 2-0 (20.3%)
+- Ajuste de baja anotacion: victoria Senegal 81.4% | empate 15.1% | victoria Iraq 3.5% | marcador mas probable 2-0 (20.3%)
+- Ensamble ligero: victoria Senegal 82.0% | empate 14.8% | victoria Iraq 3.3% | marcador mas probable 2-0 (20.3%)
 - Marcadores mas probables: 2-0 20.3%, 1-0 19.0%, 3-0 14.5%, 0-0 8.9%, 4-0 7.8%
 
 ### Cape Verde vs Saudi Arabia
@@ -1475,6 +1785,11 @@ _Todavia no hay suficientes partidos terminados para medir como viene acertando 
 - Que tanto coinciden los modelos entre si: 97.9%
 - Stack estadistico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotacion + Ensamble ligero
 - Factores dominantes: Elo dinámico -32.000; Recursos/PIB proxy -0.513; Portero -0.152
+- Comparativa entre modelos:
+- Bivariante Poisson: victoria Cape Verde 22.8% | empate 28.5% | victoria Saudi Arabia 48.7% | marcador mas probable 0-1 (14.3%)
+- Poisson independiente: victoria Cape Verde 24.0% | empate 27.1% | victoria Saudi Arabia 48.9% | marcador mas probable 0-1 (13.9%)
+- Ajuste de baja anotacion: victoria Cape Verde 22.5% | empate 30.2% | victoria Saudi Arabia 47.3% | marcador mas probable 1-1 (14.2%)
+- Ensamble ligero: victoria Cape Verde 23.0% | empate 28.6% | victoria Saudi Arabia 48.5% | marcador mas probable 0-1 (13.9%)
 - Marcadores mas probables: 0-1 13.9%, 1-1 12.9%, 0-0 10.8%, 0-2 9.6%, 1-2 9.0%
 
 ### Uruguay vs Spain
@@ -1494,6 +1809,11 @@ _Todavia no hay suficientes partidos terminados para medir como viene acertando 
 - Que tanto coinciden los modelos entre si: 99.4%
 - Stack estadistico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotacion + Ensamble ligero
 - Factores dominantes: Elo dinámico -281.000; Recursos/PIB proxy -0.298; Disciplina estructural -0.257
+- Comparativa entre modelos:
+- Bivariante Poisson: victoria Uruguay 3.2% | empate 14.3% | victoria Spain 82.4% | marcador mas probable 0-2 (19.8%)
+- Poisson independiente: victoria Uruguay 3.8% | empate 14.3% | victoria Spain 81.9% | marcador mas probable 0-2 (19.7%)
+- Ajuste de baja anotacion: victoria Uruguay 3.6% | empate 14.7% | victoria Spain 81.7% | marcador mas probable 0-2 (19.7%)
+- Ensamble ligero: victoria Uruguay 3.4% | empate 14.4% | victoria Spain 82.2% | marcador mas probable 0-2 (19.8%)
 - Marcadores mas probables: 0-2 19.8%, 0-1 18.0%, 0-3 14.5%, 0-0 8.2%, 0-4 7.9%
 
 ### Egypt vs Iran
@@ -1513,6 +1833,11 @@ _Todavia no hay suficientes partidos terminados para medir como viene acertando 
 - Que tanto coinciden los modelos entre si: 98.2%
 - Stack estadistico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotacion + Ensamble ligero
 - Factores dominantes: Elo dinámico -94.000; Disciplina estructural -0.090; Portero -0.075
+- Comparativa entre modelos:
+- Bivariante Poisson: victoria Egypt 18.6% | empate 27.0% | victoria Iran 54.4% | marcador mas probable 0-1 (15.1%)
+- Poisson independiente: victoria Egypt 19.9% | empate 25.7% | victoria Iran 54.4% | marcador mas probable 0-1 (14.6%)
+- Ajuste de baja anotacion: victoria Egypt 18.5% | empate 28.4% | victoria Iran 53.1% | marcador mas probable 0-1 (13.3%)
+- Ensamble ligero: victoria Egypt 18.8% | empate 27.0% | victoria Iran 54.2% | marcador mas probable 0-1 (14.7%)
 - Marcadores mas probables: 0-1 14.7%, 1-1 12.1%, 0-2 11.0%, 0-0 10.4%, 1-2 9.2%
 
 ### New Zealand vs Belgium
@@ -1532,6 +1857,11 @@ _Todavia no hay suficientes partidos terminados para medir como viene acertando 
 - Que tanto coinciden los modelos entre si: 99.5%
 - Stack estadistico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotacion + Ensamble ligero
 - Factores dominantes: Elo dinámico -263.000; Ranking FIFA / puntos FIFA -0.541; Historia mundialista -0.330
+- Comparativa entre modelos:
+- Bivariante Poisson: victoria New Zealand 2.9% | empate 14.5% | victoria Belgium 82.6% | marcador mas probable 0-2 (20.6%)
+- Poisson independiente: victoria New Zealand 3.5% | empate 14.5% | victoria Belgium 82.1% | marcador mas probable 0-2 (20.5%)
+- Ajuste de baja anotacion: victoria New Zealand 3.3% | empate 14.8% | victoria Belgium 81.9% | marcador mas probable 0-2 (20.5%)
+- Ensamble ligero: victoria New Zealand 3.1% | empate 14.5% | victoria Belgium 82.4% | marcador mas probable 0-2 (20.6%)
 - Marcadores mas probables: 0-2 20.6%, 0-1 19.1%, 0-3 14.7%, 0-0 8.9%, 0-4 7.9%
 
 ### Croatia vs Ghana
@@ -1551,6 +1881,11 @@ _Todavia no hay suficientes partidos terminados para medir como viene acertando 
 - Que tanto coinciden los modelos entre si: 99.8%
 - Stack estadistico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotacion + Ensamble ligero
 - Factores dominantes: Elo dinámico +423.000; Ranking FIFA / puntos FIFA +0.438; Profundidad de banco +0.359
+- Comparativa entre modelos:
+- Bivariante Poisson: victoria Croatia 89.2% | empate 10.0% | victoria Ghana 0.8% | marcador mas probable 2-0 (23.6%)
+- Poisson independiente: victoria Croatia 89.0% | empate 10.1% | victoria Ghana 0.9% | marcador mas probable 2-0 (23.5%)
+- Ajuste de baja anotacion: victoria Croatia 89.0% | empate 10.1% | victoria Ghana 0.9% | marcador mas probable 2-0 (23.5%)
+- Ensamble ligero: victoria Croatia 89.1% | empate 10.1% | victoria Ghana 0.8% | marcador mas probable 2-0 (23.6%)
 - Marcadores mas probables: 2-0 23.6%, 1-0 19.6%, 3-0 19.0%, 4-0 11.4%, 0-0 8.1%
 
 ### Panama vs England
@@ -1570,6 +1905,11 @@ _Todavia no hay suficientes partidos terminados para medir como viene acertando 
 - Que tanto coinciden los modelos entre si: 99.6%
 - Stack estadistico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotacion + Ensamble ligero
 - Factores dominantes: Elo dinámico -309.000; Recursos/PIB proxy -0.551; Historia mundialista -0.430
+- Comparativa entre modelos:
+- Bivariante Poisson: victoria Panama 1.8% | empate 12.4% | victoria England 85.8% | marcador mas probable 0-2 (22.0%)
+- Poisson independiente: victoria Panama 2.2% | empate 12.4% | victoria England 85.4% | marcador mas probable 0-2 (21.9%)
+- Ajuste de baja anotacion: victoria Panama 2.1% | empate 12.6% | victoria England 85.3% | marcador mas probable 0-2 (21.9%)
+- Ensamble ligero: victoria Panama 1.9% | empate 12.4% | victoria England 85.7% | marcador mas probable 0-2 (22.0%)
 - Marcadores mas probables: 0-2 22.0%, 0-1 19.3%, 0-3 16.6%, 0-4 9.4%, 0-0 8.5%
 
 ### Colombia vs Portugal
@@ -1590,6 +1930,11 @@ _Todavia no hay suficientes partidos terminados para medir como viene acertando 
 - Que tanto coinciden los modelos entre si: 97.2%
 - Stack estadistico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotacion + Ensamble ligero
 - Factores dominantes: Elo dinámico +22.000; Recursos/PIB proxy -0.108; Disciplina estructural -0.099
+- Comparativa entre modelos:
+- Bivariante Poisson: victoria Colombia 35.9% | empate 29.7% | victoria Portugal 34.4% | marcador mas probable 1-1 (13.3%)
+- Poisson independiente: victoria Colombia 36.6% | empate 28.2% | victoria Portugal 35.2% | marcador mas probable 1-1 (13.2%)
+- Ajuste de baja anotacion: victoria Colombia 34.5% | empate 32.3% | victoria Portugal 33.1% | marcador mas probable 1-1 (15.3%)
+- Ensamble ligero: victoria Colombia 35.7% | empate 30.0% | victoria Portugal 34.3% | marcador mas probable 1-1 (13.7%)
 - Marcadores mas probables: 1-1 13.7%, 1-0 11.2%, 0-1 10.9%, 0-0 10.8%, 2-1 7.8%
 
 ### Dem. Rep. of Congo vs Uzbekistan
@@ -1610,6 +1955,11 @@ _Todavia no hay suficientes partidos terminados para medir como viene acertando 
 - Que tanto coinciden los modelos entre si: 98.3%
 - Stack estadistico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotacion + Ensamble ligero
 - Factores dominantes: Elo dinámico -89.000; Recursos/PIB proxy -0.149; Portero -0.071
+- Comparativa entre modelos:
+- Bivariante Poisson: victoria Dem. Rep. of Congo 17.8% | empate 26.9% | victoria Uzbekistan 55.3% | marcador mas probable 0-1 (15.5%)
+- Poisson independiente: victoria Dem. Rep. of Congo 19.1% | empate 25.7% | victoria Uzbekistan 55.2% | marcador mas probable 0-1 (15.0%)
+- Ajuste de baja anotacion: victoria Dem. Rep. of Congo 17.8% | empate 28.2% | victoria Uzbekistan 53.9% | marcador mas probable 0-1 (13.7%)
+- Ensamble ligero: victoria Dem. Rep. of Congo 18.1% | empate 26.9% | victoria Uzbekistan 55.0% | marcador mas probable 0-1 (15.1%)
 - Marcadores mas probables: 0-1 15.1%, 1-1 12.0%, 0-2 11.3%, 0-0 10.6%, 1-2 9.2%
 
 ### Algeria vs Austria
@@ -1629,6 +1979,11 @@ _Todavia no hay suficientes partidos terminados para medir como viene acertando 
 - Que tanto coinciden los modelos entre si: 98.6%
 - Stack estadistico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotacion + Ensamble ligero
 - Factores dominantes: Elo dinámico -144.000; Historia mundialista -0.170; Recursos/PIB proxy -0.164
+- Comparativa entre modelos:
+- Bivariante Poisson: victoria Algeria 10.4% | empate 22.8% | victoria Austria 66.8% | marcador mas probable 0-1 (17.2%)
+- Poisson independiente: victoria Algeria 11.8% | empate 22.0% | victoria Austria 66.2% | marcador mas probable 0-1 (16.5%)
+- Ajuste de baja anotacion: victoria Algeria 11.0% | empate 23.6% | victoria Austria 65.5% | marcador mas probable 0-1 (15.7%)
+- Ensamble ligero: victoria Algeria 10.7% | empate 22.8% | victoria Austria 66.5% | marcador mas probable 0-1 (16.8%)
 - Marcadores mas probables: 0-1 16.8%, 0-2 14.6%, 0-0 10.0%, 1-1 9.8%, 1-2 8.9%
 
 ### Jordan vs Argentina
@@ -1649,6 +2004,11 @@ _Todavia no hay suficientes partidos terminados para medir como viene acertando 
 - Que tanto coinciden los modelos entre si: 99.8%
 - Stack estadistico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotacion + Ensamble ligero
 - Factores dominantes: Elo dinámico -422.000; Historia mundialista -0.660; Ranking FIFA / puntos FIFA -0.580
+- Comparativa entre modelos:
+- Bivariante Poisson: victoria Jordan 0.7% | empate 10.0% | victoria Argentina 89.3% | marcador mas probable 0-2 (23.8%)
+- Poisson independiente: victoria Jordan 0.9% | empate 10.0% | victoria Argentina 89.1% | marcador mas probable 0-2 (23.8%)
+- Ajuste de baja anotacion: victoria Jordan 0.8% | empate 10.1% | victoria Argentina 89.1% | marcador mas probable 0-2 (23.8%)
+- Ensamble ligero: victoria Jordan 0.8% | empate 10.0% | victoria Argentina 89.3% | marcador mas probable 0-2 (23.8%)
 - Marcadores mas probables: 0-2 23.8%, 0-1 19.8%, 0-3 19.1%, 0-4 11.5%, 0-0 8.2%
 
 ### Dieciseisavos 1: South Korea vs Canada
@@ -1670,12 +2030,17 @@ _Todavia no hay suficientes partidos terminados para medir como viene acertando 
 - Que tanto coinciden los modelos entre si: 97.0%
 - Stack estadistico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotacion + Ensamble ligero
 - Factores dominantes: Elo dinámico -22.000; Recursos/PIB proxy -0.112; Historia mundialista +0.100
+- Comparativa entre modelos:
+- Bivariante Poisson: victoria South Korea 30.7% | empate 30.1% | victoria Canada 39.1% | marcador mas probable 1-1 (13.3%)
+- Poisson independiente: victoria South Korea 31.7% | empate 28.5% | victoria Canada 39.8% | marcador mas probable 1-1 (13.3%)
+- Ajuste de baja anotacion: victoria South Korea 29.5% | empate 33.0% | victoria Canada 37.6% | marcador mas probable 1-1 (15.5%)
+- Ensamble ligero: victoria South Korea 30.6% | empate 30.5% | victoria Canada 38.9% | marcador mas probable 1-1 (13.8%)
 - Quien tiene mas probabilidad de avanzar: South Korea 45.6% | Canada 54.4%
 - Si empatan tras 90': gana en prorroga South Korea 17.8% | siguen empatados 60.8% | Canada 21.4%
 - Si llegan a penales: South Korea 51.6% | Canada 48.4%
 - Marcador mas probable de la tanda: 4-3
-- Marcador medio esperado en la tanda: South Korea 3.72 | Canada 3.73
-- Marcadores de tanda mas probables: 4-3 10.9%, 3-4 10.6%, 4-5 10.2%, 4-2 9.3%, 2-4 7.9%
+- Marcador medio esperado en la tanda: South Korea 3.77 | Canada 3.75
+- Marcadores de tanda mas probables: 4-3 10.1%, 4-5 9.9%, 4-2 9.2%, 3-4 8.9%, 2-4 8.6%
 - Marcadores mas probables: 1-1 13.8%, 0-1 12.2%, 0-0 11.6%, 1-0 10.4%, 1-2 8.0%
 
 ### Dieciseisavos 2: Germany vs Bosnia and Herzegovina
@@ -1698,12 +2063,17 @@ _Todavia no hay suficientes partidos terminados para medir como viene acertando 
 - Que tanto coinciden los modelos entre si: 99.7%
 - Stack estadistico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotacion + Ensamble ligero
 - Factores dominantes: Elo dinámico +339.000; Historia mundialista +0.570; Recursos/PIB proxy +0.464
+- Comparativa entre modelos:
+- Bivariante Poisson: victoria Germany 86.2% | empate 12.5% | victoria Bosnia and Herzegovina 1.3% | marcador mas probable 2-0 (23.5%)
+- Poisson independiente: victoria Germany 86.0% | empate 12.5% | victoria Bosnia and Herzegovina 1.5% | marcador mas probable 2-0 (23.4%)
+- Ajuste de baja anotacion: victoria Germany 85.9% | empate 12.7% | victoria Bosnia and Herzegovina 1.4% | marcador mas probable 2-0 (23.4%)
+- Ensamble ligero: victoria Germany 86.1% | empate 12.5% | victoria Bosnia and Herzegovina 1.4% | marcador mas probable 2-0 (23.5%)
 - Quien tiene mas probabilidad de avanzar: Germany 95.8% | Bosnia and Herzegovina 4.2%
 - Si empatan tras 90': gana en prorroga Germany 46.1% | siguen empatados 52.1% | Bosnia and Herzegovina 1.8%
 - Si llegan a penales: Germany 59.9% | Bosnia and Herzegovina 40.1%
-- Marcador mas probable de la tanda: 4-2
-- Marcador medio esperado en la tanda: Germany 3.95 | Bosnia and Herzegovina 3.43
-- Marcadores de tanda mas probables: 4-2 13.1%, 4-3 12.6%, 5-4 11.2%, 3-4 6.9%, 2-4 6.8%
+- Marcador mas probable de la tanda: 4-3
+- Marcador medio esperado en la tanda: Germany 3.94 | Bosnia and Herzegovina 3.42
+- Marcadores de tanda mas probables: 4-3 12.6%, 4-2 11.4%, 5-4 11.4%, 4-5 7.1%, 5-3 6.8%
 - Marcadores mas probables: 2-0 23.5%, 1-0 21.3%, 3-0 17.3%, 0-0 9.7%, 4-0 9.5%
 
 ### Dieciseisavos 3: Netherlands vs Morocco
@@ -1725,12 +2095,17 @@ _Todavia no hay suficientes partidos terminados para medir como viene acertando 
 - Que tanto coinciden los modelos entre si: 98.5%
 - Stack estadistico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotacion + Ensamble ligero
 - Factores dominantes: Elo dinámico +153.000; Historia mundialista +0.250; Recursos/PIB proxy +0.195
+- Comparativa entre modelos:
+- Bivariante Poisson: victoria Netherlands 68.0% | empate 22.7% | victoria Morocco 9.3% | marcador mas probable 1-0 (18.3%)
+- Poisson independiente: victoria Netherlands 67.5% | empate 21.9% | victoria Morocco 10.6% | marcador mas probable 1-0 (17.6%)
+- Ajuste de baja anotacion: victoria Netherlands 66.6% | empate 23.7% | victoria Morocco 9.8% | marcador mas probable 1-0 (16.7%)
+- Ensamble ligero: victoria Netherlands 67.7% | empate 22.7% | victoria Morocco 9.6% | marcador mas probable 1-0 (17.9%)
 - Quien tiene mas probabilidad de avanzar: Netherlands 82.7% | Morocco 17.3%
 - Si empatan tras 90': gana en prorroga Netherlands 35.1% | siguen empatados 56.9% | Morocco 8.0%
 - Si llegan a penales: Netherlands 54.5% | Morocco 45.5%
 - Marcador mas probable de la tanda: 5-4
 - Marcador medio esperado en la tanda: Netherlands 3.87 | Morocco 3.74
-- Marcadores de tanda mas probables: 5-4 11.6%, 4-2 9.4%, 3-4 9.3%, 4-5 9.3%, 4-3 8.6%
+- Marcadores de tanda mas probables: 5-4 10.2%, 4-5 9.6%, 4-2 9.5%, 4-3 9.4%, 3-4 8.8%
 - Marcadores mas probables: 1-0 17.9%, 2-0 15.4%, 0-0 10.7%, 1-1 9.4%, 3-0 8.8%
 
 ### Dieciseisavos 4: Brazil vs Japan
@@ -1753,12 +2128,17 @@ _Todavia no hay suficientes partidos terminados para medir como viene acertando 
 - Que tanto coinciden los modelos entre si: 98.2%
 - Stack estadistico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotacion + Ensamble ligero
 - Factores dominantes: Elo dinámico +100.000; Historia mundialista +0.710; Trayectoria futbolística +0.272
+- Comparativa entre modelos:
+- Bivariante Poisson: victoria Brazil 62.1% | empate 25.1% | victoria Japan 12.8% | marcador mas probable 1-0 (17.3%)
+- Poisson independiente: victoria Brazil 61.8% | empate 24.0% | victoria Japan 14.2% | marcador mas probable 1-0 (16.7%)
+- Ajuste de baja anotacion: victoria Brazil 60.6% | empate 26.4% | victoria Japan 13.0% | marcador mas probable 1-0 (15.5%)
+- Ensamble ligero: victoria Brazil 61.7% | empate 25.2% | victoria Japan 13.1% | marcador mas probable 1-0 (16.9%)
 - Quien tiene mas probabilidad de avanzar: Brazil 78.2% | Japan 21.8%
 - Si empatan tras 90': gana en prorroga Brazil 32.1% | siguen empatados 58.1% | Japan 9.9%
 - Si llegan a penales: Brazil 57.2% | Japan 42.8%
-- Marcador mas probable de la tanda: 4-3
-- Marcador medio esperado en la tanda: Brazil 3.97 | Japan 3.69
-- Marcadores de tanda mas probables: 4-3 12.4%, 4-2 10.8%, 5-4 9.8%, 4-5 8.3%, 3-4 7.4%
+- Marcador mas probable de la tanda: 4-2
+- Marcador medio esperado en la tanda: Brazil 3.94 | Japan 3.62
+- Marcadores de tanda mas probables: 4-2 11.6%, 5-4 10.8%, 4-3 9.9%, 3-4 7.9%, 2-4 7.5%
 - Marcadores mas probables: 1-0 16.9%, 2-0 13.5%, 0-0 11.0%, 1-1 10.8%, 2-1 8.9%
 
 ### Dieciseisavos 5: France vs Egypt
@@ -1781,12 +2161,17 @@ _Todavia no hay suficientes partidos terminados para medir como viene acertando 
 - Que tanto coinciden los modelos entre si: 99.8%
 - Stack estadistico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotacion + Ensamble ligero
 - Factores dominantes: Elo dinámico +403.000; Historia mundialista +0.460; Ranking FIFA / puntos FIFA +0.375
+- Comparativa entre modelos:
+- Bivariante Poisson: victoria France 88.0% | empate 11.2% | victoria Egypt 0.9% | marcador mas probable 2-0 (24.1%)
+- Poisson independiente: victoria France 87.8% | empate 11.2% | victoria Egypt 1.0% | marcador mas probable 2-0 (24.0%)
+- Ajuste de baja anotacion: victoria France 87.7% | empate 11.3% | victoria Egypt 1.0% | marcador mas probable 2-0 (24.0%)
+- Ensamble ligero: victoria France 87.9% | empate 11.2% | victoria Egypt 0.9% | marcador mas probable 2-0 (24.1%)
 - Quien tiene mas probabilidad de avanzar: France 96.6% | Egypt 3.4%
 - Si empatan tras 90': gana en prorroga France 47.7% | siguen empatados 51.0% | Egypt 1.3%
 - Si llegan a penales: France 58.6% | Egypt 41.4%
-- Marcador mas probable de la tanda: 4-2
-- Marcador medio esperado en la tanda: France 3.93 | Egypt 3.51
-- Marcadores de tanda mas probables: 4-2 11.1%, 5-4 11.1%, 4-3 11.1%, 4-5 7.2%, 3-4 7.1%
+- Marcador mas probable de la tanda: 4-3
+- Marcador medio esperado en la tanda: France 3.99 | Egypt 3.55
+- Marcadores de tanda mas probables: 4-3 13.2%, 4-2 12.0%, 5-4 11.6%, 3-4 8.0%, 2-4 6.2%
 - Marcadores mas probables: 2-0 24.1%, 1-0 20.9%, 3-0 18.4%, 4-0 10.6%, 0-0 9.1%
 
 ### Dieciseisavos 6: Ecuador vs Norway
@@ -1808,12 +2193,17 @@ _Todavia no hay suficientes partidos terminados para medir como viene acertando 
 - Que tanto coinciden los modelos entre si: 96.8%
 - Stack estadistico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotacion + Ensamble ligero
 - Factores dominantes: Elo dinámico +11.000; Recursos/PIB proxy -0.149; Portero -0.128
+- Comparativa entre modelos:
+- Bivariante Poisson: victoria Ecuador 34.5% | empate 30.4% | victoria Norway 35.1% | marcador mas probable 1-1 (13.4%)
+- Poisson independiente: victoria Ecuador 35.3% | empate 28.8% | victoria Norway 35.9% | marcador mas probable 1-1 (13.3%)
+- Ajuste de baja anotacion: victoria Ecuador 32.9% | empate 33.5% | victoria Norway 33.5% | marcador mas probable 1-1 (15.7%)
+- Ensamble ligero: victoria Ecuador 34.3% | empate 30.8% | victoria Norway 34.9% | marcador mas probable 1-1 (13.9%)
 - Quien tiene mas probabilidad de avanzar: Ecuador 49.1% | Norway 50.9%
 - Si empatan tras 90': gana en prorroga Ecuador 19.2% | siguen empatados 61.3% | Norway 19.5%
 - Si llegan a penales: Ecuador 47.1% | Norway 52.9%
-- Marcador mas probable de la tanda: 2-4
-- Marcador medio esperado en la tanda: Ecuador 3.76 | Norway 3.86
-- Marcadores de tanda mas probables: 2-4 10.7%, 3-4 10.1%, 4-5 9.9%, 4-3 9.2%, 5-4 9.0%
+- Marcador mas probable de la tanda: 3-4
+- Marcador medio esperado en la tanda: Ecuador 3.73 | Norway 3.85
+- Marcadores de tanda mas probables: 3-4 11.2%, 4-5 9.7%, 2-4 9.7%, 4-3 9.3%, 5-4 8.6%
 - Marcadores mas probables: 1-1 13.9%, 0-0 11.8%, 0-1 11.4%, 1-0 11.3%, 1-2 7.5%
 
 ### Dieciseisavos 7: Mexico vs Scotland
@@ -1835,12 +2225,17 @@ _Todavia no hay suficientes partidos terminados para medir como viene acertando 
 - Que tanto coinciden los modelos entre si: 97.8%
 - Stack estadistico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotacion + Ensamble ligero
 - Factores dominantes: Elo dinámico +63.000; Ranking FIFA / puntos FIFA +0.202; Recursos/PIB proxy +0.196
+- Comparativa entre modelos:
+- Bivariante Poisson: victoria Mexico 52.6% | empate 27.3% | victoria Scotland 20.1% | marcador mas probable 1-0 (14.6%)
+- Poisson independiente: victoria Mexico 52.6% | empate 26.0% | victoria Scotland 21.3% | marcador mas probable 1-0 (14.1%)
+- Ajuste de baja anotacion: victoria Mexico 51.0% | empate 29.3% | victoria Scotland 19.7% | marcador mas probable 1-1 (13.8%)
+- Ensamble ligero: victoria Mexico 52.2% | empate 27.5% | victoria Scotland 20.3% | marcador mas probable 1-0 (14.1%)
 - Quien tiene mas probabilidad de avanzar: Mexico 68.2% | Scotland 31.8%
 - Si empatan tras 90': gana en prorroga Mexico 28.0% | siguen empatados 58.5% | Scotland 13.5%
 - Si llegan a penales: Mexico 51.2% | Scotland 48.8%
-- Marcador mas probable de la tanda: 4-2
-- Marcador medio esperado en la tanda: Mexico 3.85 | Scotland 3.76
-- Marcadores de tanda mas probables: 4-2 10.6%, 4-3 10.3%, 4-5 9.3%, 3-4 8.9%, 5-4 8.8%
+- Marcador mas probable de la tanda: 4-5
+- Marcador medio esperado en la tanda: Mexico 3.83 | Scotland 3.78
+- Marcadores de tanda mas probables: 4-5 10.4%, 3-4 10.4%, 5-4 10.4%, 4-3 9.6%, 4-2 8.8%
 - Marcadores mas probables: 1-0 14.1%, 1-1 12.4%, 2-0 10.4%, 0-0 10.3%, 2-1 9.2%
 
 ### Dieciseisavos 8: England vs Uzbekistan
@@ -1863,12 +2258,17 @@ _Todavia no hay suficientes partidos terminados para medir como viene acertando 
 - Que tanto coinciden los modelos entre si: 99.6%
 - Stack estadistico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotacion + Ensamble ligero
 - Factores dominantes: Elo dinámico +314.000; Ranking FIFA / puntos FIFA +0.446; Historia mundialista +0.440
+- Comparativa entre modelos:
+- Bivariante Poisson: victoria England 84.8% | empate 13.4% | victoria Uzbekistan 1.8% | marcador mas probable 2-0 (22.5%)
+- Poisson independiente: victoria England 84.4% | empate 13.4% | victoria Uzbekistan 2.2% | marcador mas probable 2-0 (22.4%)
+- Ajuste de baja anotacion: victoria England 84.3% | empate 13.7% | victoria Uzbekistan 2.0% | marcador mas probable 2-0 (22.4%)
+- Ensamble ligero: victoria England 84.6% | empate 13.4% | victoria Uzbekistan 1.9% | marcador mas probable 2-0 (22.5%)
 - Quien tiene mas probabilidad de avanzar: England 94.6% | Uzbekistan 5.4%
 - Si empatan tras 90': gana en prorroga England 45.2% | siguen empatados 52.4% | Uzbekistan 2.4%
 - Si llegan a penales: England 54.6% | Uzbekistan 45.4%
 - Marcador mas probable de la tanda: 4-2
-- Marcador medio esperado en la tanda: England 3.87 | Uzbekistan 3.59
-- Marcadores de tanda mas probables: 4-2 12.8%, 4-3 10.5%, 3-4 9.4%, 5-4 8.8%, 4-5 8.3%
+- Marcador medio esperado en la tanda: England 3.93 | Uzbekistan 3.61
+- Marcadores de tanda mas probables: 4-2 12.4%, 4-3 10.8%, 5-4 10.2%, 4-5 8.6%, 3-4 8.2%
 - Marcadores mas probables: 2-0 22.5%, 1-0 20.7%, 3-0 16.3%, 0-0 9.6%, 4-0 8.8%
 
 ### Dieciseisavos 9: Turkey vs Bosnia and Herzegovina
@@ -1890,12 +2290,17 @@ _Todavia no hay suficientes partidos terminados para medir como viene acertando 
 - Que tanto coinciden los modelos entre si: 99.5%
 - Stack estadistico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotacion + Ensamble ligero
 - Factores dominantes: Elo dinámico +309.000; Recursos/PIB proxy +0.301; Ranking FIFA / puntos FIFA +0.264
+- Comparativa entre modelos:
+- Bivariante Poisson: victoria Turkey 83.2% | empate 14.4% | victoria Bosnia and Herzegovina 2.4% | marcador mas probable 2-0 (21.7%)
+- Poisson independiente: victoria Turkey 82.8% | empate 14.4% | victoria Bosnia and Herzegovina 2.8% | marcador mas probable 2-0 (21.7%)
+- Ajuste de baja anotacion: victoria Turkey 82.6% | empate 14.8% | victoria Bosnia and Herzegovina 2.6% | marcador mas probable 2-0 (21.7%)
+- Ensamble ligero: victoria Turkey 83.0% | empate 14.5% | victoria Bosnia and Herzegovina 2.5% | marcador mas probable 2-0 (21.7%)
 - Quien tiene mas probabilidad de avanzar: Turkey 93.5% | Bosnia and Herzegovina 6.5%
 - Si empatan tras 90': gana en prorroga Turkey 44.0% | siguen empatados 53.0% | Bosnia and Herzegovina 2.9%
 - Si llegan a penales: Turkey 53.1% | Bosnia and Herzegovina 46.9%
-- Marcador mas probable de la tanda: 4-2
-- Marcador medio esperado en la tanda: Turkey 3.81 | Bosnia and Herzegovina 3.55
-- Marcadores de tanda mas probables: 4-2 10.6%, 4-3 10.4%, 5-4 9.9%, 4-5 8.2%, 3-4 7.8%
+- Marcador mas probable de la tanda: 4-3
+- Marcador medio esperado en la tanda: Turkey 3.76 | Bosnia and Herzegovina 3.51
+- Marcadores de tanda mas probables: 4-3 11.5%, 4-2 10.2%, 5-4 9.3%, 3-4 7.9%, 2-4 7.7%
 - Marcadores mas probables: 2-0 21.7%, 1-0 20.5%, 3-0 15.3%, 0-0 9.7%, 4-0 8.1%
 
 ### Dieciseisavos 10: Belgium vs Czech Republic
@@ -1917,12 +2322,17 @@ _Todavia no hay suficientes partidos terminados para medir como viene acertando 
 - Que tanto coinciden los modelos entre si: 98.2%
 - Stack estadistico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotacion + Ensamble ligero
 - Factores dominantes: Elo dinámico +118.000; Ranking FIFA / puntos FIFA +0.292; Profundidad de banco +0.106
+- Comparativa entre modelos:
+- Bivariante Poisson: victoria Belgium 61.4% | empate 25.3% | victoria Czech Republic 13.4% | marcador mas probable 1-0 (17.0%)
+- Poisson independiente: victoria Belgium 61.1% | empate 24.1% | victoria Czech Republic 14.8% | marcador mas probable 1-0 (16.3%)
+- Ajuste de baja anotacion: victoria Belgium 59.9% | empate 26.6% | victoria Czech Republic 13.6% | marcador mas probable 1-0 (15.1%)
+- Ensamble ligero: victoria Belgium 61.0% | empate 25.3% | victoria Czech Republic 13.7% | marcador mas probable 1-0 (16.5%)
 - Quien tiene mas probabilidad de avanzar: Belgium 76.6% | Czech Republic 23.4%
 - Si empatan tras 90': gana en prorroga Belgium 31.8% | siguen empatados 58.0% | Czech Republic 10.2%
 - Si llegan a penales: Belgium 51.5% | Czech Republic 48.5%
-- Marcador mas probable de la tanda: 4-3
-- Marcador medio esperado en la tanda: Belgium 3.85 | Czech Republic 3.78
-- Marcadores de tanda mas probables: 4-3 10.3%, 3-4 10.1%, 5-4 9.8%, 4-5 9.1%, 4-2 8.1%
+- Marcador mas probable de la tanda: 3-4
+- Marcador medio esperado en la tanda: Belgium 3.81 | Czech Republic 3.78
+- Marcadores de tanda mas probables: 3-4 10.1%, 5-4 10.0%, 4-2 9.8%, 4-3 9.6%, 4-5 9.0%
 - Marcadores mas probables: 1-0 16.5%, 2-0 13.2%, 1-1 11.0%, 0-0 10.8%, 2-1 9.0%
 
 ### Dieciseisavos 11: Portugal vs Croatia
@@ -1944,12 +2354,17 @@ _Todavia no hay suficientes partidos terminados para medir como viene acertando 
 - Que tanto coinciden los modelos entre si: 97.3%
 - Stack estadistico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotacion + Ensamble ligero
 - Factores dominantes: Elo dinámico +44.000; Portero +0.075; Ranking FIFA / puntos FIFA +0.052
+- Comparativa entre modelos:
+- Bivariante Poisson: victoria Portugal 44.3% | empate 29.6% | victoria Croatia 26.1% | marcador mas probable 1-0 (13.8%)
+- Poisson independiente: victoria Portugal 44.7% | empate 28.0% | victoria Croatia 27.3% | marcador mas probable 1-0 (13.6%)
+- Ajuste de baja anotacion: victoria Portugal 42.7% | empate 32.1% | victoria Croatia 25.3% | marcador mas probable 1-1 (15.0%)
+- Ensamble ligero: victoria Portugal 44.0% | empate 29.8% | victoria Croatia 26.2% | marcador mas probable 1-1 (13.4%)
 - Quien tiene mas probabilidad de avanzar: Portugal 60.4% | Croatia 39.6%
 - Si empatan tras 90': gana en prorroga Portugal 23.8% | siguen empatados 60.4% | Croatia 15.9%
 - Si llegan a penales: Portugal 51.5% | Croatia 48.5%
-- Marcador mas probable de la tanda: 4-5
-- Marcador medio esperado en la tanda: Portugal 3.90 | Croatia 3.90
-- Marcadores de tanda mas probables: 4-5 10.9%, 4-3 9.9%, 5-4 9.8%, 3-4 8.8%, 2-4 8.7%
+- Marcador mas probable de la tanda: 5-4
+- Marcador medio esperado en la tanda: Portugal 3.82 | Croatia 3.90
+- Marcadores de tanda mas probables: 5-4 10.1%, 3-4 9.9%, 2-4 8.9%, 4-2 8.8%, 4-5 8.7%
 - Marcadores mas probables: 1-1 13.4%, 1-0 13.3%, 0-0 11.4%, 0-1 9.4%, 2-0 8.6%
 
 ### Dieciseisavos 12: Spain vs Austria
@@ -1971,12 +2386,17 @@ _Todavia no hay suficientes partidos terminados para medir como viene acertando 
 - Que tanto coinciden los modelos entre si: 99.6%
 - Stack estadistico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotacion + Ensamble ligero
 - Factores dominantes: Elo dinámico +353.000; Ranking FIFA / puntos FIFA +0.349; Historia mundialista +0.180
+- Comparativa entre modelos:
+- Bivariante Poisson: victoria Spain 85.6% | empate 12.8% | victoria Austria 1.7% | marcador mas probable 2-0 (22.6%)
+- Poisson independiente: victoria Spain 85.2% | empate 12.8% | victoria Austria 2.0% | marcador mas probable 2-0 (22.5%)
+- Ajuste de baja anotacion: victoria Spain 85.1% | empate 13.1% | victoria Austria 1.8% | marcador mas probable 2-0 (22.5%)
+- Ensamble ligero: victoria Spain 85.4% | empate 12.8% | victoria Austria 1.7% | marcador mas probable 2-0 (22.6%)
 - Quien tiene mas probabilidad de avanzar: Spain 94.9% | Austria 5.1%
 - Si empatan tras 90': gana en prorroga Spain 45.9% | siguen empatados 51.8% | Austria 2.2%
 - Si llegan a penales: Spain 53.5% | Austria 46.5%
-- Marcador mas probable de la tanda: 4-3
-- Marcador medio esperado en la tanda: Spain 3.96 | Austria 3.79
-- Marcadores de tanda mas probables: 4-3 10.2%, 5-4 9.9%, 4-2 9.2%, 3-4 9.0%, 4-5 8.8%
+- Marcador mas probable de la tanda: 4-2
+- Marcador medio esperado en la tanda: Spain 3.87 | Austria 3.65
+- Marcadores de tanda mas probables: 4-2 11.8%, 5-4 10.1%, 4-3 9.1%, 4-5 8.9%, 3-4 7.1%
 - Marcadores mas probables: 2-0 22.6%, 1-0 20.4%, 3-0 16.7%, 4-0 9.2%, 0-0 9.2%
 
 ### Dieciseisavos 13: Switzerland vs Egypt
@@ -1998,12 +2418,17 @@ _Todavia no hay suficientes partidos terminados para medir como viene acertando 
 - Que tanto coinciden los modelos entre si: 99.2%
 - Stack estadistico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotacion + Ensamble ligero
 - Factores dominantes: Elo dinámico +237.000; Profundidad de banco +0.237; Recursos/PIB proxy +0.204
+- Comparativa entre modelos:
+- Bivariante Poisson: victoria Switzerland 78.7% | empate 17.2% | victoria Egypt 4.2% | marcador mas probable 1-0 (20.0%)
+- Poisson independiente: victoria Switzerland 78.1% | empate 17.0% | victoria Egypt 4.9% | marcador mas probable 2-0 (19.6%)
+- Ajuste de baja anotacion: victoria Switzerland 77.7% | empate 17.8% | victoria Egypt 4.5% | marcador mas probable 2-0 (19.6%)
+- Ensamble ligero: victoria Switzerland 78.4% | empate 17.2% | victoria Egypt 4.4% | marcador mas probable 1-0 (19.7%)
 - Quien tiene mas probabilidad de avanzar: Switzerland 90.7% | Egypt 9.3%
 - Si empatan tras 90': gana en prorroga Switzerland 41.1% | siguen empatados 54.4% | Egypt 4.5%
 - Si llegan a penales: Switzerland 55.2% | Egypt 44.8%
-- Marcador mas probable de la tanda: 4-2
-- Marcador medio esperado en la tanda: Switzerland 3.87 | Egypt 3.54
-- Marcadores de tanda mas probables: 4-2 11.9%, 4-3 11.1%, 5-4 9.4%, 4-5 8.5%, 2-4 7.4%
+- Marcador mas probable de la tanda: 5-4
+- Marcador medio esperado en la tanda: Switzerland 3.97 | Egypt 3.62
+- Marcadores de tanda mas probables: 5-4 12.3%, 4-2 11.1%, 4-3 10.8%, 3-4 8.4%, 4-5 8.2%
 - Marcadores mas probables: 1-0 19.7%, 2-0 19.6%, 3-0 12.9%, 0-0 10.1%, 4-0 6.4%
 
 ### Dieciseisavos 14: Argentina vs Uruguay
@@ -2026,12 +2451,17 @@ _Todavia no hay suficientes partidos terminados para medir como viene acertando 
 - Que tanto coinciden los modelos entre si: 99.0%
 - Stack estadistico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotacion + Ensamble ligero
 - Factores dominantes: Elo dinámico +223.000; Ranking FIFA / puntos FIFA +0.240; Recursos/PIB proxy +0.182
+- Comparativa entre modelos:
+- Bivariante Poisson: victoria Argentina 75.8% | empate 18.8% | victoria Uruguay 5.4% | marcador mas probable 1-0 (19.7%)
+- Poisson independiente: victoria Argentina 75.2% | empate 18.5% | victoria Uruguay 6.3% | marcador mas probable 1-0 (19.0%)
+- Ajuste de baja anotacion: victoria Argentina 74.7% | empate 19.5% | victoria Uruguay 5.8% | marcador mas probable 1-0 (18.5%)
+- Ensamble ligero: victoria Argentina 75.5% | empate 18.9% | victoria Uruguay 5.6% | marcador mas probable 1-0 (19.4%)
 - Quien tiene mas probabilidad de avanzar: Argentina 88.4% | Uruguay 11.6%
 - Si empatan tras 90': gana en prorroga Argentina 39.3% | siguen empatados 55.3% | Uruguay 5.4%
 - Si llegan a penales: Argentina 52.1% | Uruguay 47.9%
 - Marcador mas probable de la tanda: 4-3
-- Marcador medio esperado en la tanda: Argentina 3.80 | Uruguay 3.66
-- Marcadores de tanda mas probables: 4-3 10.6%, 4-2 10.2%, 3-4 10.0%, 5-4 8.6%, 2-4 8.6%
+- Marcador medio esperado en la tanda: Argentina 3.88 | Uruguay 3.75
+- Marcadores de tanda mas probables: 4-3 10.8%, 5-4 9.4%, 4-2 9.2%, 2-4 8.4%, 4-5 8.2%
 - Marcadores mas probables: 1-0 19.4%, 2-0 18.5%, 3-0 11.7%, 0-0 10.3%, 1-1 7.1%
 
 ### Dieciseisavos 15: Colombia vs Panama
@@ -2054,12 +2484,17 @@ _Todavia no hay suficientes partidos terminados para medir como viene acertando 
 - Que tanto coinciden los modelos entre si: 99.3%
 - Stack estadistico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotacion + Ensamble ligero
 - Factores dominantes: Elo dinámico +265.000; Historia mundialista +0.250; Recursos/PIB proxy +0.237
+- Comparativa entre modelos:
+- Bivariante Poisson: victoria Colombia 80.3% | empate 16.2% | victoria Panama 3.4% | marcador mas probable 2-0 (20.5%)
+- Poisson independiente: victoria Colombia 79.8% | empate 16.1% | victoria Panama 4.1% | marcador mas probable 2-0 (20.4%)
+- Ajuste de baja anotacion: victoria Colombia 79.5% | empate 16.8% | victoria Panama 3.7% | marcador mas probable 2-0 (20.4%)
+- Ensamble ligero: victoria Colombia 80.1% | empate 16.3% | victoria Panama 3.6% | marcador mas probable 2-0 (20.5%)
 - Quien tiene mas probabilidad de avanzar: Colombia 91.6% | Panama 8.4%
 - Si empatan tras 90': gana en prorroga Colombia 42.0% | siguen empatados 54.1% | Panama 3.9%
 - Si llegan a penales: Colombia 53.1% | Panama 46.9%
 - Marcador mas probable de la tanda: 4-3
-- Marcador medio esperado en la tanda: Colombia 3.76 | Panama 3.56
-- Marcadores de tanda mas probables: 4-3 11.1%, 4-2 11.0%, 5-4 10.2%, 3-4 9.5%, 4-5 7.9%
+- Marcador medio esperado en la tanda: Colombia 3.79 | Panama 3.62
+- Marcadores de tanda mas probables: 4-3 10.3%, 4-2 9.8%, 3-4 9.2%, 4-5 8.8%, 5-4 8.8%
 - Marcadores mas probables: 2-0 20.5%, 1-0 20.2%, 3-0 13.8%, 0-0 10.1%, 4-0 7.0%
 
 ### Dieciseisavos 16: Turkey vs Iran
@@ -2081,12 +2516,17 @@ _Todavia no hay suficientes partidos terminados para medir como viene acertando 
 - Que tanto coinciden los modelos entre si: 98.3%
 - Stack estadistico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotacion + Ensamble ligero
 - Factores dominantes: Elo dinámico +126.000; Recursos/PIB proxy +0.213; Historia mundialista +0.190
+- Comparativa entre modelos:
+- Bivariante Poisson: victoria Turkey 63.8% | empate 24.8% | victoria Iran 11.4% | marcador mas probable 1-0 (18.1%)
+- Poisson independiente: victoria Turkey 63.4% | empate 23.7% | victoria Iran 12.9% | marcador mas probable 1-0 (17.4%)
+- Ajuste de baja anotacion: victoria Turkey 62.3% | empate 25.8% | victoria Iran 11.8% | marcador mas probable 1-0 (16.4%)
+- Ensamble ligero: victoria Turkey 63.5% | empate 24.8% | victoria Iran 11.8% | marcador mas probable 1-0 (17.7%)
 - Quien tiene mas probabilidad de avanzar: Turkey 79.3% | Iran 20.7%
 - Si empatan tras 90': gana en prorroga Turkey 32.7% | siguen empatados 58.2% | Iran 9.1%
 - Si llegan a penales: Turkey 53.9% | Iran 46.1%
-- Marcador mas probable de la tanda: 4-2
-- Marcador medio esperado en la tanda: Turkey 3.73 | Iran 3.46
-- Marcadores de tanda mas probables: 4-2 11.8%, 4-3 11.3%, 5-4 8.8%, 3-4 8.3%, 4-5 7.8%
+- Marcador mas probable de la tanda: 4-3
+- Marcador medio esperado en la tanda: Turkey 3.75 | Iran 3.47
+- Marcadores de tanda mas probables: 4-3 10.9%, 4-2 10.9%, 5-4 9.8%, 3-4 8.6%, 2-4 7.9%
 - Marcadores mas probables: 1-0 17.7%, 2-0 14.3%, 0-0 11.4%, 1-1 10.4%, 2-1 8.7%
 
 ### Octavos 1: Canada vs Germany
@@ -2109,12 +2549,17 @@ _Todavia no hay suficientes partidos terminados para medir como viene acertando 
 - Que tanto coinciden los modelos entre si: 98.4%
 - Stack estadistico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotacion + Ensamble ligero
 - Factores dominantes: Elo dinámico -104.000; Historia mundialista -0.730; Trayectoria futbolística -0.283
+- Comparativa entre modelos:
+- Bivariante Poisson: victoria Canada 10.3% | empate 23.9% | victoria Germany 65.8% | marcador mas probable 0-1 (18.3%)
+- Poisson independiente: victoria Canada 11.8% | empate 22.9% | victoria Germany 65.3% | marcador mas probable 0-1 (17.6%)
+- Ajuste de baja anotacion: victoria Canada 10.8% | empate 24.9% | victoria Germany 64.3% | marcador mas probable 0-1 (16.6%)
+- Ensamble ligero: victoria Canada 10.7% | empate 23.9% | victoria Germany 65.4% | marcador mas probable 0-1 (17.9%)
 - Quien tiene mas probabilidad de avanzar: Canada 18.1% | Germany 81.9%
 - Si empatan tras 90': gana en prorroga Canada 8.6% | siguen empatados 57.7% | Germany 33.8%
 - Si llegan a penales: Canada 38.9% | Germany 61.1%
-- Marcador mas probable de la tanda: 2-4
-- Marcador medio esperado en la tanda: Canada 3.40 | Germany 3.88
-- Marcadores de tanda mas probables: 2-4 12.6%, 3-4 12.4%, 4-5 10.3%, 4-3 8.0%, 4-2 6.6%
+- Marcador mas probable de la tanda: 3-4
+- Marcador medio esperado en la tanda: Canada 3.50 | Germany 4.01
+- Marcadores de tanda mas probables: 3-4 13.4%, 2-4 13.1%, 4-5 10.4%, 5-4 7.7%, 4-2 6.2%
 - Marcadores mas probables: 0-1 17.9%, 0-2 14.8%, 0-0 11.2%, 1-1 9.9%, 1-2 8.6%
 
 ### Octavos 2: Netherlands vs Brazil
@@ -2136,12 +2581,17 @@ _Todavia no hay suficientes partidos terminados para medir como viene acertando 
 - Que tanto coinciden los modelos entre si: 97.3%
 - Stack estadistico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotacion + Ensamble ligero
 - Factores dominantes: Elo dinámico -19.000; Historia mundialista -0.460; Trayectoria futbolística -0.181
+- Comparativa entre modelos:
+- Bivariante Poisson: victoria Netherlands 26.0% | empate 29.7% | victoria Brazil 44.2% | marcador mas probable 0-1 (14.0%)
+- Poisson independiente: victoria Netherlands 27.2% | empate 28.2% | victoria Brazil 44.7% | marcador mas probable 0-1 (13.7%)
+- Ajuste de baja anotacion: victoria Netherlands 25.2% | empate 32.2% | victoria Brazil 42.6% | marcador mas probable 1-1 (15.0%)
+- Ensamble ligero: victoria Netherlands 26.1% | empate 30.0% | victoria Brazil 44.0% | marcador mas probable 1-1 (13.5%)
 - Quien tiene mas probabilidad de avanzar: Netherlands 39.1% | Brazil 60.9%
 - Si empatan tras 90': gana en prorroga Netherlands 15.8% | siguen empatados 60.6% | Brazil 23.7%
 - Si llegan a penales: Netherlands 45.7% | Brazil 54.3%
 - Marcador mas probable de la tanda: 3-4
-- Marcador medio esperado en la tanda: Netherlands 3.77 | Brazil 4.00
-- Marcadores de tanda mas probables: 3-4 11.2%, 2-4 10.3%, 4-5 10.1%, 4-3 8.4%, 5-4 8.1%
+- Marcador medio esperado en la tanda: Netherlands 3.71 | Brazil 3.91
+- Marcadores de tanda mas probables: 3-4 10.9%, 5-4 10.4%, 2-4 9.4%, 4-5 9.2%, 4-3 8.1%
 - Marcadores mas probables: 1-1 13.5%, 0-1 13.4%, 0-0 11.6%, 1-0 9.5%, 0-2 8.6%
 
 ### Octavos 3: France vs Norway
@@ -2163,12 +2613,17 @@ _Todavia no hay suficientes partidos terminados para medir como viene acertando 
 - Que tanto coinciden los modelos entre si: 98.5%
 - Stack estadistico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotacion + Ensamble ligero
 - Factores dominantes: Elo dinámico +141.000; Ranking FIFA / puntos FIFA +0.380; Historia mundialista +0.300
+- Comparativa entre modelos:
+- Bivariante Poisson: victoria France 68.5% | empate 22.5% | victoria Norway 9.0% | marcador mas probable 1-0 (18.4%)
+- Poisson independiente: victoria France 67.9% | empate 21.7% | victoria Norway 10.4% | marcador mas probable 1-0 (17.7%)
+- Ajuste de baja anotacion: victoria France 67.1% | empate 23.4% | victoria Norway 9.5% | marcador mas probable 1-0 (16.8%)
+- Ensamble ligero: victoria France 68.1% | empate 22.5% | victoria Norway 9.3% | marcador mas probable 1-0 (18.0%)
 - Quien tiene mas probabilidad de avanzar: France 82.9% | Norway 17.1%
 - Si empatan tras 90': gana en prorroga France 35.3% | siguen empatados 56.8% | Norway 7.9%
 - Si llegan a penales: France 53.2% | Norway 46.8%
-- Marcador mas probable de la tanda: 5-4
-- Marcador medio esperado en la tanda: France 3.97 | Norway 3.76
-- Marcadores de tanda mas probables: 5-4 10.8%, 4-3 10.6%, 4-2 9.5%, 4-5 8.4%, 2-4 8.3%
+- Marcador mas probable de la tanda: 4-2
+- Marcador medio esperado en la tanda: France 3.98 | Norway 3.79
+- Marcadores de tanda mas probables: 4-2 10.9%, 5-4 10.6%, 4-3 10.2%, 4-5 9.1%, 3-4 7.6%
 - Marcadores mas probables: 1-0 18.0%, 2-0 15.6%, 0-0 10.7%, 1-1 9.3%, 3-0 9.0%
 
 ### Octavos 4: Mexico vs England
@@ -2190,12 +2645,17 @@ _Todavia no hay suficientes partidos terminados para medir como viene acertando 
 - Que tanto coinciden los modelos entre si: 98.7%
 - Stack estadistico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotacion + Ensamble ligero
 - Factores dominantes: Elo dinámico -189.000; Historia mundialista -0.280; Ranking FIFA / puntos FIFA -0.190
+- Comparativa entre modelos:
+- Bivariante Poisson: victoria Mexico 7.3% | empate 20.1% | victoria England 72.6% | marcador mas probable 0-1 (17.9%)
+- Poisson independiente: victoria Mexico 8.5% | empate 19.5% | victoria England 72.0% | marcador mas probable 0-1 (17.2%)
+- Ajuste de baja anotacion: victoria Mexico 7.8% | empate 21.0% | victoria England 71.3% | marcador mas probable 0-2 (16.6%)
+- Ensamble ligero: victoria Mexico 7.6% | empate 20.1% | victoria England 72.3% | marcador mas probable 0-1 (17.5%)
 - Quien tiene mas probabilidad de avanzar: Mexico 14.4% | England 85.6%
 - Si empatan tras 90': gana en prorroga Mexico 7.0% | siguen empatados 55.0% | England 38.0%
 - Si llegan a penales: Mexico 48.7% | England 51.3%
-- Marcador mas probable de la tanda: 4-3
-- Marcador medio esperado en la tanda: Mexico 3.84 | England 3.94
-- Marcadores de tanda mas probables: 4-3 10.4%, 3-4 10.2%, 5-4 9.8%, 4-5 9.4%, 2-4 7.9%
+- Marcador mas probable de la tanda: 4-5
+- Marcador medio esperado en la tanda: Mexico 3.83 | England 3.89
+- Marcadores de tanda mas probables: 4-5 9.9%, 5-4 9.6%, 2-4 9.4%, 4-2 9.0%, 3-4 9.0%
 - Marcadores mas probables: 0-1 17.5%, 0-2 16.5%, 0-3 10.3%, 0-0 9.6%, 1-1 8.3%
 
 ### Octavos 5: Turkey vs Belgium
@@ -2218,12 +2678,17 @@ _Todavia no hay suficientes partidos terminados para medir como viene acertando 
 - Que tanto coinciden los modelos entre si: 97.0%
 - Stack estadistico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotacion + Ensamble ligero
 - Factores dominantes: Elo dinámico +31.000; Ranking FIFA / puntos FIFA -0.177; Disciplina estructural -0.101
+- Comparativa entre modelos:
+- Bivariante Poisson: victoria Turkey 39.1% | empate 30.4% | victoria Belgium 30.5% | marcador mas probable 1-1 (13.3%)
+- Poisson independiente: victoria Turkey 39.8% | empate 28.7% | victoria Belgium 31.5% | marcador mas probable 1-1 (13.3%)
+- Ajuste de baja anotacion: victoria Turkey 37.5% | empate 33.2% | victoria Belgium 29.3% | marcador mas probable 1-1 (15.5%)
+- Ensamble ligero: victoria Turkey 38.9% | empate 30.7% | victoria Belgium 30.4% | marcador mas probable 1-1 (13.8%)
 - Quien tiene mas probabilidad de avanzar: Turkey 54.9% | Belgium 45.1%
 - Si empatan tras 90': gana en prorroga Turkey 21.3% | siguen empatados 61.1% | Belgium 17.6%
 - Si llegan a penales: Turkey 50.4% | Belgium 49.6%
 - Marcador mas probable de la tanda: 4-3
-- Marcador medio esperado en la tanda: Turkey 3.81 | Belgium 3.72
-- Marcadores de tanda mas probables: 4-3 10.1%, 4-2 9.9%, 5-4 9.4%, 4-5 9.1%, 2-4 8.7%
+- Marcador medio esperado en la tanda: Turkey 3.73 | Belgium 3.65
+- Marcadores de tanda mas probables: 4-3 11.4%, 4-2 9.8%, 2-4 9.3%, 4-5 9.3%, 3-4 9.1%
 - Marcadores mas probables: 1-1 13.8%, 1-0 12.4%, 0-0 11.9%, 0-1 10.6%, 2-1 8.0%
 
 ### Octavos 6: Croatia vs Spain
@@ -2245,12 +2710,17 @@ _Todavia no hay suficientes partidos terminados para medir como viene acertando 
 - Que tanto coinciden los modelos entre si: 99.1%
 - Stack estadistico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotacion + Ensamble ligero
 - Factores dominantes: Elo dinámico -239.000; Recursos/PIB proxy -0.194; Ranking FIFA / puntos FIFA -0.192
+- Comparativa entre modelos:
+- Bivariante Poisson: victoria Croatia 4.7% | empate 17.8% | victoria Spain 77.5% | marcador mas probable 0-1 (19.5%)
+- Poisson independiente: victoria Croatia 5.6% | empate 17.5% | victoria Spain 76.9% | marcador mas probable 0-2 (18.9%)
+- Ajuste de baja anotacion: victoria Croatia 5.1% | empate 18.4% | victoria Spain 76.5% | marcador mas probable 0-2 (18.9%)
+- Ensamble ligero: victoria Croatia 5.0% | empate 17.8% | victoria Spain 77.2% | marcador mas probable 0-1 (19.2%)
 - Quien tiene mas probabilidad de avanzar: Croatia 10.5% | Spain 89.5%
 - Si empatan tras 90': gana en prorroga Croatia 5.0% | siguen empatados 54.5% | Spain 40.5%
 - Si llegan a penales: Croatia 47.4% | Spain 52.6%
-- Marcador mas probable de la tanda: 2-4
-- Marcador medio esperado en la tanda: Croatia 3.91 | Spain 3.92
-- Marcadores de tanda mas probables: 2-4 10.1%, 4-3 10.1%, 3-4 9.5%, 5-4 8.9%, 4-5 8.5%
+- Marcador mas probable de la tanda: 3-4
+- Marcador medio esperado en la tanda: Croatia 3.87 | Spain 3.98
+- Marcadores de tanda mas probables: 3-4 10.9%, 4-5 10.4%, 5-4 9.6%, 2-4 9.2%, 4-3 8.4%
 - Marcadores mas probables: 0-1 19.2%, 0-2 18.9%, 0-3 12.4%, 0-0 9.9%, 1-2 6.8%
 
 ### Octavos 7: Switzerland vs Argentina
@@ -2273,12 +2743,17 @@ _Todavia no hay suficientes partidos terminados para medir como viene acertando 
 - Que tanto coinciden los modelos entre si: 99.0%
 - Stack estadistico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotacion + Ensamble ligero
 - Factores dominantes: Elo dinámico -216.000; Historia mundialista -0.390; Ranking FIFA / puntos FIFA -0.262
+- Comparativa entre modelos:
+- Bivariante Poisson: victoria Switzerland 5.4% | empate 18.9% | victoria Argentina 75.7% | marcador mas probable 0-1 (19.7%)
+- Poisson independiente: victoria Switzerland 6.3% | empate 18.5% | victoria Argentina 75.1% | marcador mas probable 0-1 (19.1%)
+- Ajuste de baja anotacion: victoria Switzerland 5.8% | empate 19.6% | victoria Argentina 74.6% | marcador mas probable 0-1 (18.5%)
+- Ensamble ligero: victoria Switzerland 5.6% | empate 18.9% | victoria Argentina 75.4% | marcador mas probable 0-1 (19.4%)
 - Quien tiene mas probabilidad de avanzar: Switzerland 11.4% | Argentina 88.6%
 - Si empatan tras 90': gana en prorroga Switzerland 5.4% | siguen empatados 55.3% | Argentina 39.2%
 - Si llegan a penales: Switzerland 45.3% | Argentina 54.7%
-- Marcador mas probable de la tanda: 4-5
-- Marcador medio esperado en la tanda: Switzerland 3.78 | Argentina 3.86
-- Marcadores de tanda mas probables: 4-5 10.9%, 3-4 10.6%, 4-2 9.1%, 2-4 8.8%, 4-3 8.7%
+- Marcador mas probable de la tanda: 3-4
+- Marcador medio esperado en la tanda: Switzerland 3.69 | Argentina 3.79
+- Marcadores de tanda mas probables: 3-4 9.9%, 2-4 9.7%, 4-2 9.3%, 4-5 8.7%, 4-3 8.6%
 - Marcadores mas probables: 0-1 19.4%, 0-2 18.4%, 0-3 11.7%, 0-0 10.4%, 1-1 7.1%
 
 ### Octavos 8: Colombia vs Paraguay
@@ -2300,12 +2775,17 @@ _Todavia no hay suficientes partidos terminados para medir como viene acertando 
 - Que tanto coinciden los modelos entre si: 98.5%
 - Stack estadistico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotacion + Ensamble ligero
 - Factores dominantes: Elo dinámico +165.000; Ranking FIFA / puntos FIFA +0.239; Recursos/PIB proxy +0.097
+- Comparativa entre modelos:
+- Bivariante Poisson: victoria Colombia 68.2% | empate 22.6% | victoria Paraguay 9.2% | marcador mas probable 1-0 (18.2%)
+- Poisson independiente: victoria Colombia 67.6% | empate 21.7% | victoria Paraguay 10.6% | marcador mas probable 1-0 (17.4%)
+- Ajuste de baja anotacion: victoria Colombia 66.7% | empate 23.5% | victoria Paraguay 9.7% | marcador mas probable 1-0 (16.5%)
+- Ensamble ligero: victoria Colombia 67.8% | empate 22.6% | victoria Paraguay 9.6% | marcador mas probable 1-0 (17.7%)
 - Quien tiene mas probabilidad de avanzar: Colombia 82.2% | Paraguay 17.8%
 - Si empatan tras 90': gana en prorroga Colombia 35.2% | siguen empatados 56.7% | Paraguay 8.1%
 - Si llegan a penales: Colombia 50.3% | Paraguay 49.7%
-- Marcador mas probable de la tanda: 4-2
-- Marcador medio esperado en la tanda: Colombia 3.80 | Paraguay 3.78
-- Marcadores de tanda mas probables: 4-2 10.3%, 4-3 10.1%, 3-4 9.7%, 5-4 9.2%, 2-4 8.8%
+- Marcador mas probable de la tanda: 3-4
+- Marcador medio esperado en la tanda: Colombia 3.90 | Paraguay 3.86
+- Marcadores de tanda mas probables: 3-4 9.6%, 5-4 9.4%, 4-2 9.4%, 4-5 9.3%, 4-3 9.3%
 - Marcadores mas probables: 1-0 17.7%, 2-0 15.4%, 0-0 10.6%, 1-1 9.4%, 3-0 8.9%
 
 ### Cuartos 1: Germany vs Brazil
@@ -2327,12 +2807,17 @@ _Todavia no hay suficientes partidos terminados para medir como viene acertando 
 - Que tanto coinciden los modelos entre si: 97.5%
 - Stack estadistico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotacion + Ensamble ligero
 - Factores dominantes: Elo dinámico -68.000; Disciplina estructural +0.115; Recursos/PIB proxy +0.103
+- Comparativa entre modelos:
+- Bivariante Poisson: victoria Germany 23.6% | empate 29.1% | victoria Brazil 47.3% | marcador mas probable 0-1 (14.5%)
+- Poisson independiente: victoria Germany 24.8% | empate 27.6% | victoria Brazil 47.6% | marcador mas probable 0-1 (14.1%)
+- Ajuste de baja anotacion: victoria Germany 22.9% | empate 31.3% | victoria Brazil 45.8% | marcador mas probable 1-1 (14.6%)
+- Ensamble ligero: victoria Germany 23.6% | empate 29.3% | victoria Brazil 47.1% | marcador mas probable 0-1 (13.9%)
 - Quien tiene mas probabilidad de avanzar: Germany 37.0% | Brazil 63.0%
 - Si empatan tras 90': gana en prorroga Germany 14.8% | siguen empatados 60.0% | Brazil 25.2%
 - Si llegan a penales: Germany 51.3% | Brazil 48.7%
-- Marcador mas probable de la tanda: 5-4
-- Marcador medio esperado en la tanda: Germany 4.06 | Brazil 3.98
-- Marcadores de tanda mas probables: 5-4 10.8%, 4-5 9.8%, 4-3 9.1%, 4-2 8.9%, 2-4 8.5%
+- Marcador mas probable de la tanda: 4-3
+- Marcador medio esperado en la tanda: Germany 4.00 | Brazil 3.98
+- Marcadores de tanda mas probables: 4-3 9.9%, 5-4 9.7%, 3-4 9.6%, 4-5 9.4%, 4-2 8.0%
 - Marcadores mas probables: 0-1 13.9%, 1-1 13.2%, 0-0 11.4%, 0-2 9.4%, 1-0 8.8%
 
 ### Cuartos 2: France vs England
@@ -2354,12 +2839,17 @@ _Todavia no hay suficientes partidos terminados para medir como viene acertando 
 - Que tanto coinciden los modelos entre si: 97.2%
 - Stack estadistico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotacion + Ensamble ligero
 - Factores dominantes: Elo dinámico +21.000; Historia mundialista +0.110; Portero +0.096
+- Comparativa entre modelos:
+- Bivariante Poisson: victoria France 41.6% | empate 29.9% | victoria England 28.4% | marcador mas probable 1-0 (13.3%)
+- Poisson independiente: victoria France 42.2% | empate 28.3% | victoria England 29.5% | marcador mas probable 1-1 (13.2%)
+- Ajuste de baja anotacion: victoria France 40.0% | empate 32.6% | victoria England 27.4% | marcador mas probable 1-1 (15.3%)
+- Ensamble ligero: victoria France 41.4% | empate 30.2% | victoria England 28.4% | marcador mas probable 1-1 (13.6%)
 - Quien tiene mas probabilidad de avanzar: France 57.9% | England 42.1%
 - Si empatan tras 90': gana en prorroga France 22.5% | siguen empatados 60.6% | England 16.8%
 - Si llegan a penales: France 52.9% | England 47.1%
-- Marcador mas probable de la tanda: 4-5
-- Marcador medio esperado en la tanda: France 3.96 | England 3.87
-- Marcadores de tanda mas probables: 4-5 10.8%, 4-2 10.4%, 4-3 9.8%, 5-4 8.7%, 2-4 8.4%
+- Marcador mas probable de la tanda: 5-4
+- Marcador medio esperado en la tanda: France 4.09 | England 3.93
+- Marcadores de tanda mas probables: 5-4 11.1%, 4-5 9.9%, 4-2 9.8%, 4-3 9.1%, 3-4 8.4%
 - Marcadores mas probables: 1-1 13.6%, 1-0 12.8%, 0-0 11.5%, 0-1 9.9%, 2-1 8.3%
 
 ### Cuartos 3: Belgium vs Spain
@@ -2382,12 +2872,17 @@ _Todavia no hay suficientes partidos terminados para medir como viene acertando 
 - Que tanto coinciden los modelos entre si: 99.5%
 - Stack estadistico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotacion + Ensamble ligero
 - Factores dominantes: Elo dinámico -322.000; Ranking FIFA / puntos FIFA -0.176; Recursos/PIB proxy -0.122
+- Comparativa entre modelos:
+- Bivariante Poisson: victoria Belgium 2.4% | empate 14.5% | victoria Spain 83.1% | marcador mas probable 0-2 (21.8%)
+- Poisson independiente: victoria Belgium 2.9% | empate 14.5% | victoria Spain 82.7% | marcador mas probable 0-2 (21.7%)
+- Ajuste de baja anotacion: victoria Belgium 2.6% | empate 14.9% | victoria Spain 82.4% | marcador mas probable 0-2 (21.7%)
+- Ensamble ligero: victoria Belgium 2.5% | empate 14.6% | victoria Spain 82.9% | marcador mas probable 0-2 (21.7%)
 - Quien tiene mas probabilidad de avanzar: Belgium 6.6% | Spain 93.4%
 - Si empatan tras 90': gana en prorroga Belgium 2.9% | siguen empatados 53.2% | Spain 43.9%
 - Si llegan a penales: Belgium 47.6% | Spain 52.4%
-- Marcador mas probable de la tanda: 2-4
-- Marcador medio esperado en la tanda: Belgium 3.67 | Spain 3.80
-- Marcadores de tanda mas probables: 2-4 9.8%, 4-5 9.7%, 3-4 9.5%, 4-2 9.5%, 4-3 8.5%
+- Marcador mas probable de la tanda: 4-5
+- Marcador medio esperado en la tanda: Belgium 3.71 | Spain 3.88
+- Marcadores de tanda mas probables: 4-5 10.8%, 3-4 9.8%, 2-4 9.7%, 4-3 8.6%, 5-4 8.5%
 - Marcadores mas probables: 0-2 21.7%, 0-1 20.6%, 0-3 15.3%, 0-0 9.8%, 0-4 8.0%
 
 ### Cuartos 4: Argentina vs Colombia
@@ -2409,12 +2904,17 @@ _Todavia no hay suficientes partidos terminados para medir como viene acertando 
 - Que tanto coinciden los modelos entre si: 98.3%
 - Stack estadistico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotacion + Ensamble ligero
 - Factores dominantes: Elo dinámico +115.000; Historia mundialista +0.400; Ranking FIFA / puntos FIFA +0.206
+- Comparativa entre modelos:
+- Bivariante Poisson: victoria Argentina 64.4% | empate 24.3% | victoria Colombia 11.2% | marcador mas probable 1-0 (17.9%)
+- Poisson independiente: victoria Argentina 64.0% | empate 23.3% | victoria Colombia 12.7% | marcador mas probable 1-0 (17.2%)
+- Ajuste de baja anotacion: victoria Argentina 62.9% | empate 25.4% | victoria Colombia 11.6% | marcador mas probable 1-0 (16.2%)
+- Ensamble ligero: victoria Argentina 64.1% | empate 24.4% | victoria Colombia 11.6% | marcador mas probable 1-0 (17.4%)
 - Quien tiene mas probabilidad de avanzar: Argentina 80.1% | Colombia 19.9%
 - Si empatan tras 90': gana en prorroga Argentina 33.1% | siguen empatados 57.8% | Colombia 9.1%
 - Si llegan a penales: Argentina 56.7% | Colombia 43.3%
-- Marcador mas probable de la tanda: 5-4
-- Marcador medio esperado en la tanda: Argentina 3.89 | Colombia 3.65
-- Marcadores de tanda mas probables: 5-4 11.2%, 4-3 10.7%, 4-2 10.0%, 3-4 9.1%, 4-5 8.0%
+- Marcador mas probable de la tanda: 4-2
+- Marcador medio esperado en la tanda: Argentina 3.96 | Colombia 3.73
+- Marcadores de tanda mas probables: 4-2 11.7%, 4-3 10.6%, 5-4 9.9%, 3-4 8.9%, 4-5 8.2%
 - Marcadores mas probables: 1-0 17.4%, 2-0 14.3%, 0-0 11.1%, 1-1 10.3%, 2-1 8.8%
 
 ### Semifinal 1: Brazil vs France
@@ -2437,12 +2937,17 @@ _Todavia no hay suficientes partidos terminados para medir como viene acertando 
 - Que tanto coinciden los modelos entre si: 97.7%
 - Stack estadistico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotacion + Ensamble ligero
 - Factores dominantes: Elo dinámico -85.000; Historia mundialista +0.280; Ranking FIFA / puntos FIFA -0.131
+- Comparativa entre modelos:
+- Bivariante Poisson: victoria Brazil 20.8% | empate 28.5% | victoria France 50.7% | marcador mas probable 0-1 (15.2%)
+- Poisson independiente: victoria Brazil 22.1% | empate 27.0% | victoria France 50.9% | marcador mas probable 0-1 (14.8%)
+- Ajuste de baja anotacion: victoria Brazil 20.4% | empate 30.5% | victoria France 49.1% | marcador mas probable 1-1 (14.1%)
+- Ensamble ligero: victoria Brazil 21.0% | empate 28.6% | victoria France 50.4% | marcador mas probable 0-1 (14.7%)
 - Quien tiene mas probabilidad de avanzar: Brazil 33.8% | France 66.2%
 - Si empatan tras 90': gana en prorroga Brazil 13.6% | siguen empatados 59.7% | France 26.7%
 - Si llegan a penales: Brazil 52.4% | France 47.6%
 - Marcador mas probable de la tanda: 5-4
-- Marcador medio esperado en la tanda: Brazil 3.99 | France 3.89
-- Marcadores de tanda mas probables: 5-4 10.4%, 4-3 9.1%, 4-2 9.1%, 3-4 8.9%, 4-5 8.8%
+- Marcador medio esperado en la tanda: Brazil 4.03 | France 3.95
+- Marcadores de tanda mas probables: 5-4 10.8%, 3-4 9.2%, 4-2 8.9%, 4-5 8.8%, 4-3 8.5%
 - Marcadores mas probables: 0-1 14.7%, 1-1 12.8%, 0-0 11.4%, 0-2 10.3%, 1-2 8.9%
 
 ### Semifinal 2: Spain vs Argentina
@@ -2465,12 +2970,17 @@ _Todavia no hay suficientes partidos terminados para medir como viene acertando 
 - Que tanto coinciden los modelos entre si: 97.3%
 - Stack estadistico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotacion + Ensamble ligero
 - Factores dominantes: Elo dinámico +58.000; Historia mundialista -0.220; Disciplina estructural +0.214
+- Comparativa entre modelos:
+- Bivariante Poisson: victoria Spain 44.8% | empate 29.8% | victoria Argentina 25.4% | marcador mas probable 1-0 (14.3%)
+- Poisson independiente: victoria Spain 45.2% | empate 28.2% | victoria Argentina 26.6% | marcador mas probable 1-0 (14.0%)
+- Ajuste de baja anotacion: victoria Spain 43.2% | empate 32.2% | victoria Argentina 24.6% | marcador mas probable 1-1 (15.0%)
+- Ensamble ligero: victoria Spain 44.5% | empate 30.0% | victoria Argentina 25.4% | marcador mas probable 1-0 (13.7%)
 - Quien tiene mas probabilidad de avanzar: Spain 60.4% | Argentina 39.6%
 - Si empatan tras 90': gana en prorroga Spain 23.9% | siguen empatados 60.7% | Argentina 15.4%
 - Si llegan a penales: Spain 47.5% | Argentina 52.5%
 - Marcador mas probable de la tanda: 3-4
-- Marcador medio esperado en la tanda: Spain 3.72 | Argentina 3.83
-- Marcadores de tanda mas probables: 3-4 10.5%, 2-4 9.3%, 4-3 8.8%, 4-2 8.6%, 5-4 8.1%
+- Marcador medio esperado en la tanda: Spain 3.83 | Argentina 3.87
+- Marcadores de tanda mas probables: 3-4 10.6%, 5-4 9.9%, 4-5 9.9%, 4-3 9.2%, 4-2 8.5%
 - Marcadores mas probables: 1-0 13.7%, 1-1 13.4%, 0-0 11.8%, 0-1 9.4%, 2-0 8.8%
 
 ### Final: France vs Spain
@@ -2492,12 +3002,17 @@ _Todavia no hay suficientes partidos terminados para medir como viene acertando 
 - Que tanto coinciden los modelos entre si: 97.9%
 - Stack estadistico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotacion + Ensamble ligero
 - Factores dominantes: Elo dinámico -108.000; Historia mundialista +0.110; Experiencia de plantilla +0.053
+- Comparativa entre modelos:
+- Bivariante Poisson: victoria France 18.4% | empate 27.7% | victoria Spain 53.9% | marcador mas probable 0-1 (15.8%)
+- Poisson independiente: victoria France 19.7% | empate 26.3% | victoria Spain 53.9% | marcador mas probable 0-1 (15.3%)
+- Ajuste de baja anotacion: victoria France 18.2% | empate 29.5% | victoria Spain 52.4% | marcador mas probable 0-1 (13.8%)
+- Ensamble ligero: victoria France 18.6% | empate 27.8% | victoria Spain 53.6% | marcador mas probable 0-1 (15.3%)
 - Quien tiene mas probabilidad de avanzar: France 30.5% | Spain 69.5%
 - Si empatan tras 90': gana en prorroga France 12.5% | siguen empatados 59.3% | Spain 28.2%
 - Si llegan a penales: France 51.3% | Spain 48.7%
-- Marcador mas probable de la tanda: 5-4
-- Marcador medio esperado en la tanda: France 3.95 | Spain 3.85
-- Marcadores de tanda mas probables: 5-4 10.4%, 4-2 9.8%, 4-3 9.5%, 3-4 9.2%, 4-5 8.9%
+- Marcador mas probable de la tanda: 4-5
+- Marcador medio esperado en la tanda: France 3.92 | Spain 3.89
+- Marcadores de tanda mas probables: 4-5 10.3%, 5-4 10.0%, 4-2 10.0%, 4-3 9.2%, 3-4 7.8%
 - Marcadores mas probables: 0-1 15.3%, 1-1 12.3%, 0-0 11.3%, 0-2 11.1%, 1-2 9.0%
 
 ### Tercer puesto: Brazil vs Argentina
@@ -2520,10 +3035,15 @@ _Todavia no hay suficientes partidos terminados para medir como viene acertando 
 - Que tanto coinciden los modelos entre si: 98.2%
 - Stack estadistico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotacion + Ensamble ligero
 - Factores dominantes: Elo dinámico -135.000; Historia mundialista +0.170; Rivalidad +0.160
+- Comparativa entre modelos:
+- Bivariante Poisson: victoria Brazil 14.5% | empate 26.1% | victoria Argentina 59.4% | marcador mas probable 0-1 (16.8%)
+- Poisson independiente: victoria Brazil 16.0% | empate 24.9% | victoria Argentina 59.2% | marcador mas probable 0-1 (16.2%)
+- Ajuste de baja anotacion: victoria Brazil 14.6% | empate 27.5% | victoria Argentina 57.9% | marcador mas probable 0-1 (14.9%)
+- Ensamble ligero: victoria Brazil 14.8% | empate 26.1% | victoria Argentina 59.1% | marcador mas probable 0-1 (16.4%)
 - Quien tiene mas probabilidad de avanzar: Brazil 25.4% | Argentina 74.6%
 - Si empatan tras 90': gana en prorroga Brazil 10.7% | siguen empatados 58.5% | Argentina 30.8%
 - Si llegan a penales: Brazil 51.2% | Argentina 48.8%
-- Marcador mas probable de la tanda: 4-3
-- Marcador medio esperado en la tanda: Brazil 3.89 | Argentina 3.81
-- Marcadores de tanda mas probables: 4-3 11.5%, 5-4 10.1%, 4-5 9.6%, 4-2 8.7%, 3-4 8.6%
+- Marcador mas probable de la tanda: 4-5
+- Marcador medio esperado en la tanda: Brazil 3.84 | Argentina 3.87
+- Marcadores de tanda mas probables: 4-5 9.8%, 4-3 9.4%, 2-4 9.2%, 3-4 9.0%, 4-2 8.8%
 - Marcadores mas probables: 0-1 16.4%, 0-2 12.7%, 1-1 11.4%, 0-0 11.1%, 1-2 9.0%

@@ -2114,6 +2114,13 @@ def pairwise_model_agreement(prob_sets: Sequence[Dict[str, float]]) -> float:
     return clamp(1.0 - (sum(distances) / len(distances)), 0.0, 1.0)
 
 
+def top_score_from_distribution(dist: Dict[Tuple[int, int], float]) -> Tuple[str, float]:
+    if not dist:
+        return ("0-0", 0.0)
+    (goals_a, goals_b), prob = max(dist.items(), key=lambda item: item[1])
+    return (f"{goals_a}-{goals_b}", float(prob))
+
+
 def build_model_stack(
     mu_a: float,
     mu_b: float,
@@ -2166,6 +2173,10 @@ def build_model_stack(
         "contrast_probs": contrast_probs,
         "low_score_probs": low_score_probs,
         "ensemble_probs": ensemble_probs,
+        "primary_top_score": top_score_from_distribution(primary),
+        "contrast_top_score": top_score_from_distribution(contrast),
+        "low_score_top_score": top_score_from_distribution(low_score),
+        "ensemble_top_score": top_score_from_distribution(ensemble),
     }
     return ensemble, meta
 
@@ -5500,6 +5511,7 @@ def build_dashboard_markdown(
             f"- {result_prob_label(prediction)}: {format_pct(prediction.win_a)} / {format_pct(prediction.draw)} / {format_pct(prediction.win_b)}"
         )
         lines.extend(statistical_depth_lines(prediction))
+        lines.extend(model_comparison_lines(prediction))
         if prediction.advance_a is not None and prediction.advance_b is not None:
             detail = prediction.knockout_detail or {}
             lines.append(
@@ -5658,6 +5670,63 @@ def statistical_depth_html(prediction: MatchPrediction) -> str:
         "</div>"
         f"{stack_html}"
         f"{drivers_html}"
+        "</div>"
+    )
+
+
+def model_comparison_lines(prediction: MatchPrediction) -> List[str]:
+    stack = prediction.model_stack or {}
+    if not stack:
+        return []
+
+    def row(name_key: str, probs_key: str, score_key: str) -> str:
+        name = str(stack.get(name_key, "Modelo"))
+        probs = stack.get(probs_key, {}) or {}
+        top_score, top_score_prob = stack.get(score_key, ("0-0", 0.0))
+        return (
+            f"- {name}: victoria {prediction.team_a} {format_pct(float(probs.get('a', 0.0)))} | "
+            f"empate {format_pct(float(probs.get('draw', 0.0)))} | "
+            f"victoria {prediction.team_b} {format_pct(float(probs.get('b', 0.0)))} | "
+            f"marcador mas probable {top_score} ({format_pct(float(top_score_prob))})"
+        )
+
+    lines = ["- Comparativa entre modelos:"]
+    lines.append(row("primary_name", "primary_probs", "primary_top_score"))
+    lines.append(row("contrast_name", "contrast_probs", "contrast_top_score"))
+    lines.append(row("low_score_name", "low_score_probs", "low_score_top_score"))
+    lines.append(row("final_name", "ensemble_probs", "ensemble_top_score"))
+    return lines
+
+
+def model_comparison_html(prediction: MatchPrediction) -> str:
+    stack = prediction.model_stack or {}
+    if not stack:
+        return ""
+
+    def card(name_key: str, probs_key: str, score_key: str, tone: str) -> str:
+        name = str(stack.get(name_key, "Modelo"))
+        probs = stack.get(probs_key, {}) or {}
+        top_score, top_score_prob = stack.get(score_key, ("0-0", 0.0))
+        return (
+            f"<article class=\"model-card {tone}\">"
+            f"<h5>{html.escape(name)}</h5>"
+            f"<p>Victoria {html.escape(prediction.team_a)} {format_pct(float(probs.get('a', 0.0)))}</p>"
+            f"<p>Empate {format_pct(float(probs.get('draw', 0.0)))}</p>"
+            f"<p>Victoria {html.escape(prediction.team_b)} {format_pct(float(probs.get('b', 0.0)))}</p>"
+            f"<p><strong>Marcador mas probable:</strong> {html.escape(str(top_score))} ({format_pct(float(top_score_prob))})</p>"
+            "</article>"
+        )
+
+    return (
+        "<div class=\"reason-block model-compare-block\">"
+        "<h4>Comparativa entre modelos</h4>"
+        "<p class=\"meta\">Aqui puedes ver que dice cada capa del stack antes del resultado final publicado.</p>"
+        "<div class=\"model-compare-grid\">"
+        f"{card('primary_name', 'primary_probs', 'primary_top_score', 'primary')}"
+        f"{card('contrast_name', 'contrast_probs', 'contrast_top_score', 'contrast')}"
+        f"{card('low_score_name', 'low_score_probs', 'low_score_top_score', 'low-score')}"
+        f"{card('final_name', 'ensemble_probs', 'ensemble_top_score', 'ensemble')}"
+        "</div>"
         "</div>"
     )
 
@@ -6438,6 +6507,7 @@ def build_dashboard_html(
                     + "</p>"
                 )
         depth_html = statistical_depth_html(prediction)
+        model_compare_html = model_comparison_html(prediction)
 
         knockout_html = ""
         if prediction.advance_a is not None and prediction.advance_b is not None:
@@ -6514,6 +6584,7 @@ def build_dashboard_html(
             f"<div class=\"prob-block\">{probability_rows_html}</div>"
             f"{remaining_goals_html}"
             f"{depth_html}"
+            f"{model_compare_html}"
             f"{knockout_html}"
             "<div class=\"scores\">"
             "<h4>Marcadores finales mas probables</h4>"
@@ -7098,6 +7169,40 @@ def build_dashboard_html(
       margin: 0 0 10px;
       color: var(--accent-dark);
     }}
+    .model-compare-grid {{
+      display: grid;
+      gap: 10px;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }}
+    .model-card {{
+      border-radius: 14px;
+      padding: 12px;
+      border: 1px solid rgba(15,109,102,0.10);
+      background: rgba(255,255,255,0.55);
+    }}
+    .model-card h5 {{
+      margin: 0 0 8px;
+      color: var(--accent-dark);
+      font-size: 0.92rem;
+    }}
+    .model-card p {{
+      margin: 5px 0 0;
+      color: var(--muted);
+      font-size: 0.84rem;
+      line-height: 1.35;
+    }}
+    .model-card.primary {{
+      background: linear-gradient(180deg, rgba(15,109,102,0.10), rgba(255,255,255,0.75));
+    }}
+    .model-card.contrast {{
+      background: linear-gradient(180deg, rgba(52,73,94,0.10), rgba(255,255,255,0.75));
+    }}
+    .model-card.low-score {{
+      background: linear-gradient(180deg, rgba(181,131,47,0.10), rgba(255,255,255,0.75));
+    }}
+    .model-card.ensemble {{
+      background: linear-gradient(180deg, rgba(176,71,60,0.10), rgba(255,255,255,0.75));
+    }}
     .scores h4 {{
       margin: 14px 0 8px;
       color: var(--accent);
@@ -7137,6 +7242,9 @@ def build_dashboard_html(
         grid-template-columns: 1fr;
       }}
       .depth-grid {{
+        grid-template-columns: 1fr;
+      }}
+      .model-compare-grid {{
         grid-template-columns: 1fr;
       }}
       .bracket-canvas {{
