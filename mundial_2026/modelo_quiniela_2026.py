@@ -4720,6 +4720,356 @@ def load_bracket_json(path: Path) -> dict:
     return json.loads(path.read_text())
 
 
+def dashboard_entry_key(entry: dict) -> str:
+    match_id = entry.get("match_id")
+    if match_id:
+        return str(match_id)
+    return str(entry.get("title", "partido"))
+
+
+def load_previous_site_snapshot(
+    current_fixtures_path: Path,
+    current_bracket_json_path: Path,
+    teams: Dict[str, Team],
+    states: Dict[str, dict],
+    top_scores: int,
+) -> Tuple[List[dict], dict, Optional[str]]:
+    site_dir = Path(__file__).with_name("site")
+    previous_fixtures_path = site_dir / current_fixtures_path.name
+    previous_bracket_json_path = site_dir / current_bracket_json_path.name
+    previous_latest_path = site_dir / "latest.json"
+
+    previous_entries: List[dict] = []
+    previous_bracket_payload: dict = {}
+    previous_updated_at: Optional[str] = None
+
+    if previous_latest_path.exists():
+        try:
+            previous_updated_at = json.loads(previous_latest_path.read_text()).get("updated_at_utc")
+        except Exception:
+            previous_updated_at = None
+
+    if previous_bracket_json_path.exists():
+        previous_bracket_payload = load_bracket_json(previous_bracket_json_path)
+
+    if previous_fixtures_path.exists():
+        try:
+            previous_fixtures = read_fixtures(previous_fixtures_path)
+            previous_entries = dashboard_fixture_entries(previous_fixtures, teams, states, top_scores)
+            previous_entries.extend(
+                projected_bracket_entries(
+                    previous_fixtures,
+                    previous_bracket_payload,
+                    teams,
+                    states,
+                    top_scores,
+                    [entry["match_id"] for entry in previous_entries if entry.get("match_id")],
+                )
+            )
+        except Exception:
+            previous_entries = []
+
+    return previous_entries, previous_bracket_payload, previous_updated_at
+
+
+def compare_entry_predictions(current_entries: Sequence[dict], previous_entries: Sequence[dict]) -> dict:
+    previous_map = {dashboard_entry_key(entry): entry for entry in previous_entries}
+    movers = []
+    score_changes = []
+    label_changes = []
+    for current in current_entries:
+        previous = previous_map.get(dashboard_entry_key(current))
+        if not previous:
+            continue
+        current_prediction: MatchPrediction = current["prediction"]
+        previous_prediction: MatchPrediction = previous["prediction"]
+        current_label, current_prob = pick_summary(current_prediction)
+        previous_label, previous_prob = pick_summary(previous_prediction)
+        delta = float(current_prob) - float(previous_prob)
+        title = str(current.get("title", "Partido"))
+        abs_delta = abs(delta)
+        if abs_delta >= 0.005 or previous_label != current_label:
+            movers.append(
+                {
+                    "title": title,
+                    "previous_label": previous_label,
+                    "previous_prob": float(previous_prob),
+                    "current_label": current_label,
+                    "current_prob": float(current_prob),
+                    "delta": delta,
+                    "abs_delta": abs_delta,
+                }
+            )
+        previous_score = projected_score_value(previous_prediction)
+        current_score = projected_score_value(current_prediction)
+        if previous_score != current_score:
+            score_changes.append(
+                {
+                    "title": title,
+                    "previous_score": previous_score,
+                    "current_score": current_score,
+                }
+            )
+        if previous_label != current_label:
+            label_changes.append(
+                {
+                    "title": title,
+                    "previous_label": previous_label,
+                    "current_label": current_label,
+                }
+            )
+    movers.sort(key=lambda item: item["abs_delta"], reverse=True)
+    return {
+        "movers": movers[:6],
+        "score_changes": score_changes[:6],
+        "label_changes": label_changes[:6],
+    }
+
+
+def compare_bracket_payloads(current_bracket: dict, previous_bracket: dict) -> dict:
+    current_matches = current_bracket.get("matches", {}) if current_bracket else {}
+    previous_matches = previous_bracket.get("matches", {}) if previous_bracket else {}
+    stage_order = {"round32": 0, "round16": 1, "quarterfinal": 2, "semifinal": 3, "final": 4, "third_place": 5}
+
+    def matchup_text(match: dict) -> str:
+        return f"{match.get('team_a', '?')} vs {match.get('team_b', '?')}"
+
+    matchup_changes = []
+    favorite_flips = []
+    current_teams = set()
+    previous_teams = set()
+
+    for match_id, current in current_matches.items():
+        current_teams.update(team for team in [current.get("team_a"), current.get("team_b")] if team)
+        previous = previous_matches.get(match_id)
+        if not previous:
+            continue
+        previous_teams.update(team for team in [previous.get("team_a"), previous.get("team_b")] if team)
+        if current.get("team_a") != previous.get("team_a") or current.get("team_b") != previous.get("team_b"):
+            matchup_changes.append(
+                {
+                    "match_id": match_id,
+                    "title": current.get("title", match_id),
+                    "stage": current.get("stage"),
+                    "previous_matchup": matchup_text(previous),
+                    "current_matchup": matchup_text(current),
+                    "current_prob": float(current.get("matchup_prob", 0.0)),
+                }
+            )
+        elif current.get("winner") != previous.get("winner"):
+            favorite_flips.append(
+                {
+                    "match_id": match_id,
+                    "title": current.get("title", match_id),
+                    "stage": current.get("stage"),
+                    "matchup": matchup_text(current),
+                    "previous_winner": previous.get("winner"),
+                    "current_winner": current.get("winner"),
+                    "current_prob": float(current.get("winner_prob", 0.0)),
+                }
+            )
+
+    for previous in previous_matches.values():
+        previous_teams.update(team for team in [previous.get("team_a"), previous.get("team_b")] if team)
+
+    matchup_changes.sort(
+        key=lambda item: (stage_order.get(str(item.get("stage")), 99), -item["current_prob"], str(item["title"]))
+    )
+    favorite_flips.sort(
+        key=lambda item: (stage_order.get(str(item.get("stage")), 99), -item["current_prob"], str(item["title"]))
+    )
+
+    return {
+        "matchup_changes": matchup_changes[:8],
+        "favorite_flips": favorite_flips[:6],
+        "new_teams": sorted(current_teams - previous_teams),
+        "dropped_teams": sorted(previous_teams - current_teams),
+    }
+
+
+def build_recent_changes_markdown(
+    current_entries: Sequence[dict],
+    previous_entries: Sequence[dict],
+    current_bracket: dict,
+    previous_bracket: dict,
+    previous_updated_at: Optional[str],
+) -> List[str]:
+    if not previous_entries and not previous_bracket:
+        return ["_Todavia no hay una publicacion anterior comparable para mostrar cambios recientes._"]
+
+    entry_changes = compare_entry_predictions(current_entries, previous_entries)
+    bracket_changes = compare_bracket_payloads(current_bracket, previous_bracket)
+    lines = []
+    if previous_updated_at:
+        lines.append(f"- Comparado contra la publicacion anterior de: {previous_updated_at}")
+    lines.append(
+        "- Esta seccion muestra solo movimientos reales frente a la version anterior ya publicada: picks que cambiaron, marcadores nuevos y cruces que entran o salen de la llave principal."
+    )
+    if bracket_changes["new_teams"]:
+        lines.append("- Equipos que entran en la ruta principal de la llave: " + "; ".join(bracket_changes["new_teams"]))
+    if bracket_changes["dropped_teams"]:
+        lines.append("- Equipos que salen de la ruta principal de la llave: " + "; ".join(bracket_changes["dropped_teams"]))
+    if bracket_changes["matchup_changes"]:
+        lines.append(
+            "- Cruces principales que cambiaron: "
+            + "; ".join(
+                f"{item['title']}: {item['previous_matchup']} -> {item['current_matchup']} ({format_pct(item['current_prob'])})"
+                for item in bracket_changes["matchup_changes"]
+            )
+        )
+    if bracket_changes["favorite_flips"]:
+        lines.append(
+            "- Cruces donde cambio el favorito de avance: "
+            + "; ".join(
+                f"{item['title']}: {item['matchup']} | antes {item['previous_winner']} -> ahora {item['current_winner']} ({format_pct(item['current_prob'])})"
+                for item in bracket_changes["favorite_flips"]
+            )
+        )
+    if entry_changes["movers"]:
+        lines.append(
+            "- Partidos donde mas se movio el pick principal: "
+            + "; ".join(
+                f"{item['title']}: {item['previous_label']} {format_pct(item['previous_prob'])} -> {item['current_label']} {format_pct(item['current_prob'])}"
+                for item in entry_changes["movers"]
+            )
+        )
+    if entry_changes["score_changes"]:
+        lines.append(
+            "- Partidos cuyo marcador proyectado cambio: "
+            + "; ".join(
+                f"{item['title']}: {item['previous_score']} -> {item['current_score']}"
+                for item in entry_changes["score_changes"]
+            )
+        )
+    if entry_changes["label_changes"]:
+        lines.append(
+            "- Partidos donde cambio el resultado mas probable: "
+            + "; ".join(
+                f"{item['title']}: {item['previous_label']} -> {item['current_label']}"
+                for item in entry_changes["label_changes"]
+            )
+        )
+    if len(lines) <= 2:
+        lines.append("- Todavia no hay un cambio grande frente a la publicacion anterior.")
+    return lines
+
+
+def build_recent_changes_html(
+    current_entries: Sequence[dict],
+    previous_entries: Sequence[dict],
+    current_bracket: dict,
+    previous_bracket: dict,
+    previous_updated_at: Optional[str],
+) -> str:
+    if not previous_entries and not previous_bracket:
+        return (
+            "<section class=\"panel changes-panel\">"
+            "<div class=\"panel-head\"><div><p class=\"eyebrow\">Comparativo</p><h2>Que cambio desde la ultima actualizacion</h2>"
+            "<p class=\"lede-tight\">Todavia no hay una publicacion anterior comparable para resumir movimientos del tablero.</p>"
+            "</div></div></section>"
+        )
+
+    entry_changes = compare_entry_predictions(current_entries, previous_entries)
+    bracket_changes = compare_bracket_payloads(current_bracket, previous_bracket)
+
+    def text_list(items: Sequence[str]) -> str:
+        return "".join(f"<li><strong>{html.escape(item)}</strong></li>" for item in items)
+
+    def detailed_rows(rows: Sequence[dict], formatter) -> str:
+        return "".join(
+            f"<li><strong>{html.escape(formatter(row)[0])}</strong><span>{html.escape(formatter(row)[1])}</span></li>"
+            for row in rows
+        )
+
+    matchup_html = (
+        "<article><h3>Cruces principales que cambiaron</h3><ul>"
+        + (
+            detailed_rows(
+                bracket_changes["matchup_changes"],
+                lambda row: (
+                    row["title"],
+                    f"{row['previous_matchup']} -> {row['current_matchup']} | este cruce ahora aparece {format_pct(row['current_prob'])}",
+                ),
+            )
+            if bracket_changes["matchup_changes"]
+            else "<li><strong>Sin cambios grandes</strong><span>La ruta principal del cuadro se mantiene respecto de la version anterior.</span></li>"
+        )
+        + "</ul></article>"
+    )
+    teams_html = (
+        "<article><h3>Equipos que entran o salen de la ruta principal</h3><ul>"
+        + (
+            text_list([f"Entran: {', '.join(bracket_changes['new_teams'])}"] if bracket_changes["new_teams"] else [])
+            + text_list([f"Salen: {', '.join(bracket_changes['dropped_teams'])}"] if bracket_changes["dropped_teams"] else [])
+            if bracket_changes["new_teams"] or bracket_changes["dropped_teams"]
+            else "<li><strong>Sin entradas o salidas nuevas</strong><span>Los equipos visibles en la ruta principal no cambiaron frente a la publicacion anterior.</span></li>"
+        )
+        + "</ul></article>"
+    )
+    movers_html = (
+        "<article><h3>Partidos donde mas se movio el pick</h3><ul>"
+        + (
+            detailed_rows(
+                entry_changes["movers"],
+                lambda row: (
+                    row["title"],
+                    f"{row['previous_label']} {format_pct(row['previous_prob'])} -> {row['current_label']} {format_pct(row['current_prob'])}",
+                ),
+            )
+            if entry_changes["movers"]
+            else "<li><strong>Sin cambios detectables</strong><span>Los picks principales siguen practicamente iguales que en la ultima publicacion.</span></li>"
+        )
+        + "</ul></article>"
+    )
+    score_html = (
+        "<article><h3>Marcadores proyectados que cambiaron</h3><ul>"
+        + (
+            detailed_rows(
+                entry_changes["score_changes"],
+                lambda row: (row["title"], f"{row['previous_score']} -> {row['current_score']}"),
+            )
+            if entry_changes["score_changes"]
+            else "<li><strong>Sin cambio de marcador principal</strong><span>El resultado entero mas probable sigue igual en los partidos comparables.</span></li>"
+        )
+        + "</ul></article>"
+    )
+    flip_html = (
+        "<article><h3>Cruces donde cambio el favorito</h3><ul>"
+        + (
+            detailed_rows(
+                bracket_changes["favorite_flips"],
+                lambda row: (
+                    row["title"],
+                    f"{row['matchup']} | antes {row['previous_winner']} -> ahora {row['current_winner']} ({format_pct(row['current_prob'])})",
+                ),
+            )
+            if bracket_changes["favorite_flips"]
+            else "<li><strong>Sin giro de favorito</strong><span>En los cruces principales comparables no cambio el equipo con mas probabilidad de avanzar.</span></li>"
+        )
+        + "</ul></article>"
+    )
+
+    compared_html = ""
+    if previous_updated_at:
+        compared_html = f"<p class=\"meta\">Comparado contra la publicacion anterior de {html.escape(previous_updated_at)}.</p>"
+
+    return (
+        "<section class=\"panel changes-panel\">"
+        "<div class=\"panel-head\"><div><p class=\"eyebrow\">Comparativo</p><h2>Que cambio desde la ultima actualizacion</h2>"
+        "<p class=\"lede-tight\">Este bloque resume solo movimientos reales respecto de la version anterior ya publicada, para que se note rapido si el tablero se movio poco o mucho.</p>"
+        f"{compared_html}"
+        "</div></div>"
+        "<div class=\"confidence-grid\">"
+        f"{teams_html}"
+        f"{matchup_html}"
+        f"{movers_html}"
+        f"{score_html}"
+        f"{flip_html}"
+        "</div>"
+        "</section>"
+    )
+
+
 def projected_bracket_entries(
     fixtures: Sequence[dict],
     bracket_payload: dict,
@@ -5023,6 +5373,9 @@ def build_dashboard_markdown(
     backtest: dict,
     state_path: Path,
     fixtures_path: Path,
+    previous_entries: Optional[Sequence[dict]] = None,
+    previous_bracket_payload: Optional[dict] = None,
+    previous_updated_at: Optional[str] = None,
 ) -> str:
     lines = [
         "# Reporte actual del Mundial 2026",
@@ -5035,6 +5388,16 @@ def build_dashboard_markdown(
         "",
     ]
     lines.extend(build_global_confidence_markdown(entries))
+    lines.extend(["", "## Que cambio desde la ultima actualizacion", ""])
+    lines.extend(
+        build_recent_changes_markdown(
+            entries,
+            previous_entries or [],
+            bracket_payload,
+            previous_bracket_payload or {},
+            previous_updated_at,
+        )
+    )
     lines.extend(["", "## Como viene acertando el modelo", ""])
     lines.extend(build_backtesting_markdown(backtest))
     lines.extend([
@@ -5923,6 +6286,9 @@ def build_dashboard_html(
     backtest: dict,
     state_path: Path,
     fixtures_path: Path,
+    previous_entries: Optional[Sequence[dict]] = None,
+    previous_bracket_payload: Optional[dict] = None,
+    previous_updated_at: Optional[str] = None,
 ) -> str:
     cards = []
     for entry in entries:
@@ -6163,6 +6529,13 @@ def build_dashboard_html(
     bracket_visual_html = build_bracket_visual_html(bracket_payload)
     methodology_html = build_methodology_html(bracket_payload, backtest)
     global_confidence_html = build_global_confidence_html(entries)
+    recent_changes_html = build_recent_changes_html(
+        entries,
+        previous_entries or [],
+        bracket_payload,
+        previous_bracket_payload or {},
+        previous_updated_at,
+    )
     backtesting_html = build_backtesting_html(backtest)
     return f"""<!doctype html>
 <html lang="es">
@@ -6848,6 +7221,7 @@ def build_dashboard_html(
     </section>
     {methodology_html}
     {global_confidence_html}
+    {recent_changes_html}
     {backtesting_html}
     {bracket_visual_html}
     <section class="panel">
@@ -6879,6 +7253,13 @@ def command_project_dashboard(args: argparse.Namespace, teams: Dict[str, Team]) 
     bracket_json_path = Path(args.bracket_json_file)
     bracket_text = bracket_path.read_text() if bracket_path.exists() else ""
     bracket_payload = load_bracket_json(bracket_json_path)
+    previous_entries, previous_bracket_payload, previous_updated_at = load_previous_site_snapshot(
+        fixture_path,
+        bracket_json_path,
+        teams,
+        states,
+        args.top_scores,
+    )
 
     entries = dashboard_fixture_entries(fixtures, teams, states, args.top_scores)
     entries.extend(
@@ -6892,8 +7273,28 @@ def command_project_dashboard(args: argparse.Namespace, teams: Dict[str, Team]) 
         )
     )
     backtest = compute_backtest_summary(fixtures, teams, args.top_scores)
-    markdown = build_dashboard_markdown(entries, bracket_text, bracket_payload, backtest, Path(args.state_file), fixture_path)
-    html_content = build_dashboard_html(entries, bracket_text, bracket_payload, backtest, Path(args.state_file), fixture_path)
+    markdown = build_dashboard_markdown(
+        entries,
+        bracket_text,
+        bracket_payload,
+        backtest,
+        Path(args.state_file),
+        fixture_path,
+        previous_entries=previous_entries,
+        previous_bracket_payload=previous_bracket_payload,
+        previous_updated_at=previous_updated_at,
+    )
+    html_content = build_dashboard_html(
+        entries,
+        bracket_text,
+        bracket_payload,
+        backtest,
+        Path(args.state_file),
+        fixture_path,
+        previous_entries=previous_entries,
+        previous_bracket_payload=previous_bracket_payload,
+        previous_updated_at=previous_updated_at,
+    )
 
     output_md = Path(args.output_md)
     output_html = Path(args.output_html)
