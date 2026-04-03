@@ -62,6 +62,17 @@ from worldcup2026.models.penalties import (
     penalty_conversion_probability as calculate_penalty_conversion_probability,
     simulate_penalty_shootout as run_penalty_shootout,
 )
+from worldcup2026.models.elo import (
+    effective_elo as calculate_effective_elo,
+    elo_delta_for_match as calculate_elo_delta_for_match,
+)
+from worldcup2026.models.expected_goals import (
+    attack_metric as calculate_attack_metric,
+    context_components as calculate_context_components,
+    defense_metric as calculate_defense_metric,
+    expected_goals as calculate_expected_goals,
+    factor_breakdown as calculate_factor_breakdown,
+)
 from worldcup2026.modeling import (
     dynamic_correlation,
 )
@@ -74,6 +85,26 @@ from worldcup2026.parallel import (
     run_parallel_batches,
 )
 from worldcup2026.simulation.rng import fast_random, poisson_sample_fast, seed_fast_rng
+from worldcup2026.simulation.match import (
+    build_simulation_context as calculate_build_simulation_context,
+    penalty_shootout_summary as calculate_penalty_shootout_summary,
+    sample_cards as calculate_sample_cards,
+    sample_knockout_resolution as calculate_sample_knockout_resolution,
+    simulate_match_sample as calculate_simulate_match_sample,
+    update_simulation_state as calculate_update_simulation_state,
+)
+from worldcup2026.simulation.tournament import (
+    assign_third_place_slots as calculate_assign_third_place_slots,
+    bracket_match_order as calculate_bracket_match_order,
+    project_bracket_batch as calculate_project_bracket_batch,
+    resolve_r32_team as calculate_resolve_r32_team,
+    run_knockout_round as calculate_run_knockout_round,
+    simulate_group_stage as calculate_simulate_group_stage,
+    simulate_tournament_batch as calculate_simulate_tournament_batch,
+    simulate_tournament_iteration as calculate_simulate_tournament_iteration,
+    sort_standings as calculate_sort_standings,
+    standings_entry as calculate_standings_entry,
+)
 from worldcup2026.profiles.indices import (
     chemistry_index as calculate_chemistry_index,
     coach_index as calculate_coach_index,
@@ -1481,7 +1512,7 @@ def state_int(state: Optional[dict], key: str, default: int) -> int:
 
 
 def effective_elo(team: Team, state: Optional[dict] = None) -> float:
-    return clamp(team.elo + state_float(state, "elo_shift", 0.0), 1200.0, 2400.0)
+    return calculate_effective_elo(team, state=state, clamp=clamp, state_float=state_float)
 
 
 def recent_form_signal(state: Optional[dict]) -> float:
@@ -1530,121 +1561,56 @@ def context_components(
     side: str,
     state: Optional[dict] = None,
 ) -> Dict[str, float]:
-    if side == "A":
-        rest_days = ctx.rest_days_a
-        other_rest_days = ctx.rest_days_b
-        injuries = ctx.injuries_a
-        travel = ctx.travel_km_a
-        other_travel = ctx.travel_km_b
-        morale_signal = ctx.morale_a
-        yellow_cards = ctx.yellow_cards_a
-        red_suspensions = ctx.red_suspensions_a
-        group_points_value = ctx.group_points_a
-        group_goal_diff_value = ctx.group_goal_diff_a
-        group_matches_played = ctx.group_matches_played_a
-        lineup_confirmed = ctx.lineup_confirmed_a
-        lineup_changes = ctx.lineup_change_count_a
-    else:
-        rest_days = ctx.rest_days_b
-        other_rest_days = ctx.rest_days_a
-        injuries = ctx.injuries_b
-        travel = ctx.travel_km_b
-        other_travel = ctx.travel_km_a
-        morale_signal = ctx.morale_b
-        yellow_cards = ctx.yellow_cards_b
-        red_suspensions = ctx.red_suspensions_b
-        group_points_value = ctx.group_points_b
-        group_goal_diff_value = ctx.group_goal_diff_b
-        group_matches_played = ctx.group_matches_played_b
-        lineup_confirmed = ctx.lineup_confirmed_b
-        lineup_changes = ctx.lineup_change_count_b
-
-    components = {
-        "home": 0.0,
-        "rest": 0.0,
-        "travel": 0.0,
-        "morale": current_morale(profile, morale_signal),
-        "injury": -0.30 * clamp(injuries, 0.0, 1.0),
-        "cards": -discipline_absence_penalty(profile, yellow_cards, red_suspensions),
-        "group_pressure": 0.0,
-        "weather": -0.08 * clamp(ctx.weather_stress, 0.0, 1.0),
-        "altitude": 0.0,
-        "rivalry": rivalry_intensity(team, opponent),
-        "lineup": (0.01 if lineup_confirmed else 0.0) - 0.018 * clamp(lineup_changes, 0, 6),
-        "fatigue": -0.14 * fatigue_level(state),
-        "availability": -0.18 * (1.0 - availability_level(state)),
-        "recent_form": 0.10 * recent_form_signal(state),
-    }
-
-    if not ctx.neutral and ctx.home_team == team.name:
-        components["home"] += 0.22
-    if ctx.venue_country and team.host_country == ctx.venue_country:
-        components["home"] += 0.14
-    elif ctx.venue_country in HOST_COUNTRIES and team.is_host:
-        components["home"] += 0.06
-
-    rest_diff = clamp(rest_days - other_rest_days, -4, 4)
-    components["rest"] = 0.018 * rest_diff
-
-    travel_diff = max(travel - other_travel, 0.0)
-    components["travel"] = -0.18 * (travel_diff / 6000.0) * (1.0 - profile.travel_resilience)
-
-    pressure = group_pressure(group_points_value, group_matches_played, group_goal_diff_value)
-    components["group_pressure"] = -0.10 * pressure
-
-    if ctx.altitude_m >= 1400 and ctx.venue_country == "Mexico" and team.name == "Mexico":
-        components["altitude"] += 0.05
-    if ctx.altitude_m >= 1400 and opponent.name == "Mexico" and team.name != "Mexico":
-        components["altitude"] -= 0.02
-
-    return components
+    return calculate_context_components(
+        team,
+        profile,
+        opponent,
+        ctx,
+        side,
+        state=state,
+        current_morale=current_morale,
+        discipline_absence_penalty=discipline_absence_penalty,
+        group_pressure=group_pressure,
+        rivalry_intensity=rivalry_intensity,
+        fatigue_level=fatigue_level,
+        availability_level=availability_level,
+        recent_form_signal=recent_form_signal,
+        clamp=clamp,
+        host_countries=HOST_COUNTRIES,
+    )
 
 
 def attack_metric(team: Team, profile: TeamProfile, state: Optional[dict] = None) -> float:
-    strength = (effective_elo(team, state) - 1650.0) / 320.0
-    value = 0.48 * strength
-    value += 0.05 * centered(profile.fifa_strength_index)
-    value += 0.12 * centered(profile.history.attack_index)
-    value += 0.05 * centered(profile.history.competitive_index)
-    value += 0.30 * centered(profile.squad.attack_unit)
-    value += 0.18 * centered(profile.squad.midfield_unit)
-    value += 0.14 * centered(profile.squad.finishing)
-    value += 0.10 * centered(profile.squad.set_piece_attack)
-    value += 0.08 * centered(profile.coach_index)
-    value += 0.06 * centered(profile.resource_index)
-    value += 0.06 * centered(profile.trajectory_index)
-    value += team.attack_bias
-    value += 0.28 * attack_form_signal(state)
-    value += 0.16 * recent_form_signal(state)
-    value += 0.10 * tactical_attack_signal(state)
-    value += 0.04 * tactical_tempo_signal(state)
-    value -= 0.12 * fatigue_level(state)
-    value -= 0.22 * (1.0 - availability_level(state))
-    return value
+    return calculate_attack_metric(
+        team,
+        profile,
+        state=state,
+        effective_elo=effective_elo,
+        centered=centered,
+        attack_form_signal=attack_form_signal,
+        recent_form_signal=recent_form_signal,
+        tactical_attack_signal=tactical_attack_signal,
+        tactical_tempo_signal=tactical_tempo_signal,
+        fatigue_level=fatigue_level,
+        availability_level=availability_level,
+    )
 
 
 def defense_metric(team: Team, profile: TeamProfile, state: Optional[dict] = None) -> float:
-    strength = (effective_elo(team, state) - 1650.0) / 340.0
-    value = 0.44 * strength
-    value += 0.04 * centered(profile.fifa_strength_index)
-    value += 0.12 * centered(profile.history.defense_index)
-    value += 0.04 * centered(profile.history.world_cup_index)
-    value += 0.28 * centered(profile.squad.defense_unit)
-    value += 0.14 * centered(profile.squad.goalkeeper_unit)
-    value += 0.10 * centered(profile.squad.player_experience)
-    value += 0.08 * centered(profile.squad.discipline_index)
-    value += 0.06 * centered(profile.coach_index)
-    value += 0.05 * centered(profile.heritage_index)
-    value += 0.04 * centered(profile.squad.set_piece_defense)
-    value += team.defense_bias
-    value += 0.30 * defense_form_signal(state)
-    value += 0.14 * recent_form_signal(state)
-    value += 0.08 * discipline_trend(state)
-    value += 0.08 * tactical_defense_signal(state)
-    value -= 0.03 * tactical_tempo_signal(state)
-    value -= 0.10 * fatigue_level(state)
-    value -= 0.20 * (1.0 - availability_level(state))
-    return value
+    return calculate_defense_metric(
+        team,
+        profile,
+        state=state,
+        effective_elo=effective_elo,
+        centered=centered,
+        defense_form_signal=defense_form_signal,
+        recent_form_signal=recent_form_signal,
+        discipline_trend=discipline_trend,
+        tactical_defense_signal=tactical_defense_signal,
+        tactical_tempo_signal=tactical_tempo_signal,
+        fatigue_level=fatigue_level,
+        availability_level=availability_level,
+    )
 
 
 def expected_goals(
@@ -1654,96 +1620,31 @@ def expected_goals(
     state_a: Optional[dict] = None,
     state_b: Optional[dict] = None,
 ) -> Tuple[float, float]:
-    profile_a = profile_for(team_a)
-    profile_b = profile_for(team_b)
-    context_a = context_components(team_a, profile_a, team_b, ctx, "A", state_a)
-    context_b = context_components(team_b, profile_b, team_a, ctx, "B", state_b)
-    importance_scale = clamp(ctx.importance, 0.70, 1.50)
-
-    attack_a = attack_metric(team_a, profile_a, state_a)
-    attack_b = attack_metric(team_b, profile_b, state_b)
-    defense_a = defense_metric(team_a, profile_a, state_a)
-    defense_b = defense_metric(team_b, profile_b, state_b)
-
-    attack_edge_a = attack_a - defense_b
-    attack_edge_b = attack_b - defense_a
-    elo_diff = effective_elo(team_a, state_a) - effective_elo(team_b, state_b)
-    fifa_diff = profile_a.fifa_strength_index - profile_b.fifa_strength_index
-    history_weight = (0.11 if ctx.knockout else 0.06) * importance_scale
-
-    delta_score = elo_diff / 255.0
-    delta_score += 0.16 * fifa_diff
-    delta_score += 0.10 * (profile_a.history.strength_index - profile_b.history.strength_index)
-    delta_score += 0.95 * (attack_edge_a - attack_edge_b)
-    delta_score += history_weight * (profile_a.heritage_index - profile_b.heritage_index)
-    delta_score += 0.05 * (profile_a.history.world_cup_index - profile_b.history.world_cup_index)
-    delta_score += 0.07 * (profile_a.resource_index - profile_b.resource_index)
-    delta_score += 0.09 * (profile_a.coach_index - profile_b.coach_index)
-    delta_score += 0.07 * (profile_a.squad.player_experience - profile_b.squad.player_experience)
-    delta_score += 0.05 * (profile_a.chemistry_index - profile_b.chemistry_index)
-    delta_score += 0.05 * (importance_scale - 1.0) * (
-        (profile_a.coach_index + profile_a.squad.player_experience + profile_a.heritage_index)
-        - (profile_b.coach_index + profile_b.squad.player_experience + profile_b.heritage_index)
+    return calculate_expected_goals(
+        team_a,
+        team_b,
+        ctx,
+        state_a=state_a,
+        state_b=state_b,
+        profile_for=profile_for,
+        context_components_fn=context_components,
+        attack_metric_fn=attack_metric,
+        defense_metric_fn=defense_metric,
+        effective_elo=effective_elo,
+        logistic=logistic,
+        centered=centered,
+        rivalry_intensity=rivalry_intensity,
+        attack_form_signal=attack_form_signal,
+        defense_form_signal=defense_form_signal,
+        recent_form_signal=recent_form_signal,
+        tactical_attack_signal=tactical_attack_signal,
+        tactical_defense_signal=tactical_defense_signal,
+        tactical_tempo_signal=tactical_tempo_signal,
+        fatigue_level=fatigue_level,
+        availability_level=availability_level,
+        group_pressure=group_pressure,
+        clamp=clamp,
     )
-    delta_score += 0.30 * ((sum(context_a.values()) - sum(context_b.values())))
-    delta_score += 0.14 * (recent_form_signal(state_a) - recent_form_signal(state_b))
-    delta_score += 0.10 * (attack_form_signal(state_a) - attack_form_signal(state_b))
-    delta_score += 0.08 * (defense_form_signal(state_a) - defense_form_signal(state_b))
-    delta_score += 0.06 * (tactical_attack_signal(state_a) - tactical_attack_signal(state_b))
-    delta_score += 0.04 * (tactical_defense_signal(state_a) - tactical_defense_signal(state_b))
-    delta_score -= 0.10 * (fatigue_level(state_a) - fatigue_level(state_b))
-    delta_score += 0.08 * (availability_level(state_a) - availability_level(state_b))
-    if (
-        ctx.market_prob_a is not None
-        and ctx.market_prob_b is not None
-        and ctx.market_prob_draw is not None
-    ):
-        market_edge = clamp(ctx.market_prob_a - ctx.market_prob_b, -0.90, 0.90)
-        market_draw_suppression = clamp(ctx.market_prob_draw - 0.26, -0.18, 0.18)
-        delta_score += 0.72 * market_edge
-        delta_score -= 0.08 * market_draw_suppression
-
-    share_a = logistic(delta_score)
-
-    total_goals = 2.28
-    total_goals += 0.16 * abs(elo_diff) / 400.0
-    total_goals += 0.04 * abs(fifa_diff)
-    total_goals += 0.18 * centered(profile_a.squad.attack_unit + profile_b.squad.attack_unit)
-    total_goals += 0.08 * centered(profile_a.history.attack_index + profile_b.history.attack_index)
-    total_goals += 0.12 * centered(profile_a.squad.shot_creation + profile_b.squad.shot_creation)
-    total_goals -= 0.12 * centered(profile_a.squad.defense_unit + profile_b.squad.defense_unit)
-    total_goals -= 0.08 * centered(profile_a.history.defense_index + profile_b.history.defense_index)
-    total_goals -= 0.06 * centered(profile_a.squad.goalkeeper_unit + profile_b.squad.goalkeeper_unit)
-    total_goals += 0.06 * (profile_a.tempo + profile_b.tempo - 1.0)
-    total_goals += 0.03 * (profile_a.squad.red_rate + profile_b.squad.red_rate - 0.02)
-    total_goals += 0.04 * (
-        group_pressure(ctx.group_points_a, ctx.group_matches_played_a, ctx.group_goal_diff_a)
-        + group_pressure(ctx.group_points_b, ctx.group_matches_played_b, ctx.group_goal_diff_b)
-    )
-    total_goals -= 0.10 if ctx.knockout else 0.0
-    total_goals -= 0.08 * max(importance_scale - 1.0, 0.0)
-    total_goals += 0.05 * max(1.0 - importance_scale, 0.0)
-    total_goals -= 0.12 * (clamp(ctx.injuries_a, 0.0, 1.0) + clamp(ctx.injuries_b, 0.0, 1.0))
-    total_goals -= 0.05 * ((ctx.travel_km_a + ctx.travel_km_b) / 12000.0)
-    total_goals -= 0.10 * clamp(ctx.weather_stress, 0.0, 1.0)
-    total_goals += 0.08 if ctx.altitude_m >= 1400 else 0.0
-    total_goals += 0.03 * rivalry_intensity(team_a, team_b)
-    total_goals += 0.08 * (attack_form_signal(state_a) + attack_form_signal(state_b))
-    total_goals -= 0.05 * (defense_form_signal(state_a) + defense_form_signal(state_b))
-    total_goals += 0.06 * (tactical_tempo_signal(state_a) + tactical_tempo_signal(state_b))
-    total_goals += 0.03 * (tactical_attack_signal(state_a) + tactical_attack_signal(state_b))
-    total_goals -= 0.02 * (tactical_defense_signal(state_a) + tactical_defense_signal(state_b))
-    total_goals -= 0.10 * (fatigue_level(state_a) + fatigue_level(state_b))
-    total_goals -= 0.07 * ((1.0 - availability_level(state_a)) + (1.0 - availability_level(state_b)))
-    if ctx.market_total_line is not None:
-        total_goals = 0.84 * total_goals + 0.16 * clamp(ctx.market_total_line + 0.05, 1.5, 4.6)
-    if ctx.market_prob_draw is not None:
-        total_goals -= 0.12 * clamp(ctx.market_prob_draw - 0.26, -0.15, 0.22)
-    total_goals = clamp(total_goals, 1.45, 4.55)
-
-    mu_a = clamp(total_goals * share_a, 0.07, 4.95)
-    mu_b = clamp(total_goals * (1.0 - share_a), 0.07, 4.95)
-    return mu_a, mu_b
 
 
 def factor_breakdown(
@@ -1753,51 +1654,24 @@ def factor_breakdown(
     state_a: Optional[dict] = None,
     state_b: Optional[dict] = None,
 ) -> Dict[str, float]:
-    profile_a = profile_for(team_a)
-    profile_b = profile_for(team_b)
-    context_a = context_components(team_a, profile_a, team_b, ctx, "A", state_a)
-    context_b = context_components(team_b, profile_b, team_a, ctx, "B", state_b)
-    return {
-        "elo_diff": effective_elo(team_a, state_a) - effective_elo(team_b, state_b),
-        "fifa_strength_diff": profile_a.fifa_strength_index - profile_b.fifa_strength_index,
-        "resource_diff": profile_a.resource_index - profile_b.resource_index,
-        "heritage_diff": profile_a.heritage_index - profile_b.heritage_index,
-        "historical_strength_diff": profile_a.history.strength_index - profile_b.history.strength_index,
-        "historical_attack_diff": profile_a.history.attack_index - profile_b.history.attack_index,
-        "historical_defense_diff": profile_a.history.defense_index - profile_b.history.defense_index,
-        "competitive_history_diff": profile_a.history.competitive_index - profile_b.history.competitive_index,
-        "world_cup_history_diff": profile_a.history.world_cup_index - profile_b.history.world_cup_index,
-        "coach_diff": profile_a.coach_index - profile_b.coach_index,
-        "importance": clamp(ctx.importance, 0.70, 1.50),
-        "trajectory_diff": profile_a.trajectory_index - profile_b.trajectory_index,
-        "attack_unit_diff": profile_a.squad.attack_unit - profile_b.squad.attack_unit,
-        "midfield_diff": profile_a.squad.midfield_unit - profile_b.squad.midfield_unit,
-        "defense_diff": profile_a.squad.defense_unit - profile_b.squad.defense_unit,
-        "goalkeeper_diff": profile_a.squad.goalkeeper_unit - profile_b.squad.goalkeeper_unit,
-        "bench_depth_diff": profile_a.squad.bench_depth - profile_b.squad.bench_depth,
-        "discipline_diff": profile_a.squad.discipline_index - profile_b.squad.discipline_index,
-        "experience_diff": profile_a.squad.player_experience - profile_b.squad.player_experience,
-        "morale_diff": context_a["morale"] - context_b["morale"],
-        "home_diff": context_a["home"] - context_b["home"],
-        "travel_diff": context_a["travel"] - context_b["travel"],
-        "injury_diff": context_a["injury"] - context_b["injury"],
-        "cards_diff": context_a["cards"] - context_b["cards"],
-        "group_pressure_diff": context_a["group_pressure"] - context_b["group_pressure"],
-        "lineup_diff": context_a["lineup"] - context_b["lineup"],
-        "market_prob_diff": (ctx.market_prob_a or 0.0) - (ctx.market_prob_b or 0.0),
-        "market_draw_prob": ctx.market_prob_draw or 0.0,
-        "market_total_line": ctx.market_total_line or 0.0,
-        "recent_form_diff": recent_form_signal(state_a) - recent_form_signal(state_b),
-        "attack_form_diff": attack_form_signal(state_a) - attack_form_signal(state_b),
-        "defense_form_diff": defense_form_signal(state_a) - defense_form_signal(state_b),
-        "tactical_attack_diff": tactical_attack_signal(state_a) - tactical_attack_signal(state_b),
-        "tactical_defense_diff": tactical_defense_signal(state_a) - tactical_defense_signal(state_b),
-        "tactical_tempo_diff": tactical_tempo_signal(state_a) - tactical_tempo_signal(state_b),
-        "fatigue_diff": fatigue_level(state_a) - fatigue_level(state_b),
-        "availability_diff": availability_level(state_a) - availability_level(state_b),
-        "discipline_trend_diff": discipline_trend(state_a) - discipline_trend(state_b),
-        "rivalry": rivalry_intensity(team_a, team_b),
-    }
+    return calculate_factor_breakdown(
+        team_a,
+        team_b,
+        ctx,
+        state_a=state_a,
+        state_b=state_b,
+        profile_for=profile_for,
+        context_components_fn=context_components,
+        effective_elo=effective_elo,
+        attack_form_signal=attack_form_signal,
+        defense_form_signal=defense_form_signal,
+        fatigue_level=fatigue_level,
+        availability_level=availability_level,
+        discipline_trend=discipline_trend,
+        tactical_attack_signal=tactical_attack_signal,
+        tactical_defense_signal=tactical_defense_signal,
+        tactical_tempo_signal=tactical_tempo_signal,
+    )
 
 
 def bivariate_poisson_prob(x: int, y: int, lambda1: float, lambda2: float, lambda3: float) -> float:
@@ -1997,78 +1871,23 @@ def sample_knockout_resolution(
     state_a: Optional[dict] = None,
     state_b: Optional[dict] = None,
 ) -> dict:
-    if score_a > score_b:
-        return asdict(
-            KnockoutResolution(
-                winner=team_a.name,
-                loser=team_b.name,
-                score_a=score_a,
-                score_b=score_b,
-                extra_time_score_a=0,
-                extra_time_score_b=0,
-                went_extra_time=False,
-                went_penalties=False,
-                penalty_score_a=None,
-                penalty_score_b=None,
-            )
-        )
-    if score_b > score_a:
-        return asdict(
-            KnockoutResolution(
-                winner=team_b.name,
-                loser=team_a.name,
-                score_a=score_a,
-                score_b=score_b,
-                extra_time_score_a=0,
-                extra_time_score_b=0,
-                went_extra_time=False,
-                went_penalties=False,
-                penalty_score_a=None,
-                penalty_score_b=None,
-            )
-        )
-
-    et_mu_a, et_mu_b = extra_time_expected_goals(mu_a, mu_b, state_a=state_a, state_b=state_b)
-    et_score_a, et_score_b = sample_score(et_mu_a, et_mu_b, ctx)
-    total_a = score_a + et_score_a
-    total_b = score_b + et_score_b
-    penalty_score_a = None
-    penalty_score_b = None
-    if et_score_a > et_score_b:
-        winner = team_a.name
-        loser = team_b.name
-        went_penalties = False
-    elif et_score_b > et_score_a:
-        winner = team_b.name
-        loser = team_a.name
-        went_penalties = False
-    else:
-        shootout = simulate_penalty_shootout(
-            team_a,
-            team_b,
-            ctx,
-            penalties_context_state(ctx.morale_a, state_a),
-            penalties_context_state(ctx.morale_b, state_b),
-            a_starts=fast_random() < 0.5,
-        )
-        winner = shootout["winner"]
-        loser = team_b.name if winner == team_a.name else team_a.name
-        went_penalties = True
-        penalty_score_a = shootout["score_a"]
-        penalty_score_b = shootout["score_b"]
-    return asdict(
-        KnockoutResolution(
-            winner=winner,
-            loser=loser,
-            score_a=total_a,
-            score_b=total_b,
-            extra_time_score_a=et_score_a,
-            extra_time_score_b=et_score_b,
-            went_extra_time=True,
-            went_penalties=went_penalties,
-            penalty_score_a=penalty_score_a,
-            penalty_score_b=penalty_score_b,
-        )
+    return calculate_sample_knockout_resolution(
+        team_a,
+        team_b,
+        ctx,
+        score_a,
+        score_b,
+        mu_a,
+        mu_b,
+        state_a=state_a,
+        state_b=state_b,
+        asdict=asdict,
+        KnockoutResolution=KnockoutResolution,
+        extra_time_expected_goals=extra_time_expected_goals,
+        sample_score=sample_score,
+        simulate_penalty_shootout=simulate_penalty_shootout,
+        penalties_context_state=penalties_context_state,
+        fast_random=fast_random,
     )
 
 
@@ -2974,48 +2793,21 @@ def sample_cards(
     state_a: Optional[dict] = None,
     state_b: Optional[dict] = None,
 ) -> Tuple[int, int, int, int]:
-    profile_a = profile_for(teams[team_a])
-    profile_b = profile_for(teams[team_b])
-    rivalry = rivalry_intensity(teams[team_a], teams[team_b])
-
-    yellow_lambda_a = clamp(
-        0.75 + 7.0 * profile_a.squad.yellow_rate + 0.35 * importance + 0.60 * rivalry
-        - 0.50 * profile_a.squad.discipline_index
-        + 0.55 * fatigue_level(state_a)
-        - 0.35 * discipline_trend(state_a),
-        0.25,
-        4.80,
+    return calculate_sample_cards(
+        teams,
+        team_a,
+        team_b,
+        importance,
+        state_a=state_a,
+        state_b=state_b,
+        profile_for=profile_for,
+        rivalry_intensity=rivalry_intensity,
+        fatigue_level=fatigue_level,
+        discipline_trend=discipline_trend,
+        poisson_sample=poisson_sample,
+        fast_random=fast_random,
+        clamp=clamp,
     )
-    yellow_lambda_b = clamp(
-        0.75 + 7.0 * profile_b.squad.yellow_rate + 0.35 * importance + 0.60 * rivalry
-        - 0.50 * profile_b.squad.discipline_index
-        + 0.55 * fatigue_level(state_b)
-        - 0.35 * discipline_trend(state_b),
-        0.25,
-        4.80,
-    )
-    red_prob_a = clamp(
-        0.012 + 1.8 * profile_a.squad.red_rate + 0.028 * importance + 0.04 * rivalry
-        - 0.02 * profile_a.squad.discipline_index
-        + 0.025 * fatigue_level(state_a)
-        - 0.018 * discipline_trend(state_a),
-        0.003,
-        0.20,
-    )
-    red_prob_b = clamp(
-        0.012 + 1.8 * profile_b.squad.red_rate + 0.028 * importance + 0.04 * rivalry
-        - 0.02 * profile_b.squad.discipline_index
-        + 0.025 * fatigue_level(state_b)
-        - 0.018 * discipline_trend(state_b),
-        0.003,
-        0.20,
-    )
-
-    yellows_a = poisson_sample(yellow_lambda_a)
-    yellows_b = poisson_sample(yellow_lambda_b)
-    reds_a = 1 if fast_random() < red_prob_a else 0
-    reds_b = 1 if fast_random() < red_prob_b else 0
-    return yellows_a, reds_a, yellows_b, reds_b
 
 
 def penalties_probability(team_a: Team, team_b: Team, state_a: dict, state_b: dict) -> float:
@@ -3092,33 +2884,15 @@ def penalty_shootout_summary(
     state_b: dict,
     iterations: int = 2400,
 ) -> dict:
-    counts: Dict[Tuple[int, int], int] = {}
-    wins_a = 0
-    wins_b = 0
-    total_a = 0
-    total_b = 0
-    starts_a = 0
-    for index in range(iterations):
-        a_starts = index % 2 == 0
-        starts_a += 1 if a_starts else 0
-        result = simulate_penalty_shootout(team_a, team_b, ctx, state_a, state_b, a_starts=a_starts)
-        counts[(result["score_a"], result["score_b"])] = counts.get((result["score_a"], result["score_b"]), 0) + 1
-        total_a += result["score_a"]
-        total_b += result["score_b"]
-        if result["winner"] == team_a.name:
-            wins_a += 1
-        else:
-            wins_b += 1
-    top_scores = sorted(counts.items(), key=lambda item: item[1], reverse=True)[:5]
-    return {
-        "iterations": iterations,
-        "win_a": wins_a / float(iterations),
-        "win_b": wins_b / float(iterations),
-        "avg_score_a": total_a / float(iterations),
-        "avg_score_b": total_b / float(iterations),
-        "a_starts_rate": starts_a / float(iterations),
-        "top_scores": [(f"{score[0]}-{score[1]}", count / float(iterations)) for score, count in top_scores],
-    }
+    return calculate_penalty_shootout_summary(
+        team_a,
+        team_b,
+        ctx,
+        state_a,
+        state_b,
+        iterations=iterations,
+        simulate_penalty_shootout_fn=simulate_penalty_shootout,
+    )
 
 
 def build_simulation_context(
@@ -3129,56 +2903,19 @@ def build_simulation_context(
     stage: str,
     group_name: Optional[str] = None,
 ) -> MatchContext:
-    state_a = ensure_state(states, team_a)
-    state_b = ensure_state(states, team_b)
-
-    neutral = True
-    home_team = None
-    venue_country = None
-    if stage == "group":
-        if teams[team_a].is_host:
-            neutral = False
-            home_team = team_a
-            venue_country = teams[team_a].host_country
-        elif teams[team_b].is_host:
-            neutral = False
-            home_team = team_b
-            venue_country = teams[team_b].host_country
-    else:
-        if teams[team_a].is_host:
-            venue_country = teams[team_a].host_country
-        elif teams[team_b].is_host:
-            venue_country = teams[team_b].host_country
-
-    weather_bucket = random.choice((0.03, 0.06, 0.09, 0.12))
-
-    return MatchContext(
-        neutral=neutral,
-        home_team=home_team,
-        venue_country=venue_country,
-        rest_days_a=4 if stage == "group" else 5,
-        rest_days_b=4 if stage == "group" else 5,
-        injuries_a=dynamic_injury_load(teams[team_a], state_a),
-        injuries_b=dynamic_injury_load(teams[team_b], state_b),
-        altitude_m=1500 if venue_country == "Mexico" and stage == "group" else 0,
-        travel_km_a=0.0 if teams[team_a].is_host else 3500.0,
-        travel_km_b=0.0 if teams[team_b].is_host else 3500.0,
-        knockout=stage != "group",
-        morale_a=state_a["morale"],
-        morale_b=state_b["morale"],
-        yellow_cards_a=predictive_yellow_cards(state_a),
-        yellow_cards_b=predictive_yellow_cards(state_b),
-        red_suspensions_a=int(state_a["red_suspensions"]),
-        red_suspensions_b=int(state_b["red_suspensions"]),
-        group=group_name,
-        group_points_a=int(state_a["group_points"]),
-        group_points_b=int(state_b["group_points"]),
-        group_goal_diff_a=int(state_a["group_goal_diff"]),
-        group_goal_diff_b=int(state_b["group_goal_diff"]),
-        group_matches_played_a=int(state_a["group_matches_played"]),
-        group_matches_played_b=int(state_b["group_matches_played"]),
-        weather_stress=weather_bucket,
-        importance=STAGE_IMPORTANCE[stage],
+    return calculate_build_simulation_context(
+        teams,
+        states,
+        team_a,
+        team_b,
+        stage,
+        group_name=group_name,
+        ensure_state=ensure_state,
+        dynamic_injury_load=dynamic_injury_load,
+        predictive_yellow_cards=predictive_yellow_cards,
+        stage_importance=STAGE_IMPORTANCE,
+        random_choice=random.choice,
+        MatchContext=MatchContext,
     )
 
 
@@ -3202,209 +2939,14 @@ def update_simulation_state(
     went_penalties: bool = False,
     live_stats: Optional[Dict[str, float]] = None,
 ) -> None:
-    state_a = ensure_state(states, team_a)
-    state_b = ensure_state(states, team_b)
-    effective_elo_a = effective_elo(teams[team_a], state_a)
-    effective_elo_b = effective_elo(teams[team_b], state_b)
-    home_edge = 0.0
-    if not ctx.neutral and ctx.home_team == team_a:
-        home_edge = 55.0
-    elif not ctx.neutral and ctx.home_team == team_b:
-        home_edge = -55.0
-
-    expected_result_a = 1.0 / (1.0 + 10.0 ** (-((effective_elo_a - effective_elo_b + home_edge) / 400.0)))
-    expected_result_b = 1.0 - expected_result_a
-    knockout = stage != "group"
-
-    if score_a > score_b:
-        actual_result_a = 1.0
-        actual_result_b = 0.0
-    elif score_b > score_a:
-        actual_result_a = 0.0
-        actual_result_b = 1.0
-    elif knockout and winner:
-        actual_result_a = 0.75 if winner == team_a else 0.25
-        actual_result_b = 1.0 - actual_result_a
-    else:
-        actual_result_a = 0.5
-        actual_result_b = 0.5
-
-    margin_multiplier = 1.0 + 0.18 * clamp(abs(score_a - score_b), 0, 3)
-    rating_k = clamp(22.0 + 12.0 * (ctx.importance - 1.0), 18.0, 34.0)
-    elo_delta_a = rating_k * margin_multiplier * (actual_result_a - expected_result_a)
-    elo_delta_b = -elo_delta_a
-    state_a["elo_shift"] = clamp(state_a["elo_shift"] + elo_delta_a, -220.0, 220.0)
-    state_b["elo_shift"] = clamp(state_b["elo_shift"] + elo_delta_b, -220.0, 220.0)
-
-    for state, team_name, score_for, score_against, expected_for, expected_against, actual_result, expected_result, yellows, reds, rest_days, travel_km, injuries in (
-        (
-            state_a,
-            team_a,
-            score_a,
-            score_b,
-            expected_goals_a,
-            expected_goals_b,
-            actual_result_a,
-            expected_result_a,
-            yellows_a,
-            reds_a,
-            ctx.rest_days_a,
-            ctx.travel_km_a,
-            ctx.injuries_a,
-        ),
-        (
-            state_b,
-            team_b,
-            score_b,
-            score_a,
-            expected_goals_b,
-            expected_goals_a,
-            actual_result_b,
-            expected_result_b,
-            yellows_b,
-            reds_b,
-            ctx.rest_days_b,
-            ctx.travel_km_b,
-            ctx.injuries_b,
-        ),
-    ):
-        team_profile = profile_for(teams[team_name])
-        attack_signal = clamp((score_for - expected_for) / 1.8, -1.0, 1.0)
-        defense_signal = clamp((expected_against - score_against) / 1.8, -1.0, 1.0)
-        result_signal = clamp(2.0 * (actual_result - expected_result), -1.0, 1.0)
-        form_signal = clamp(0.48 * result_signal + 0.30 * attack_signal + 0.22 * defense_signal, -1.0, 1.0)
-
-        state["recent_form"] = clamp(0.60 * state["recent_form"] + 0.40 * form_signal, -1.0, 1.0)
-        state["attack_form"] = clamp(0.58 * state["attack_form"] + 0.42 * attack_signal, -1.0, 1.0)
-        state["defense_form"] = clamp(0.58 * state["defense_form"] + 0.42 * defense_signal, -1.0, 1.0)
-        morale_delta = clamp(0.08 * form_signal + 0.03 * (1 if actual_result > 0.5 else -1 if actual_result < 0.5 else 0), -0.18, 0.18)
-        state["morale"] = clamp(0.72 * state["morale"] + morale_delta, -1.0, 1.0)
-
-        fatigue_delta = (
-            0.24
-            + 0.06 * max(ctx.importance - 1.0, 0.0)
-            + 0.05 * clamp(travel_km / 6000.0, 0.0, 2.0)
-            + 0.05 * clamp(injuries, 0.0, 1.0)
-            + 0.025 * (yellows + 2 * reds)
-            + (0.18 if went_extra_time else 0.0)
-            + (0.04 if went_penalties else 0.0)
-            - 0.045 * clamp(rest_days, 2, 8)
-        )
-        state["fatigue"] = clamp(0.58 * state["fatigue"] + fatigue_delta, 0.0, 1.0)
-
-        target_availability = (
-            1.0
-            - 0.50 * clamp(injuries, 0.0, 1.0)
-            - 0.12 * reds
-            - 0.03 * yellows
-            - 0.10 * state["fatigue"]
-            - (0.05 if went_extra_time else 0.0)
-            - (0.02 if went_penalties else 0.0)
-        )
-        state["availability"] = clamp(0.74 * state["availability"] + 0.26 * target_availability, 0.40, 1.0)
-
-        discipline_signal = clamp(
-            0.10 * (team_profile.squad.discipline_index - 0.5) - 0.10 * yellows - 0.34 * reds,
-            -1.0,
-            0.4,
-        )
-        state["discipline_drift"] = clamp(0.68 * state["discipline_drift"] + 0.32 * discipline_signal, -1.0, 0.5)
-
-    state_a["yellow_cards"] = clamp(state_a["yellow_cards"] + yellows_a, 0, 12)
-    state_b["yellow_cards"] = clamp(state_b["yellow_cards"] + yellows_b, 0, 12)
-    state_a["yellow_load"] = clamp(state_a["yellow_load"] * 0.55 + 0.45 * yellows_a + 0.70 * reds_a, 0.0, 6.0)
-    state_b["yellow_load"] = clamp(state_b["yellow_load"] * 0.55 + 0.45 * yellows_b + 0.70 * reds_b, 0.0, 6.0)
-    state_a["red_suspensions"] = clamp(reds_a, 0, 4)
-    state_b["red_suspensions"] = clamp(reds_b, 0, 4)
-
-    state_a["matches_played"] += 1
-    state_b["matches_played"] += 1
-    state_a["goals_for"] += score_a
-    state_a["goals_against"] += score_b
-    state_b["goals_for"] += score_b
-    state_b["goals_against"] += score_a
-    update_tactical_signature_state(state_a, live_signature_metrics("a", live_stats or {}))
-    update_tactical_signature_state(state_b, live_signature_metrics("b", live_stats or {}))
-
-    if stage == "group":
-        state_a["group_matches_played"] += 1
-        state_b["group_matches_played"] += 1
-        state_a["group_goals_for"] += score_a
-        state_b["group_goals_for"] += score_b
-        state_a["group_goals_against"] += score_b
-        state_b["group_goals_against"] += score_a
-        state_a["group_goal_diff"] += score_a - score_b
-        state_b["group_goal_diff"] += score_b - score_a
-        if score_a > score_b:
-            state_a["group_points"] += 3
-        elif score_b > score_a:
-            state_b["group_points"] += 3
-        else:
-            state_a["group_points"] += 1
-            state_b["group_points"] += 1
-        state_a["fair_play"] -= yellows_a + 3 * reds_a
-        state_b["fair_play"] -= yellows_b + 3 * reds_b
-
-
-def simulate_match_sample(
-    teams: Dict[str, Team],
-    states: Dict[str, dict],
-    team_a: str,
-    team_b: str,
-    stage: str,
-    group_name: Optional[str] = None,
-) -> dict:
-    ctx = build_simulation_context(teams, states, team_a, team_b, stage, group_name=group_name)
-    state_a = ensure_state(states, team_a)
-    state_b = ensure_state(states, team_b)
-    mu_a, mu_b = cached_simulation_expected_goals(
-        team_a,
-        team_b,
-        ctx,
-        simulation_state_signature(state_a),
-        simulation_state_signature(state_b),
-    )
-    score_a, score_b = sample_score(mu_a, mu_b, ctx)
-    yellows_a, reds_a, yellows_b, reds_b = sample_cards(
-        teams,
-        team_a,
-        team_b,
-        ctx.importance,
-        state_a=state_a,
-        state_b=state_b,
-    )
-
-    winner = None
-    loser = None
-    went_extra_time = False
-    went_penalties = False
-    if stage != "group":
-        resolution = sample_knockout_resolution(
-            teams[team_a],
-            teams[team_b],
-            ctx,
-            score_a,
-            score_b,
-            mu_a,
-            mu_b,
-            state_a=state_a,
-            state_b=state_b,
-        )
-        winner = resolution["winner"]
-        loser = resolution["loser"]
-        score_a = resolution["score_a"]
-        score_b = resolution["score_b"]
-        went_extra_time = resolution["went_extra_time"]
-        went_penalties = resolution["went_penalties"]
-
-    update_simulation_state(
+    return calculate_update_simulation_state(
         teams,
         states,
         team_a,
         team_b,
         ctx,
-        mu_a,
-        mu_b,
+        expected_goals_a,
+        expected_goals_b,
         score_a,
         score_b,
         yellows_a,
@@ -3415,45 +2957,55 @@ def simulate_match_sample(
         winner=winner,
         went_extra_time=went_extra_time,
         went_penalties=went_penalties,
+        live_stats=live_stats,
+        ensure_state=ensure_state,
+        effective_elo=effective_elo,
+        elo_delta_for_match=calculate_elo_delta_for_match,
+        profile_for=profile_for,
+        live_signature_metrics=live_signature_metrics,
+        update_tactical_signature_state=update_tactical_signature_state,
+        clamp=clamp,
     )
 
-    return {
-        "team_a": team_a,
-        "team_b": team_b,
-        "score_a": score_a,
-        "score_b": score_b,
-        "winner": winner,
-        "loser": loser,
-        "went_extra_time": went_extra_time,
-        "went_penalties": went_penalties,
-    }
+
+def simulate_match_sample(
+    teams: Dict[str, Team],
+    states: Dict[str, dict],
+    team_a: str,
+    team_b: str,
+    stage: str,
+    group_name: Optional[str] = None,
+) -> dict:
+    return calculate_simulate_match_sample(
+        teams,
+        states,
+        team_a,
+        team_b,
+        stage,
+        group_name=group_name,
+        build_simulation_context_fn=build_simulation_context,
+        ensure_state=ensure_state,
+        cached_simulation_expected_goals=cached_simulation_expected_goals,
+        simulation_state_signature=simulation_state_signature,
+        sample_score=sample_score,
+        sample_cards_fn=sample_cards,
+        sample_knockout_resolution_fn=sample_knockout_resolution,
+        update_simulation_state_fn=update_simulation_state,
+    )
 
 
 def standings_entry(teams: Dict[str, Team], states: Dict[str, dict], group_name: str, team_name: str) -> dict:
-    state = ensure_state(states, team_name)
-    return {
-        "team": team_name,
-        "group": group_name,
-        "points": state["group_points"],
-        "goal_diff": state["group_goal_diff"],
-        "goals_for": state["group_goals_for"],
-        "fair_play": state["fair_play"],
-        "elo": teams[team_name].elo,
-    }
+    return calculate_standings_entry(
+        teams,
+        states,
+        group_name,
+        team_name,
+        ensure_state=ensure_state,
+    )
 
 
 def sort_standings(entries: Sequence[dict]) -> List[dict]:
-    return sorted(
-        entries,
-        key=lambda entry: (
-            entry["points"],
-            entry["goal_diff"],
-            entry["goals_for"],
-            entry["fair_play"],
-            entry["elo"],
-        ),
-        reverse=True,
-    )
+    return calculate_sort_standings(entries)
 
 
 def simulate_group_stage(
@@ -3461,68 +3013,28 @@ def simulate_group_stage(
     groups: Dict[str, List[str]],
     states: Dict[str, dict],
 ) -> Dict[str, List[dict]]:
-    standings = {}
-    for group_name, group_teams in groups.items():
-        for team_name in group_teams:
-            ensure_state(states, team_name)
-        for index_a, index_b in GROUP_MATCH_PAIRS:
-            team_a = group_teams[index_a]
-            team_b = group_teams[index_b]
-            simulate_match_sample(teams, states, team_a, team_b, "group", group_name=group_name)
-        entries = [standings_entry(teams, states, group_name, team_name) for team_name in group_teams]
-        standings[group_name] = sort_standings(entries)
-    return standings
+    return calculate_simulate_group_stage(
+        teams,
+        groups,
+        states,
+        ensure_state=ensure_state,
+        group_match_pairs=GROUP_MATCH_PAIRS,
+        simulate_match_sample_fn=simulate_match_sample,
+        standings_entry_fn=standings_entry,
+        sort_standings_fn=sort_standings,
+    )
 
 
 def assign_third_place_slots(
     standings: Dict[str, List[dict]],
     winner_ranks: Dict[str, int],
 ) -> Tuple[List[dict], Dict[str, str]]:
-    third_place_entries = sort_standings([table[2] for table in standings.values()])[:8]
-    for rank, entry in enumerate(third_place_entries, start=1):
-        entry["third_rank"] = rank
-
-    third_slot_matches = [match for match in R32_MATCHES if match["team_b"]["type"] == "third_place"]
-    ordered_slots = sorted(
-        third_slot_matches,
-        key=lambda match: (
-            len(match["team_b"]["allowed_groups"]),
-            winner_ranks[match["team_a"]["group"]],
-            match["id"],
-        ),
+    return calculate_assign_third_place_slots(
+        standings,
+        winner_ranks,
+        sort_standings_fn=sort_standings,
+        r32_matches=R32_MATCHES,
     )
-
-    best_assignment: Dict[str, str] = {}
-    best_score = -1.0
-
-    def backtrack(index: int, used_groups: set, current: Dict[str, str], score: float) -> None:
-        nonlocal best_assignment, best_score
-        if index == len(ordered_slots):
-            if score > best_score:
-                best_score = score
-                best_assignment = dict(current)
-            return
-
-        match = ordered_slots[index]
-        winner_rank = winner_ranks[match["team_a"]["group"]]
-        candidates = [
-            entry for entry in third_place_entries
-            if entry["group"] in match["team_b"]["allowed_groups"] and entry["group"] not in used_groups
-        ]
-        candidates.sort(key=lambda entry: entry["third_rank"], reverse=True)
-
-        for candidate in candidates:
-            current[match["id"]] = candidate["team"]
-            used_groups.add(candidate["group"])
-            candidate_score = (13 - winner_rank) * candidate["third_rank"]
-            backtrack(index + 1, used_groups, current, score + candidate_score)
-            used_groups.remove(candidate["group"])
-            current.pop(match["id"], None)
-
-    backtrack(0, set(), {}, 0.0)
-    if len(best_assignment) != len(third_slot_matches):
-        raise SystemExit("No se pudo asignar un cuadro valido para los mejores terceros.")
-    return third_place_entries, best_assignment
 
 
 def resolve_r32_team(
@@ -3531,11 +3043,7 @@ def resolve_r32_team(
     third_assignments: Dict[str, str],
     match_id: str,
 ) -> str:
-    if slot["type"] == "group_rank":
-        return standings[slot["group"]][slot["rank"] - 1]["team"]
-    if slot["type"] == "third_place":
-        return third_assignments[match_id]
-    raise SystemExit(f"Slot no soportado en {match_id}: {slot}")
+    return calculate_resolve_r32_team(slot, standings, third_assignments, match_id)
 
 
 def run_knockout_round(
@@ -3545,15 +3053,14 @@ def run_knockout_round(
     fixtures: Sequence[Tuple[str, str, str]],
     previous_winners: Dict[str, str],
 ) -> Tuple[Dict[str, str], Dict[str, dict]]:
-    winners = {}
-    results = {}
-    for match_id, left_id, right_id in fixtures:
-        team_a = previous_winners[left_id]
-        team_b = previous_winners[right_id]
-        result = simulate_match_sample(teams, states, team_a, team_b, stage)
-        winners[match_id] = result["winner"]
-        results[match_id] = result
-    return winners, results
+    return calculate_run_knockout_round(
+        teams,
+        states,
+        stage,
+        fixtures,
+        previous_winners,
+        simulate_match_sample_fn=simulate_match_sample,
+    )
 
 
 def simulate_tournament_iteration(
@@ -3561,81 +3068,22 @@ def simulate_tournament_iteration(
     config: dict,
     initial_payload: Optional[dict] = None,
 ) -> dict:
-    placeholders = sample_playoff_placeholders(teams)
-    groups = resolve_groups_for_iteration(config, placeholders)
-    participants = [team for members in groups.values() for team in members]
-    states = initial_simulation_states(initial_payload)
-    standings = simulate_group_stage(teams, groups, states)
-
-    winner_entries = sort_standings([table[0] for table in standings.values()])
-    winner_ranks = {entry["group"]: rank for rank, entry in enumerate(winner_entries, start=1)}
-    third_entries, third_assignments = assign_third_place_slots(standings, winner_ranks)
-
-    stage_reached = {team: "group" for team in participants}
-    qualified = {entry["team"] for table in standings.values() for entry in table[:2]}
-    qualified.update(entry["team"] for entry in third_entries)
-    bracket_matches = {}
-
-    for team in qualified:
-        stage_reached[team] = "round32"
-
-    r32_winners = {}
-    for match in R32_MATCHES:
-        team_a = resolve_r32_team(match["team_a"], standings, third_assignments, match["id"])
-        team_b = resolve_r32_team(match["team_b"], standings, third_assignments, match["id"])
-        result = simulate_match_sample(teams, states, team_a, team_b, "round32")
-        winner = result["winner"]
-        r32_winners[match["id"]] = winner
-        bracket_matches[match["id"]] = result
-        stage_reached[winner] = "round16"
-
-    round16_winners, round16_results = run_knockout_round(teams, states, "round16", KNOCKOUT_MATCHES["round16"], r32_winners)
-    bracket_matches.update(round16_results)
-    for winner in round16_winners.values():
-        stage_reached[winner] = "quarterfinal"
-
-    quarter_winners, quarter_results = run_knockout_round(teams, states, "quarterfinal", KNOCKOUT_MATCHES["quarterfinal"], round16_winners)
-    bracket_matches.update(quarter_results)
-    for winner in quarter_winners.values():
-        stage_reached[winner] = "semifinal"
-
-    semifinal_winners = {}
-    semifinal_losers = []
-    for match_id, left_id, right_id in KNOCKOUT_MATCHES["semifinal"]:
-        team_a = quarter_winners[left_id]
-        team_b = quarter_winners[right_id]
-        result = simulate_match_sample(teams, states, team_a, team_b, "semifinal")
-        semifinal_winners[match_id] = result["winner"]
-        semifinal_losers.append(result["loser"])
-        bracket_matches[match_id] = result
-    for winner in semifinal_winners.values():
-        stage_reached[winner] = "final"
-
-    third_place_result = simulate_match_sample(
+    return calculate_simulate_tournament_iteration(
         teams,
-        states,
-        semifinal_losers[0],
-        semifinal_losers[1],
-        "third_place",
+        config,
+        initial_payload=initial_payload,
+        sample_playoff_placeholders=sample_playoff_placeholders,
+        resolve_groups_for_iteration=resolve_groups_for_iteration,
+        initial_simulation_states=initial_simulation_states,
+        simulate_group_stage_fn=simulate_group_stage,
+        sort_standings_fn=sort_standings,
+        assign_third_place_slots_fn=assign_third_place_slots,
+        resolve_r32_team_fn=resolve_r32_team,
+        run_knockout_round_fn=run_knockout_round,
+        r32_matches=R32_MATCHES,
+        knockout_matches=KNOCKOUT_MATCHES,
+        simulate_match_sample_fn=simulate_match_sample,
     )
-    bracket_matches["M104"] = third_place_result
-
-    final_winners, final_results = run_knockout_round(teams, states, "final", KNOCKOUT_MATCHES["final"], semifinal_winners)
-    bracket_matches.update(final_results)
-    champion = final_winners["M103"]
-    stage_reached[champion] = "champion"
-
-    return {
-        "participants": participants,
-        "standings": standings,
-        "third_entries": third_entries,
-        "stage_reached": stage_reached,
-        "states": states,
-        "champion": champion,
-        "third_place": third_place_result["winner"],
-        "fourth_place": third_place_result["loser"],
-        "bracket_matches": bracket_matches,
-    }
 
 
 def _simulate_tournament_batch(
@@ -3645,39 +3093,17 @@ def _simulate_tournament_batch(
     config: dict,
     initial_payload: Optional[dict],
 ) -> Dict[str, dict]:
-    seed_all_rng(seed)
-    summary = empty_tournament_summary(teams)
-    for _ in range(batch_size):
-        result = simulate_tournament_iteration(teams, config, initial_payload=initial_payload)
-        participants = set(result["participants"])
-        for team_name in participants:
-            stats = summary[team_name]
-            state = ensure_state(result["states"], team_name)
-            stats["appear"] += 1
-            stats["avg_group_points"] += state["group_points"]
-            stats["avg_goals_for"] += state["goals_for"]
-            stats["avg_goals_against"] += state["goals_against"]
-
-        for group_table in result["standings"].values():
-            summary[group_table[0]["team"]]["group_winner"] += 1
-
-        for team_name, stage in result["stage_reached"].items():
-            stats = summary[team_name]
-            if stage in {"round32", "round16", "quarterfinal", "semifinal", "final", "champion"}:
-                stats["advance_group"] += 1
-            if stage in {"round16", "quarterfinal", "semifinal", "final", "champion"}:
-                stats["reach_round16"] += 1
-            if stage in {"quarterfinal", "semifinal", "final", "champion"}:
-                stats["reach_quarterfinal"] += 1
-            if stage in {"semifinal", "final", "champion"}:
-                stats["reach_semifinal"] += 1
-            if stage in {"final", "champion"}:
-                stats["reach_final"] += 1
-            if stage == "champion":
-                stats["champion"] += 1
-        summary[result["third_place"]]["third_place"] += 1
-        summary[result["fourth_place"]]["fourth_place"] += 1
-    return summary
+    return calculate_simulate_tournament_batch(
+        batch_size,
+        seed,
+        teams,
+        config,
+        initial_payload,
+        seed_all_rng=seed_all_rng,
+        empty_tournament_summary=empty_tournament_summary,
+        ensure_state=ensure_state,
+        simulate_tournament_iteration_fn=simulate_tournament_iteration,
+    )
 
 
 def _project_bracket_batch(
@@ -3687,21 +3113,17 @@ def _project_bracket_batch(
     config: dict,
     initial_payload: Optional[dict],
 ) -> Dict[str, dict]:
-    seed_all_rng(seed)
-    match_aggregate = empty_bracket_aggregate(bracket_match_order())
-    for _ in range(batch_size):
-        result = simulate_tournament_iteration(teams, config, initial_payload=initial_payload)
-        for match_id, match_result in result["bracket_matches"].items():
-            aggregate = match_aggregate[match_id]
-            outcome_key = (match_result["team_a"], match_result["team_b"], match_result["winner"])
-            aggregate["outcomes"][outcome_key] = aggregate["outcomes"].get(outcome_key, 0) + 1
-            aggregate["winner"][match_result["winner"]] = aggregate["winner"].get(match_result["winner"], 0) + 1
-            aggregate["went_extra_time"] += 1 if match_result.get("went_extra_time") else 0
-            aggregate["went_penalties"] += 1 if match_result.get("went_penalties") else 0
-            if match_result.get("went_penalties") and match_result.get("penalty_score_a") is not None and match_result.get("penalty_score_b") is not None:
-                penalty_key = (int(match_result["penalty_score_a"]), int(match_result["penalty_score_b"]))
-                aggregate["penalty_scores"][penalty_key] = aggregate["penalty_scores"].get(penalty_key, 0) + 1
-    return match_aggregate
+    return calculate_project_bracket_batch(
+        batch_size,
+        seed,
+        teams,
+        config,
+        initial_payload,
+        seed_all_rng=seed_all_rng,
+        empty_bracket_aggregate=empty_bracket_aggregate,
+        bracket_match_order_fn=bracket_match_order,
+        simulate_tournament_iteration_fn=simulate_tournament_iteration,
+    )
 
 
 def command_simulate_tournament(args: argparse.Namespace, teams: Dict[str, Team]) -> None:
@@ -3800,7 +3222,10 @@ def command_simulate_tournament(args: argparse.Namespace, teams: Dict[str, Team]
 
 
 def bracket_match_order() -> List[str]:
-    return [match["id"] for match in R32_MATCHES] + [match_id for round_matches in KNOCKOUT_MATCHES.values() for match_id, _, _ in round_matches] + ["M104"]
+    return calculate_bracket_match_order(
+        r32_matches=R32_MATCHES,
+        knockout_matches=KNOCKOUT_MATCHES,
+    )
 
 
 def stage_for_match_id(match_id: str) -> str:
