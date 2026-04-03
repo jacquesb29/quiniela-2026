@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Dashboard Mundial 2026</title>
+  <style>{{ css }}</style>
+</head>
+<body>
+  <main>
+    <section class="panel hero">
+      <div class="hero-grid">
+        <div>
+          <p class="eyebrow">Modelo Dinámico | Mundial 2026</p>
+          <h1>Pronóstico En Vivo y Hoja de Ruta</h1>
+          <p class="lede">Cada partido mezcla un stack estadistico con modelo principal, contraste, ajuste de baja anotacion, Elo, puntos FIFA complementarios, forma reciente, clima, alineaciones, bajas, mercado y estado del torneo. Si un juego está en curso, las probabilidades ya se condicionan al minuto y al marcador actual.</p>
+          <div class="summary-grid">
+            <div class="summary-tile">
+              <span>Última actualización</span>
+              <strong>{{ updated_at }}</strong>
+            </div>
+            <div class="summary-tile">
+              <span>Frecuencia cloud</span>
+              <strong>Cada 5 minutos</strong>
+            </div>
+            <div class="summary-tile">
+              <span>Estado del torneo</span>
+              <strong>Elo + forma + fatiga + disciplina</strong>
+            </div>
+            <div class="summary-tile">
+              <span>Origen operativo</span>
+              <strong>GitHub Actions + Pages</strong>
+            </div>
+          </div>
+        </div>
+        <div class="hero-notes">
+          <article class="hero-note">
+            <h3>Qué significan las métricas</h3>
+            <p><strong>Marcador proyectado</strong> muestra el resultado entero mas probable. <strong>Promedio estimado de goles del modelo</strong> es una media probabilistica y por eso puede llevar decimales. <strong>Probabilidades de resultado</strong> es la chance de victoria, empate o derrota en ese mismo corte. <strong>Puntos FIFA</strong> entran como señal estructural secundaria, con menos peso que Elo. <strong>Historia desde 1990</strong> suma memoria de rendimiento competitivo, mundialista, ataque, defensa y penales. <strong>Coincidencia entre modelos</strong> ayuda a separar picks claros de partidos realmente parejos.</p>
+          </article>
+          <article class="hero-note">
+            <h3>Durante un partido</h3>
+            <p>El dashboard pasa a modo in-play: usa minuto, marcador actual y fase del juego para recalcular el resultado final más probable, el resto de goles esperados y los marcadores finales mas probables en cada corte de actualizacion.</p>
+          </article>
+          <article class="hero-note">
+            <h3>Trazabilidad</h3>
+            <p>Estado usado: {{ state_path }}<br>Fixtures leídos: {{ fixtures_path }}</p>
+          </article>
+          <article class="hero-note">
+            <h3>Como validar el in-play</h3>
+            <p>Si el partido esta en vivo, revisa la hora superior, el badge En vivo, el minuto modelado y el archivo <a href="latest.json" style="color:#fff3d7;">latest.json</a>. Todo eso se regenera en cada corrida de GitHub Actions y debe mover probabilidades y marcadores proyectados cuando cambie el estado del juego.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+    {{ methodology_html }}
+    {{ global_confidence_html }}
+    {{ recent_changes_html }}
+    {{ backtesting_html }}
+    {{ bracket_visual_html }}
+    <section class="panel">
+      <div class="panel-head">
+        <div>
+          <p class="eyebrow">Texto técnico</p>
+          <h2>Resumen completo de la llave</h2>
+          <p class="lede-tight">Además del bracket visual, aquí se conserva el detalle textual completo para revisar todos los cruces y porcentajes publicados.</p>
+        </div>
+      </div>
+      <h2>Llave actual</h2>
+      <pre>{{ bracket_html }}</pre>
+    </section>
+    <section class="cards">
+      {{ cards_html }}
+    </section>
+  </main>
+</body>
+</html>

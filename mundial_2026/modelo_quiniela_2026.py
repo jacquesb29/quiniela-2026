@@ -16,13 +16,24 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Dict, List, Optional, Sequence, Tuple
 
+from worldcup2026.calibration import empirical_bayes_shrinkage
 from worldcup2026.config import PARAMS
+from worldcup2026.dashboard.html_builder import render_dashboard_html
+from worldcup2026.data.state import (
+    coerce_team_state as package_coerce_team_state,
+    copy_states as package_copy_states,
+    default_team_state as package_default_team_state,
+    initial_team_states as package_initial_team_states,
+    normalize_team_state as package_normalize_team_state,
+    state_has_activity as package_state_has_activity,
+)
 from worldcup2026.distributions import (
     build_model_stack,
     cached_low_score_distribution,
     low_score_rho,
     model_blend_weights,
 )
+from worldcup2026.logging_utils import log
 from worldcup2026.metrics import avg_or_none, brier_decomposition, summarize_temporal_windows
 from worldcup2026.modeling import (
     dynamic_correlation,
@@ -35,6 +46,7 @@ from worldcup2026.parallel import (
     merge_tournament_summary,
     run_parallel_batches,
 )
+from worldcup2026.simulation.rng import fast_random, poisson_sample_fast, seed_fast_rng
 from worldcup2026.types import BacktestMetrics, KnockoutResolution
 
 
@@ -605,6 +617,11 @@ def stable_seed(value: str) -> int:
     for index, char in enumerate(value):
         total += (index + 1) * ord(char)
     return total
+
+
+def seed_all_rng(seed: Optional[int]) -> None:
+    random.seed(seed)
+    seed_fast_rng(seed)
 
 
 def parse_elapsed_minutes(status_detail: Optional[str], knockout: bool) -> Tuple[Optional[float], str]:
@@ -1190,15 +1207,7 @@ def resolve_fixture_names(fixture: dict, teams: Dict[str, Team]) -> dict:
 
 
 def poisson_sample(lmbda: float) -> int:
-    if lmbda <= 0:
-        return 0
-    threshold = math.exp(-lmbda)
-    product = 1.0
-    count = 0
-    while product > threshold:
-        count += 1
-        product *= random.random()
-    return count - 1
+    return poisson_sample_fast(lmbda)
 
 
 def load_players(raw_players: Sequence[dict]) -> Tuple[Player, ...]:
@@ -1382,12 +1391,79 @@ def historical_snapshot(team: Team) -> HistoricalSnapshot:
     row = payload.get("teams", {}).get(team.name)
     if not row:
         return proxy_historical_snapshot(team)
+    proxy = proxy_historical_snapshot(team)
+    weighted_matches = float(row.get("weighted_matches_since_1990", 0.0))
+    matches_since_1990 = int(row.get("matches_since_1990", 0))
+    competitive_matches = int(row.get("competitive_matches_since_1990", 0))
+    world_cup_matches = int(row.get("world_cup_matches_since_1990", 0))
+    shootout_matches = int(row.get("shootout_matches_since_1990", 0))
+
+    strength_index = clamp(
+        empirical_bayes_shrinkage(
+            float(row.get("strength_index", proxy.strength_index)),
+            weighted_matches or matches_since_1990,
+            proxy.strength_index,
+            18.0,
+        ),
+        0.0,
+        1.0,
+    )
+    attack_index = clamp(
+        empirical_bayes_shrinkage(
+            float(row.get("attack_index", proxy.attack_index)),
+            weighted_matches or matches_since_1990,
+            proxy.attack_index,
+            18.0,
+        ),
+        0.0,
+        1.0,
+    )
+    defense_index = clamp(
+        empirical_bayes_shrinkage(
+            float(row.get("defense_index", proxy.defense_index)),
+            weighted_matches or matches_since_1990,
+            proxy.defense_index,
+            18.0,
+        ),
+        0.0,
+        1.0,
+    )
+    competitive_index = clamp(
+        empirical_bayes_shrinkage(
+            float(row.get("competitive_index", proxy.competitive_index)),
+            competitive_matches,
+            proxy.competitive_index,
+            12.0,
+        ),
+        0.0,
+        1.0,
+    )
+    world_cup_index = clamp(
+        empirical_bayes_shrinkage(
+            float(row.get("world_cup_index", proxy.world_cup_index)),
+            world_cup_matches,
+            proxy.world_cup_index,
+            6.0,
+        ),
+        0.0,
+        1.0,
+    )
+    shootout_index = clamp(
+        empirical_bayes_shrinkage(
+            float(row.get("shootout_index", proxy.shootout_index)),
+            shootout_matches,
+            proxy.shootout_index,
+            5.0,
+        ),
+        0.0,
+        1.0,
+    )
     return HistoricalSnapshot(
         source_names=tuple(row.get("source_names") or [HISTORICAL_TEAM_NAME_ALIASES.get(team.name, team.name)]),
-        matches_since_1990=int(row.get("matches_since_1990", 0)),
-        weighted_matches_since_1990=float(row.get("weighted_matches_since_1990", 0.0)),
-        points_per_match=float(row.get("points_per_match", 1.25)),
-        weighted_points_per_match=float(row.get("weighted_points_per_match", 1.25)),
+        matches_since_1990=matches_since_1990,
+        weighted_matches_since_1990=weighted_matches,
+        points_per_match=float(row.get("points_per_match", proxy.points_per_match)),
+        weighted_points_per_match=float(row.get("weighted_points_per_match", proxy.weighted_points_per_match)),
         goals_for_per_match=float(row.get("goals_for_per_match", 1.2)),
         goals_against_per_match=float(row.get("goals_against_per_match", 1.2)),
         goal_diff_per_match=float(row.get("goal_diff_per_match", 0.0)),
@@ -1396,20 +1472,20 @@ def historical_snapshot(team: Team) -> HistoricalSnapshot:
         weighted_goal_diff_per_match=float(row.get("weighted_goal_diff_per_match", 0.0)),
         scoring_rate=float(row.get("scoring_rate", 0.62)),
         clean_sheet_rate=float(row.get("clean_sheet_rate", 0.26)),
-        competitive_matches_since_1990=int(row.get("competitive_matches_since_1990", 0)),
-        competitive_points_per_match=float(row.get("competitive_points_per_match", 1.25)),
+        competitive_matches_since_1990=competitive_matches,
+        competitive_points_per_match=float(row.get("competitive_points_per_match", proxy.competitive_points_per_match)),
         competitive_goal_diff_per_match=float(row.get("competitive_goal_diff_per_match", 0.0)),
-        world_cup_matches_since_1990=int(row.get("world_cup_matches_since_1990", 0)),
-        world_cup_points_per_match=float(row.get("world_cup_points_per_match", 0.0)),
+        world_cup_matches_since_1990=world_cup_matches,
+        world_cup_points_per_match=float(row.get("world_cup_points_per_match", proxy.world_cup_points_per_match)),
         world_cup_goal_diff_per_match=float(row.get("world_cup_goal_diff_per_match", 0.0)),
-        shootout_matches_since_1990=int(row.get("shootout_matches_since_1990", 0)),
-        shootout_win_rate=float(row.get("shootout_win_rate", 0.5)),
-        strength_index=clamp(float(row.get("strength_index", 0.5)), 0.0, 1.0),
-        attack_index=clamp(float(row.get("attack_index", 0.5)), 0.0, 1.0),
-        defense_index=clamp(float(row.get("defense_index", 0.5)), 0.0, 1.0),
-        competitive_index=clamp(float(row.get("competitive_index", 0.5)), 0.0, 1.0),
-        world_cup_index=clamp(float(row.get("world_cup_index", 0.5)), 0.0, 1.0),
-        shootout_index=clamp(float(row.get("shootout_index", 0.5)), 0.0, 1.0),
+        shootout_matches_since_1990=shootout_matches,
+        shootout_win_rate=float(row.get("shootout_win_rate", proxy.shootout_win_rate)),
+        strength_index=strength_index,
+        attack_index=attack_index,
+        defense_index=defense_index,
+        competitive_index=competitive_index,
+        world_cup_index=world_cup_index,
+        shootout_index=shootout_index,
     )
 
 
@@ -2113,7 +2189,7 @@ def bivariate_poisson_prob(x: int, y: int, lambda1: float, lambda2: float, lambd
 
 
 def _sample_from_distribution(dist: Dict[Tuple[int, int], float]) -> Tuple[int, int]:
-    roll = random.random()
+    roll = fast_random()
     cumulative = 0.0
     last_score = (0, 0)
     for score, prob in dist.items():
@@ -2138,7 +2214,7 @@ def independent_sample_score(mu_a: float, mu_b: float) -> Tuple[int, int]:
 
 def sample_score(mu_a: float, mu_b: float, ctx: Optional[MatchContext] = None) -> Tuple[int, int]:
     weights = model_blend_weights(mu_a, mu_b, ctx)
-    roll = random.random()
+    roll = fast_random()
     if roll < weights["primary"]:
         return correlated_sample_score(mu_a, mu_b, ctx)
     if roll < weights["primary"] + weights["contrast"]:
@@ -2160,19 +2236,7 @@ def penalties_context_state(ctx_morale: float, state: Optional[dict]) -> dict:
 
 
 def simulation_state_signature(state: Optional[dict]) -> Tuple[float, ...]:
-    normalized = normalize_team_state(state)
-    return (
-        round(float(normalized["elo_shift"]), 1),
-        round(float(normalized["recent_form"]), 2),
-        round(float(normalized["attack_form"]), 2),
-        round(float(normalized["defense_form"]), 2),
-        round(float(normalized["fatigue"]), 2),
-        round(float(normalized["availability"]), 2),
-        round(float(normalized["discipline_drift"]), 2),
-        round(float(normalized["style_attack_bias"]), 2),
-        round(float(normalized["style_defense_bias"]), 2),
-        round(float(normalized["style_tempo"]), 2),
-    )
+    return package_coerce_team_state(state).simulation_signature()
 
 
 def simulation_state_from_signature(signature: Tuple[float, ...]) -> dict:
@@ -2360,7 +2424,7 @@ def sample_knockout_resolution(
             ctx,
             penalties_context_state(ctx.morale_a, state_a),
             penalties_context_state(ctx.morale_b, state_b),
-            a_starts=random.random() < 0.5,
+            a_starts=fast_random() < 0.5,
         )
         winner = shootout["winner"]
         loser = team_b.name if winner == team_a.name else team_a.name
@@ -3324,8 +3388,8 @@ def sample_cards(
 
     yellows_a = poisson_sample(yellow_lambda_a)
     yellows_b = poisson_sample(yellow_lambda_b)
-    reds_a = 1 if random.random() < red_prob_a else 0
-    reds_b = 1 if random.random() < red_prob_b else 0
+    reds_a = 1 if fast_random() < red_prob_a else 0
+    reds_b = 1 if fast_random() < red_prob_b else 0
     return yellows_a, reds_a, yellows_b, reds_b
 
 
@@ -3416,7 +3480,7 @@ def simulate_penalty_shootout(
                     round_number=round_number,
                 )
                 kicks_a += 1
-                if random.random() < prob:
+                if fast_random() < prob:
                     score_a += 1
             else:
                 trailing = score_b < score_a
@@ -3432,7 +3496,7 @@ def simulate_penalty_shootout(
                     round_number=round_number,
                 )
                 kicks_b += 1
-                if random.random() < prob:
+                if fast_random() < prob:
                     score_b += 1
 
             remaining_a = regulation_rounds - kicks_a
@@ -3461,7 +3525,7 @@ def simulate_penalty_shootout(
                     trailing=score_a < score_b,
                     round_number=regulation_rounds + sudden_round,
                 )
-                if random.random() < prob:
+                if fast_random() < prob:
                     score_a += 1
                     round_scored_a = True
             else:
@@ -3476,14 +3540,14 @@ def simulate_penalty_shootout(
                     trailing=score_b < score_a,
                     round_number=regulation_rounds + sudden_round,
                 )
-                if random.random() < prob:
+                if fast_random() < prob:
                     score_b += 1
                     round_scored_b = True
         if round_scored_a != round_scored_b:
             break
 
     if score_a == score_b:
-        winner = team_a.name if random.random() < penalties_probability(team_a, team_b, state_a, state_b) else team_b.name
+        winner = team_a.name if fast_random() < penalties_probability(team_a, team_b, state_a, state_b) else team_b.name
         if winner == team_a.name:
             score_a += 1
         else:
@@ -4055,7 +4119,7 @@ def _simulate_tournament_batch(
     config: dict,
     initial_payload: Optional[dict],
 ) -> Dict[str, dict]:
-    random.seed(seed)
+    seed_all_rng(seed)
     summary = empty_tournament_summary(teams)
     for _ in range(batch_size):
         result = simulate_tournament_iteration(teams, config, initial_payload=initial_payload)
@@ -4097,7 +4161,7 @@ def _project_bracket_batch(
     config: dict,
     initial_payload: Optional[dict],
 ) -> Dict[str, dict]:
-    random.seed(seed)
+    seed_all_rng(seed)
     match_aggregate = empty_bracket_aggregate(bracket_match_order())
     for _ in range(batch_size):
         result = simulate_tournament_iteration(teams, config, initial_payload=initial_payload)
@@ -4116,7 +4180,7 @@ def _project_bracket_batch(
 
 def command_simulate_tournament(args: argparse.Namespace, teams: Dict[str, Team]) -> None:
     if args.seed is not None:
-        random.seed(args.seed)
+        seed_all_rng(args.seed)
 
     config = load_tournament_config(Path(args.config))
     initial_payload = None if getattr(args, "ignore_state", False) else load_persistent_payload(Path(args.state_file), teams)
@@ -4332,7 +4396,7 @@ def format_match_projection(match_id: str, aggregate: dict, iterations: int) -> 
 
 def command_project_bracket(args: argparse.Namespace, teams: Dict[str, Team]) -> None:
     if args.seed is not None:
-        random.seed(args.seed)
+        seed_all_rng(args.seed)
 
     config = load_tournament_config(Path(args.config))
     initial_payload = None if getattr(args, "ignore_state", False) else load_persistent_payload(Path(args.state_file), teams)
@@ -6412,11 +6476,11 @@ def build_methodology_html(bracket_payload: dict, backtest: dict) -> str:
         "</article>"
         "<article>"
         "<h3>Capa historica desde 1990</h3>"
-        "<p>Ademas del Elo y la forma actual, el modelo incorpora resultados de selecciones desde 1990: rendimiento total, competitivo, mundialista, ataque, defensa y tandas de penales. Esa memoria historica entra con peso moderado, para sumar contexto sin tapar lo que esta pasando hoy.</p>"
+        "<p>Ademas del Elo y la forma actual, el modelo incorpora resultados de selecciones desde 1990: rendimiento total, competitivo, mundialista, ataque, defensa y tandas de penales. Esa memoria historica ahora usa shrinkage bayesiano empirico para no sobrepremiar muestras chicas y para sumar contexto sin tapar lo que esta pasando hoy.</p>"
         "</article>"
         "<article>"
         "<h3>Cuadro completo</h3>"
-        f"<p>La llave publicada se construye con Monte Carlo dinamico de {html.escape(montecarlo_line)} por corrida para que el cuadro no cambie solo por ruido de simulacion.</p>"
+        f"<p>La llave publicada se construye con Monte Carlo dinamico de {html.escape(montecarlo_line)} por corrida para que el cuadro no cambie solo por ruido de simulacion. El muestreo de goles ya usa un RNG rapido con NumPy y semillas deterministas para sostener mas simulaciones sin volver lento el procesamiento.</p>"
         "</article>"
         "<article>"
         "<h3>Stack estadistico</h3>"
@@ -6716,748 +6780,20 @@ def build_dashboard_html(
         previous_updated_at,
     )
     backtesting_html = build_backtesting_html(backtest)
-    return f"""<!doctype html>
-<html lang="es">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Dashboard Mundial 2026</title>
-  <style>
-    :root {{
-      --bg: #f4efe2;
-      --panel: rgba(255, 253, 246, 0.92);
-      --panel-strong: #fffaf0;
-      --ink: #182126;
-      --muted: #5a676b;
-      --line: rgba(184, 160, 109, 0.34);
-      --accent: #0f6d66;
-      --accent-dark: #0a4e49;
-      --accent-soft: rgba(15, 109, 102, 0.10);
-      --gold: #b5832f;
-      --gold-soft: rgba(181, 131, 47, 0.12);
-      --rose: #b0473c;
-      --shadow: 0 20px 45px rgba(49, 40, 23, 0.10);
-    }}
-    * {{ box-sizing: border-box; }}
-    body {{
-      margin: 0;
-      font-family: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Georgia, serif;
-      color: var(--ink);
-      background:
-        radial-gradient(circle at top left, rgba(15,109,102,0.16), transparent 24%),
-        radial-gradient(circle at top right, rgba(181,131,47,0.14), transparent 22%),
-        linear-gradient(180deg, #f8f3e8 0%, #eedfc4 100%);
-    }}
-    main {{
-      max-width: 1180px;
-      margin: 0 auto;
-      padding: 24px 14px 56px;
-    }}
-    h1, h2, h3, h4 {{ margin: 0; }}
-    h1 {{ font-size: clamp(2.2rem, 5vw, 3.6rem); line-height: 0.95; margin-bottom: 10px; }}
-    h2 {{ font-size: clamp(1.4rem, 3vw, 2rem); }}
-    h3 {{ font-size: 1.05rem; }}
-    .lede {{ color: var(--muted); margin: 0; max-width: 60ch; font-size: 1.02rem; }}
-    .lede-tight {{ color: var(--muted); margin: 8px 0 0; max-width: 58ch; }}
-    .eyebrow {{
-      margin: 0 0 10px;
-      color: var(--accent-dark);
-      text-transform: uppercase;
-      letter-spacing: 0.16em;
-      font-size: 0.75rem;
-      font-weight: 700;
-    }}
-    .panel {{
-      background: var(--panel);
-      border: 1px solid var(--line);
-      backdrop-filter: blur(12px);
-      border-radius: 24px;
-      padding: 18px;
-      box-shadow: var(--shadow);
-      margin-bottom: 18px;
-    }}
-    .hero {{
-      position: relative;
-      overflow: hidden;
-      background:
-        linear-gradient(135deg, rgba(15, 109, 102, 0.94), rgba(10, 78, 73, 0.92)),
-        linear-gradient(180deg, #0f6d66 0%, #0a4e49 100%);
-      color: #f7f3ea;
-      padding: 26px 22px;
-    }}
-    .hero::after {{
-      content: "";
-      position: absolute;
-      inset: auto -60px -70px auto;
-      width: 220px;
-      height: 220px;
-      border-radius: 999px;
-      background: rgba(255,255,255,0.08);
-    }}
-    .hero .eyebrow,
-    .hero .lede,
-    .hero .meta,
-    .hero .lede-tight {{
-      color: rgba(247, 243, 234, 0.86);
-    }}
-    .hero-grid {{
-      display: grid;
-      gap: 18px;
-      grid-template-columns: minmax(0, 1.6fr) minmax(280px, 1fr);
-      position: relative;
-      z-index: 1;
-    }}
-    .summary-grid {{
-      display: grid;
-      gap: 12px;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      margin-top: 18px;
-    }}
-    .summary-tile {{
-      background: rgba(255,255,255,0.09);
-      border: 1px solid rgba(255,255,255,0.12);
-      border-radius: 18px;
-      padding: 14px;
-    }}
-    .summary-tile span {{
-      color: rgba(247, 243, 234, 0.72);
-      font-size: 0.72rem;
-      margin-bottom: 6px;
-    }}
-    .summary-tile strong {{
-      font-size: 1.05rem;
-      color: #fffdf7;
-    }}
-    .hero-notes {{
-      display: grid;
-      gap: 12px;
-    }}
-    .hero-note {{
-      background: rgba(255,255,255,0.08);
-      border: 1px solid rgba(255,255,255,0.10);
-      border-radius: 18px;
-      padding: 14px;
-    }}
-    .hero-note h3 {{
-      margin-bottom: 8px;
-      font-size: 1rem;
-    }}
-    .hero-note p {{
-      margin: 0;
-      color: rgba(247, 243, 234, 0.84);
-      line-height: 1.45;
-      font-size: 0.95rem;
-    }}
-    .panel-head {{
-      display: flex;
-      justify-content: space-between;
-      gap: 14px;
-      align-items: start;
-      margin-bottom: 14px;
-    }}
-    .meta {{
-      margin: 6px 0 0;
-      color: var(--muted);
-      font-size: 0.95rem;
-      line-height: 1.4;
-    }}
-    .badge {{
-      display: inline-block;
-      margin: 0 0 10px;
-      padding: 6px 10px;
-      border-radius: 999px;
-      font-size: 0.78rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      color: #fff;
-    }}
-    .badge.live {{ background: #c0392b; }}
-    .badge.final {{ background: #355c3a; }}
-    .badge.pending {{ background: #7d6a43; }}
-    .badge.projection {{ background: #0f6d66; }}
-    .bracket-panel {{
-      padding-bottom: 22px;
-    }}
-    .bracket-shell {{
-      position: relative;
-      overflow-x: auto;
-      padding: 8px 4px 12px;
-      margin: 0 -4px;
-    }}
-    .bracket-canvas {{
-      --bracket-col: 196px;
-      --bracket-gap: 18px;
-      --bracket-board-width: 1908px;
-      --bracket-board-height: 1210px;
-      position: relative;
-      width: var(--bracket-board-width);
-      min-width: var(--bracket-board-width);
-      min-height: var(--bracket-board-height);
-    }}
-    .bracket-svg {{
-      position: absolute;
-      inset: 0;
-      width: var(--bracket-board-width);
-      height: var(--bracket-board-height);
-      pointer-events: none;
-      z-index: 0;
-      overflow: visible;
-    }}
-    .bracket-link {{
-      fill: none;
-      stroke: rgba(15, 109, 102, 0.34);
-      stroke-width: 3;
-      stroke-linecap: round;
-      stroke-linejoin: round;
-      filter: url(#bracketGlow);
-    }}
-    .bracket-link-strong {{
-      stroke: rgba(181, 131, 47, 0.62);
-      stroke-width: 3.6;
-    }}
-    .bracket-link-secondary {{
-      stroke: rgba(15, 109, 102, 0.20);
-      stroke-dasharray: 7 8;
-    }}
-    .bracket-board {{
-      position: relative;
-      z-index: 1;
-      display: grid;
-      gap: 18px;
-      grid-template-columns: repeat(9, var(--bracket-col));
-      width: var(--bracket-board-width);
-      min-width: var(--bracket-board-width);
-      min-height: var(--bracket-board-height);
-      align-items: start;
-    }}
-    .bracket-column {{
-      position: relative;
-      min-width: 0;
-      grid-row: 1;
-    }}
-    .left-round32 {{ grid-column: 1; }}
-    .left-round16 {{ grid-column: 2; }}
-    .left-quarterfinal {{ grid-column: 3; }}
-    .left-semifinal {{ grid-column: 4; }}
-    .center-column {{ grid-column: 5; }}
-    .right-semifinal {{ grid-column: 6; }}
-    .right-quarterfinal {{ grid-column: 7; }}
-    .right-round16 {{ grid-column: 8; }}
-    .right-round32 {{ grid-column: 9; }}
-    .stage-head {{
-      margin-bottom: 14px;
-      padding: 12px 14px;
-      border-radius: 16px;
-      background: linear-gradient(180deg, rgba(15,109,102,0.12), rgba(255,255,255,0.72));
-      border: 1px solid rgba(15,109,102,0.14);
-      box-shadow: 0 10px 24px rgba(12, 41, 45, 0.08);
-    }}
-    .stage-kicker {{
-      margin: 0 0 4px;
-      color: var(--accent-dark);
-      font-size: 0.72rem;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      font-weight: 700;
-    }}
-    .stage-head h3 {{
-      margin: 0;
-      font-size: 1.05rem;
-    }}
-    .stage-matches {{
-      display: flex;
-      flex-direction: column;
-      position: relative;
-    }}
-    .left-round32 .stage-matches,
-    .right-round32 .stage-matches {{
-      gap: 14px;
-    }}
-    .left-round16 .stage-matches,
-    .right-round16 .stage-matches {{
-      gap: 74px;
-      padding-top: 56px;
-    }}
-    .left-quarterfinal .stage-matches,
-    .right-quarterfinal .stage-matches {{
-      gap: 230px;
-      padding-top: 158px;
-    }}
-    .left-semifinal .stage-matches,
-    .right-semifinal .stage-matches {{
-      gap: 500px;
-      padding-top: 362px;
-    }}
-    .center-stack {{
-      display: flex;
-      flex-direction: column;
-      gap: 232px;
-      padding-top: 320px;
-    }}
-    .center-final .stage-matches,
-    .center-third_place .stage-matches {{
-      gap: 20px;
-    }}
-    .bracket-match {{
-      min-height: 126px;
-      padding: 12px 12px 14px;
-      border-radius: 14px;
-      background: linear-gradient(180deg, rgba(255,253,246,0.99), rgba(245,239,225,0.97));
-      border: 1px solid rgba(15,109,102,0.14);
-      box-shadow: 0 14px 24px rgba(12, 41, 45, 0.09);
-    }}
-    .match-teams {{
-      display: grid;
-      gap: 0;
-      margin-bottom: 10px;
-      border: 1px solid rgba(15,109,102,0.10);
-      border-radius: 12px;
-      overflow: hidden;
-    }}
-    .match-kicker {{
-      margin: 0 0 4px;
-      color: var(--accent-dark);
-      font-size: 0.68rem;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      font-weight: 700;
-    }}
-    .team-row {{
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 8px;
-      padding: 10px 12px;
-      background: rgba(255,255,255,0.68);
-    }}
-    .team-row.favorite {{
-      background: linear-gradient(90deg, rgba(15,109,102,0.12), rgba(255,255,255,0.90));
-    }}
-    .team-name {{
-      display: block;
-      margin: 0;
-      color: var(--ink);
-      font-size: 0.96rem;
-      font-weight: 700;
-      text-transform: none;
-      letter-spacing: 0;
-      line-height: 1.2;
-    }}
-    .team-divider {{
-      height: 1px;
-      background: rgba(15,109,102,0.10);
-    }}
-    .team-badge {{
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      padding: 4px 8px;
-      border-radius: 999px;
-      background: rgba(15,109,102,0.12);
-      color: var(--accent-dark);
-      font-size: 0.70rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
-      margin: 0;
-    }}
-    .bracket-pills {{
-      display: flex;
-      flex-wrap: wrap;
-      gap: 7px;
-      margin-top: 8px;
-    }}
-    .bracket-pills span {{
-      margin: 0;
-      padding: 5px 9px;
-      border-radius: 999px;
-      background: rgba(15,109,102,0.08);
-      border: 1px solid rgba(15,109,102,0.12);
-      color: var(--accent-dark);
-      font-size: 0.73rem;
-      font-weight: 700;
-      text-transform: none;
-      letter-spacing: 0;
-    }}
-    .mini {{
-      margin: 6px 0 0;
-      color: var(--muted);
-      font-size: 0.80rem;
-      line-height: 1.35;
-    }}
-    .penalty-note {{
-      margin-top: 6px;
-    }}
-    .bracket-extra {{
-      margin-top: 10px;
-      border-top: 1px dashed rgba(15,109,102,0.16);
-      padding-top: 6px;
-    }}
-    .bracket-extra summary {{
-      cursor: pointer;
-      color: var(--accent-dark);
-      font-size: 0.76rem;
-      font-weight: 700;
-      list-style: none;
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-    }}
-    .bracket-extra summary::-webkit-details-marker {{
-      display: none;
-    }}
-    .method-grid {{
-      display: grid;
-      gap: 12px;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    }}
-    .method-grid article {{
-      border-radius: 18px;
-      background: linear-gradient(180deg, rgba(255,255,255,0.65), rgba(15,109,102,0.05));
-      border: 1px solid var(--line);
-      padding: 14px;
-    }}
-    .method-grid p {{
-      margin: 8px 0 0;
-      color: var(--muted);
-      line-height: 1.45;
-    }}
-    .confidence-panel a {{
-      color: var(--accent-dark);
-      text-decoration: none;
-      border-bottom: 1px dashed currentColor;
-    }}
-    .confidence-tiles {{
-      display: grid;
-      gap: 12px;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-      margin-bottom: 14px;
-    }}
-    .confidence-grid {{
-      display: grid;
-      gap: 12px;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    }}
-    .confidence-grid article {{
-      border-radius: 18px;
-      background: linear-gradient(180deg, rgba(255,255,255,0.68), rgba(181,131,47,0.05));
-      border: 1px solid var(--line);
-      padding: 14px;
-    }}
-    .confidence-grid ul {{
-      list-style: none;
-      padding: 0;
-      margin: 12px 0 0;
-      display: grid;
-      gap: 10px;
-    }}
-    .confidence-grid li {{
-      border-bottom: 1px dashed var(--line);
-      padding-bottom: 8px;
-    }}
-    .confidence-grid li span {{
-      text-transform: none;
-      letter-spacing: 0;
-      margin-top: 4px;
-      margin-bottom: 0;
-      font-size: 0.84rem;
-    }}
-    .confidence-panel .summary-tile {{
-      background: linear-gradient(180deg, rgba(255,255,255,0.76), rgba(15,109,102,0.06));
-      border: 1px solid var(--line);
-    }}
-    .confidence-panel .summary-tile span {{
-      color: var(--muted);
-    }}
-    .confidence-panel .summary-tile strong {{
-      color: var(--ink);
-      font-size: 1rem;
-    }}
-    .cards {{
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-      gap: 16px;
-    }}
-    .card {{
-      background: linear-gradient(180deg, rgba(255,253,246,0.97), rgba(251,246,234,0.94));
-      border: 1px solid var(--line);
-      border-radius: 24px;
-      padding: 18px;
-      box-shadow: var(--shadow);
-    }}
-    .hero-metrics, .subgrid {{
-      display: grid;
-      gap: 12px;
-      margin-top: 12px;
-    }}
-    .hero-metrics {{
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }}
-    .metric, .subgrid div {{
-      background: rgba(15,109,102,0.07);
-      border-radius: 16px;
-      padding: 12px 14px;
-      border: 1px solid rgba(15,109,102,0.08);
-    }}
-    span {{
-      display: block;
-      color: var(--muted);
-      font-size: 0.82rem;
-      margin-bottom: 3px;
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
-    }}
-    strong {{
-      font-size: 1rem;
-    }}
-    .prob-block {{
-      margin-top: 14px;
-      display: grid;
-      gap: 10px;
-    }}
-    .prob-row {{
-      display: grid;
-      gap: 10px;
-      align-items: center;
-      grid-template-columns: minmax(92px, 1fr) minmax(100px, 2.3fr) auto;
-    }}
-    .prob-label {{
-      font-size: 0.88rem;
-      color: var(--muted);
-    }}
-    .prob-bar {{
-      height: 10px;
-      border-radius: 999px;
-      overflow: hidden;
-      background: rgba(24, 33, 38, 0.10);
-    }}
-    .prob-fill {{
-      display: block;
-      height: 100%;
-      border-radius: 999px;
-    }}
-    .prob-fill.a {{ background: linear-gradient(90deg, var(--accent), #14a39a); }}
-    .prob-fill.draw {{ background: linear-gradient(90deg, var(--gold), #d2a54c); }}
-    .prob-fill.b {{ background: linear-gradient(90deg, #34495e, #4f7091); }}
-    .prob-value {{
-      font-variant-numeric: tabular-nums;
-      font-weight: 700;
-      color: var(--ink);
-    }}
-    .depth-block {{
-      margin-top: 14px;
-      padding: 14px;
-      border-radius: 18px;
-      background: linear-gradient(180deg, rgba(181,131,47,0.10), rgba(15,109,102,0.05));
-      border: 1px solid rgba(181,131,47,0.18);
-    }}
-    .depth-block h4 {{
-      margin: 0 0 10px;
-      color: var(--accent-dark);
-    }}
-    .depth-grid {{
-      display: grid;
-      gap: 10px;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }}
-    .depth-grid div {{
-      background: rgba(255,255,255,0.45);
-      border: 1px solid rgba(15,109,102,0.08);
-      border-radius: 14px;
-      padding: 10px 12px;
-    }}
-    .reason-block {{
-      margin-top: 14px;
-      padding: 14px;
-      border-radius: 18px;
-      background: linear-gradient(180deg, rgba(15,109,102,0.08), rgba(255,255,255,0.65));
-      border: 1px solid rgba(15,109,102,0.16);
-    }}
-    .reason-block h4 {{
-      margin: 0 0 10px;
-      color: var(--accent-dark);
-    }}
-    .model-compare-grid {{
-      display: grid;
-      gap: 10px;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }}
-    .model-card {{
-      border-radius: 14px;
-      padding: 12px;
-      border: 1px solid rgba(15,109,102,0.10);
-      background: rgba(255,255,255,0.55);
-    }}
-    .model-card h5 {{
-      margin: 0 0 8px;
-      color: var(--accent-dark);
-      font-size: 0.92rem;
-    }}
-    .model-card p {{
-      margin: 5px 0 0;
-      color: var(--muted);
-      font-size: 0.84rem;
-      line-height: 1.35;
-    }}
-    .model-card.primary {{
-      background: linear-gradient(180deg, rgba(15,109,102,0.10), rgba(255,255,255,0.75));
-    }}
-    .model-card.contrast {{
-      background: linear-gradient(180deg, rgba(52,73,94,0.10), rgba(255,255,255,0.75));
-    }}
-    .model-card.low-score {{
-      background: linear-gradient(180deg, rgba(181,131,47,0.10), rgba(255,255,255,0.75));
-    }}
-    .model-card.ensemble {{
-      background: linear-gradient(180deg, rgba(176,71,60,0.10), rgba(255,255,255,0.75));
-    }}
-    .scores h4 {{
-      margin: 14px 0 8px;
-      color: var(--accent);
-    }}
-    .scores ul {{
-      list-style: none;
-      padding: 0;
-      margin: 0;
-      display: grid;
-      gap: 8px;
-    }}
-    .scores li {{
-      display: flex;
-      justify-content: space-between;
-      gap: 8px;
-      border-bottom: 1px dashed var(--line);
-      padding-bottom: 6px;
-    }}
-    pre {{
-      white-space: pre-wrap;
-      word-break: break-word;
-      margin: 0;
-      font-size: 0.92rem;
-      color: var(--ink);
-      max-height: 480px;
-      overflow: auto;
-      padding-right: 4px;
-    }}
-    @media (max-width: 820px) {{
-      .hero-grid {{
-        grid-template-columns: 1fr;
-      }}
-      .hero-metrics {{
-        grid-template-columns: 1fr;
-      }}
-      .prob-row {{
-        grid-template-columns: 1fr;
-      }}
-      .depth-grid {{
-        grid-template-columns: 1fr;
-      }}
-      .model-compare-grid {{
-        grid-template-columns: 1fr;
-      }}
-      .bracket-canvas {{
-        --bracket-board-width: 1908px;
-      }}
-    }}
-    @media (max-width: 640px) {{
-      main {{
-        padding: 16px 12px 42px;
-      }}
-      .panel, .card {{
-        border-radius: 20px;
-      }}
-      .summary-grid,
-      .confidence-tiles {{
-        grid-template-columns: 1fr;
-      }}
-      .bracket-canvas {{
-        --bracket-col: 188px;
-        --bracket-gap: 14px;
-        --bracket-board-width: 1804px;
-      }}
-      .stage-head {{
-        padding: 12px 14px;
-      }}
-      .bracket-match {{
-        min-height: 112px;
-        padding: 12px;
-      }}
-      .center-stack {{
-        gap: 180px;
-      }}
-    }}
-  </style>
-</head>
-<body>
-  <main>
-    <section class="panel hero">
-      <div class="hero-grid">
-        <div>
-          <p class="eyebrow">Modelo Dinámico | Mundial 2026</p>
-          <h1>Pronóstico En Vivo y Hoja de Ruta</h1>
-          <p class="lede">Cada partido mezcla un stack estadistico con modelo principal, contraste, ajuste de baja anotacion, Elo, puntos FIFA complementarios, forma reciente, clima, alineaciones, bajas, mercado y estado del torneo. Si un juego está en curso, las probabilidades ya se condicionan al minuto y al marcador actual.</p>
-          <div class="summary-grid">
-            <div class="summary-tile">
-              <span>Última actualización</span>
-              <strong>{html.escape(iso_timestamp())}</strong>
-            </div>
-            <div class="summary-tile">
-              <span>Frecuencia cloud</span>
-              <strong>Cada 5 minutos</strong>
-            </div>
-            <div class="summary-tile">
-              <span>Estado del torneo</span>
-              <strong>Elo + forma + fatiga + disciplina</strong>
-            </div>
-            <div class="summary-tile">
-              <span>Origen operativo</span>
-              <strong>GitHub Actions + Pages</strong>
-            </div>
-          </div>
-        </div>
-        <div class="hero-notes">
-          <article class="hero-note">
-            <h3>Qué significan las métricas</h3>
-            <p><strong>Marcador proyectado</strong> muestra el resultado entero mas probable. <strong>Promedio estimado de goles del modelo</strong> es una media probabilistica y por eso puede llevar decimales. <strong>Probabilidades de resultado</strong> es la chance de victoria, empate o derrota en ese mismo corte. <strong>Puntos FIFA</strong> entran como señal estructural secundaria, con menos peso que Elo. <strong>Historia desde 1990</strong> suma memoria de rendimiento competitivo, mundialista, ataque, defensa y penales. <strong>Coincidencia entre modelos</strong> ayuda a separar picks claros de partidos realmente parejos.</p>
-          </article>
-          <article class="hero-note">
-            <h3>Durante un partido</h3>
-            <p>El dashboard pasa a modo in-play: usa minuto, marcador actual y fase del juego para recalcular el resultado final más probable, el resto de goles esperados y los marcadores finales mas probables en cada corte de actualizacion.</p>
-          </article>
-          <article class="hero-note">
-            <h3>Trazabilidad</h3>
-            <p>Estado usado: {html.escape(str(state_path))}<br>Fixtures leídos: {html.escape(str(fixtures_path))}</p>
-          </article>
-          <article class="hero-note">
-            <h3>Como validar el in-play</h3>
-            <p>Si el partido esta en vivo, revisa la hora superior, el badge En vivo, el minuto modelado y el archivo <a href="latest.json" style="color:#fff3d7;">latest.json</a>. Todo eso se regenera en cada corrida de GitHub Actions y debe mover probabilidades y marcadores proyectados cuando cambie el estado del juego.</p>
-          </article>
-        </div>
-      </div>
-    </section>
-    {methodology_html}
-    {global_confidence_html}
-    {recent_changes_html}
-    {backtesting_html}
-    {bracket_visual_html}
-    <section class="panel">
-      <div class="panel-head">
-        <div>
-          <p class="eyebrow">Texto técnico</p>
-          <h2>Resumen completo de la llave</h2>
-          <p class="lede-tight">Además del bracket visual, aquí se conserva el detalle textual completo para revisar todos los cruces y porcentajes publicados.</p>
-        </div>
-      </div>
-      <h2>Llave actual</h2>
-      <pre>{bracket_html}</pre>
-    </section>
-    <section class="cards">
-      {''.join(cards)}
-    </section>
-  </main>
-</body>
-</html>
-"""
+    return render_dashboard_html(
+        {
+            "updated_at": html.escape(iso_timestamp()),
+            "state_path": html.escape(str(state_path)),
+            "fixtures_path": html.escape(str(fixtures_path)),
+            "methodology_html": methodology_html,
+            "global_confidence_html": global_confidence_html,
+            "recent_changes_html": recent_changes_html,
+            "backtesting_html": backtesting_html,
+            "bracket_visual_html": bracket_visual_html,
+            "bracket_html": bracket_html,
+            "cards_html": "".join(cards),
+        }
+    )
 
 
 def command_project_dashboard(args: argparse.Namespace, teams: Dict[str, Team]) -> None:
@@ -7529,70 +6865,15 @@ def iso_timestamp() -> str:
 
 
 def default_team_state() -> dict:
-    return {
-        "morale": 0.0,
-        "yellow_cards": 0,
-        "yellow_load": 0.0,
-        "red_suspensions": 0,
-        "group_points": 0,
-        "group_goal_diff": 0,
-        "group_goals_for": 0,
-        "group_goals_against": 0,
-        "group_matches_played": 0,
-        "fair_play": 0.0,
-        "matches_played": 0,
-        "goals_for": 0,
-        "goals_against": 0,
-        "elo_shift": 0.0,
-        "recent_form": 0.0,
-        "attack_form": 0.0,
-        "defense_form": 0.0,
-        "fatigue": 0.0,
-        "availability": 1.0,
-        "discipline_drift": 0.0,
-        "style_possession": 0.0,
-        "style_verticality": 0.0,
-        "style_pressure": 0.0,
-        "style_chance_quality": 0.0,
-        "style_tempo": 0.0,
-        "style_attack_bias": 0.0,
-        "style_defense_bias": 0.0,
-        "tactical_sample_matches": 0,
-        "tactical_signature": "sin muestra suficiente",
-        "updated_at": None,
-    }
+    return package_default_team_state()
 
 
 def normalize_team_state(state: Optional[dict]) -> dict:
-    normalized = default_team_state()
-    if state:
-        legacy_state = dict(state)
-        if "pending_red_suspensions" in legacy_state and "red_suspensions" not in legacy_state:
-            legacy_state["red_suspensions"] = legacy_state["pending_red_suspensions"]
-        normalized.update(legacy_state)
-    normalized["availability"] = clamp(float(normalized["availability"]), 0.40, 1.0)
-    normalized["fatigue"] = clamp(float(normalized["fatigue"]), 0.0, 1.0)
-    normalized["elo_shift"] = clamp(float(normalized["elo_shift"]), -220.0, 220.0)
-    normalized["recent_form"] = clamp(float(normalized["recent_form"]), -1.0, 1.0)
-    normalized["attack_form"] = clamp(float(normalized["attack_form"]), -1.0, 1.0)
-    normalized["defense_form"] = clamp(float(normalized["defense_form"]), -1.0, 1.0)
-    normalized["discipline_drift"] = clamp(float(normalized["discipline_drift"]), -1.0, 0.5)
-    normalized["style_possession"] = clamp(float(normalized["style_possession"]), -1.0, 1.0)
-    normalized["style_verticality"] = clamp(float(normalized["style_verticality"]), -1.0, 1.0)
-    normalized["style_pressure"] = clamp(float(normalized["style_pressure"]), -1.0, 1.0)
-    normalized["style_chance_quality"] = clamp(float(normalized["style_chance_quality"]), -1.0, 1.0)
-    normalized["style_tempo"] = clamp(float(normalized["style_tempo"]), -1.0, 1.0)
-    normalized["style_attack_bias"] = clamp(float(normalized["style_attack_bias"]), -1.0, 1.0)
-    normalized["style_defense_bias"] = clamp(float(normalized["style_defense_bias"]), -1.0, 1.0)
-    normalized["tactical_sample_matches"] = max(0, int(normalized["tactical_sample_matches"]))
-    normalized["yellow_load"] = clamp(float(normalized["yellow_load"]), 0.0, 6.0)
-    normalized["morale"] = clamp(float(normalized["morale"]), -1.0, 1.0)
-    normalized["tactical_signature"] = str(normalized.get("tactical_signature") or "sin muestra suficiente")
-    return normalized
+    return package_normalize_team_state(state)
 
 
 def initial_team_states(teams: Dict[str, Team]) -> Dict[str, dict]:
-    return {name: default_team_state() for name in teams}
+    return package_initial_team_states(teams)
 
 
 def empty_persistent_payload(teams: Dict[str, Team]) -> dict:
@@ -7647,7 +6928,7 @@ def save_persistent_payload(path: Path, payload: dict) -> None:
 
 
 def copy_states(payload: dict) -> Dict[str, dict]:
-    return {team_name: normalize_team_state(state) for team_name, state in payload["teams"].items()}
+    return package_copy_states(payload)
 
 
 def print_state(state_name: str, state: dict) -> None:
@@ -7680,22 +6961,7 @@ def print_state(state_name: str, state: dict) -> None:
 
 
 def state_has_activity(state: dict) -> bool:
-    state = normalize_team_state(state)
-    return any(
-        [
-            state["matches_played"] > 0,
-            state["group_matches_played"] > 0,
-            abs(state["morale"]) > 1e-9,
-            abs(state["elo_shift"]) > 1e-9,
-            abs(state["recent_form"]) > 1e-9,
-            abs(state["attack_form"]) > 1e-9,
-            abs(state["defense_form"]) > 1e-9,
-            abs(state["discipline_drift"]) > 1e-9,
-            abs(state["fatigue"]) > 1e-9,
-            abs(state["availability"] - 1.0) > 1e-9,
-            state["tactical_sample_matches"] > 0,
-        ]
-    )
+    return package_state_has_activity(state)
 
 
 def tactical_state_value(state: Optional[dict], key: str, default: float = 0.0) -> float:
@@ -8382,7 +7648,7 @@ def command_predict(args: argparse.Namespace, teams: Dict[str, Team]) -> None:
     seed = getattr(args, "seed", None)
     if monte_carlo_iterations and monte_carlo_iterations > 0:
         if seed is not None:
-            random.seed(seed)
+            seed_all_rng(seed)
         summary = monte_carlo_match_summary(
             teams,
             team_a_name,

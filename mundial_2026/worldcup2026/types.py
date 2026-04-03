@@ -1,13 +1,18 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Optional, Tuple, TypeAlias
+
+ScoreDist: TypeAlias = Dict[Tuple[int, int], float]
+TeamName: TypeAlias = str
+MatchID: TypeAlias = str
+GroupName: TypeAlias = str
 
 
 @dataclass(frozen=True)
 class ModelOutput:
     name: str
-    dist: Dict[Tuple[int, int], float]
+    dist: ScoreDist
     probs: Dict[str, float]
     weight: float
     top_score: Tuple[str, float]

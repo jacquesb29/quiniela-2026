@@ -29,6 +29,11 @@ jobs:
         with:
           python-version: "3.12"
 
+      - name: Install Python dependencies
+        run: |
+          python3 -m pip install --upgrade pip
+          python3 -m pip install -r mundial_2026/requirements.txt
+
       - name: Make scripts executable
         run: |
           chmod +x mundial_2026/build_pages_site.sh

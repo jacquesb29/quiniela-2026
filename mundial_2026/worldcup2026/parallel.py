@@ -6,6 +6,7 @@ from concurrent.futures import ProcessPoolExecutor, as_completed
 from typing import Any, Callable, Dict, List, Optional, Sequence
 
 from .config import PARAMS
+from .logging_utils import log
 
 
 def default_parallel_workers(iterations: int) -> int:
@@ -108,7 +109,11 @@ def run_parallel_batches(
                 results.append(future.result())
                 if progress_every:
                     completed_iterations += futures[future]
-                    print(f"Progreso: {min(completed_iterations, iterations)}/{iterations} iteraciones")
+                    log.info(
+                        "Progreso: %d/%d iteraciones",
+                        min(completed_iterations, iterations),
+                        iterations,
+                    )
         return results
     except (PermissionError, OSError):
         return [worker_fn(iterations, base_seed, teams, config, initial_payload)]
