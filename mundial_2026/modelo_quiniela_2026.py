@@ -18,6 +18,28 @@ from typing import Dict, List, Optional, Sequence, Tuple
 
 from worldcup2026.calibration import empirical_bayes_shrinkage
 from worldcup2026.config import PARAMS
+from worldcup2026.constants import (
+    BRACKET_MATCH_TITLES,
+    COACH_OVERRIDES,
+    DISCIPLINE_BY_CONFEDERATION,
+    DISCIPLINE_OVERRIDES,
+    GROUP_MATCH_PAIRS,
+    HISTORICAL_BY_CONFEDERATION,
+    KNOCKOUT_MATCHES,
+    LOSER_NEXT_MATCH,
+    R32_MATCHES,
+    RESOURCE_BY_CONFEDERATION,
+    RESOURCE_OVERRIDES,
+    RIVALRIES,
+    STAGE_ALIASES,
+    STAGE_IMPORTANCE,
+    TEAM_NAME_ALIASES,
+    TEMPO_BY_CONFEDERATION,
+    TRADITION_BONUS,
+    TRAVEL_BY_CONFEDERATION,
+    WINNER_NEXT_MATCH,
+    WORLD_CUP_TITLES,
+)
 from worldcup2026.dashboard.html_builder import render_dashboard_html
 from worldcup2026.data.state import (
     coerce_team_state as package_coerce_team_state,
@@ -35,6 +57,11 @@ from worldcup2026.distributions import (
 )
 from worldcup2026.logging_utils import log
 from worldcup2026.metrics import avg_or_none, brier_decomposition, summarize_temporal_windows
+from worldcup2026.models.penalties import (
+    penalties_probability as calculate_penalties_probability,
+    penalty_conversion_probability as calculate_penalty_conversion_probability,
+    simulate_penalty_shootout as run_penalty_shootout,
+)
 from worldcup2026.modeling import (
     dynamic_correlation,
 )
@@ -47,7 +74,28 @@ from worldcup2026.parallel import (
     run_parallel_batches,
 )
 from worldcup2026.simulation.rng import fast_random, poisson_sample_fast, seed_fast_rng
+from worldcup2026.profiles.indices import (
+    chemistry_index as calculate_chemistry_index,
+    coach_index as calculate_coach_index,
+    discipline_proxy as calculate_discipline_proxy,
+    heritage_index as calculate_heritage_index,
+    morale_base as calculate_morale_base,
+    resource_index as calculate_resource_index,
+    tactical_flexibility as calculate_tactical_flexibility,
+    tempo_proxy as calculate_tempo_proxy,
+    trajectory_index as calculate_trajectory_index,
+    travel_resilience as calculate_travel_resilience,
+)
 from worldcup2026.types import BacktestMetrics, KnockoutResolution
+from worldcup2026.utils.naming import (
+    normalize_stage_name as package_normalize_stage_name,
+    normalize_team_name as package_normalize_team_name,
+    normalize_team_text as package_normalize_team_text,
+    resolve_optional_team_name as package_resolve_optional_team_name,
+    resolve_team_name as package_resolve_team_name,
+    resolve_venue_country as package_resolve_venue_country,
+    resolved_team_name_from_penalties as package_resolved_team_name_from_penalties,
+)
 
 
 DATA_FILE = Path(__file__).with_name("teams_2026.json")
@@ -56,377 +104,10 @@ TOURNAMENT_CONFIG_FILE = Path(__file__).with_name("tournament_2026_draw.json")
 STATE_FILE = Path(__file__).with_name("tournament_state_2026.json")
 FACTORIALS = [math.factorial(i) for i in range(16)]
 HOST_COUNTRIES = {"Canada", "Mexico", "United States"}
-GROUP_MATCH_PAIRS = [
-    (0, 3),
-    (1, 2),
-    (0, 2),
-    (3, 1),
-    (0, 1),
-    (2, 3),
-]
-STAGE_IMPORTANCE = {
-    "group": 1.00,
-    "round32": 1.12,
-    "round16": 1.22,
-    "quarterfinal": 1.30,
-    "semifinal": 1.38,
-    "third_place": 1.24,
-    "final": 1.48,
-}
-STAGE_ALIASES = {
-    "group": "group",
-    "groups": "group",
-    "fase_de_grupos": "group",
-    "fasegrupos": "group",
-    "round32": "round32",
-    "round_of_32": "round32",
-    "roundof32": "round32",
-    "dieciseisavos": "round32",
-    "round16": "round16",
-    "round_of_16": "round16",
-    "roundof16": "round16",
-    "octavos": "round16",
-    "round8": "quarterfinal",
-    "round_of_8": "quarterfinal",
-    "roundof8": "quarterfinal",
-    "quarterfinal": "quarterfinal",
-    "quarterfinals": "quarterfinal",
-    "cuartos": "quarterfinal",
-    "round4": "semifinal",
-    "round_of_4": "semifinal",
-    "roundof4": "semifinal",
-    "semifinal": "semifinal",
-    "semifinals": "semifinal",
-    "semis": "semifinal",
-    "third_place": "third_place",
-    "thirdplace": "third_place",
-    "third-place": "third_place",
-    "third_and_fourth_place": "third_place",
-    "thirdandfourthplace": "third_place",
-    "final": "final",
-}
-R32_MATCHES = [
-    {"id": "M73", "team_a": {"type": "group_rank", "group": "A", "rank": 2}, "team_b": {"type": "group_rank", "group": "B", "rank": 2}},
-    {"id": "M74", "team_a": {"type": "group_rank", "group": "E", "rank": 1}, "team_b": {"type": "third_place", "allowed_groups": ["A", "B", "C", "D", "F"]}},
-    {"id": "M75", "team_a": {"type": "group_rank", "group": "F", "rank": 1}, "team_b": {"type": "group_rank", "group": "C", "rank": 2}},
-    {"id": "M76", "team_a": {"type": "group_rank", "group": "C", "rank": 1}, "team_b": {"type": "group_rank", "group": "F", "rank": 2}},
-    {"id": "M77", "team_a": {"type": "group_rank", "group": "I", "rank": 1}, "team_b": {"type": "third_place", "allowed_groups": ["C", "D", "F", "G", "H"]}},
-    {"id": "M78", "team_a": {"type": "group_rank", "group": "E", "rank": 2}, "team_b": {"type": "group_rank", "group": "I", "rank": 2}},
-    {"id": "M79", "team_a": {"type": "group_rank", "group": "A", "rank": 1}, "team_b": {"type": "third_place", "allowed_groups": ["C", "E", "F", "H", "I"]}},
-    {"id": "M80", "team_a": {"type": "group_rank", "group": "L", "rank": 1}, "team_b": {"type": "third_place", "allowed_groups": ["E", "H", "I", "J", "K"]}},
-    {"id": "M81", "team_a": {"type": "group_rank", "group": "D", "rank": 1}, "team_b": {"type": "third_place", "allowed_groups": ["B", "E", "F", "I", "J"]}},
-    {"id": "M82", "team_a": {"type": "group_rank", "group": "G", "rank": 1}, "team_b": {"type": "third_place", "allowed_groups": ["A", "E", "H", "I", "J"]}},
-    {"id": "M83", "team_a": {"type": "group_rank", "group": "K", "rank": 2}, "team_b": {"type": "group_rank", "group": "L", "rank": 2}},
-    {"id": "M84", "team_a": {"type": "group_rank", "group": "H", "rank": 1}, "team_b": {"type": "group_rank", "group": "J", "rank": 2}},
-    {"id": "M85", "team_a": {"type": "group_rank", "group": "B", "rank": 1}, "team_b": {"type": "third_place", "allowed_groups": ["E", "F", "G", "I", "J"]}},
-    {"id": "M86", "team_a": {"type": "group_rank", "group": "J", "rank": 1}, "team_b": {"type": "group_rank", "group": "H", "rank": 2}},
-    {"id": "M87", "team_a": {"type": "group_rank", "group": "K", "rank": 1}, "team_b": {"type": "third_place", "allowed_groups": ["D", "E", "I", "J", "L"]}},
-    {"id": "M88", "team_a": {"type": "group_rank", "group": "D", "rank": 2}, "team_b": {"type": "group_rank", "group": "G", "rank": 2}},
-]
-KNOCKOUT_MATCHES = {
-    "round16": [
-        ("M89", "M73", "M74"),
-        ("M90", "M75", "M76"),
-        ("M91", "M77", "M78"),
-        ("M92", "M79", "M80"),
-        ("M93", "M81", "M82"),
-        ("M94", "M83", "M84"),
-        ("M95", "M85", "M86"),
-        ("M96", "M87", "M88"),
-    ],
-    "quarterfinal": [
-        ("M97", "M89", "M90"),
-        ("M98", "M91", "M92"),
-        ("M99", "M93", "M94"),
-        ("M100", "M95", "M96"),
-    ],
-    "semifinal": [
-        ("M101", "M97", "M98"),
-        ("M102", "M99", "M100"),
-    ],
-    "final": [
-        ("M103", "M101", "M102"),
-    ],
-}
-WINNER_NEXT_MATCH = {
-    source: match_id
-    for round_matches in KNOCKOUT_MATCHES.values()
-    for match_id, left_source, right_source in round_matches
-    for source in (left_source, right_source)
-}
-LOSER_NEXT_MATCH = {
-    "M101": "M104",
-    "M102": "M104",
-}
 BRACKET_FILE = Path(__file__).with_name("llave_actual_2026.md")
 BRACKET_JSON_FILE = Path(__file__).with_name("llave_actual_2026.json")
 DASHBOARD_HTML_FILE = Path(__file__).with_name("dashboard_actual_2026.html")
 DASHBOARD_MD_FILE = Path(__file__).with_name("reporte_actual_2026.md")
-BRACKET_MATCH_TITLES = {
-    "M73": "Dieciseisavos 1",
-    "M74": "Dieciseisavos 2",
-    "M75": "Dieciseisavos 3",
-    "M76": "Dieciseisavos 4",
-    "M77": "Dieciseisavos 5",
-    "M78": "Dieciseisavos 6",
-    "M79": "Dieciseisavos 7",
-    "M80": "Dieciseisavos 8",
-    "M81": "Dieciseisavos 9",
-    "M82": "Dieciseisavos 10",
-    "M83": "Dieciseisavos 11",
-    "M84": "Dieciseisavos 12",
-    "M85": "Dieciseisavos 13",
-    "M86": "Dieciseisavos 14",
-    "M87": "Dieciseisavos 15",
-    "M88": "Dieciseisavos 16",
-    "M89": "Octavos 1",
-    "M90": "Octavos 2",
-    "M91": "Octavos 3",
-    "M92": "Octavos 4",
-    "M93": "Octavos 5",
-    "M94": "Octavos 6",
-    "M95": "Octavos 7",
-    "M96": "Octavos 8",
-    "M97": "Cuartos 1",
-    "M98": "Cuartos 2",
-    "M99": "Cuartos 3",
-    "M100": "Cuartos 4",
-    "M101": "Semifinal 1",
-    "M102": "Semifinal 2",
-    "M103": "Final",
-    "M104": "Tercer puesto",
-}
-RIVALRIES = {
-    frozenset({"Argentina", "Brazil"}): 0.16,
-    frozenset({"England", "Scotland"}): 0.14,
-    frozenset({"Mexico", "United States"}): 0.15,
-    frozenset({"Croatia", "Serbia"}): 0.12,
-    frozenset({"Japan", "South Korea"}): 0.10,
-    frozenset({"Turkey", "Greece"}): 0.10,
-}
-TEAM_NAME_ALIASES = {
-    "espana": "Spain",
-    "uruguay": "Uruguay",
-    "estadosunidos": "United States",
-    "eeuu": "United States",
-    "usa": "United States",
-    "holanda": "Netherlands",
-    "paisesbajos": "Netherlands",
-    "brasil": "Brazil",
-    "alemania": "Germany",
-    "inglaterra": "England",
-    "escocia": "Scotland",
-    "suiza": "Switzerland",
-    "coreadelsur": "South Korea",
-    "corearepublica": "South Korea",
-    "surcorea": "South Korea",
-    "corea": "South Korea",
-    "japon": "Japan",
-    "arabiasaudita": "Saudi Arabia",
-    "nuevazelanda": "New Zealand",
-    "costademarfil": "Ivory Coast",
-    "caboverde": "Cape Verde",
-    "marruecos": "Morocco",
-    "argelia": "Algeria",
-    "egipto": "Egypt",
-    "turquia": "Turkey",
-    "turkiye": "Turkey",
-    "republicacheca": "Czech Republic",
-    "chequia": "Czech Republic",
-    "czechia": "Czech Republic",
-    "irlanda": "Republic of Ireland",
-    "irlandadelnorte": "Northern Ireland",
-    "bosnia": "Bosnia and Herzegovina",
-    "bosniaherzegovina": "Bosnia and Herzegovina",
-    "bosniayherzegovina": "Bosnia and Herzegovina",
-    "congord": "Dem. Rep. of Congo",
-    "congodr": "Dem. Rep. of Congo",
-    "drcongo": "Dem. Rep. of Congo",
-    "rdcongo": "Dem. Rep. of Congo",
-    "iriran": "Iran",
-    "irak": "Iraq",
-}
-RESOURCE_BY_CONFEDERATION = {
-    "UEFA": 0.70,
-    "CONMEBOL": 0.60,
-    "AFC": 0.57,
-    "CONCACAF": 0.55,
-    "CAF": 0.40,
-    "OFC": 0.24,
-}
-HISTORICAL_BY_CONFEDERATION = {
-    "UEFA": 0.25,
-    "CONMEBOL": 0.26,
-    "AFC": 0.08,
-    "CONCACAF": 0.09,
-    "CAF": 0.10,
-    "OFC": 0.05,
-}
-DISCIPLINE_BY_CONFEDERATION = {
-    "UEFA": 0.08,
-    "CONMEBOL": -0.05,
-    "AFC": 0.06,
-    "CONCACAF": -0.02,
-    "CAF": -0.04,
-    "OFC": 0.04,
-}
-TEMPO_BY_CONFEDERATION = {
-    "UEFA": 0.54,
-    "CONMEBOL": 0.56,
-    "AFC": 0.50,
-    "CONCACAF": 0.53,
-    "CAF": 0.52,
-    "OFC": 0.48,
-}
-TRAVEL_BY_CONFEDERATION = {
-    "UEFA": 0.62,
-    "CONMEBOL": 0.66,
-    "AFC": 0.60,
-    "CONCACAF": 0.70,
-    "CAF": 0.58,
-    "OFC": 0.52,
-}
-RESOURCE_OVERRIDES = {
-    "United States": 1.00,
-    "Germany": 0.95,
-    "England": 0.93,
-    "France": 0.93,
-    "Canada": 0.88,
-    "Spain": 0.87,
-    "Mexico": 0.84,
-    "Brazil": 0.84,
-    "Japan": 0.84,
-    "Italy": 0.82,
-    "South Korea": 0.82,
-    "Australia": 0.81,
-    "Netherlands": 0.81,
-    "Saudi Arabia": 0.80,
-    "Turkey": 0.79,
-    "Belgium": 0.78,
-    "Switzerland": 0.78,
-    "Poland": 0.77,
-    "Argentina": 0.76,
-    "Denmark": 0.76,
-    "Norway": 0.75,
-    "Austria": 0.74,
-    "Sweden": 0.74,
-    "Portugal": 0.73,
-    "Republic of Ireland": 0.73,
-    "Czech Republic": 0.71,
-    "Romania": 0.68,
-    "Ukraine": 0.67,
-    "Qatar": 0.67,
-    "Morocco": 0.63,
-    "Colombia": 0.62,
-    "Iraq": 0.62,
-    "Egypt": 0.60,
-    "New Zealand": 0.60,
-    "Algeria": 0.59,
-    "Iran": 0.59,
-    "South Africa": 0.59,
-    "Slovakia": 0.58,
-    "Tunisia": 0.56,
-    "Uzbekistan": 0.54,
-    "Paraguay": 0.54,
-    "Jordan": 0.52,
-    "Bosnia and Herzegovina": 0.52,
-    "North Macedonia": 0.50,
-    "Albania": 0.49,
-    "Kosovo": 0.48,
-    "Ghana": 0.47,
-    "Bolivia": 0.46,
-    "Wales": 0.46,
-    "Jamaica": 0.44,
-    "Senegal": 0.44,
-    "Ivory Coast": 0.43,
-    "Panama": 0.41,
-    "Dem. Rep. of Congo": 0.40,
-    "Haiti": 0.37,
-    "Curacao": 0.34,
-    "Cape Verde": 0.29,
-    "Suriname": 0.28,
-    "New Caledonia": 0.19,
-}
-WORLD_CUP_TITLES = {
-    "Brazil": 5,
-    "Germany": 4,
-    "Italy": 4,
-    "Argentina": 3,
-    "France": 2,
-    "Uruguay": 2,
-    "England": 1,
-    "Spain": 1,
-}
-TRADITION_BONUS = {
-    "Argentina": 0.27,
-    "Brazil": 0.30,
-    "Germany": 0.29,
-    "Italy": 0.29,
-    "France": 0.24,
-    "England": 0.20,
-    "Spain": 0.20,
-    "Uruguay": 0.22,
-    "Netherlands": 0.20,
-    "Portugal": 0.18,
-    "Belgium": 0.16,
-    "Croatia": 0.18,
-    "Mexico": 0.15,
-    "United States": 0.12,
-    "Morocco": 0.10,
-    "Japan": 0.12,
-    "South Korea": 0.11,
-    "Switzerland": 0.10,
-    "Denmark": 0.10,
-    "Poland": 0.10,
-    "Sweden": 0.10,
-    "Turkey": 0.09,
-    "Czech Republic": 0.10,
-    "Austria": 0.09,
-    "Scotland": 0.09,
-    "Wales": 0.08,
-    "Norway": 0.08,
-    "Senegal": 0.08,
-    "Ivory Coast": 0.07,
-    "Egypt": 0.07,
-    "Algeria": 0.07,
-    "Colombia": 0.08,
-    "Paraguay": 0.08,
-    "Ecuador": 0.07,
-    "Australia": 0.07,
-    "Iran": 0.07,
-    "Saudi Arabia": 0.06,
-}
-COACH_OVERRIDES = {
-    "Spain": 0.06,
-    "Argentina": 0.06,
-    "France": 0.05,
-    "England": 0.05,
-    "Portugal": 0.05,
-    "Germany": 0.04,
-    "Croatia": 0.04,
-    "Japan": 0.03,
-    "Morocco": 0.03,
-    "Brazil": 0.03,
-    "Italy": 0.03,
-    "Turkey": 0.02,
-    "Denmark": 0.02,
-    "Mexico": 0.01,
-}
-DISCIPLINE_OVERRIDES = {
-    "Japan": 0.08,
-    "South Korea": 0.03,
-    "England": 0.03,
-    "Switzerland": 0.03,
-    "Spain": 0.03,
-    "Uruguay": -0.08,
-    "Argentina": -0.05,
-    "Turkey": -0.05,
-    "Morocco": -0.03,
-    "Mexico": -0.03,
-    "Jamaica": -0.03,
-    "Bolivia": -0.02,
-    "Paraguay": -0.04,
-}
 
 
 @dataclass(frozen=True)
@@ -1126,73 +807,31 @@ def top_factor_drivers(factors: Optional[Dict[str, float]], limit: int = 3) -> L
 
 
 def normalize_team_text(value: str) -> str:
-    ascii_text = unicodedata.normalize("NFKD", value).encode("ascii", "ignore").decode("ascii")
-    return "".join(char.lower() for char in ascii_text if char.isalnum())
+    return package_normalize_team_text(value)
 
 
 def normalize_team_name(value: str) -> str:
-    normalized = normalize_team_text(value)
-    return TEAM_NAME_ALIASES.get(normalized, str(value).strip())
+    return package_normalize_team_name(value, aliases=TEAM_NAME_ALIASES)
 
 
 def normalize_stage_name(raw_stage: Optional[str]) -> Optional[str]:
-    if raw_stage is None:
-        return None
-    if raw_stage in STAGE_IMPORTANCE:
-        return raw_stage
-    lowered = str(raw_stage).strip().lower()
-    alias = STAGE_ALIASES.get(lowered)
-    if alias:
-        return alias
-    compact = lowered.replace(" ", "_")
-    alias = STAGE_ALIASES.get(compact)
-    if alias:
-        return alias
-    normalized = normalize_team_text(lowered)
-    alias = STAGE_ALIASES.get(normalized)
-    if alias:
-        return alias
-    raise SystemExit(f"Stage no soportado: {raw_stage}")
-
-
-def resolve_team_name(raw_name: str, teams: Dict[str, Team]) -> str:
-    if raw_name in teams:
-        return raw_name
-
-    normalized = normalize_team_text(raw_name)
-    if normalized in TEAM_NAME_ALIASES:
-        return TEAM_NAME_ALIASES[normalized]
-
-    for team_name in teams:
-        if normalize_team_text(team_name) == normalized:
-            return team_name
-
-    raise SystemExit(
-        f"Equipo no encontrado: {raw_name}. Usa list-teams para ver los nombres disponibles."
+    return package_normalize_stage_name(
+        raw_stage,
+        stage_importance=STAGE_IMPORTANCE,
+        stage_aliases=STAGE_ALIASES,
     )
 
 
+def resolve_team_name(raw_name: str, teams: Dict[str, Team]) -> str:
+    return package_resolve_team_name(raw_name, teams, aliases=TEAM_NAME_ALIASES)
+
+
 def resolve_optional_team_name(raw_name: Optional[str], teams: Dict[str, Team]) -> Optional[str]:
-    if raw_name is None:
-        return None
-    return resolve_team_name(raw_name, teams)
+    return package_resolve_optional_team_name(raw_name, teams, aliases=TEAM_NAME_ALIASES)
 
 
 def resolve_venue_country(raw_name: Optional[str], teams: Dict[str, Team]) -> Optional[str]:
-    if raw_name is None:
-        return None
-
-    normalized = normalize_team_text(raw_name)
-    host_countries = {team.host_country for team in teams.values() if team.host_country}
-    for country in host_countries:
-        if country and normalize_team_text(country) == normalized:
-            return country
-
-    aliased_team = TEAM_NAME_ALIASES.get(normalized)
-    if aliased_team and aliased_team in teams and teams[aliased_team].host_country:
-        return teams[aliased_team].host_country
-
-    return raw_name
+    return package_resolve_venue_country(raw_name, teams, aliases=TEAM_NAME_ALIASES)
 
 
 def resolve_fixture_names(fixture: dict, teams: Dict[str, Team]) -> dict:
@@ -1491,110 +1130,96 @@ def historical_snapshot(team: Team) -> HistoricalSnapshot:
 
 @lru_cache(maxsize=None)
 def resource_index(team: Team) -> float:
-    base = RESOURCE_OVERRIDES.get(team.name, RESOURCE_BY_CONFEDERATION[team.confederation])
-    base += 0.04 * ((team.elo - 1650.0) / 400.0)
-    base += team.resource_bias
-    if team.is_host:
-        base += 0.05
-    return clamp(base, 0.18, 1.00)
+    return calculate_resource_index(team, clamp=clamp)
 
 
 @lru_cache(maxsize=None)
 def heritage_index(team: Team) -> float:
-    history = historical_snapshot(team)
-    titles = WORLD_CUP_TITLES.get(team.name, 0)
-    base = HISTORICAL_BY_CONFEDERATION[team.confederation]
-    base += TRADITION_BONUS.get(team.name, 0.0)
-    base += 0.05 * titles
-    base += 0.18 * centered(history.strength_index)
-    base += 0.14 * centered(history.world_cup_index)
-    base += 0.06 * centered(history.competitive_index)
-    base += 0.02 if team.status == "qualified" else 0.0
-    base += team.heritage_bias
-    return clamp(base, 0.10, 1.00)
+    return calculate_heritage_index(
+        team,
+        historical_snapshot=historical_snapshot,
+        clamp=clamp,
+        centered=centered,
+    )
 
 
 @lru_cache(maxsize=None)
 def trajectory_index(team: Team) -> float:
-    history = historical_snapshot(team)
-    value = 0.28
-    value += 0.30 * heritage_index(team)
-    value += 0.18 * resource_index(team)
-    value += 0.14 * history.strength_index
-    value += 0.08 * history.competitive_index
-    value += 0.05 * history.attack_index
-    value += 0.05 * history.defense_index
-    value += 0.06 * clamp((team.elo - 1650.0) / 350.0, -0.2, 0.4)
-    value += 0.03 if team.status == "qualified" else 0.0
-    return clamp(value, 0.12, 1.00)
+    return calculate_trajectory_index(
+        team,
+        historical_snapshot=historical_snapshot,
+        heritage_index_value=heritage_index(team),
+        resource_index_value=resource_index(team),
+        clamp=clamp,
+    )
 
 
 @lru_cache(maxsize=None)
 def coach_index(team: Team) -> float:
-    history = historical_snapshot(team)
-    value = 0.32
-    value += 0.26 * heritage_index(team)
-    value += 0.14 * resource_index(team)
-    value += 0.06 * history.world_cup_index
-    value += 0.04 * history.competitive_index
-    value += 0.05 * clamp((team.elo - 1650.0) / 300.0, -0.3, 0.5)
-    value += COACH_OVERRIDES.get(team.name, 0.0)
-    value += team.coach_bias
-    return clamp(value, 0.20, 0.98)
+    return calculate_coach_index(
+        team,
+        historical_snapshot=historical_snapshot,
+        heritage_index_value=heritage_index(team),
+        resource_index_value=resource_index(team),
+        clamp=clamp,
+    )
 
 
 @lru_cache(maxsize=None)
 def chemistry_index(team: Team) -> float:
-    value = 0.36
-    value += 0.22 * coach_index(team)
-    value += 0.14 * heritage_index(team)
-    value += 0.08 * resource_index(team)
-    value += team.chemistry_bias
-    return clamp(value, 0.20, 0.98)
+    return calculate_chemistry_index(
+        team,
+        coach_index_value=coach_index(team),
+        heritage_index_value=heritage_index(team),
+        resource_index_value=resource_index(team),
+        clamp=clamp,
+    )
 
 
 @lru_cache(maxsize=None)
 def discipline_proxy(team: Team) -> float:
-    value = 0.56
-    value += DISCIPLINE_BY_CONFEDERATION[team.confederation]
-    value += DISCIPLINE_OVERRIDES.get(team.name, 0.0)
-    value += team.discipline_bias
-    return clamp(value, 0.18, 0.96)
+    return calculate_discipline_proxy(team, clamp=clamp)
 
 
 @lru_cache(maxsize=None)
 def tactical_flexibility(team: Team) -> float:
-    value = 0.34
-    value += 0.24 * coach_index(team)
-    value += 0.10 * resource_index(team)
-    value += 0.06 * heritage_index(team)
-    return clamp(value, 0.20, 0.96)
+    return calculate_tactical_flexibility(
+        coach_index_value=coach_index(team),
+        resource_index_value=resource_index(team),
+        heritage_index_value=heritage_index(team),
+        clamp=clamp,
+    )
 
 
 @lru_cache(maxsize=None)
 def morale_base(team: Team) -> float:
-    value = 0.38
-    value += 0.18 * chemistry_index(team)
-    value += 0.10 * heritage_index(team)
-    value += 0.06 * coach_index(team)
-    return clamp(value, 0.20, 0.95)
+    return calculate_morale_base(
+        chemistry_index_value=chemistry_index(team),
+        heritage_index_value=heritage_index(team),
+        coach_index_value=coach_index(team),
+        clamp=clamp,
+    )
 
 
 @lru_cache(maxsize=None)
 def travel_resilience(team: Team) -> float:
-    value = TRAVEL_BY_CONFEDERATION[team.confederation]
-    value += 0.08 * resource_index(team)
-    value += 0.05 * chemistry_index(team)
-    value += 0.04 if team.is_host else 0.0
-    return clamp(value, 0.35, 0.98)
+    return calculate_travel_resilience(
+        team,
+        resource_index_value=resource_index(team),
+        chemistry_index_value=chemistry_index(team),
+        clamp=clamp,
+    )
 
 
 @lru_cache(maxsize=None)
 def tempo_proxy(team: Team) -> float:
-    value = TEMPO_BY_CONFEDERATION[team.confederation]
-    value += 0.03 * centered(trajectory_index(team))
-    value += 0.02 * centered(coach_index(team))
-    return clamp(value, 0.32, 0.78)
+    return calculate_tempo_proxy(
+        team,
+        trajectory_index_value=trajectory_index(team),
+        coach_index_value=coach_index(team),
+        clamp=clamp,
+        centered=centered,
+    )
 
 
 def position_template() -> List[str]:
@@ -3394,17 +3019,16 @@ def sample_cards(
 
 
 def penalties_probability(team_a: Team, team_b: Team, state_a: dict, state_b: dict) -> float:
-    profile_a = profile_for(team_a)
-    profile_b = profile_for(team_b)
-    edge = 0.80 * (profile_a.squad.goalkeeper_unit - profile_b.squad.goalkeeper_unit)
-    edge += 0.40 * (profile_a.coach_index - profile_b.coach_index)
-    edge += 0.20 * (profile_a.heritage_index - profile_b.heritage_index)
-    edge += 0.14 * (profile_a.history.shootout_index - profile_b.history.shootout_index)
-    edge += 0.15 * (profile_a.squad.player_experience - profile_b.squad.player_experience)
-    edge += 0.15 * (state_a["morale"] - state_b["morale"])
-    edge += 0.12 * (recent_form_signal(state_a) - recent_form_signal(state_b))
-    edge -= 0.08 * (fatigue_level(state_a) - fatigue_level(state_b))
-    return logistic(edge)
+    return calculate_penalties_probability(
+        team_a,
+        team_b,
+        state_a,
+        state_b,
+        profile_for=profile_for,
+        logistic=logistic,
+        recent_form_signal=recent_form_signal,
+        fatigue_level=fatigue_level,
+    )
 
 
 def penalty_conversion_probability(
@@ -3419,32 +3043,23 @@ def penalty_conversion_probability(
     trailing: bool,
     round_number: int,
 ) -> float:
-    taker_profile = profile_for(taker)
-    keeper_profile = profile_for(keeper_team)
-    rate = 0.74
-    rate += 0.16 * centered(taker_profile.squad.finishing)
-    rate += 0.05 * centered(taker_profile.squad.shot_creation)
-    rate += 0.04 * centered(taker_profile.squad.player_experience)
-    rate += 0.03 * centered(taker_profile.coach_index)
-    rate += 0.03 * centered(taker_profile.heritage_index)
-    rate += 0.02 * centered(taker_profile.history.shootout_index)
-    rate += 0.05 * clamp(float(taker_state.get("morale", 0.0)), -1.0, 1.0)
-    rate += 0.03 * recent_form_signal(taker_state)
-    rate -= 0.06 * fatigue_level(taker_state)
-    rate -= 0.06 * (1.0 - availability_level(taker_state))
-    rate -= 0.10 * centered(keeper_profile.squad.goalkeeper_unit)
-    rate -= 0.03 * centered(keeper_profile.coach_index)
-    rate -= 0.02 * centered(keeper_profile.history.shootout_index)
-    rate -= 0.05 * clamp(ctx.weather_stress, 0.0, 1.0)
-    if taker_first:
-        rate += 0.008
-    if trailing:
-        rate -= 0.020
-    if sudden_death:
-        rate -= 0.010
-    if round_number >= 4:
-        rate -= 0.012 * (round_number - 3)
-    return clamp(rate, 0.46, 0.92)
+    return calculate_penalty_conversion_probability(
+        taker,
+        keeper_team,
+        ctx,
+        taker_state,
+        keeper_state,
+        taker_first=taker_first,
+        sudden_death=sudden_death,
+        trailing=trailing,
+        round_number=round_number,
+        profile_for=profile_for,
+        centered=centered,
+        recent_form_signal=recent_form_signal,
+        fatigue_level=fatigue_level,
+        availability_level=availability_level,
+        clamp=clamp,
+    )
 
 
 def simulate_penalty_shootout(
@@ -3456,106 +3071,17 @@ def simulate_penalty_shootout(
     *,
     a_starts: bool,
 ) -> dict:
-    score_a = 0
-    score_b = 0
-    kicks_a = 0
-    kicks_b = 0
-    regulation_rounds = 5
-
-    for round_number in range(1, regulation_rounds + 1):
-        order = ("A", "B") if a_starts else ("B", "A")
-        for shooter in order:
-            sudden_death = False
-            if shooter == "A":
-                trailing = score_a < score_b
-                prob = penalty_conversion_probability(
-                    team_a,
-                    team_b,
-                    ctx,
-                    state_a,
-                    state_b,
-                    taker_first=a_starts,
-                    sudden_death=sudden_death,
-                    trailing=trailing,
-                    round_number=round_number,
-                )
-                kicks_a += 1
-                if fast_random() < prob:
-                    score_a += 1
-            else:
-                trailing = score_b < score_a
-                prob = penalty_conversion_probability(
-                    team_b,
-                    team_a,
-                    ctx,
-                    state_b,
-                    state_a,
-                    taker_first=not a_starts,
-                    sudden_death=sudden_death,
-                    trailing=trailing,
-                    round_number=round_number,
-                )
-                kicks_b += 1
-                if fast_random() < prob:
-                    score_b += 1
-
-            remaining_a = regulation_rounds - kicks_a
-            remaining_b = regulation_rounds - kicks_b
-            if score_a > score_b + remaining_b:
-                return {"winner": team_a.name, "score_a": score_a, "score_b": score_b, "a_starts": a_starts}
-            if score_b > score_a + remaining_a:
-                return {"winner": team_b.name, "score_a": score_a, "score_b": score_b, "a_starts": a_starts}
-
-    sudden_round = 0
-    while score_a == score_b and sudden_round < 12:
-        sudden_round += 1
-        order = ("A", "B") if a_starts else ("B", "A")
-        round_scored_a = False
-        round_scored_b = False
-        for shooter in order:
-            if shooter == "A":
-                prob = penalty_conversion_probability(
-                    team_a,
-                    team_b,
-                    ctx,
-                    state_a,
-                    state_b,
-                    taker_first=a_starts,
-                    sudden_death=True,
-                    trailing=score_a < score_b,
-                    round_number=regulation_rounds + sudden_round,
-                )
-                if fast_random() < prob:
-                    score_a += 1
-                    round_scored_a = True
-            else:
-                prob = penalty_conversion_probability(
-                    team_b,
-                    team_a,
-                    ctx,
-                    state_b,
-                    state_a,
-                    taker_first=not a_starts,
-                    sudden_death=True,
-                    trailing=score_b < score_a,
-                    round_number=regulation_rounds + sudden_round,
-                )
-                if fast_random() < prob:
-                    score_b += 1
-                    round_scored_b = True
-        if round_scored_a != round_scored_b:
-            break
-
-    if score_a == score_b:
-        winner = team_a.name if fast_random() < penalties_probability(team_a, team_b, state_a, state_b) else team_b.name
-        if winner == team_a.name:
-            score_a += 1
-        else:
-            score_b += 1
-    else:
-        winner = team_a.name if score_a > score_b else team_b.name
-
-    return {"winner": winner, "score_a": score_a, "score_b": score_b, "a_starts": a_starts}
+    return run_penalty_shootout(
+        team_a,
+        team_b,
+        ctx,
+        state_a,
+        state_b,
+        a_starts=a_starts,
+        penalty_conversion_probability_fn=penalty_conversion_probability,
+        penalties_probability_fn=penalties_probability,
+        fast_random=fast_random,
+    )
 
 
 def penalty_shootout_summary(
@@ -4505,19 +4031,12 @@ def resolved_team_name_from_penalties(
     team_a: str,
     team_b: str,
 ) -> Optional[str]:
-    if not penalties_winner:
-        return None
-    winner = str(penalties_winner).strip()
-    if winner == "A":
-        return team_a
-    if winner == "B":
-        return team_b
-    resolved = normalize_team_name(winner)
-    if resolved == team_a or winner == team_a:
-        return team_a
-    if resolved == team_b or winner == team_b:
-        return team_b
-    return None
+    return package_resolved_team_name_from_penalties(
+        penalties_winner,
+        team_a,
+        team_b,
+        aliases=TEAM_NAME_ALIASES,
+    )
 
 
 def resolved_winner_for_entry(entry: dict, prediction: MatchPrediction) -> Optional[str]:
