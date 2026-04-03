@@ -1195,6 +1195,7 @@ def load_players(raw_players: Sequence[dict]) -> Tuple[Player, ...]:
     return tuple(players)
 
 
+@lru_cache(maxsize=1)
 def load_teams() -> Dict[str, Team]:
     payload = json.loads(DATA_FILE.read_text())
     teams = {}
@@ -2403,6 +2404,65 @@ def penalties_context_state(ctx_morale: float, state: Optional[dict]) -> dict:
     penalties_state = normalize_team_state(state)
     penalties_state["morale"] = clamp(ctx_morale, -1.0, 1.0)
     return penalties_state
+
+
+def simulation_state_signature(state: Optional[dict]) -> Tuple[float, ...]:
+    normalized = normalize_team_state(state)
+    return (
+        round(float(normalized["elo_shift"]), 1),
+        round(float(normalized["recent_form"]), 2),
+        round(float(normalized["attack_form"]), 2),
+        round(float(normalized["defense_form"]), 2),
+        round(float(normalized["fatigue"]), 2),
+        round(float(normalized["availability"]), 2),
+        round(float(normalized["discipline_drift"]), 2),
+        round(float(normalized["style_attack_bias"]), 2),
+        round(float(normalized["style_defense_bias"]), 2),
+        round(float(normalized["style_tempo"]), 2),
+    )
+
+
+def simulation_state_from_signature(signature: Tuple[float, ...]) -> dict:
+    (
+        elo_shift,
+        recent_form,
+        attack_form,
+        defense_form,
+        fatigue,
+        availability,
+        discipline_drift,
+        style_attack_bias,
+        style_defense_bias,
+        style_tempo,
+    ) = signature
+    return {
+        "elo_shift": float(elo_shift),
+        "recent_form": float(recent_form),
+        "attack_form": float(attack_form),
+        "defense_form": float(defense_form),
+        "fatigue": float(fatigue),
+        "availability": float(availability),
+        "discipline_drift": float(discipline_drift),
+        "style_attack_bias": float(style_attack_bias),
+        "style_defense_bias": float(style_defense_bias),
+        "style_tempo": float(style_tempo),
+    }
+
+
+@lru_cache(maxsize=131072)
+def cached_simulation_expected_goals(
+    team_a_name: str,
+    team_b_name: str,
+    ctx: MatchContext,
+    state_signature_a: Tuple[float, ...],
+    state_signature_b: Tuple[float, ...],
+) -> Tuple[float, float]:
+    teams = load_teams()
+    team_a = teams[team_a_name]
+    team_b = teams[team_b_name]
+    state_a = simulation_state_from_signature(state_signature_a)
+    state_b = simulation_state_from_signature(state_signature_b)
+    return expected_goals(team_a, team_b, ctx, state_a=state_a, state_b=state_b)
 
 
 def extra_time_expected_goals(
@@ -3725,6 +3785,8 @@ def build_simulation_context(
         elif teams[team_b].is_host:
             venue_country = teams[team_b].host_country
 
+    weather_bucket = random.choice((0.03, 0.06, 0.09, 0.12))
+
     return MatchContext(
         neutral=neutral,
         home_team=home_team,
@@ -3750,7 +3812,7 @@ def build_simulation_context(
         group_goal_diff_b=int(state_b["group_goal_diff"]),
         group_matches_played_a=int(state_a["group_matches_played"]),
         group_matches_played_b=int(state_b["group_matches_played"]),
-        weather_stress=random.uniform(0.02, 0.12),
+        weather_stress=weather_bucket,
         importance=STAGE_IMPORTANCE[stage],
     )
 
@@ -3930,7 +3992,13 @@ def simulate_match_sample(
     ctx = build_simulation_context(teams, states, team_a, team_b, stage, group_name=group_name)
     state_a = ensure_state(states, team_a)
     state_b = ensure_state(states, team_b)
-    mu_a, mu_b = expected_goals(teams[team_a], teams[team_b], ctx, state_a=state_a, state_b=state_b)
+    mu_a, mu_b = cached_simulation_expected_goals(
+        team_a,
+        team_b,
+        ctx,
+        simulation_state_signature(state_a),
+        simulation_state_signature(state_b),
+    )
     score_a, score_b = sample_score(mu_a, mu_b, ctx)
     yellows_a, reds_a, yellows_b, reds_b = sample_cards(
         teams,
@@ -6487,6 +6555,10 @@ def build_methodology_html(bracket_payload: dict, backtest: dict) -> str:
         "<article>"
         "<h3>Stack estadistico</h3>"
         "<p>La capa prepartido mezcla el modelo principal Bivariante Poisson, un modelo de contraste Poisson independiente, un ajuste de baja anotacion y un ensamble ligero final. Si las cuotas son confiables, tambien se usan como referencia suave y no como sustituto del modelo.</p>"
+        "</article>"
+        "<article>"
+        "<h3>Estrategia de datos</h3>"
+        "<p>El modelo prioriza fuentes solidas y trazables antes que volumen bruto. Aqui la meta no es meter cientos de terabytes por marketing, sino usar capas de alta señal: datos oficiales, historia desde 1990, feed en vivo y mercado como referencia suave.</p>"
         "</article>"
         "<article>"
         "<h3>Modelos visibles en la web</h3>"

@@ -1,0 +1,43 @@
+{
+  "meta": {
+    "as_of": "2026-04-03",
+    "description": "Inventario curado de fuentes de alta señal para el modelo del Mundial 2026. La estrategia prioriza calidad, cobertura y trazabilidad por encima de volumen bruto.",
+    "design_note": "No se intenta inflar el modelo con cientos de terabytes o petabytes de datos heterogeneos. En este dominio, mas volumen sin curacion tiende a meter ruido, duplicacion y costo computacional sin mejorar calibracion."
+  },
+  "tiers": [
+    {
+      "name": "Tier 1 - Oficiales y estructurales",
+      "purpose": "Base lenta y confiable de selecciones y torneo.",
+      "sources": [
+        "FIFA rankings",
+        "FIFA tournament procedures and draw",
+        "Official qualified teams"
+      ]
+    },
+    {
+      "name": "Tier 2 - Historico de selecciones desde 1990",
+      "purpose": "Memoria moderna de rendimiento, ataque, defensa, Mundial y penales.",
+      "sources": [
+        "International results dataset",
+        "Shootouts dataset",
+        "Former team names mapping"
+      ]
+    },
+    {
+      "name": "Tier 3 - Operativo en vivo",
+      "purpose": "Actualizar el modelo cada 5 minutos durante partidos en vivo.",
+      "sources": [
+        "ESPN scoreboard and summary",
+        "API-Football when configured",
+        "Open-Meteo forecast"
+      ]
+    },
+    {
+      "name": "Tier 4 - Referencia de mercado",
+      "purpose": "Usar cuotas como referencia suave y no como sustituto del modelo.",
+      "sources": [
+        "Market implied probabilities when feed provides them"
+      ]
+    }
+  ]
+}
