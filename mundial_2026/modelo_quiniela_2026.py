@@ -5,18 +5,34 @@ import argparse
 import html
 import json
 import math
-import multiprocessing as mp
 import random
 import re
 import shutil
 import tempfile
 import unicodedata
-from concurrent.futures import ProcessPoolExecutor, as_completed
 from dataclasses import asdict, dataclass
 from datetime import datetime
 from functools import lru_cache
 from pathlib import Path
 from typing import Dict, List, Optional, Sequence, Tuple
+
+from worldcup2026.config import PARAMS
+from worldcup2026.metrics import avg_or_none, brier_decomposition, summarize_temporal_windows
+from worldcup2026.modeling import (
+    adaptive_ensemble_weights,
+    dynamic_correlation,
+    quantize_for_cache,
+    top_score_from_distribution,
+)
+from worldcup2026.parallel import (
+    default_parallel_workers,
+    empty_bracket_aggregate,
+    empty_tournament_summary,
+    merge_bracket_aggregate,
+    merge_tournament_summary,
+    run_parallel_batches,
+)
+from worldcup2026.types import BacktestMetrics, KnockoutResolution, ModelOutput
 
 
 DATA_FILE = Path(__file__).with_name("teams_2026.json")
@@ -571,100 +587,6 @@ class MatchPrediction:
     statistical_depth: Optional[Dict[str, object]] = None
     live_patterns: Optional[Dict[str, object]] = None
     model_stack: Optional[Dict[str, object]] = None
-
-
-@dataclass(frozen=True)
-class ModelHyperparameters:
-    bivariate_correlation_base: float = 0.08
-    bivariate_correlation_cap: float = 0.10
-    bivariate_shared_goal_share: float = 0.18
-    bivariate_closeness_bonus: float = 0.04
-    bivariate_knockout_bonus: float = 0.03
-    bivariate_importance_bonus: float = 0.02
-    low_score_draw_threshold: float = 0.27
-    low_score_draw_positive_cap: float = 0.12
-    low_score_draw_negative_cap: float = -0.08
-    low_score_rho_base: float = -0.16
-    low_score_rho_positive_draw: float = -0.55
-    low_score_rho_negative_draw: float = 0.20
-    low_score_knockout_shift: float = -0.02
-    low_score_floor: float = 0.05
-    model_contrast_weight: float = 0.18
-    model_low_score_base: float = 0.12
-    model_low_score_closeness_weight: float = 0.08
-    model_low_score_draw_weight: float = 0.45
-    model_low_score_knockout_bonus: float = 0.03
-    model_low_score_min: float = 0.12
-    model_low_score_max: float = 0.28
-    model_primary_min: float = 0.40
-    model_market_bonus_strength: float = 0.30
-    model_consensus_strength: float = 1.0
-    confidence_base: float = 0.10
-    confidence_top_outcome_weight: float = 0.60
-    confidence_gap_weight: float = 0.25
-    confidence_top3_weight: float = 0.10
-    confidence_entropy_weight: float = 0.10
-    confidence_agreement_weight: float = 0.12
-    confidence_floor: float = 0.05
-    confidence_cap: float = 0.99
-    extra_time_share: float = 0.29
-    extra_time_fatigue_weight: float = 0.16
-    extra_time_availability_weight: float = 0.10
-    extra_time_attack_form_weight: float = 0.08
-    extra_time_recent_form_weight: float = 0.04
-    cache_goal_precision: float = 50.0
-    cache_rho_precision: float = 100.0
-    temporal_cv_fold_size: int = 8
-    auto_parallel_min_iterations: int = 4000
-    auto_parallel_max_workers_floor: int = 1
-
-
-@dataclass(frozen=True)
-class ModelOutput:
-    name: str
-    dist: Dict[Tuple[int, int], float]
-    probs: Dict[str, float]
-    weight: float
-    top_score: Tuple[str, float]
-
-
-@dataclass(frozen=True)
-class KnockoutResolution:
-    winner: str
-    loser: str
-    score_a: int
-    score_b: int
-    extra_time_score_a: int
-    extra_time_score_b: int
-    went_extra_time: bool
-    went_penalties: bool
-    penalty_score_a: Optional[int]
-    penalty_score_b: Optional[int]
-
-
-@dataclass(frozen=True)
-class BacktestMetrics:
-    completed_matches: int
-    regular_time_samples: int
-    advancement_samples: int
-    favorite_hit_rate: Optional[float]
-    top1_score_hit_rate: Optional[float]
-    top3_score_hit_rate: Optional[float]
-    brier_result: Optional[float]
-    logloss_result: Optional[float]
-    brier_advance: Optional[float]
-    logloss_advance: Optional[float]
-    market_logloss_result: Optional[float]
-    calibration_buckets: List[Dict[str, float]]
-    brier_reliability: Optional[float] = None
-    brier_resolution: Optional[float] = None
-    brier_uncertainty: Optional[float] = None
-    temporal_cv_logloss: Optional[float] = None
-    temporal_cv_brier: Optional[float] = None
-    temporal_cv_accuracy: Optional[float] = None
-
-
-PARAMS = ModelHyperparameters()
 
 
 def clamp(value: float, low: float, high: float) -> float:
@@ -2195,46 +2117,6 @@ def poisson_prob(goals: int, mu: float) -> float:
     return math.exp(-mu) * (mu ** goals) / factorial
 
 
-def quantize_for_cache(value: float, precision: Optional[float] = None) -> int:
-    scale = precision if precision is not None else PARAMS.cache_goal_precision
-    return int(round(float(value) * scale))
-
-
-def dynamic_correlation(
-    mu_a: float,
-    mu_b: float,
-    ctx: Optional[MatchContext] = None,
-) -> float:
-    closeness = clamp(1.0 - abs(mu_a - mu_b) / max(mu_a + mu_b, 1.0), 0.0, 1.0)
-    draw_signal = 0.0
-    importance = 1.0
-    knockout = False
-    if ctx:
-        knockout = bool(ctx.knockout)
-        importance = float(ctx.importance)
-        if ctx.market_prob_draw is not None:
-            draw_signal = clamp(
-                float(ctx.market_prob_draw) - PARAMS.low_score_draw_threshold,
-                PARAMS.low_score_draw_negative_cap,
-                PARAMS.low_score_draw_positive_cap,
-            )
-    base = PARAMS.bivariate_correlation_base
-    base += PARAMS.bivariate_closeness_bonus * closeness
-    base += PARAMS.bivariate_importance_bonus * max(importance - 1.0, 0.0)
-    base += 0.04 * max(draw_signal, 0.0)
-    if knockout:
-        base += PARAMS.bivariate_knockout_bonus
-    return clamp(
-        base,
-        0.0,
-        min(
-            PARAMS.bivariate_correlation_cap,
-            mu_a * 0.25,
-            mu_b * 0.25,
-        ),
-    )
-
-
 @lru_cache(maxsize=65536)
 def cached_primary_score_distribution(
     mu_a_key: int,
@@ -2480,49 +2362,6 @@ def pairwise_model_agreement(prob_sets: Sequence[Dict[str, float]]) -> float:
     if not distances:
         return 1.0
     return clamp(1.0 - (sum(distances) / len(distances)), 0.0, 1.0)
-
-
-def top_score_from_distribution(dist: Dict[Tuple[int, int], float]) -> Tuple[str, float]:
-    if not dist:
-        return ("0-0", 0.0)
-    (goals_a, goals_b), prob = max(dist.items(), key=lambda item: item[1])
-    return (f"{goals_a}-{goals_b}", float(prob))
-
-
-def adaptive_ensemble_weights(
-    models: Sequence[ModelOutput],
-    market_probs: Optional[Dict[str, float]] = None,
-) -> List[float]:
-    if not models:
-        return []
-    if len(models) == 1:
-        return [1.0]
-
-    base_weights = [model.weight for model in models]
-    total_base = sum(base_weights) or 1.0
-    consensus = {
-        key: sum(model.probs.get(key, 0.0) * weight for model, weight in zip(models, base_weights)) / total_base
-        for key in ("a", "draw", "b")
-    }
-    adjusted_weights = []
-    for model in models:
-        distance = 0.5 * sum(
-            abs(float(model.probs.get(key, 0.0)) - float(consensus[key]))
-            for key in ("a", "draw", "b")
-        )
-        agreement_multiplier = clamp(1.0 - distance * PARAMS.model_consensus_strength, 0.55, 1.25)
-        market_multiplier = 1.0
-        if market_probs:
-            market_distance = 0.5 * sum(
-                abs(float(model.probs.get(key, 0.0)) - float(market_probs.get(key, 0.0)))
-                for key in ("a", "draw", "b")
-            )
-            market_multiplier = clamp(1.0 - market_distance * PARAMS.model_market_bonus_strength, 0.70, 1.10)
-        adjusted_weights.append(model.weight * agreement_multiplier * market_multiplier)
-    total = sum(adjusted_weights)
-    if total <= 0.0:
-        return [weight / total_base for weight in base_weights]
-    return [weight / total for weight in adjusted_weights]
 
 
 def build_model_stack(
@@ -4550,66 +4389,6 @@ def simulate_tournament_iteration(
     }
 
 
-def default_parallel_workers(iterations: int) -> int:
-    if iterations < PARAMS.auto_parallel_min_iterations:
-        return 1
-    return max(PARAMS.auto_parallel_max_workers_floor, mp.cpu_count() - 1)
-
-
-def empty_tournament_summary(teams: Dict[str, Team]) -> Dict[str, dict]:
-    return {
-        name: {
-            "appear": 0,
-            "advance_group": 0,
-            "reach_round16": 0,
-            "reach_quarterfinal": 0,
-            "reach_semifinal": 0,
-            "reach_final": 0,
-            "third_place": 0,
-            "fourth_place": 0,
-            "champion": 0,
-            "group_winner": 0,
-            "avg_group_points": 0.0,
-            "avg_goals_for": 0.0,
-            "avg_goals_against": 0.0,
-        }
-        for name in teams
-    }
-
-
-def empty_bracket_aggregate() -> Dict[str, dict]:
-    return {
-        match_id: {
-            "outcomes": {},
-            "winner": {},
-            "went_extra_time": 0,
-            "went_penalties": 0,
-            "penalty_scores": {},
-        }
-        for match_id in bracket_match_order()
-    }
-
-
-def merge_tournament_summary(target: Dict[str, dict], batch_summary: Dict[str, dict]) -> None:
-    for team_name, stats in batch_summary.items():
-        current = target[team_name]
-        for key, value in stats.items():
-            current[key] += value
-
-
-def merge_bracket_aggregate(target: Dict[str, dict], batch_aggregate: Dict[str, dict]) -> None:
-    for match_id, aggregate in batch_aggregate.items():
-        current = target[match_id]
-        current["went_extra_time"] += aggregate.get("went_extra_time", 0)
-        current["went_penalties"] += aggregate.get("went_penalties", 0)
-        for outcome_key, count in aggregate.get("outcomes", {}).items():
-            current["outcomes"][outcome_key] = current["outcomes"].get(outcome_key, 0) + count
-        for winner, count in aggregate.get("winner", {}).items():
-            current["winner"][winner] = current["winner"].get(winner, 0) + count
-        for score_key, count in aggregate.get("penalty_scores", {}).items():
-            current["penalty_scores"][score_key] = current["penalty_scores"].get(score_key, 0) + count
-
-
 def _simulate_tournament_batch(
     batch_size: int,
     seed: int,
@@ -4660,7 +4439,7 @@ def _project_bracket_batch(
     initial_payload: Optional[dict],
 ) -> Dict[str, dict]:
     random.seed(seed)
-    match_aggregate = empty_bracket_aggregate()
+    match_aggregate = empty_bracket_aggregate(bracket_match_order())
     for _ in range(batch_size):
         result = simulate_tournament_iteration(teams, config, initial_payload=initial_payload)
         for match_id, match_result in result["bracket_matches"].items():
@@ -4674,52 +4453,6 @@ def _project_bracket_batch(
                 penalty_key = (int(match_result["penalty_score_a"]), int(match_result["penalty_score_b"]))
                 aggregate["penalty_scores"][penalty_key] = aggregate["penalty_scores"].get(penalty_key, 0) + 1
     return match_aggregate
-
-
-def run_parallel_batches(
-    *,
-    iterations: int,
-    workers: int,
-    seed: Optional[int],
-    worker_fn,
-    teams: Dict[str, Team],
-    config: dict,
-    initial_payload: Optional[dict],
-    progress_every: int = 0,
-) -> List[dict]:
-    workers = max(1, workers)
-    if workers == 1:
-        return [worker_fn(iterations, seed or 0, teams, config, initial_payload)]
-
-    base_seed = seed if seed is not None else random.randrange(1, 10_000_000)
-    batch_size = iterations // workers
-    remainder = iterations % workers
-    completed_iterations = 0
-    results: List[dict] = []
-    try:
-        with ProcessPoolExecutor(max_workers=workers) as executor:
-            futures = {}
-            for batch_index in range(workers):
-                size = batch_size + (1 if batch_index < remainder else 0)
-                if size <= 0:
-                    continue
-                future = executor.submit(
-                    worker_fn,
-                    size,
-                    base_seed + batch_index,
-                    teams,
-                    config,
-                    initial_payload,
-                )
-                futures[future] = size
-            for future in as_completed(futures):
-                results.append(future.result())
-                if progress_every:
-                    completed_iterations += futures[future]
-                    print(f"Progreso: {min(completed_iterations, iterations)}/{iterations} iteraciones")
-        return results
-    except (PermissionError, OSError):
-        return [worker_fn(iterations, base_seed, teams, config, initial_payload)]
 
 
 def command_simulate_tournament(args: argparse.Namespace, teams: Dict[str, Team]) -> None:
@@ -4945,7 +4678,7 @@ def command_project_bracket(args: argparse.Namespace, teams: Dict[str, Team]) ->
     config = load_tournament_config(Path(args.config))
     initial_payload = None if getattr(args, "ignore_state", False) else load_persistent_payload(Path(args.state_file), teams)
     workers = args.workers if args.workers > 0 else default_parallel_workers(args.iterations)
-    match_aggregate = empty_bracket_aggregate()
+    match_aggregate = empty_bracket_aggregate(bracket_match_order())
     if workers > 1:
         for batch_aggregate in run_parallel_batches(
             iterations=args.iterations,
@@ -8609,80 +8342,6 @@ def confidence_bucket(value: float) -> str:
     if pct < 80.0:
         return "70-79%"
     return "80%+"
-
-
-def avg_or_none(values: Sequence[float]) -> Optional[float]:
-    return sum(values) / len(values) if values else None
-
-
-def brier_decomposition(
-    predictions: Sequence[Tuple[float, float, float]],
-    outcomes: Sequence[str],
-) -> Dict[str, float]:
-    if not predictions or not outcomes or len(predictions) != len(outcomes):
-        return {"brier": 0.0, "reliability": 0.0, "resolution": 0.0, "uncertainty": 0.0}
-
-    n = len(predictions)
-    bar_a = sum(1.0 for outcome in outcomes if outcome == "a") / n
-    bar_d = sum(1.0 for outcome in outcomes if outcome == "draw") / n
-    bar_b = sum(1.0 for outcome in outcomes if outcome == "b") / n
-    uncertainty = (bar_a * (1.0 - bar_a) + bar_d * (1.0 - bar_d) + bar_b * (1.0 - bar_b)) / 3.0
-
-    total_brier = 0.0
-    buckets: Dict[float, List[Tuple[Tuple[float, float, float], str]]] = {}
-    for triple, outcome in zip(predictions, outcomes):
-        pa, pd, pb = triple
-        obs_a = 1.0 if outcome == "a" else 0.0
-        obs_d = 1.0 if outcome == "draw" else 0.0
-        obs_b = 1.0 if outcome == "b" else 0.0
-        total_brier += ((pa - obs_a) ** 2 + (pd - obs_d) ** 2 + (pb - obs_b) ** 2) / 3.0
-        bucket_key = round(max(pa, pd, pb) * 10.0) / 10.0
-        buckets.setdefault(bucket_key, []).append((triple, outcome))
-
-    reliability = 0.0
-    resolution = 0.0
-    for items in buckets.values():
-        nk = len(items)
-        avg_pa = sum(item[0][0] for item in items) / nk
-        avg_pd = sum(item[0][1] for item in items) / nk
-        avg_pb = sum(item[0][2] for item in items) / nk
-        obs_a = sum(1.0 for _, outcome in items if outcome == "a") / nk
-        obs_d = sum(1.0 for _, outcome in items if outcome == "draw") / nk
-        obs_b = sum(1.0 for _, outcome in items if outcome == "b") / nk
-        reliability += (nk / n) * (((avg_pa - obs_a) ** 2 + (avg_pd - obs_d) ** 2 + (avg_pb - obs_b) ** 2) / 3.0)
-        resolution += (nk / n) * (((obs_a - bar_a) ** 2 + (obs_d - bar_d) ** 2 + (obs_b - bar_b) ** 2) / 3.0)
-
-    return {
-        "brier": total_brier / n,
-        "reliability": reliability,
-        "resolution": resolution,
-        "uncertainty": uncertainty,
-    }
-
-
-def summarize_temporal_windows(
-    result_logloss: Sequence[float],
-    result_brier: Sequence[float],
-    result_hits: Sequence[int],
-    *,
-    fold_size: int = PARAMS.temporal_cv_fold_size,
-) -> Dict[str, Optional[float]]:
-    if not result_logloss:
-        return {"logloss": None, "brier": None, "accuracy": None}
-    fold_size = max(1, int(fold_size))
-    logloss_windows: List[float] = []
-    brier_windows: List[float] = []
-    accuracy_windows: List[float] = []
-    for start in range(0, len(result_logloss), fold_size):
-        end = start + fold_size
-        logloss_windows.append(sum(result_logloss[start:end]) / len(result_logloss[start:end]))
-        brier_windows.append(sum(result_brier[start:end]) / len(result_brier[start:end]))
-        accuracy_windows.append(sum(result_hits[start:end]) / len(result_hits[start:end]))
-    return {
-        "logloss": avg_or_none(logloss_windows),
-        "brier": avg_or_none(brier_windows),
-        "accuracy": avg_or_none(accuracy_windows),
-    }
 
 
 def compute_backtest_summary(fixtures: Sequence[dict], teams: Dict[str, Team], top_scores: int) -> dict:
