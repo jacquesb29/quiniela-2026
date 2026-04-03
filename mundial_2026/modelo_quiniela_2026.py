@@ -18,6 +18,7 @@ from typing import Dict, List, Optional, Sequence, Tuple
 
 
 DATA_FILE = Path(__file__).with_name("teams_2026.json")
+HISTORICAL_FEATURES_FILE = Path(__file__).with_name("historical_features_1990.json")
 TOURNAMENT_CONFIG_FILE = Path(__file__).with_name("tournament_2026_draw.json")
 STATE_FILE = Path(__file__).with_name("tournament_state_2026.json")
 FACTORIALS = [math.factorial(i) for i in range(16)]
@@ -457,6 +458,37 @@ class SquadAggregate:
 
 
 @dataclass(frozen=True)
+class HistoricalSnapshot:
+    source_names: Tuple[str, ...]
+    matches_since_1990: int
+    weighted_matches_since_1990: float
+    points_per_match: float
+    weighted_points_per_match: float
+    goals_for_per_match: float
+    goals_against_per_match: float
+    goal_diff_per_match: float
+    weighted_goals_for_per_match: float
+    weighted_goals_against_per_match: float
+    weighted_goal_diff_per_match: float
+    scoring_rate: float
+    clean_sheet_rate: float
+    competitive_matches_since_1990: int
+    competitive_points_per_match: float
+    competitive_goal_diff_per_match: float
+    world_cup_matches_since_1990: int
+    world_cup_points_per_match: float
+    world_cup_goal_diff_per_match: float
+    shootout_matches_since_1990: int
+    shootout_win_rate: float
+    strength_index: float
+    attack_index: float
+    defense_index: float
+    competitive_index: float
+    world_cup_index: float
+    shootout_index: float
+
+
+@dataclass(frozen=True)
 class TeamProfile:
     fifa_points: float
     fifa_rank: int
@@ -472,6 +504,7 @@ class TeamProfile:
     travel_resilience: float
     tempo: float
     squad: SquadAggregate
+    history: HistoricalSnapshot
 
 
 @dataclass(frozen=True)
@@ -1009,6 +1042,11 @@ def top_factor_drivers(factors: Optional[Dict[str, float]], limit: int = 3) -> L
         "fifa_strength_diff": "Ranking FIFA / puntos FIFA",
         "resource_diff": "Recursos/PIB proxy",
         "heritage_diff": "Historia mundialista",
+        "historical_strength_diff": "Historia competitiva desde 1990",
+        "historical_attack_diff": "Ataque historico desde 1990",
+        "historical_defense_diff": "Defensa historica desde 1990",
+        "competitive_history_diff": "Rendimiento competitivo desde 1990",
+        "world_cup_history_diff": "Rendimiento en Mundiales desde 1990",
         "coach_diff": "Entrenador",
         "trajectory_diff": "Trayectoria futbolística",
         "attack_unit_diff": "Ataque",
@@ -1253,6 +1291,97 @@ def fifa_strength_index(team: Team) -> float:
     return clamp((fifa_points_value(team) - low) / (high - low), 0.0, 1.0)
 
 
+HISTORICAL_TEAM_NAME_ALIASES = {
+    "Curacao": "Curaçao",
+    "Dem. Rep. of Congo": "DR Congo",
+}
+
+
+@lru_cache(maxsize=1)
+def historical_features_payload() -> dict:
+    if not HISTORICAL_FEATURES_FILE.exists():
+        return {"meta": {"missing": True}, "teams": {}}
+    try:
+        return json.loads(HISTORICAL_FEATURES_FILE.read_text())
+    except json.JSONDecodeError:
+        return {"meta": {"invalid": True}, "teams": {}}
+
+
+def proxy_historical_snapshot(team: Team) -> HistoricalSnapshot:
+    strength = clamp(0.50 + (team.elo - 1650.0) / 600.0, 0.08, 0.95)
+    attack = clamp(strength + 0.10 * team.attack_bias, 0.05, 0.98)
+    defense = clamp(strength + 0.10 * team.defense_bias, 0.05, 0.98)
+    competitive = clamp(0.42 + (team.elo - 1650.0) / 720.0, 0.08, 0.95)
+    world_cup = clamp(0.26 + 0.10 * WORLD_CUP_TITLES.get(team.name, 0), 0.05, 0.98)
+    shootout = clamp(0.46 + 0.06 * COACH_OVERRIDES.get(team.name, 0.0), 0.05, 0.95)
+    return HistoricalSnapshot(
+        source_names=(HISTORICAL_TEAM_NAME_ALIASES.get(team.name, team.name),),
+        matches_since_1990=0,
+        weighted_matches_since_1990=0.0,
+        points_per_match=1.25,
+        weighted_points_per_match=1.25,
+        goals_for_per_match=1.2,
+        goals_against_per_match=1.2,
+        goal_diff_per_match=0.0,
+        weighted_goals_for_per_match=1.2,
+        weighted_goals_against_per_match=1.2,
+        weighted_goal_diff_per_match=0.0,
+        scoring_rate=0.62,
+        clean_sheet_rate=0.26,
+        competitive_matches_since_1990=0,
+        competitive_points_per_match=1.25,
+        competitive_goal_diff_per_match=0.0,
+        world_cup_matches_since_1990=0,
+        world_cup_points_per_match=0.0,
+        world_cup_goal_diff_per_match=0.0,
+        shootout_matches_since_1990=0,
+        shootout_win_rate=0.5,
+        strength_index=strength,
+        attack_index=attack,
+        defense_index=defense,
+        competitive_index=competitive,
+        world_cup_index=world_cup,
+        shootout_index=shootout,
+    )
+
+
+@lru_cache(maxsize=None)
+def historical_snapshot(team: Team) -> HistoricalSnapshot:
+    payload = historical_features_payload()
+    row = payload.get("teams", {}).get(team.name)
+    if not row:
+        return proxy_historical_snapshot(team)
+    return HistoricalSnapshot(
+        source_names=tuple(row.get("source_names") or [HISTORICAL_TEAM_NAME_ALIASES.get(team.name, team.name)]),
+        matches_since_1990=int(row.get("matches_since_1990", 0)),
+        weighted_matches_since_1990=float(row.get("weighted_matches_since_1990", 0.0)),
+        points_per_match=float(row.get("points_per_match", 1.25)),
+        weighted_points_per_match=float(row.get("weighted_points_per_match", 1.25)),
+        goals_for_per_match=float(row.get("goals_for_per_match", 1.2)),
+        goals_against_per_match=float(row.get("goals_against_per_match", 1.2)),
+        goal_diff_per_match=float(row.get("goal_diff_per_match", 0.0)),
+        weighted_goals_for_per_match=float(row.get("weighted_goals_for_per_match", 1.2)),
+        weighted_goals_against_per_match=float(row.get("weighted_goals_against_per_match", 1.2)),
+        weighted_goal_diff_per_match=float(row.get("weighted_goal_diff_per_match", 0.0)),
+        scoring_rate=float(row.get("scoring_rate", 0.62)),
+        clean_sheet_rate=float(row.get("clean_sheet_rate", 0.26)),
+        competitive_matches_since_1990=int(row.get("competitive_matches_since_1990", 0)),
+        competitive_points_per_match=float(row.get("competitive_points_per_match", 1.25)),
+        competitive_goal_diff_per_match=float(row.get("competitive_goal_diff_per_match", 0.0)),
+        world_cup_matches_since_1990=int(row.get("world_cup_matches_since_1990", 0)),
+        world_cup_points_per_match=float(row.get("world_cup_points_per_match", 0.0)),
+        world_cup_goal_diff_per_match=float(row.get("world_cup_goal_diff_per_match", 0.0)),
+        shootout_matches_since_1990=int(row.get("shootout_matches_since_1990", 0)),
+        shootout_win_rate=float(row.get("shootout_win_rate", 0.5)),
+        strength_index=clamp(float(row.get("strength_index", 0.5)), 0.0, 1.0),
+        attack_index=clamp(float(row.get("attack_index", 0.5)), 0.0, 1.0),
+        defense_index=clamp(float(row.get("defense_index", 0.5)), 0.0, 1.0),
+        competitive_index=clamp(float(row.get("competitive_index", 0.5)), 0.0, 1.0),
+        world_cup_index=clamp(float(row.get("world_cup_index", 0.5)), 0.0, 1.0),
+        shootout_index=clamp(float(row.get("shootout_index", 0.5)), 0.0, 1.0),
+    )
+
+
 @lru_cache(maxsize=None)
 def resource_index(team: Team) -> float:
     base = RESOURCE_OVERRIDES.get(team.name, RESOURCE_BY_CONFEDERATION[team.confederation])
@@ -1265,10 +1394,14 @@ def resource_index(team: Team) -> float:
 
 @lru_cache(maxsize=None)
 def heritage_index(team: Team) -> float:
+    history = historical_snapshot(team)
     titles = WORLD_CUP_TITLES.get(team.name, 0)
     base = HISTORICAL_BY_CONFEDERATION[team.confederation]
     base += TRADITION_BONUS.get(team.name, 0.0)
-    base += 0.07 * titles
+    base += 0.05 * titles
+    base += 0.18 * centered(history.strength_index)
+    base += 0.14 * centered(history.world_cup_index)
+    base += 0.06 * centered(history.competitive_index)
     base += 0.02 if team.status == "qualified" else 0.0
     base += team.heritage_bias
     return clamp(base, 0.10, 1.00)
@@ -1276,9 +1409,14 @@ def heritage_index(team: Team) -> float:
 
 @lru_cache(maxsize=None)
 def trajectory_index(team: Team) -> float:
+    history = historical_snapshot(team)
     value = 0.28
-    value += 0.38 * heritage_index(team)
+    value += 0.30 * heritage_index(team)
     value += 0.18 * resource_index(team)
+    value += 0.14 * history.strength_index
+    value += 0.08 * history.competitive_index
+    value += 0.05 * history.attack_index
+    value += 0.05 * history.defense_index
     value += 0.06 * clamp((team.elo - 1650.0) / 350.0, -0.2, 0.4)
     value += 0.03 if team.status == "qualified" else 0.0
     return clamp(value, 0.12, 1.00)
@@ -1286,9 +1424,12 @@ def trajectory_index(team: Team) -> float:
 
 @lru_cache(maxsize=None)
 def coach_index(team: Team) -> float:
+    history = historical_snapshot(team)
     value = 0.32
     value += 0.26 * heritage_index(team)
     value += 0.14 * resource_index(team)
+    value += 0.06 * history.world_cup_index
+    value += 0.04 * history.competitive_index
     value += 0.05 * clamp((team.elo - 1650.0) / 300.0, -0.3, 0.5)
     value += COACH_OVERRIDES.get(team.name, 0.0)
     value += team.coach_bias
@@ -1556,6 +1697,7 @@ def profile_for(team: Team) -> TeamProfile:
         travel_resilience=travel_resilience(team),
         tempo=tempo_proxy(team),
         squad=aggregate_squad(team),
+        history=historical_snapshot(team),
     )
 
 
@@ -1730,6 +1872,8 @@ def attack_metric(team: Team, profile: TeamProfile, state: Optional[dict] = None
     strength = (effective_elo(team, state) - 1650.0) / 320.0
     value = 0.48 * strength
     value += 0.05 * centered(profile.fifa_strength_index)
+    value += 0.12 * centered(profile.history.attack_index)
+    value += 0.05 * centered(profile.history.competitive_index)
     value += 0.30 * centered(profile.squad.attack_unit)
     value += 0.18 * centered(profile.squad.midfield_unit)
     value += 0.14 * centered(profile.squad.finishing)
@@ -1751,6 +1895,8 @@ def defense_metric(team: Team, profile: TeamProfile, state: Optional[dict] = Non
     strength = (effective_elo(team, state) - 1650.0) / 340.0
     value = 0.44 * strength
     value += 0.04 * centered(profile.fifa_strength_index)
+    value += 0.12 * centered(profile.history.defense_index)
+    value += 0.04 * centered(profile.history.world_cup_index)
     value += 0.28 * centered(profile.squad.defense_unit)
     value += 0.14 * centered(profile.squad.goalkeeper_unit)
     value += 0.10 * centered(profile.squad.player_experience)
@@ -1795,8 +1941,10 @@ def expected_goals(
 
     delta_score = elo_diff / 255.0
     delta_score += 0.16 * fifa_diff
+    delta_score += 0.10 * (profile_a.history.strength_index - profile_b.history.strength_index)
     delta_score += 0.95 * (attack_edge_a - attack_edge_b)
     delta_score += history_weight * (profile_a.heritage_index - profile_b.heritage_index)
+    delta_score += 0.05 * (profile_a.history.world_cup_index - profile_b.history.world_cup_index)
     delta_score += 0.07 * (profile_a.resource_index - profile_b.resource_index)
     delta_score += 0.09 * (profile_a.coach_index - profile_b.coach_index)
     delta_score += 0.07 * (profile_a.squad.player_experience - profile_b.squad.player_experience)
@@ -1829,8 +1977,10 @@ def expected_goals(
     total_goals += 0.16 * abs(elo_diff) / 400.0
     total_goals += 0.04 * abs(fifa_diff)
     total_goals += 0.18 * centered(profile_a.squad.attack_unit + profile_b.squad.attack_unit)
+    total_goals += 0.08 * centered(profile_a.history.attack_index + profile_b.history.attack_index)
     total_goals += 0.12 * centered(profile_a.squad.shot_creation + profile_b.squad.shot_creation)
     total_goals -= 0.12 * centered(profile_a.squad.defense_unit + profile_b.squad.defense_unit)
+    total_goals -= 0.08 * centered(profile_a.history.defense_index + profile_b.history.defense_index)
     total_goals -= 0.06 * centered(profile_a.squad.goalkeeper_unit + profile_b.squad.goalkeeper_unit)
     total_goals += 0.06 * (profile_a.tempo + profile_b.tempo - 1.0)
     total_goals += 0.03 * (profile_a.squad.red_rate + profile_b.squad.red_rate - 0.02)
@@ -1880,6 +2030,11 @@ def factor_breakdown(
         "fifa_strength_diff": profile_a.fifa_strength_index - profile_b.fifa_strength_index,
         "resource_diff": profile_a.resource_index - profile_b.resource_index,
         "heritage_diff": profile_a.heritage_index - profile_b.heritage_index,
+        "historical_strength_diff": profile_a.history.strength_index - profile_b.history.strength_index,
+        "historical_attack_diff": profile_a.history.attack_index - profile_b.history.attack_index,
+        "historical_defense_diff": profile_a.history.defense_index - profile_b.history.defense_index,
+        "competitive_history_diff": profile_a.history.competitive_index - profile_b.history.competitive_index,
+        "world_cup_history_diff": profile_a.history.world_cup_index - profile_b.history.world_cup_index,
         "coach_diff": profile_a.coach_index - profile_b.coach_index,
         "importance": clamp(ctx.importance, 0.70, 1.50),
         "trajectory_diff": profile_a.trajectory_index - profile_b.trajectory_index,
@@ -3345,6 +3500,7 @@ def penalties_probability(team_a: Team, team_b: Team, state_a: dict, state_b: di
     edge = 0.80 * (profile_a.squad.goalkeeper_unit - profile_b.squad.goalkeeper_unit)
     edge += 0.40 * (profile_a.coach_index - profile_b.coach_index)
     edge += 0.20 * (profile_a.heritage_index - profile_b.heritage_index)
+    edge += 0.14 * (profile_a.history.shootout_index - profile_b.history.shootout_index)
     edge += 0.15 * (profile_a.squad.player_experience - profile_b.squad.player_experience)
     edge += 0.15 * (state_a["morale"] - state_b["morale"])
     edge += 0.12 * (recent_form_signal(state_a) - recent_form_signal(state_b))
@@ -3372,12 +3528,14 @@ def penalty_conversion_probability(
     rate += 0.04 * centered(taker_profile.squad.player_experience)
     rate += 0.03 * centered(taker_profile.coach_index)
     rate += 0.03 * centered(taker_profile.heritage_index)
+    rate += 0.02 * centered(taker_profile.history.shootout_index)
     rate += 0.05 * clamp(float(taker_state.get("morale", 0.0)), -1.0, 1.0)
     rate += 0.03 * recent_form_signal(taker_state)
     rate -= 0.06 * fatigue_level(taker_state)
     rate -= 0.06 * (1.0 - availability_level(taker_state))
     rate -= 0.10 * centered(keeper_profile.squad.goalkeeper_unit)
     rate -= 0.03 * centered(keeper_profile.coach_index)
+    rate -= 0.02 * centered(keeper_profile.history.shootout_index)
     rate -= 0.05 * clamp(ctx.weather_stress, 0.0, 1.0)
     if taker_first:
         rate += 0.008
@@ -6319,6 +6477,10 @@ def build_methodology_html(bracket_payload: dict, backtest: dict) -> str:
         "<p>Combina fuerza de cada seleccion, contexto del partido y un stack de modelos para estimar marcador final y probabilidades de victoria, empate y derrota.</p>"
         "</article>"
         "<article>"
+        "<h3>Capa historica desde 1990</h3>"
+        "<p>Ademas del Elo y la forma actual, el modelo incorpora resultados de selecciones desde 1990: rendimiento total, competitivo, mundialista, ataque, defensa y tandas de penales. Esa memoria historica entra con peso moderado, para sumar contexto sin tapar lo que esta pasando hoy.</p>"
+        "</article>"
+        "<article>"
         "<h3>Cuadro completo</h3>"
         f"<p>La llave publicada se construye con Monte Carlo dinamico de {html.escape(montecarlo_line)} por corrida para que el cuadro no cambie solo por ruido de simulacion.</p>"
         "</article>"
@@ -7314,7 +7476,7 @@ def build_dashboard_html(
         <div class="hero-notes">
           <article class="hero-note">
             <h3>Qué significan las métricas</h3>
-            <p><strong>Marcador proyectado</strong> muestra el resultado entero mas probable. <strong>Promedio estimado de goles del modelo</strong> es una media probabilistica y por eso puede llevar decimales. <strong>Probabilidades de resultado</strong> es la chance de victoria, empate o derrota en ese mismo corte. <strong>Puntos FIFA</strong> entran como señal estructural secundaria, con menos peso que Elo. <strong>Coincidencia entre modelos</strong> ayuda a separar picks claros de partidos realmente parejos.</p>
+            <p><strong>Marcador proyectado</strong> muestra el resultado entero mas probable. <strong>Promedio estimado de goles del modelo</strong> es una media probabilistica y por eso puede llevar decimales. <strong>Probabilidades de resultado</strong> es la chance de victoria, empate o derrota en ese mismo corte. <strong>Puntos FIFA</strong> entran como señal estructural secundaria, con menos peso que Elo. <strong>Historia desde 1990</strong> suma memoria de rendimiento competitivo, mundialista, ataque, defensa y penales. <strong>Coincidencia entre modelos</strong> ayuda a separar picks claros de partidos realmente parejos.</p>
           </article>
           <article class="hero-note">
             <h3>Durante un partido</h3>
@@ -8148,6 +8310,7 @@ def print_monte_carlo_summary(team_a: str, team_b: str, summary: dict) -> None:
 def print_team_profile(team: Team) -> None:
     profile = profile_for(team)
     squad = profile.squad
+    history = profile.history
     fifa_note = " (proxy calibrado)" if fifa_points_are_proxy(team) else ""
     print(f"{team.name} ({pretty_status(team.status)})")
     print(f"  Elo: {team.elo:.0f}")
@@ -8163,6 +8326,20 @@ def print_team_profile(team: Team) -> None:
     print(f"  Flexibilidad tactica: {profile.tactical_flexibility:.2f}")
     print(f"  Resiliencia de viaje: {profile.travel_resilience:.2f}")
     print(f"  Ritmo de juego: {profile.tempo:.2f}")
+    print(f"  Partidos historicos desde 1990: {history.matches_since_1990}")
+    print(f"  Puntos por partido desde 1990: {history.points_per_match:.2f}")
+    print(f"  Puntos ponderados recientes desde 1990: {history.weighted_points_per_match:.2f}")
+    print(f"  Rendimiento competitivo desde 1990: {history.competitive_points_per_match:.2f}")
+    print(f"  Partidos de Mundial desde 1990: {history.world_cup_matches_since_1990}")
+    print(f"  Rendimiento en Mundiales desde 1990: {history.world_cup_points_per_match:.2f}")
+    print(f"  Tandas de penales desde 1990: {history.shootout_matches_since_1990}")
+    print(f"  Eficacia en penales desde 1990: {history.shootout_win_rate:.2f}")
+    print(f"  Fuerza historica desde 1990: {history.strength_index:.2f}")
+    print(f"  Ataque historico desde 1990: {history.attack_index:.2f}")
+    print(f"  Defensa historica desde 1990: {history.defense_index:.2f}")
+    print(f"  Rendimiento competitivo historico: {history.competitive_index:.2f}")
+    print(f"  Rendimiento mundialista moderno: {history.world_cup_index:.2f}")
+    print(f"  Solidez historica en penales: {history.shootout_index:.2f}")
     print(f"  Calidad global de plantilla: {squad.squad_quality:.2f}")
     print(f"  Ataque de plantilla: {squad.attack_unit:.2f}")
     print(f"  Mediocampo/control: {squad.midfield_unit:.2f}")
