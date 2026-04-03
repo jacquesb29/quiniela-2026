@@ -5,12 +5,14 @@ import argparse
 import html
 import json
 import math
+import multiprocessing as mp
 import random
 import re
 import shutil
 import tempfile
 import unicodedata
-from dataclasses import dataclass
+from concurrent.futures import ProcessPoolExecutor, as_completed
+from dataclasses import asdict, dataclass
 from datetime import datetime
 from functools import lru_cache
 from pathlib import Path
@@ -571,6 +573,100 @@ class MatchPrediction:
     model_stack: Optional[Dict[str, object]] = None
 
 
+@dataclass(frozen=True)
+class ModelHyperparameters:
+    bivariate_correlation_base: float = 0.08
+    bivariate_correlation_cap: float = 0.10
+    bivariate_shared_goal_share: float = 0.18
+    bivariate_closeness_bonus: float = 0.04
+    bivariate_knockout_bonus: float = 0.03
+    bivariate_importance_bonus: float = 0.02
+    low_score_draw_threshold: float = 0.27
+    low_score_draw_positive_cap: float = 0.12
+    low_score_draw_negative_cap: float = -0.08
+    low_score_rho_base: float = -0.16
+    low_score_rho_positive_draw: float = -0.55
+    low_score_rho_negative_draw: float = 0.20
+    low_score_knockout_shift: float = -0.02
+    low_score_floor: float = 0.05
+    model_contrast_weight: float = 0.18
+    model_low_score_base: float = 0.12
+    model_low_score_closeness_weight: float = 0.08
+    model_low_score_draw_weight: float = 0.45
+    model_low_score_knockout_bonus: float = 0.03
+    model_low_score_min: float = 0.12
+    model_low_score_max: float = 0.28
+    model_primary_min: float = 0.40
+    model_market_bonus_strength: float = 0.30
+    model_consensus_strength: float = 1.0
+    confidence_base: float = 0.10
+    confidence_top_outcome_weight: float = 0.60
+    confidence_gap_weight: float = 0.25
+    confidence_top3_weight: float = 0.10
+    confidence_entropy_weight: float = 0.10
+    confidence_agreement_weight: float = 0.12
+    confidence_floor: float = 0.05
+    confidence_cap: float = 0.99
+    extra_time_share: float = 0.29
+    extra_time_fatigue_weight: float = 0.16
+    extra_time_availability_weight: float = 0.10
+    extra_time_attack_form_weight: float = 0.08
+    extra_time_recent_form_weight: float = 0.04
+    cache_goal_precision: float = 50.0
+    cache_rho_precision: float = 100.0
+    temporal_cv_fold_size: int = 8
+    auto_parallel_min_iterations: int = 4000
+    auto_parallel_max_workers_floor: int = 1
+
+
+@dataclass(frozen=True)
+class ModelOutput:
+    name: str
+    dist: Dict[Tuple[int, int], float]
+    probs: Dict[str, float]
+    weight: float
+    top_score: Tuple[str, float]
+
+
+@dataclass(frozen=True)
+class KnockoutResolution:
+    winner: str
+    loser: str
+    score_a: int
+    score_b: int
+    extra_time_score_a: int
+    extra_time_score_b: int
+    went_extra_time: bool
+    went_penalties: bool
+    penalty_score_a: Optional[int]
+    penalty_score_b: Optional[int]
+
+
+@dataclass(frozen=True)
+class BacktestMetrics:
+    completed_matches: int
+    regular_time_samples: int
+    advancement_samples: int
+    favorite_hit_rate: Optional[float]
+    top1_score_hit_rate: Optional[float]
+    top3_score_hit_rate: Optional[float]
+    brier_result: Optional[float]
+    logloss_result: Optional[float]
+    brier_advance: Optional[float]
+    logloss_advance: Optional[float]
+    market_logloss_result: Optional[float]
+    calibration_buckets: List[Dict[str, float]]
+    brier_reliability: Optional[float] = None
+    brier_resolution: Optional[float] = None
+    brier_uncertainty: Optional[float] = None
+    temporal_cv_logloss: Optional[float] = None
+    temporal_cv_brier: Optional[float] = None
+    temporal_cv_accuracy: Optional[float] = None
+
+
+PARAMS = ModelHyperparameters()
+
+
 def clamp(value: float, low: float, high: float) -> float:
     return max(low, min(high, value))
 
@@ -978,16 +1074,20 @@ def compute_statistical_depth(
     second_outcome_prob = sorted_results[1]
     model_agreement = float((model_stack or {}).get("agreement", 0.0)) if model_stack else None
     confidence = clamp(
-        0.10
-        + 0.60 * top_outcome_prob
-        + 0.25 * (top_outcome_prob - second_outcome_prob)
-        + 0.10 * top3_coverage
-        + 0.10 * (1.0 - entropy),
-        0.05,
-        0.99,
+        PARAMS.confidence_base
+        + PARAMS.confidence_top_outcome_weight * top_outcome_prob
+        + PARAMS.confidence_gap_weight * (top_outcome_prob - second_outcome_prob)
+        + PARAMS.confidence_top3_weight * top3_coverage
+        + PARAMS.confidence_entropy_weight * (1.0 - entropy),
+        PARAMS.confidence_floor,
+        PARAMS.confidence_cap,
     )
     if model_agreement is not None:
-        confidence = clamp(confidence + 0.12 * (model_agreement - 0.5), 0.05, 0.99)
+        confidence = clamp(
+            confidence + PARAMS.confidence_agreement_weight * (model_agreement - 0.5),
+            PARAMS.confidence_floor,
+            PARAMS.confidence_cap,
+        )
     margin_dist: Dict[int, float] = {}
     for (goals_a, goals_b), prob in final_dist.items():
         margin = goals_a - goals_b
@@ -1086,6 +1186,11 @@ def top_factor_drivers(factors: Optional[Dict[str, float]], limit: int = 3) -> L
 def normalize_team_text(value: str) -> str:
     ascii_text = unicodedata.normalize("NFKD", value).encode("ascii", "ignore").decode("ascii")
     return "".join(char.lower() for char in ascii_text if char.isalnum())
+
+
+def normalize_team_name(value: str) -> str:
+    normalized = normalize_team_text(value)
+    return TEAM_NAME_ALIASES.get(normalized, str(value).strip())
 
 
 def normalize_stage_name(raw_stage: Optional[str]) -> Optional[str]:
@@ -2090,26 +2195,110 @@ def poisson_prob(goals: int, mu: float) -> float:
     return math.exp(-mu) * (mu ** goals) / factorial
 
 
-def score_distribution(mu_a: float, mu_b: float, max_goals: int = 10) -> Dict[Tuple[int, int], float]:
-    lambda3 = min(0.10, mu_a * 0.18, mu_b * 0.18)
-    lambda3 = max(lambda3, 0.0)
+def quantize_for_cache(value: float, precision: Optional[float] = None) -> int:
+    scale = precision if precision is not None else PARAMS.cache_goal_precision
+    return int(round(float(value) * scale))
+
+
+def dynamic_correlation(
+    mu_a: float,
+    mu_b: float,
+    ctx: Optional[MatchContext] = None,
+) -> float:
+    closeness = clamp(1.0 - abs(mu_a - mu_b) / max(mu_a + mu_b, 1.0), 0.0, 1.0)
+    draw_signal = 0.0
+    importance = 1.0
+    knockout = False
+    if ctx:
+        knockout = bool(ctx.knockout)
+        importance = float(ctx.importance)
+        if ctx.market_prob_draw is not None:
+            draw_signal = clamp(
+                float(ctx.market_prob_draw) - PARAMS.low_score_draw_threshold,
+                PARAMS.low_score_draw_negative_cap,
+                PARAMS.low_score_draw_positive_cap,
+            )
+    base = PARAMS.bivariate_correlation_base
+    base += PARAMS.bivariate_closeness_bonus * closeness
+    base += PARAMS.bivariate_importance_bonus * max(importance - 1.0, 0.0)
+    base += 0.04 * max(draw_signal, 0.0)
+    if knockout:
+        base += PARAMS.bivariate_knockout_bonus
+    return clamp(
+        base,
+        0.0,
+        min(
+            PARAMS.bivariate_correlation_cap,
+            mu_a * 0.25,
+            mu_b * 0.25,
+        ),
+    )
+
+
+@lru_cache(maxsize=65536)
+def cached_primary_score_distribution(
+    mu_a_key: int,
+    mu_b_key: int,
+    knockout_key: int,
+    importance_key: int,
+    draw_key: int,
+    max_goals: int,
+) -> Dict[Tuple[int, int], float]:
+    mu_a = mu_a_key / PARAMS.cache_goal_precision
+    mu_b = mu_b_key / PARAMS.cache_goal_precision
+    ctx = MatchContext(
+        knockout=bool(knockout_key),
+        importance=importance_key / 100.0,
+        market_prob_draw=PARAMS.low_score_draw_threshold + draw_key / PARAMS.cache_rho_precision,
+    )
+    lambda3 = dynamic_correlation(mu_a, mu_b, ctx)
     lambda1 = max(mu_a - lambda3, 0.001)
     lambda2 = max(mu_b - lambda3, 0.001)
-    dist = {}
+    dist: Dict[Tuple[int, int], float] = {}
     total = 0.0
     for goals_a in range(max_goals + 1):
         for goals_b in range(max_goals + 1):
             prob = bivariate_poisson_prob(goals_a, goals_b, lambda1, lambda2, lambda3)
             dist[(goals_a, goals_b)] = prob
             total += prob
-    if total == 0:
+    if total == 0.0:
         return dist
     for key in list(dist):
         dist[key] /= total
     return dist
 
 
-def independent_score_distribution(mu_a: float, mu_b: float, max_goals: int = 10) -> Dict[Tuple[int, int], float]:
+def score_distribution(
+    mu_a: float,
+    mu_b: float,
+    max_goals: int = 10,
+    ctx: Optional[MatchContext] = None,
+) -> Dict[Tuple[int, int], float]:
+    draw_signal = 0.0
+    if ctx and ctx.market_prob_draw is not None:
+        draw_signal = clamp(
+            float(ctx.market_prob_draw) - PARAMS.low_score_draw_threshold,
+            PARAMS.low_score_draw_negative_cap,
+            PARAMS.low_score_draw_positive_cap,
+        )
+    return cached_primary_score_distribution(
+        quantize_for_cache(mu_a),
+        quantize_for_cache(mu_b),
+        1 if ctx and ctx.knockout else 0,
+        int(round(float(ctx.importance if ctx else 1.0) * 100.0)),
+        int(round(draw_signal * PARAMS.cache_rho_precision)),
+        max_goals,
+    )
+
+
+@lru_cache(maxsize=65536)
+def cached_independent_score_distribution(
+    mu_a_key: int,
+    mu_b_key: int,
+    max_goals: int,
+) -> Dict[Tuple[int, int], float]:
+    mu_a = mu_a_key / PARAMS.cache_goal_precision
+    mu_b = mu_b_key / PARAMS.cache_goal_precision
     dist: Dict[Tuple[int, int], float] = {}
     total = 0.0
     for goals_a in range(max_goals + 1):
@@ -2125,26 +2314,42 @@ def independent_score_distribution(mu_a: float, mu_b: float, max_goals: int = 10
     return dist
 
 
+def independent_score_distribution(mu_a: float, mu_b: float, max_goals: int = 10) -> Dict[Tuple[int, int], float]:
+    return cached_independent_score_distribution(
+        quantize_for_cache(mu_a),
+        quantize_for_cache(mu_b),
+        max_goals,
+    )
+
+
 def low_score_rho(mu_a: float, mu_b: float, ctx: Optional[MatchContext] = None) -> float:
     closeness = clamp(1.0 - abs(mu_a - mu_b) / max(mu_a + mu_b, 1.0), 0.0, 1.0)
     draw_signal = 0.0
     if ctx and ctx.market_prob_draw is not None:
-        draw_signal = clamp(float(ctx.market_prob_draw) - 0.27, -0.08, 0.12)
-    rho = -0.16 * closeness - 0.55 * max(draw_signal, 0.0) + 0.20 * min(draw_signal, 0.0)
+        draw_signal = clamp(
+            float(ctx.market_prob_draw) - PARAMS.low_score_draw_threshold,
+            PARAMS.low_score_draw_negative_cap,
+            PARAMS.low_score_draw_positive_cap,
+        )
+    rho = (
+        PARAMS.low_score_rho_base * closeness
+        + PARAMS.low_score_rho_positive_draw * max(draw_signal, 0.0)
+        + PARAMS.low_score_rho_negative_draw * min(draw_signal, 0.0)
+    )
     if ctx and ctx.knockout:
-        rho -= 0.02
+        rho += PARAMS.low_score_knockout_shift
     return clamp(rho, -0.22, 0.08)
 
 
 def dixon_coles_tau(x: int, y: int, mu_a: float, mu_b: float, rho: float) -> float:
     if x == 0 and y == 0:
-        return max(0.05, 1.0 - mu_a * mu_b * rho)
+        return max(PARAMS.low_score_floor, 1.0 - mu_a * mu_b * rho)
     if x == 0 and y == 1:
-        return max(0.05, 1.0 + mu_a * rho)
+        return max(PARAMS.low_score_floor, 1.0 + mu_a * rho)
     if x == 1 and y == 0:
-        return max(0.05, 1.0 + mu_b * rho)
+        return max(PARAMS.low_score_floor, 1.0 + mu_b * rho)
     if x == 1 and y == 1:
-        return max(0.05, 1.0 - rho)
+        return max(PARAMS.low_score_floor, 1.0 - rho)
     return 1.0
 
 
@@ -2238,14 +2443,21 @@ def model_blend_weights(mu_a: float, mu_b: float, ctx: Optional[MatchContext] = 
     closeness = clamp(1.0 - abs(mu_a - mu_b) / max(mu_a + mu_b, 1.0), 0.0, 1.0)
     draw_signal = 0.0
     if ctx and ctx.market_prob_draw is not None:
-        draw_signal = clamp(float(ctx.market_prob_draw) - 0.27, -0.08, 0.12)
-    contrast = 0.18
+        draw_signal = clamp(
+            float(ctx.market_prob_draw) - PARAMS.low_score_draw_threshold,
+            PARAMS.low_score_draw_negative_cap,
+            PARAMS.low_score_draw_positive_cap,
+        )
+    contrast = PARAMS.model_contrast_weight
     low_score = clamp(
-        0.12 + 0.08 * closeness + 0.45 * max(draw_signal, 0.0) + (0.03 if ctx and ctx.knockout else 0.0),
-        0.12,
-        0.28,
+        PARAMS.model_low_score_base
+        + PARAMS.model_low_score_closeness_weight * closeness
+        + PARAMS.model_low_score_draw_weight * max(draw_signal, 0.0)
+        + (PARAMS.model_low_score_knockout_bonus if ctx and ctx.knockout else 0.0),
+        PARAMS.model_low_score_min,
+        PARAMS.model_low_score_max,
     )
-    primary = max(0.40, 1.0 - contrast - low_score)
+    primary = max(PARAMS.model_primary_min, 1.0 - contrast - low_score)
     total = primary + contrast + low_score
     return {
         "primary": primary / total,
@@ -2277,6 +2489,42 @@ def top_score_from_distribution(dist: Dict[Tuple[int, int], float]) -> Tuple[str
     return (f"{goals_a}-{goals_b}", float(prob))
 
 
+def adaptive_ensemble_weights(
+    models: Sequence[ModelOutput],
+    market_probs: Optional[Dict[str, float]] = None,
+) -> List[float]:
+    if not models:
+        return []
+    if len(models) == 1:
+        return [1.0]
+
+    base_weights = [model.weight for model in models]
+    total_base = sum(base_weights) or 1.0
+    consensus = {
+        key: sum(model.probs.get(key, 0.0) * weight for model, weight in zip(models, base_weights)) / total_base
+        for key in ("a", "draw", "b")
+    }
+    adjusted_weights = []
+    for model in models:
+        distance = 0.5 * sum(
+            abs(float(model.probs.get(key, 0.0)) - float(consensus[key]))
+            for key in ("a", "draw", "b")
+        )
+        agreement_multiplier = clamp(1.0 - distance * PARAMS.model_consensus_strength, 0.55, 1.25)
+        market_multiplier = 1.0
+        if market_probs:
+            market_distance = 0.5 * sum(
+                abs(float(model.probs.get(key, 0.0)) - float(market_probs.get(key, 0.0)))
+                for key in ("a", "draw", "b")
+            )
+            market_multiplier = clamp(1.0 - market_distance * PARAMS.model_market_bonus_strength, 0.70, 1.10)
+        adjusted_weights.append(model.weight * agreement_multiplier * market_multiplier)
+    total = sum(adjusted_weights)
+    if total <= 0.0:
+        return [weight / total_base for weight in base_weights]
+    return [weight / total for weight in adjusted_weights]
+
+
 def build_model_stack(
     mu_a: float,
     mu_b: float,
@@ -2285,53 +2533,60 @@ def build_model_stack(
     max_goals: int = 10,
     market_strength: float = 0.28,
 ) -> Tuple[Dict[Tuple[int, int], float], Dict[str, object]]:
-    primary = score_distribution(mu_a, mu_b, max_goals=max_goals)
+    primary = score_distribution(mu_a, mu_b, max_goals=max_goals, ctx=ctx)
     contrast = independent_score_distribution(mu_a, mu_b, max_goals=max_goals)
     low_score = low_score_adjusted_distribution(mu_a, mu_b, ctx, max_goals=max_goals)
-    weights = model_blend_weights(mu_a, mu_b, ctx)
-    ensemble = blend_distributions(
-        [
-            (weights["primary"], primary),
-            (weights["contrast"], contrast),
-            (weights["low_score"], low_score),
-        ]
-    )
+    primary_probs = outcome_probabilities_from_distribution(primary)
+    contrast_probs = outcome_probabilities_from_distribution(contrast)
+    low_score_probs = outcome_probabilities_from_distribution(low_score)
+    base_weights = model_blend_weights(mu_a, mu_b, ctx)
+    market_probs = None
+    if ctx and ctx.market_prob_a is not None and ctx.market_prob_draw is not None and ctx.market_prob_b is not None:
+        market_probs = {
+            "a": float(ctx.market_prob_a),
+            "draw": float(ctx.market_prob_draw),
+            "b": float(ctx.market_prob_b),
+        }
+    models = [
+        ModelOutput("Bivariante Poisson", primary, primary_probs, base_weights["primary"], top_score_from_distribution(primary)),
+        ModelOutput("Poisson independiente", contrast, contrast_probs, base_weights["contrast"], top_score_from_distribution(contrast)),
+        ModelOutput("Ajuste de baja anotacion", low_score, low_score_probs, base_weights["low_score"], top_score_from_distribution(low_score)),
+    ]
+    adaptive_weights = adaptive_ensemble_weights(models, market_probs=market_probs)
+    ensemble = blend_distributions([(weight, model.dist) for weight, model in zip(adaptive_weights, models)])
     market_used = False
-    if (
-        ctx
-        and ctx.market_prob_a is not None
-        and ctx.market_prob_draw is not None
-        and ctx.market_prob_b is not None
-    ):
+    if market_probs:
         ensemble = apply_outcome_target_shrink(
             ensemble,
-            float(ctx.market_prob_a),
-            float(ctx.market_prob_draw),
-            float(ctx.market_prob_b),
+            market_probs["a"],
+            market_probs["draw"],
+            market_probs["b"],
             strength=market_strength,
         )
         market_used = market_strength > 0.0
 
-    primary_probs = outcome_probabilities_from_distribution(primary)
-    contrast_probs = outcome_probabilities_from_distribution(contrast)
-    low_score_probs = outcome_probabilities_from_distribution(low_score)
     ensemble_probs = outcome_probabilities_from_distribution(ensemble)
-    agreement = pairwise_model_agreement([primary_probs, contrast_probs, low_score_probs])
+    agreement = pairwise_model_agreement([model.probs for model in models])
     meta = {
-        "primary_name": "Bivariante Poisson",
-        "contrast_name": "Poisson independiente",
-        "low_score_name": "Ajuste de baja anotacion",
+        "primary_name": models[0].name,
+        "contrast_name": models[1].name,
+        "low_score_name": models[2].name,
         "final_name": "Ensamble ligero",
-        "weights": weights,
+        "weights": {
+            "primary": adaptive_weights[0],
+            "contrast": adaptive_weights[1],
+            "low_score": adaptive_weights[2],
+        },
+        "base_weights": base_weights,
         "agreement": agreement,
         "market_shrink": clamp(market_strength, 0.0, 1.0) if market_used else 0.0,
         "primary_probs": primary_probs,
         "contrast_probs": contrast_probs,
         "low_score_probs": low_score_probs,
         "ensemble_probs": ensemble_probs,
-        "primary_top_score": top_score_from_distribution(primary),
-        "contrast_top_score": top_score_from_distribution(contrast),
-        "low_score_top_score": top_score_from_distribution(low_score),
+        "primary_top_score": models[0].top_score,
+        "contrast_top_score": models[1].top_score,
+        "low_score_top_score": models[2].top_score,
         "ensemble_top_score": top_score_from_distribution(ensemble),
     }
     return ensemble, meta
@@ -2349,8 +2604,8 @@ def _sample_from_distribution(dist: Dict[Tuple[int, int], float]) -> Tuple[int, 
     return last_score
 
 
-def correlated_sample_score(mu_a: float, mu_b: float) -> Tuple[int, int]:
-    lambda3 = min(0.08, mu_a * 0.18, mu_b * 0.18)
+def correlated_sample_score(mu_a: float, mu_b: float, ctx: Optional[MatchContext] = None) -> Tuple[int, int]:
+    lambda3 = dynamic_correlation(mu_a, mu_b, ctx)
     shared = poisson_sample(lambda3)
     goals_a = poisson_sample(max(mu_a - lambda3, 0.001)) + shared
     goals_b = poisson_sample(max(mu_b - lambda3, 0.001)) + shared
@@ -2387,7 +2642,7 @@ def sample_score(mu_a: float, mu_b: float, ctx: Optional[MatchContext] = None) -
     weights = model_blend_weights(mu_a, mu_b, ctx)
     roll = random.random()
     if roll < weights["primary"]:
-        return correlated_sample_score(mu_a, mu_b)
+        return correlated_sample_score(mu_a, mu_b, ctx)
     if roll < weights["primary"] + weights["contrast"]:
         return independent_sample_score(mu_a, mu_b)
     rho = low_score_rho(mu_a, mu_b, ctx)
@@ -2471,11 +2726,31 @@ def extra_time_expected_goals(
     state_a: Optional[dict] = None,
     state_b: Optional[dict] = None,
 ) -> Tuple[float, float]:
-    base_share = 0.29
-    extra_fatigue_a = clamp(1.0 - 0.16 * fatigue_level(state_a) - 0.10 * (1.0 - availability_level(state_a)), 0.58, 1.05)
-    extra_fatigue_b = clamp(1.0 - 0.16 * fatigue_level(state_b) - 0.10 * (1.0 - availability_level(state_b)), 0.58, 1.05)
-    attacking_push_a = 1.0 + 0.08 * attack_form_signal(state_a) + 0.04 * recent_form_signal(state_a)
-    attacking_push_b = 1.0 + 0.08 * attack_form_signal(state_b) + 0.04 * recent_form_signal(state_b)
+    base_share = PARAMS.extra_time_share
+    extra_fatigue_a = clamp(
+        1.0
+        - PARAMS.extra_time_fatigue_weight * fatigue_level(state_a)
+        - PARAMS.extra_time_availability_weight * (1.0 - availability_level(state_a)),
+        0.58,
+        1.05,
+    )
+    extra_fatigue_b = clamp(
+        1.0
+        - PARAMS.extra_time_fatigue_weight * fatigue_level(state_b)
+        - PARAMS.extra_time_availability_weight * (1.0 - availability_level(state_b)),
+        0.58,
+        1.05,
+    )
+    attacking_push_a = (
+        1.0
+        + PARAMS.extra_time_attack_form_weight * attack_form_signal(state_a)
+        + PARAMS.extra_time_recent_form_weight * recent_form_signal(state_a)
+    )
+    attacking_push_b = (
+        1.0
+        + PARAMS.extra_time_attack_form_weight * attack_form_signal(state_b)
+        + PARAMS.extra_time_recent_form_weight * recent_form_signal(state_b)
+    )
     et_mu_a = clamp(mu_a * base_share * extra_fatigue_a * attacking_push_a, 0.03, 1.35)
     et_mu_b = clamp(mu_b * base_share * extra_fatigue_b * attacking_push_b, 0.03, 1.35)
     return et_mu_a, et_mu_b
@@ -2536,36 +2811,42 @@ def sample_knockout_resolution(
     state_b: Optional[dict] = None,
 ) -> dict:
     if score_a > score_b:
-        return {
-            "winner": team_a.name,
-            "loser": team_b.name,
-            "score_a": score_a,
-            "score_b": score_b,
-            "extra_time_score_a": 0,
-            "extra_time_score_b": 0,
-            "went_extra_time": False,
-            "went_penalties": False,
-            "penalty_score_a": None,
-            "penalty_score_b": None,
-        }
+        return asdict(
+            KnockoutResolution(
+                winner=team_a.name,
+                loser=team_b.name,
+                score_a=score_a,
+                score_b=score_b,
+                extra_time_score_a=0,
+                extra_time_score_b=0,
+                went_extra_time=False,
+                went_penalties=False,
+                penalty_score_a=None,
+                penalty_score_b=None,
+            )
+        )
     if score_b > score_a:
-        return {
-            "winner": team_b.name,
-            "loser": team_a.name,
-            "score_a": score_a,
-            "score_b": score_b,
-            "extra_time_score_a": 0,
-            "extra_time_score_b": 0,
-            "went_extra_time": False,
-            "went_penalties": False,
-            "penalty_score_a": None,
-            "penalty_score_b": None,
-        }
+        return asdict(
+            KnockoutResolution(
+                winner=team_b.name,
+                loser=team_a.name,
+                score_a=score_a,
+                score_b=score_b,
+                extra_time_score_a=0,
+                extra_time_score_b=0,
+                went_extra_time=False,
+                went_penalties=False,
+                penalty_score_a=None,
+                penalty_score_b=None,
+            )
+        )
 
     et_mu_a, et_mu_b = extra_time_expected_goals(mu_a, mu_b, state_a=state_a, state_b=state_b)
     et_score_a, et_score_b = sample_score(et_mu_a, et_mu_b, ctx)
     total_a = score_a + et_score_a
     total_b = score_b + et_score_b
+    penalty_score_a = None
+    penalty_score_b = None
     if et_score_a > et_score_b:
         winner = team_a.name
         loser = team_b.name
@@ -2574,8 +2855,6 @@ def sample_knockout_resolution(
         winner = team_b.name
         loser = team_a.name
         went_penalties = False
-        penalty_score_a = None
-        penalty_score_b = None
     else:
         shootout = simulate_penalty_shootout(
             team_a,
@@ -2590,22 +2869,20 @@ def sample_knockout_resolution(
         went_penalties = True
         penalty_score_a = shootout["score_a"]
         penalty_score_b = shootout["score_b"]
-    if not went_penalties:
-        penalty_score_a = None
-        penalty_score_b = None
-
-    return {
-        "winner": winner,
-        "loser": loser,
-        "score_a": total_a,
-        "score_b": total_b,
-        "extra_time_score_a": et_score_a,
-        "extra_time_score_b": et_score_b,
-        "went_extra_time": True,
-        "went_penalties": went_penalties,
-        "penalty_score_a": penalty_score_a,
-        "penalty_score_b": penalty_score_b,
-    }
+    return asdict(
+        KnockoutResolution(
+            winner=winner,
+            loser=loser,
+            score_a=total_a,
+            score_b=total_b,
+            extra_time_score_a=et_score_a,
+            extra_time_score_b=et_score_b,
+            went_extra_time=True,
+            went_penalties=went_penalties,
+            penalty_score_a=penalty_score_a,
+            penalty_score_b=penalty_score_b,
+        )
+    )
 
 
 def predict_match(
@@ -4273,13 +4550,14 @@ def simulate_tournament_iteration(
     }
 
 
-def command_simulate_tournament(args: argparse.Namespace, teams: Dict[str, Team]) -> None:
-    if args.seed is not None:
-        random.seed(args.seed)
+def default_parallel_workers(iterations: int) -> int:
+    if iterations < PARAMS.auto_parallel_min_iterations:
+        return 1
+    return max(PARAMS.auto_parallel_max_workers_floor, mp.cpu_count() - 1)
 
-    config = load_tournament_config(Path(args.config))
-    initial_payload = None if getattr(args, "ignore_state", False) else load_persistent_payload(Path(args.state_file), teams)
-    summary = {
+
+def empty_tournament_summary(teams: Dict[str, Team]) -> Dict[str, dict]:
+    return {
         name: {
             "appear": 0,
             "advance_group": 0,
@@ -4298,7 +4576,50 @@ def command_simulate_tournament(args: argparse.Namespace, teams: Dict[str, Team]
         for name in teams
     }
 
-    for iteration in range(1, args.iterations + 1):
+
+def empty_bracket_aggregate() -> Dict[str, dict]:
+    return {
+        match_id: {
+            "outcomes": {},
+            "winner": {},
+            "went_extra_time": 0,
+            "went_penalties": 0,
+            "penalty_scores": {},
+        }
+        for match_id in bracket_match_order()
+    }
+
+
+def merge_tournament_summary(target: Dict[str, dict], batch_summary: Dict[str, dict]) -> None:
+    for team_name, stats in batch_summary.items():
+        current = target[team_name]
+        for key, value in stats.items():
+            current[key] += value
+
+
+def merge_bracket_aggregate(target: Dict[str, dict], batch_aggregate: Dict[str, dict]) -> None:
+    for match_id, aggregate in batch_aggregate.items():
+        current = target[match_id]
+        current["went_extra_time"] += aggregate.get("went_extra_time", 0)
+        current["went_penalties"] += aggregate.get("went_penalties", 0)
+        for outcome_key, count in aggregate.get("outcomes", {}).items():
+            current["outcomes"][outcome_key] = current["outcomes"].get(outcome_key, 0) + count
+        for winner, count in aggregate.get("winner", {}).items():
+            current["winner"][winner] = current["winner"].get(winner, 0) + count
+        for score_key, count in aggregate.get("penalty_scores", {}).items():
+            current["penalty_scores"][score_key] = current["penalty_scores"].get(score_key, 0) + count
+
+
+def _simulate_tournament_batch(
+    batch_size: int,
+    seed: int,
+    teams: Dict[str, Team],
+    config: dict,
+    initial_payload: Optional[dict],
+) -> Dict[str, dict]:
+    random.seed(seed)
+    summary = empty_tournament_summary(teams)
+    for _ in range(batch_size):
         result = simulate_tournament_iteration(teams, config, initial_payload=initial_payload)
         participants = set(result["participants"])
         for team_name in participants:
@@ -4328,8 +4649,132 @@ def command_simulate_tournament(args: argparse.Namespace, teams: Dict[str, Team]
                 stats["champion"] += 1
         summary[result["third_place"]]["third_place"] += 1
         summary[result["fourth_place"]]["fourth_place"] += 1
-        if args.progress_every and iteration % args.progress_every == 0:
-            print(f"Progreso: {iteration}/{args.iterations} iteraciones")
+    return summary
+
+
+def _project_bracket_batch(
+    batch_size: int,
+    seed: int,
+    teams: Dict[str, Team],
+    config: dict,
+    initial_payload: Optional[dict],
+) -> Dict[str, dict]:
+    random.seed(seed)
+    match_aggregate = empty_bracket_aggregate()
+    for _ in range(batch_size):
+        result = simulate_tournament_iteration(teams, config, initial_payload=initial_payload)
+        for match_id, match_result in result["bracket_matches"].items():
+            aggregate = match_aggregate[match_id]
+            outcome_key = (match_result["team_a"], match_result["team_b"], match_result["winner"])
+            aggregate["outcomes"][outcome_key] = aggregate["outcomes"].get(outcome_key, 0) + 1
+            aggregate["winner"][match_result["winner"]] = aggregate["winner"].get(match_result["winner"], 0) + 1
+            aggregate["went_extra_time"] += 1 if match_result.get("went_extra_time") else 0
+            aggregate["went_penalties"] += 1 if match_result.get("went_penalties") else 0
+            if match_result.get("went_penalties") and match_result.get("penalty_score_a") is not None and match_result.get("penalty_score_b") is not None:
+                penalty_key = (int(match_result["penalty_score_a"]), int(match_result["penalty_score_b"]))
+                aggregate["penalty_scores"][penalty_key] = aggregate["penalty_scores"].get(penalty_key, 0) + 1
+    return match_aggregate
+
+
+def run_parallel_batches(
+    *,
+    iterations: int,
+    workers: int,
+    seed: Optional[int],
+    worker_fn,
+    teams: Dict[str, Team],
+    config: dict,
+    initial_payload: Optional[dict],
+    progress_every: int = 0,
+) -> List[dict]:
+    workers = max(1, workers)
+    if workers == 1:
+        return [worker_fn(iterations, seed or 0, teams, config, initial_payload)]
+
+    base_seed = seed if seed is not None else random.randrange(1, 10_000_000)
+    batch_size = iterations // workers
+    remainder = iterations % workers
+    completed_iterations = 0
+    results: List[dict] = []
+    try:
+        with ProcessPoolExecutor(max_workers=workers) as executor:
+            futures = {}
+            for batch_index in range(workers):
+                size = batch_size + (1 if batch_index < remainder else 0)
+                if size <= 0:
+                    continue
+                future = executor.submit(
+                    worker_fn,
+                    size,
+                    base_seed + batch_index,
+                    teams,
+                    config,
+                    initial_payload,
+                )
+                futures[future] = size
+            for future in as_completed(futures):
+                results.append(future.result())
+                if progress_every:
+                    completed_iterations += futures[future]
+                    print(f"Progreso: {min(completed_iterations, iterations)}/{iterations} iteraciones")
+        return results
+    except (PermissionError, OSError):
+        return [worker_fn(iterations, base_seed, teams, config, initial_payload)]
+
+
+def command_simulate_tournament(args: argparse.Namespace, teams: Dict[str, Team]) -> None:
+    if args.seed is not None:
+        random.seed(args.seed)
+
+    config = load_tournament_config(Path(args.config))
+    initial_payload = None if getattr(args, "ignore_state", False) else load_persistent_payload(Path(args.state_file), teams)
+    workers = args.workers if args.workers > 0 else default_parallel_workers(args.iterations)
+    summary = empty_tournament_summary(teams)
+    if workers > 1:
+        for batch_summary in run_parallel_batches(
+            iterations=args.iterations,
+            workers=workers,
+            seed=args.seed,
+            worker_fn=_simulate_tournament_batch,
+            teams=teams,
+            config=config,
+            initial_payload=initial_payload,
+            progress_every=args.progress_every,
+        ):
+            merge_tournament_summary(summary, batch_summary)
+    else:
+        for iteration in range(1, args.iterations + 1):
+            result = simulate_tournament_iteration(teams, config, initial_payload=initial_payload)
+            participants = set(result["participants"])
+            for team_name in participants:
+                stats = summary[team_name]
+                state = ensure_state(result["states"], team_name)
+                stats["appear"] += 1
+                stats["avg_group_points"] += state["group_points"]
+                stats["avg_goals_for"] += state["goals_for"]
+                stats["avg_goals_against"] += state["goals_against"]
+
+            for group_table in result["standings"].values():
+                summary[group_table[0]["team"]]["group_winner"] += 1
+
+            for team_name, stage in result["stage_reached"].items():
+                stats = summary[team_name]
+                if stage in {"round32", "round16", "quarterfinal", "semifinal", "final", "champion"}:
+                    stats["advance_group"] += 1
+                if stage in {"round16", "quarterfinal", "semifinal", "final", "champion"}:
+                    stats["reach_round16"] += 1
+                if stage in {"quarterfinal", "semifinal", "final", "champion"}:
+                    stats["reach_quarterfinal"] += 1
+                if stage in {"semifinal", "final", "champion"}:
+                    stats["reach_semifinal"] += 1
+                if stage in {"final", "champion"}:
+                    stats["reach_final"] += 1
+                if stage == "champion":
+                    stats["champion"] += 1
+            summary[result["third_place"]]["third_place"] += 1
+            summary[result["fourth_place"]]["fourth_place"] += 1
+            if args.progress_every and iteration % args.progress_every == 0:
+                print(f"Progreso: {iteration}/{args.iterations} iteraciones")
 
     rows = []
     for team_name, stats in summary.items():
@@ -4359,7 +4804,7 @@ def command_simulate_tournament(args: argparse.Namespace, teams: Dict[str, Team]
 
     print(
         f"Simulacion Monte Carlo del torneo | iteraciones={args.iterations} | "
-        f"config={Path(args.config).name}"
+        f"config={Path(args.config).name} | workers={workers}"
     )
     print("Equipo                     Mundial  Grupo  Octavos Cuartos Semis  Final   3ro    4to Campeon  1roGrp PtsGrp")
     print("-" * 118)
@@ -4499,31 +4944,35 @@ def command_project_bracket(args: argparse.Namespace, teams: Dict[str, Team]) ->
 
     config = load_tournament_config(Path(args.config))
     initial_payload = None if getattr(args, "ignore_state", False) else load_persistent_payload(Path(args.state_file), teams)
-    match_aggregate = {
-        match_id: {
-            "outcomes": {},
-            "winner": {},
-            "went_extra_time": 0,
-            "went_penalties": 0,
-            "penalty_scores": {},
-        }
-        for match_id in bracket_match_order()
-    }
-
-    for iteration in range(1, args.iterations + 1):
-        result = simulate_tournament_iteration(teams, config, initial_payload=initial_payload)
-        for match_id, match_result in result["bracket_matches"].items():
-            aggregate = match_aggregate[match_id]
-            outcome_key = (match_result["team_a"], match_result["team_b"], match_result["winner"])
-            aggregate["outcomes"][outcome_key] = aggregate["outcomes"].get(outcome_key, 0) + 1
-            aggregate["winner"][match_result["winner"]] = aggregate["winner"].get(match_result["winner"], 0) + 1
-            aggregate["went_extra_time"] += 1 if match_result.get("went_extra_time") else 0
-            aggregate["went_penalties"] += 1 if match_result.get("went_penalties") else 0
-            if match_result.get("went_penalties") and match_result.get("penalty_score_a") is not None and match_result.get("penalty_score_b") is not None:
-                penalty_key = (int(match_result["penalty_score_a"]), int(match_result["penalty_score_b"]))
-                aggregate["penalty_scores"][penalty_key] = aggregate["penalty_scores"].get(penalty_key, 0) + 1
-        if args.progress_every and iteration % args.progress_every == 0:
-            print(f"Progreso llave: {iteration}/{args.iterations} iteraciones")
+    workers = args.workers if args.workers > 0 else default_parallel_workers(args.iterations)
+    match_aggregate = empty_bracket_aggregate()
+    if workers > 1:
+        for batch_aggregate in run_parallel_batches(
+            iterations=args.iterations,
+            workers=workers,
+            seed=args.seed,
+            worker_fn=_project_bracket_batch,
+            teams=teams,
+            config=config,
+            initial_payload=initial_payload,
+            progress_every=args.progress_every,
+        ):
+            merge_bracket_aggregate(match_aggregate, batch_aggregate)
+    else:
+        for iteration in range(1, args.iterations + 1):
+            result = simulate_tournament_iteration(teams, config, initial_payload=initial_payload)
+            for match_id, match_result in result["bracket_matches"].items():
+                aggregate = match_aggregate[match_id]
+                outcome_key = (match_result["team_a"], match_result["team_b"], match_result["winner"])
+                aggregate["outcomes"][outcome_key] = aggregate["outcomes"].get(outcome_key, 0) + 1
+                aggregate["winner"][match_result["winner"]] = aggregate["winner"].get(match_result["winner"], 0) + 1
+                aggregate["went_extra_time"] += 1 if match_result.get("went_extra_time") else 0
+                aggregate["went_penalties"] += 1 if match_result.get("went_penalties") else 0
+                if match_result.get("went_penalties") and match_result.get("penalty_score_a") is not None and match_result.get("penalty_score_b") is not None:
+                    penalty_key = (int(match_result["penalty_score_a"]), int(match_result["penalty_score_b"]))
+                    aggregate["penalty_scores"][penalty_key] = aggregate["penalty_scores"].get(penalty_key, 0) + 1
+            if args.progress_every and iteration % args.progress_every == 0:
+                print(f"Progreso llave: {iteration}/{args.iterations} iteraciones")
 
     sections = [
         f"# Llave actual proyectada | iteraciones={args.iterations}",
@@ -4561,6 +5010,7 @@ def command_project_bracket(args: argparse.Namespace, teams: Dict[str, Team]) ->
     structured = {
         "updated_at": iso_timestamp(),
         "iterations": args.iterations,
+        "workers": workers,
         "matches": {
             match_id: structured_match_projection(match_id, aggregate, args.iterations)
             for match_id, aggregate in match_aggregate.items()
@@ -4570,7 +5020,7 @@ def command_project_bracket(args: argparse.Namespace, teams: Dict[str, Team]) ->
     output_json_path = Path(args.json_output)
     output_path.write_text(content)
     output_json_path.write_text(json.dumps(structured, indent=2))
-    print(f"Llave proyectada guardada en {output_path}")
+    print(f"Llave proyectada guardada en {output_path} | workers={workers}")
     print(f"Llave estructurada guardada en {output_json_path}")
     print(content)
 
@@ -5909,11 +6359,15 @@ def model_comparison_lines(prediction: MatchPrediction) -> List[str]:
         name = str(stack.get(name_key, "Modelo"))
         probs = stack.get(probs_key, {}) or {}
         top_score, top_score_prob = stack.get(score_key, ("0-0", 0.0))
+        weight_key = "primary" if name_key == "primary_name" else "contrast" if name_key == "contrast_name" else "low_score" if name_key == "low_score_name" else None
+        weight_label = ""
+        if weight_key and stack.get("weights", {}).get(weight_key) is not None:
+            weight_label = f" | peso actual {format_pct(float(stack['weights'][weight_key]))}"
         return (
             f"- {name}: victoria {prediction.team_a} {format_pct(float(probs.get('a', 0.0)))} | "
             f"empate {format_pct(float(probs.get('draw', 0.0)))} | "
             f"victoria {prediction.team_b} {format_pct(float(probs.get('b', 0.0)))} | "
-            f"marcador mas probable {top_score} ({format_pct(float(top_score_prob))})"
+            f"marcador mas probable {top_score} ({format_pct(float(top_score_prob))}){weight_label}"
         )
 
     lines = ["- Comparativa entre modelos:"]
@@ -5933,6 +6387,10 @@ def model_comparison_html(prediction: MatchPrediction) -> str:
         name = str(stack.get(name_key, "Modelo"))
         probs = stack.get(probs_key, {}) or {}
         top_score, top_score_prob = stack.get(score_key, ("0-0", 0.0))
+        weight_key = "primary" if name_key == "primary_name" else "contrast" if name_key == "contrast_name" else "low_score" if name_key == "low_score_name" else None
+        weight_html = ""
+        if weight_key and stack.get("weights", {}).get(weight_key) is not None:
+            weight_html = f"<p><strong>Peso actual:</strong> {format_pct(float(stack['weights'][weight_key]))}</p>"
         return (
             f"<article class=\"model-card {tone}\">"
             f"<h5>{html.escape(name)}</h5>"
@@ -5940,13 +6398,14 @@ def model_comparison_html(prediction: MatchPrediction) -> str:
             f"<p>Empate {format_pct(float(probs.get('draw', 0.0)))}</p>"
             f"<p>Victoria {html.escape(prediction.team_b)} {format_pct(float(probs.get('b', 0.0)))}</p>"
             f"<p><strong>Marcador mas probable:</strong> {html.escape(str(top_score))} ({format_pct(float(top_score_prob))})</p>"
+            f"{weight_html}"
             "</article>"
         )
 
     return (
         "<div class=\"reason-block model-compare-block\">"
         "<h4>Que dice cada modelo</h4>"
-        "<p class=\"meta\">Aqui se ven por separado el modelo principal, el contraste, el ajuste de baja anotacion y el ensamble final que termina publicandose.</p>"
+        "<p class=\"meta\">Aqui se ven por separado el modelo principal, el contraste y el ajuste de baja anotacion. El ensamble final repondera esos modelos segun consenso y cercania al mercado cuando hay cuotas confiables.</p>"
         "<div class=\"model-compare-grid\">"
         f"{card('primary_name', 'primary_probs', 'primary_top_score', 'primary')}"
         f"{card('contrast_name', 'contrast_probs', 'contrast_top_score', 'contrast')}"
@@ -6450,12 +6909,19 @@ def build_backtesting_markdown(backtest: dict) -> List[str]:
         lines.append(f"- Error log-loss en resultado: {float(backtest['logloss_result']):.3f}")
     if backtest.get("brier_result") is not None:
         lines.append(f"- Error Brier en resultado: {float(backtest['brier_result']):.3f}")
+    if backtest.get("brier_reliability") is not None:
+        lines.append(f"- Brier descompuesto | calibracion {float(backtest['brier_reliability']):.3f} | separacion {float(backtest['brier_resolution']):.3f} | incertidumbre base {float(backtest['brier_uncertainty']):.3f}")
     if backtest.get("logloss_advance") is not None:
         lines.append(f"- Error log-loss en clasificacion knockout: {float(backtest['logloss_advance']):.3f}")
     if backtest.get("brier_advance") is not None:
         lines.append(f"- Error Brier en clasificacion knockout: {float(backtest['brier_advance']):.3f}")
     if backtest.get("market_logloss_result") is not None:
         lines.append(f"- Error log-loss de las cuotas en esos mismos partidos: {float(backtest['market_logloss_result']):.3f}")
+    if backtest.get("temporal_cv_logloss") is not None:
+        lines.append(
+            f"- Validacion temporal por ventanas | log-loss {float(backtest['temporal_cv_logloss']):.3f} | "
+            f"Brier {float(backtest['temporal_cv_brier']):.3f} | acierto {format_pct(float(backtest['temporal_cv_accuracy']))}"
+        )
     buckets = backtest.get("calibration_buckets") or []
     if buckets:
         lines.append(
@@ -6493,12 +6959,20 @@ def build_backtesting_html(backtest: dict) -> str:
         quality_rows.append(f"<li><strong>Log-loss resultado</strong><span>{float(backtest['logloss_result']):.3f}</span></li>")
     if backtest.get("brier_result") is not None:
         quality_rows.append(f"<li><strong>Brier resultado</strong><span>{float(backtest['brier_result']):.3f}</span></li>")
+    if backtest.get("brier_reliability") is not None:
+        quality_rows.append(f"<li><strong>Brier calibracion</strong><span>{float(backtest['brier_reliability']):.3f}</span></li>")
+        quality_rows.append(f"<li><strong>Brier separacion</strong><span>{float(backtest['brier_resolution']):.3f}</span></li>")
+        quality_rows.append(f"<li><strong>Incertidumbre base</strong><span>{float(backtest['brier_uncertainty']):.3f}</span></li>")
     if backtest.get("logloss_advance") is not None:
         quality_rows.append(f"<li><strong>Log-loss clasificacion</strong><span>{float(backtest['logloss_advance']):.3f}</span></li>")
     if backtest.get("brier_advance") is not None:
         quality_rows.append(f"<li><strong>Brier clasificacion</strong><span>{float(backtest['brier_advance']):.3f}</span></li>")
     if backtest.get("market_logloss_result") is not None:
         quality_rows.append(f"<li><strong>Log-loss mercado</strong><span>{float(backtest['market_logloss_result']):.3f}</span></li>")
+    if backtest.get("temporal_cv_logloss") is not None:
+        quality_rows.append(f"<li><strong>Log-loss por ventanas</strong><span>{float(backtest['temporal_cv_logloss']):.3f}</span></li>")
+        quality_rows.append(f"<li><strong>Brier por ventanas</strong><span>{float(backtest['temporal_cv_brier']):.3f}</span></li>")
+        quality_rows.append(f"<li><strong>Acierto por ventanas</strong><span>{format_pct(float(backtest['temporal_cv_accuracy']))}</span></li>")
 
     calibration_rows = []
     for bucket in backtest.get("calibration_buckets", []):
@@ -6554,7 +7028,7 @@ def build_methodology_html(bracket_payload: dict, backtest: dict) -> str:
         "</article>"
         "<article>"
         "<h3>Stack estadistico</h3>"
-        "<p>La capa prepartido mezcla el modelo principal Bivariante Poisson, un modelo de contraste Poisson independiente, un ajuste de baja anotacion y un ensamble ligero final. Si las cuotas son confiables, tambien se usan como referencia suave y no como sustituto del modelo.</p>"
+        "<p>La capa prepartido mezcla el modelo principal Bivariante Poisson, un modelo de contraste Poisson independiente, un ajuste de baja anotacion y un ensamble ligero final. Ese ensamble ahora repondera los modelos segun consenso y cercania al mercado cuando hay cuotas confiables.</p>"
         "</article>"
         "<article>"
         "<h3>Estrategia de datos</h3>"
@@ -6567,6 +7041,10 @@ def build_methodology_html(bracket_payload: dict, backtest: dict) -> str:
         "<article>"
         "<h3>Estado dinámico</h3>"
         "<p>Actualiza Elo, forma, fatiga, disponibilidad, disciplina, clima, alineaciones, bajas y mercado a medida que aparecen datos nuevos. Ademas, acumula el estilo reciente de cada seleccion para no arrancar cada cruce desde cero.</p>"
+        "</article>"
+        "<article>"
+        "<h3>Validacion y calibracion</h3>"
+        "<p>El seguimiento del rendimiento no se queda en acierto bruto. La web ahora muestra log-loss, Brier, descomposicion de calibracion y una lectura temporal por ventanas para ver si el modelo se mantiene estable cuando el torneo avanza.</p>"
         "</article>"
         "<article>"
         "<h3>Modo in-play</h3>"
@@ -8133,6 +8611,80 @@ def confidence_bucket(value: float) -> str:
     return "80%+"
 
 
+def avg_or_none(values: Sequence[float]) -> Optional[float]:
+    return sum(values) / len(values) if values else None
+
+
+def brier_decomposition(
+    predictions: Sequence[Tuple[float, float, float]],
+    outcomes: Sequence[str],
+) -> Dict[str, float]:
+    if not predictions or not outcomes or len(predictions) != len(outcomes):
+        return {"brier": 0.0, "reliability": 0.0, "resolution": 0.0, "uncertainty": 0.0}
+
+    n = len(predictions)
+    bar_a = sum(1.0 for outcome in outcomes if outcome == "a") / n
+    bar_d = sum(1.0 for outcome in outcomes if outcome == "draw") / n
+    bar_b = sum(1.0 for outcome in outcomes if outcome == "b") / n
+    uncertainty = (bar_a * (1.0 - bar_a) + bar_d * (1.0 - bar_d) + bar_b * (1.0 - bar_b)) / 3.0
+
+    total_brier = 0.0
+    buckets: Dict[float, List[Tuple[Tuple[float, float, float], str]]] = {}
+    for triple, outcome in zip(predictions, outcomes):
+        pa, pd, pb = triple
+        obs_a = 1.0 if outcome == "a" else 0.0
+        obs_d = 1.0 if outcome == "draw" else 0.0
+        obs_b = 1.0 if outcome == "b" else 0.0
+        total_brier += ((pa - obs_a) ** 2 + (pd - obs_d) ** 2 + (pb - obs_b) ** 2) / 3.0
+        bucket_key = round(max(pa, pd, pb) * 10.0) / 10.0
+        buckets.setdefault(bucket_key, []).append((triple, outcome))
+
+    reliability = 0.0
+    resolution = 0.0
+    for items in buckets.values():
+        nk = len(items)
+        avg_pa = sum(item[0][0] for item in items) / nk
+        avg_pd = sum(item[0][1] for item in items) / nk
+        avg_pb = sum(item[0][2] for item in items) / nk
+        obs_a = sum(1.0 for _, outcome in items if outcome == "a") / nk
+        obs_d = sum(1.0 for _, outcome in items if outcome == "draw") / nk
+        obs_b = sum(1.0 for _, outcome in items if outcome == "b") / nk
+        reliability += (nk / n) * (((avg_pa - obs_a) ** 2 + (avg_pd - obs_d) ** 2 + (avg_pb - obs_b) ** 2) / 3.0)
+        resolution += (nk / n) * (((obs_a - bar_a) ** 2 + (obs_d - bar_d) ** 2 + (obs_b - bar_b) ** 2) / 3.0)
+
+    return {
+        "brier": total_brier / n,
+        "reliability": reliability,
+        "resolution": resolution,
+        "uncertainty": uncertainty,
+    }
+
+
+def summarize_temporal_windows(
+    result_logloss: Sequence[float],
+    result_brier: Sequence[float],
+    result_hits: Sequence[int],
+    *,
+    fold_size: int = PARAMS.temporal_cv_fold_size,
+) -> Dict[str, Optional[float]]:
+    if not result_logloss:
+        return {"logloss": None, "brier": None, "accuracy": None}
+    fold_size = max(1, int(fold_size))
+    logloss_windows: List[float] = []
+    brier_windows: List[float] = []
+    accuracy_windows: List[float] = []
+    for start in range(0, len(result_logloss), fold_size):
+        end = start + fold_size
+        logloss_windows.append(sum(result_logloss[start:end]) / len(result_logloss[start:end]))
+        brier_windows.append(sum(result_brier[start:end]) / len(result_brier[start:end]))
+        accuracy_windows.append(sum(result_hits[start:end]) / len(result_hits[start:end]))
+    return {
+        "logloss": avg_or_none(logloss_windows),
+        "brier": avg_or_none(brier_windows),
+        "accuracy": avg_or_none(accuracy_windows),
+    }
+
+
 def compute_backtest_summary(fixtures: Sequence[dict], teams: Dict[str, Team], top_scores: int) -> dict:
     completed = []
     for fixture in fixtures:
@@ -8144,20 +8696,22 @@ def compute_backtest_summary(fixtures: Sequence[dict], teams: Dict[str, Team], t
     completed.sort(key=lambda item: (item.get("kickoff_utc") or "", str(item.get("id", ""))))
 
     if not completed:
-        return {
-            "completed_matches": 0,
-            "regular_time_samples": 0,
-            "advancement_samples": 0,
-            "favorite_hit_rate": None,
-            "top1_score_hit_rate": None,
-            "top3_score_hit_rate": None,
-            "brier_result": None,
-            "logloss_result": None,
-            "brier_advance": None,
-            "logloss_advance": None,
-            "market_logloss_result": None,
-            "calibration_buckets": [],
-        }
+        return asdict(
+            BacktestMetrics(
+                completed_matches=0,
+                regular_time_samples=0,
+                advancement_samples=0,
+                favorite_hit_rate=None,
+                top1_score_hit_rate=None,
+                top3_score_hit_rate=None,
+                brier_result=None,
+                logloss_result=None,
+                brier_advance=None,
+                logloss_advance=None,
+                market_logloss_result=None,
+                calibration_buckets=[],
+            )
+        )
 
     states = copy_states(empty_persistent_payload(teams))
     result_brier = []
@@ -8172,6 +8726,9 @@ def compute_backtest_summary(fixtures: Sequence[dict], teams: Dict[str, Team], t
     regular_samples = 0
     advance_samples = 0
     calibration = {}
+    regular_predictions: List[Tuple[float, float, float]] = []
+    regular_outcomes: List[str] = []
+    regular_hits: List[int] = []
 
     for fixture in completed:
         try:
@@ -8198,8 +8755,10 @@ def compute_backtest_summary(fixtures: Sequence[dict], teams: Dict[str, Team], t
             regular_samples += 1
             favorite_total += 1
             predicted_outcome = max(probs.items(), key=lambda item: item[1])[0]
-            if predicted_outcome == actual_outcome:
+            is_hit = 1 if predicted_outcome == actual_outcome else 0
+            if is_hit:
                 favorite_hits += 1
+            regular_hits.append(is_hit)
             p_actual = max(probs[actual_outcome], 1e-12)
             result_logloss.append(-math.log(p_actual))
             result_brier.append(
@@ -8207,6 +8766,8 @@ def compute_backtest_summary(fixtures: Sequence[dict], teams: Dict[str, Team], t
                  + (probs["draw"] - (1.0 if actual_outcome == "draw" else 0.0)) ** 2
                  + (probs["b"] - (1.0 if actual_outcome == "b" else 0.0)) ** 2) / 3.0
             )
+            regular_predictions.append((probs["a"], probs["draw"], probs["b"]))
+            regular_outcomes.append(actual_outcome)
             if fixture.get("market_prob_a") is not None and fixture.get("market_prob_draw") is not None and fixture.get("market_prob_b") is not None:
                 market_probs = {
                     "a": float(fixture["market_prob_a"]),
@@ -8258,23 +8819,35 @@ def compute_backtest_summary(fixtures: Sequence[dict], teams: Dict[str, Team], t
             }
         )
 
-    def avg(values: List[float]) -> Optional[float]:
-        return sum(values) / len(values) if values else None
+    brier_parts = brier_decomposition(regular_predictions, regular_outcomes) if regular_predictions else None
+    temporal_windows = summarize_temporal_windows(
+        result_logloss,
+        result_brier,
+        regular_hits,
+        fold_size=PARAMS.temporal_cv_fold_size,
+    )
 
-    return {
-        "completed_matches": len(completed),
-        "regular_time_samples": regular_samples,
-        "advancement_samples": advance_samples,
-        "favorite_hit_rate": (favorite_hits / favorite_total) if favorite_total else None,
-        "top1_score_hit_rate": (top1_hits / regular_samples) if regular_samples else None,
-        "top3_score_hit_rate": (top3_hits / regular_samples) if regular_samples else None,
-        "brier_result": avg(result_brier),
-        "logloss_result": avg(result_logloss),
-        "brier_advance": avg(advance_brier),
-        "logloss_advance": avg(advance_logloss),
-        "market_logloss_result": avg(market_result_logloss),
-        "calibration_buckets": calibration_buckets,
-    }
+    metrics = BacktestMetrics(
+        completed_matches=len(completed),
+        regular_time_samples=regular_samples,
+        advancement_samples=advance_samples,
+        favorite_hit_rate=(favorite_hits / favorite_total) if favorite_total else None,
+        top1_score_hit_rate=(top1_hits / regular_samples) if regular_samples else None,
+        top3_score_hit_rate=(top3_hits / regular_samples) if regular_samples else None,
+        brier_result=avg_or_none(result_brier),
+        logloss_result=avg_or_none(result_logloss),
+        brier_advance=avg_or_none(advance_brier),
+        logloss_advance=avg_or_none(advance_logloss),
+        market_logloss_result=avg_or_none(market_result_logloss),
+        calibration_buckets=calibration_buckets,
+        brier_reliability=(brier_parts or {}).get("reliability"),
+        brier_resolution=(brier_parts or {}).get("resolution"),
+        brier_uncertainty=(brier_parts or {}).get("uncertainty"),
+        temporal_cv_logloss=temporal_windows.get("logloss"),
+        temporal_cv_brier=temporal_windows.get("brier"),
+        temporal_cv_accuracy=temporal_windows.get("accuracy"),
+    )
+    return asdict(metrics)
 
 
 def print_prediction(prediction: MatchPrediction, show_factors: bool = False) -> None:
@@ -8803,6 +9376,7 @@ def build_parser() -> argparse.ArgumentParser:
     simulate.add_argument("--top", type=int, default=20)
     simulate.add_argument("--full", action="store_true")
     simulate.add_argument("--seed", type=int, default=None)
+    simulate.add_argument("--workers", type=int, default=0, help="Procesos para Monte Carlo. 0 = auto.")
     simulate.add_argument("--progress-every", type=int, default=0)
     simulate.add_argument("--state-file", default=str(STATE_FILE))
     simulate.add_argument("--ignore-state", action="store_true")
@@ -8818,6 +9392,7 @@ def build_parser() -> argparse.ArgumentParser:
     )
     project.add_argument("--iterations", type=int, default=15000)
     project.add_argument("--seed", type=int, default=None)
+    project.add_argument("--workers", type=int, default=0, help="Procesos para Monte Carlo. 0 = auto.")
     project.add_argument("--progress-every", type=int, default=0)
     project.add_argument("--output", default=str(BRACKET_FILE))
     project.add_argument("--json-output", default=str(BRACKET_JSON_FILE))
