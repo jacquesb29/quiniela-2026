@@ -43,6 +43,11 @@ from worldcup2026.constants import (
 from worldcup2026.dashboard.backtesting import (
     compute_backtest_summary as calculate_compute_backtest_summary,
 )
+from worldcup2026.dashboard.charts import (
+    render_chart_grid,
+    render_dual_bar_chart,
+    render_rank_chart,
+)
 from worldcup2026.dashboard.comparison import (
     compare_bracket_payloads as calculate_compare_bracket_payloads,
     compare_entry_predictions as calculate_compare_entry_predictions,
@@ -3506,12 +3511,34 @@ def build_recent_changes_html(
     if previous_updated_at:
         compared_html = f"<p class=\"meta\">Comparado contra la publicacion anterior de {html.escape(previous_updated_at)}.</p>"
 
+    movers_chart_rows = [
+        {
+            "label": row["title"],
+            "value": min(1.0, float(row["abs_delta"]) * 4.0),
+            "value_text": format_pct(float(row["abs_delta"])),
+            "detail": f"{row['previous_label']} {format_pct(row['previous_prob'])} -> {row['current_label']} {format_pct(row['current_prob'])}",
+        }
+        for row in entry_changes["movers"][:6]
+    ]
+    changes_chart_html = render_chart_grid(
+        [
+            render_rank_chart(
+                "Mayores movimientos del pick principal",
+                movers_chart_rows,
+                tone="rose",
+                description="Cuanto se movio el resultado principal frente a la publicacion anterior. El valor muestra el cambio absoluto de probabilidad, no la probabilidad final del partido.",
+                empty_body="Todavia no hubo un movimiento material del pick principal frente a la version anterior.",
+            )
+        ]
+    )
+
     return (
         "<section class=\"panel changes-panel\">"
         "<div class=\"panel-head\"><div><p class=\"eyebrow\">Comparativo</p><h2>Que cambio desde la ultima actualizacion</h2>"
         "<p class=\"lede-tight\">Este bloque resume solo movimientos reales respecto de la version anterior ya publicada, para que se note rapido si el tablero se movio poco o mucho.</p>"
         f"{compared_html}"
         "</div></div>"
+        f"{changes_chart_html}"
         "<div class=\"confidence-grid\">"
         f"{teams_html}"
         f"{matchup_html}"
@@ -4306,22 +4333,27 @@ def build_global_confidence_html(entries: Sequence[dict]) -> str:
         bucket["confidence_sum"] += confidence
         bucket["draw_sum"] += float(prediction.draw)
 
+    def favorite_summary(entry: dict) -> Tuple[str, float]:
+        prediction: MatchPrediction = entry["prediction"]
+        favorite = max(
+            (
+                (prediction.win_a, f"Victoria {prediction.team_a}"),
+                (prediction.draw, "Empate"),
+                (prediction.win_b, f"Victoria {prediction.team_b}"),
+            ),
+            key=lambda item: item[0],
+        )
+        return favorite[1], float(favorite[0])
+
     def bullet_list(items: Sequence[Tuple[float, float, dict]], mode: str) -> str:
         rows = []
         for confidence, _, entry in items:
             prediction: MatchPrediction = entry["prediction"]
-            favorite = max(
-                (
-                    (prediction.win_a, f"Victoria {prediction.team_a}"),
-                    (prediction.draw, "Empate"),
-                    (prediction.win_b, f"Victoria {prediction.team_b}"),
-                ),
-                key=lambda item: item[0],
-            )
+            favorite_label, favorite_prob = favorite_summary(entry)
             tail = (
-                f"Certeza del pick {format_pct(confidence)} | resultado mas probable {favorite[1]} {format_pct(favorite[0])}"
+                f"Certeza del pick {format_pct(confidence)} | resultado mas probable {favorite_label} {format_pct(favorite_prob)}"
                 if mode == "firm"
-                else f"Certeza del pick {format_pct(confidence)} | duelo parejo"
+                else f"Certeza del pick {format_pct(confidence)} | empate {format_pct(prediction.draw)}"
             )
             rows.append(
                 "<li>"
@@ -4359,8 +4391,8 @@ def build_global_confidence_html(entries: Sequence[dict]) -> str:
 
     group_closed_html = ""
     group_open_html = ""
+    group_rows: List[Tuple[str, float, float, float, int]] = []
     if group_metrics:
-        group_rows = []
         for group_label, stats in group_metrics.items():
             avg_conf = stats["confidence_sum"] / max(stats["matches"], 1)
             avg_draw = stats["draw_sum"] / max(stats["matches"], 1)
@@ -4379,6 +4411,89 @@ def build_global_confidence_html(entries: Sequence[dict]) -> str:
             "</ul></article>"
         )
 
+    strongest_chart_rows = []
+    for confidence, _, entry in strongest:
+        favorite_label, favorite_prob = favorite_summary(entry)
+        strongest_chart_rows.append(
+            {
+                "label": entry["title"],
+                "value": confidence,
+                "value_text": format_pct(confidence),
+                "detail": f"{favorite_label} {format_pct(favorite_prob)}",
+            }
+        )
+
+    most_open_chart_rows = []
+    for confidence, _, entry in most_open:
+        prediction: MatchPrediction = entry["prediction"]
+        favorite_label, favorite_prob = favorite_summary(entry)
+        parity = max(0.0, min(1.0, (1.0 - confidence) * 0.72 + float(prediction.draw) * 0.28))
+        most_open_chart_rows.append(
+            {
+                "label": entry["title"],
+                "value": parity,
+                "value_text": format_pct(parity),
+                "detail": f"Pick mas fuerte {favorite_label} {format_pct(favorite_prob)} | empate {format_pct(prediction.draw)}",
+            }
+        )
+
+    balanced_chart_rows = []
+    favorite_group_chart_rows = []
+    if group_rows:
+        balanced_groups = sorted(group_rows, key=lambda row: (row[3], row[2]), reverse=True)
+        favorite_groups = sorted(group_rows, key=lambda row: (row[1], -row[2]), reverse=True)
+        for group_label, avg_conf, avg_draw, balance, matches in balanced_groups[:4]:
+            balanced_chart_rows.append(
+                {
+                    "label": group_label,
+                    "value": balance,
+                    "value_text": format_pct(balance),
+                    "detail": f"Empate medio {format_pct(avg_draw)} | partidos cargados {matches}",
+                }
+            )
+        for group_label, avg_conf, avg_draw, balance, matches in favorite_groups[:4]:
+            favorite_group_chart_rows.append(
+                {
+                    "label": group_label,
+                    "value": avg_conf,
+                    "value_text": format_pct(avg_conf),
+                    "detail": f"Empate medio {format_pct(avg_draw)} | partidos cargados {matches}",
+                }
+            )
+
+    charts_html = render_chart_grid(
+        [
+            render_rank_chart(
+                "Donde el favorito se ve mas fuerte",
+                strongest_chart_rows,
+                tone="accent",
+                description="Lectura rapida de los cruces donde hoy el modelo ve mas diferencia entre el pick principal y el resto.",
+                empty_body="Todavia no hay partidos comparables con ventaja clara.",
+            ),
+            render_rank_chart(
+                "Donde el partido se ve mas parejo",
+                most_open_chart_rows,
+                tone="slate",
+                description="No es lo mismo que empate seguro. Aqui sube cuando el duelo se ve abierto y ningun desenlace domina con claridad.",
+                empty_body="Todavia no hay partidos comparables lo bastante parejos para dibujar esta lectura.",
+            ),
+            render_rank_chart(
+                "Grupos mas parejos",
+                balanced_chart_rows,
+                tone="gold",
+                description="Resumen por grupo usando equilibrio medio, probabilidad de empate y los partidos que ya estan cargados.",
+                empty_body="Todavia no hay suficientes partidos de grupos para construir este grafico.",
+            ),
+            render_rank_chart(
+                "Grupos con favoritos mas claros",
+                favorite_group_chart_rows,
+                tone="rose",
+                description="Estos grupos muestran la mayor ventaja media del pick principal en los partidos publicados hasta ahora.",
+                empty_body="Todavia no hay suficiente informacion de grupos para dibujar esta lectura.",
+            ),
+        ]
+    )
+
     return (
         "<section class=\"panel confidence-panel\">"
         "<div class=\"panel-head\">"
@@ -4394,6 +4509,7 @@ def build_global_confidence_html(entries: Sequence[dict]) -> str:
         f"<div class=\"summary-tile\"><span>Partidos en vivo detectados</span><strong>{live_matches}</strong></div>"
         "<div class=\"summary-tile\"><span>Como comprobar actualizacion</span><strong><a href=\"latest.json\">latest.json</a> + badge En vivo + minuto</strong></div>"
         "</div>"
+        f"{charts_html}"
         "<div class=\"confidence-grid\">"
         "<article><h3>Partidos con favorito mas claro</h3><ul>"
         f"{bullet_list(strongest, 'firm')}"
@@ -4749,12 +4865,86 @@ def build_backtesting_html(backtest: dict) -> str:
             "</li>"
         )
 
+    performance_chart_rows = []
+    if backtest.get("favorite_hit_rate") is not None:
+        performance_chart_rows.append(
+            {
+                "label": "Pick principal",
+                "value": float(backtest["favorite_hit_rate"]),
+                "value_text": format_pct(float(backtest["favorite_hit_rate"])),
+                "detail": "Cuantas veces acierta el resultado principal que publicamos.",
+            }
+        )
+    if backtest.get("top1_score_hit_rate") is not None:
+        performance_chart_rows.append(
+            {
+                "label": "Marcador principal exacto",
+                "value": float(backtest["top1_score_hit_rate"]),
+                "value_text": format_pct(float(backtest["top1_score_hit_rate"])),
+                "detail": "Cuantas veces el marcador exacto numero uno coincide con el resultado real.",
+            }
+        )
+    if backtest.get("top3_score_hit_rate") is not None:
+        performance_chart_rows.append(
+            {
+                "label": "Marcador dentro del top-3",
+                "value": float(backtest["top3_score_hit_rate"]),
+                "value_text": format_pct(float(backtest["top3_score_hit_rate"])),
+                "detail": "Cuantas veces el marcador real cae dentro de nuestros tres marcadores principales.",
+            }
+        )
+    if backtest.get("temporal_cv_accuracy") is not None:
+        performance_chart_rows.append(
+            {
+                "label": "Acierto por ventanas",
+                "value": float(backtest["temporal_cv_accuracy"]),
+                "value_text": format_pct(float(backtest["temporal_cv_accuracy"])),
+                "detail": "Walk-forward temporal para ver si el rendimiento aguanta cuando el torneo avanza.",
+            }
+        )
+
+    calibration_chart_rows = [
+        {
+            "label": bucket["bucket"],
+            "primary": float(bucket["avg_confidence"]),
+            "secondary": float(bucket["hit_rate"]),
+            "sample": int(bucket["matches"]),
+            "detail": (
+                f"Modelo {format_pct(float(bucket['avg_confidence']))} | "
+                f"real {format_pct(float(bucket['hit_rate']))}"
+            ),
+        }
+        for bucket in backtest.get("calibration_buckets", [])
+    ]
+    charts_html = render_chart_grid(
+        [
+            render_rank_chart(
+                "Que tan seguido pega lo visible",
+                performance_chart_rows,
+                tone="accent",
+                description="Este grafico se enfoca en lo que mas se ve en la web: pick principal, marcador exacto y aciertos por ventanas temporales.",
+                empty_body="Todavia no hay suficientes partidos cerrados para medir rendimiento visible.",
+            ),
+            render_dual_bar_chart(
+                "Calibracion por tramos",
+                calibration_chart_rows,
+                description="Compara lo que el modelo prometia en cada tramo de confianza contra lo que termino pasando de verdad.",
+                primary_label="Confianza media",
+                secondary_label="Acierto real",
+                primary_tone="accent",
+                secondary_tone="gold",
+                empty_body="Todavia no hay suficientes buckets de confianza para comparar modelo y realidad.",
+            ),
+        ]
+    )
+
     return (
         "<section class=\"panel backtest-panel\">"
         "<div class=\"panel-head\"><div><p class=\"eyebrow\">Validacion</p><h2>Como viene acertando el modelo</h2>"
         "<p class=\"lede-tight\">Aqui reconstruimos el torneo partido por partido, siempre pronosticando antes de cargar el resultado real. Asi medimos con justicia si el modelo esta bien calibrado y cuanto se acerca a lo que termino pasando.</p>"
         "</div></div>"
         f"<div class=\"confidence-tiles\">{''.join(metrics)}</div>"
+        f"{charts_html}"
         "<div class=\"confidence-grid\">"
         "<article><h3>Errores del modelo</h3><ul>"
         f"{''.join(quality_rows) if quality_rows else '<li><strong>Sin muestra suficiente</strong><span>Aun no hay datos comparables.</span></li>'}"
