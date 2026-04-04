@@ -40,6 +40,13 @@ from worldcup2026.constants import (
     WINNER_NEXT_MATCH,
     WORLD_CUP_TITLES,
 )
+from worldcup2026.dashboard.backtesting import (
+    compute_backtest_summary as calculate_compute_backtest_summary,
+)
+from worldcup2026.dashboard.comparison import (
+    compare_bracket_payloads as calculate_compare_bracket_payloads,
+    compare_entry_predictions as calculate_compare_entry_predictions,
+)
 from worldcup2026.dashboard.html_builder import render_dashboard_html
 from worldcup2026.data.historical import (
     estimated_fifa_points as calculate_estimated_fifa_points,
@@ -139,6 +146,13 @@ from worldcup2026.simulation.tournament import (
     sort_standings as calculate_sort_standings,
     standings_entry as calculate_standings_entry,
 )
+from worldcup2026.simulation.playoffs import (
+    qualification_probabilities as calculate_qualification_probabilities,
+    resolved_fifa_path_winners as calculate_resolved_fifa_path_winners,
+    resolved_uefa_path_winners as calculate_resolved_uefa_path_winners,
+    sample_playoff_placeholders as calculate_sample_playoff_placeholders,
+    sample_uefa_path_winner as calculate_sample_uefa_path_winner,
+)
 from worldcup2026.cli import (
     build_parser as package_build_parser,
     dispatch_command as package_dispatch_command,
@@ -155,6 +169,8 @@ from worldcup2026.profiles.indices import (
     trajectory_index as calculate_trajectory_index,
     travel_resilience as calculate_travel_resilience,
 )
+from worldcup2026.profiles.squad import aggregate_squad as calculate_aggregate_squad
+from worldcup2026.profiles.team import profile_for as calculate_profile_for
 from worldcup2026.types import BacktestMetrics, KnockoutResolution
 from worldcup2026.utils.naming import (
     normalize_stage_name as package_normalize_stage_name,
@@ -965,116 +981,34 @@ def sort_by(players: Sequence[Player], key_name: str) -> List[Player]:
 
 @lru_cache(maxsize=None)
 def aggregate_squad(team: Team) -> SquadAggregate:
-    players = proxy_players(team)
-    gks = [player for player in players if player.position == "GK"]
-    dfs = [player for player in players if player.position == "DF"]
-    mfs = [player for player in players if player.position == "MF"]
-    fws = [player for player in players if player.position == "FW"]
-
-    starting = (
-        sort_by(gks, "goalkeeping")[:1]
-        + sorted(dfs, key=lambda player: player.defense + 0.25 * player.aerial, reverse=True)[:4]
-        + sorted(mfs, key=lambda player: player.creation + 0.15 * player.defense, reverse=True)[:3]
-        + sorted(fws, key=lambda player: player.attack + 0.10 * player.creation, reverse=True)[:3]
-    )
-    bench = [player for player in players if player not in starting]
-
-    squad_quality = sum(player.quality for player in starting) / len(starting)
-    attack_unit = (
-        0.55 * sum(player.attack for player in starting if player.position == "FW") / 3.0
-        + 0.30 * sum(player.attack for player in starting if player.position == "MF") / 3.0
-        + 0.15 * sum(player.attack for player in starting if player.position == "DF") / 4.0
-    )
-    midfield_unit = sum(
-        0.55 * player.creation + 0.25 * player.quality + 0.20 * player.defense
-        for player in starting
-        if player.position == "MF"
-    ) / 3.0
-    defense_unit = (
-        0.60 * sum(player.defense for player in starting if player.position == "DF") / 4.0
-        + 0.20 * sum(player.defense for player in starting if player.position == "MF") / 3.0
-        + 0.20 * sum(player.goalkeeping for player in starting if player.position == "GK")
-    )
-    goalkeeper_unit = sum(player.goalkeeping for player in starting if player.position == "GK")
-    bench_depth = sum(player.quality for player in bench) / len(bench)
-    player_experience = clamp(sum(player.caps for player in starting) / (len(starting) * 100.0), 0.08, 1.00)
-    set_piece_attack = clamp(
-        (
-            sum(player.aerial for player in starting if player.position in {"DF", "FW"}) / 7.0
-            + sum(player.creation for player in starting if player.position == "MF") / 6.0
-        ),
-        0.08,
-        1.00,
-    )
-    set_piece_defense = clamp(
-        (
-            sum(player.aerial for player in starting if player.position in {"GK", "DF", "MF"}) / 8.0
-            + 0.40 * goalkeeper_unit
-        ),
-        0.08,
-        1.00,
-    )
-    discipline_index = clamp(sum(player.discipline for player in starting) / len(starting), 0.08, 1.00)
-    yellow_rate = clamp(sum(player.yellow_rate for player in starting) / len(starting), 0.02, 0.40)
-    red_rate = clamp(sum(player.red_rate for player in starting) / len(starting), 0.001, 0.05)
-    availability = clamp(sum(player.availability for player in starting) / len(starting), 0.50, 1.00)
-    finishing = clamp(sum(player.attack for player in starting if player.position == "FW") / 3.0, 0.08, 1.00)
-    shot_creation = clamp(
-        (
-            sum(player.creation for player in starting if player.position == "MF") / 3.0
-            + 0.45 * sum(player.creation for player in starting if player.position == "FW") / 3.0
-        ),
-        0.08,
-        1.00,
-    )
-    pressing = clamp(
-        (
-            0.45 * sum(player.defense for player in starting if player.position == "MF") / 3.0
-            + 0.35 * sum(player.defense for player in starting if player.position == "FW") / 3.0
-            + 0.20 * sum(player.defense for player in starting if player.position == "DF") / 4.0
-        ),
-        0.08,
-        1.00,
-    )
-
-    return SquadAggregate(
-        squad_quality=clamp(squad_quality, 0.08, 1.00),
-        attack_unit=clamp(attack_unit, 0.08, 1.00),
-        midfield_unit=clamp(midfield_unit, 0.08, 1.00),
-        defense_unit=clamp(defense_unit, 0.08, 1.00),
-        goalkeeper_unit=clamp(goalkeeper_unit, 0.08, 1.00),
-        bench_depth=clamp(bench_depth, 0.08, 1.00),
-        player_experience=player_experience,
-        set_piece_attack=set_piece_attack,
-        set_piece_defense=set_piece_defense,
-        discipline_index=discipline_index,
-        yellow_rate=yellow_rate,
-        red_rate=red_rate,
-        availability=availability,
-        finishing=finishing,
-        shot_creation=shot_creation,
-        pressing=pressing,
+    return calculate_aggregate_squad(
+        team,
+        proxy_players_fn=proxy_players,
+        clamp=clamp,
+        SquadAggregateCls=SquadAggregate,
     )
 
 
 @lru_cache(maxsize=None)
 def profile_for(team: Team) -> TeamProfile:
-    return TeamProfile(
-        fifa_points=fifa_points_value(team),
-        fifa_rank=fifa_rank_value(team),
-        fifa_strength_index=fifa_strength_index(team),
-        resource_index=resource_index(team),
-        heritage_index=heritage_index(team),
-        world_cup_titles=WORLD_CUP_TITLES.get(team.name, 0),
-        trajectory_index=trajectory_index(team),
-        coach_index=coach_index(team),
-        chemistry_index=chemistry_index(team),
-        morale_base=morale_base(team),
-        tactical_flexibility=tactical_flexibility(team),
-        travel_resilience=travel_resilience(team),
-        tempo=tempo_proxy(team),
-        squad=aggregate_squad(team),
-        history=historical_snapshot(team),
+    return calculate_profile_for(
+        team,
+        TeamProfileCls=TeamProfile,
+        fifa_points_value_fn=fifa_points_value,
+        fifa_rank_value_fn=fifa_rank_value,
+        fifa_strength_index_fn=fifa_strength_index,
+        resource_index_fn=resource_index,
+        heritage_index_fn=heritage_index,
+        world_cup_titles=WORLD_CUP_TITLES,
+        trajectory_index_fn=trajectory_index,
+        coach_index_fn=coach_index,
+        chemistry_index_fn=chemistry_index,
+        morale_base_fn=morale_base,
+        tactical_flexibility_fn=tactical_flexibility,
+        travel_resilience_fn=travel_resilience,
+        tempo_proxy_fn=tempo_proxy,
+        aggregate_squad_fn=aggregate_squad,
+        historical_snapshot_fn=historical_snapshot,
     )
 
 
@@ -1989,25 +1923,11 @@ FIFA_PLAYOFF_PATHS = {
 
 
 def resolved_uefa_path_winners(teams: Dict[str, Team]) -> Dict[str, str]:
-    resolved: Dict[str, str] = {}
-    for placeholder, path in UEFA_PLAYOFF_PATHS.items():
-        candidates = list(path["semi_1"] + path["semi_2"])
-        qualified = [name for name in candidates if name in teams and teams[name].status == "qualified"]
-        pending = [name for name in candidates if name in teams and teams[name].status == "uefa_playoff"]
-        if len(qualified) == 1 and not pending:
-            resolved[placeholder] = qualified[0]
-    return resolved
+    return calculate_resolved_uefa_path_winners(teams, uefa_playoff_paths=UEFA_PLAYOFF_PATHS)
 
 
 def resolved_fifa_path_winners(teams: Dict[str, Team]) -> Dict[str, str]:
-    resolved: Dict[str, str] = {}
-    for placeholder, path in FIFA_PLAYOFF_PATHS.items():
-        candidates = [path["host"], *path["semi"]]
-        qualified = [name for name in candidates if name in teams and teams[name].status == "qualified"]
-        pending = [name for name in candidates if name in teams and teams[name].status == "fifa_playoff"]
-        if len(qualified) == 1 and not pending:
-            resolved[placeholder] = qualified[0]
-    return resolved
+    return calculate_resolved_fifa_path_winners(teams, fifa_playoff_paths=FIFA_PLAYOFF_PATHS)
 
 
 def confirmed_teams(teams: Dict[str, Team]) -> List[Team]:
@@ -2150,19 +2070,11 @@ def fifa_playoff_probabilities(teams: Dict[str, Team]) -> Dict[str, float]:
 
 
 def qualification_probabilities(teams: Dict[str, Team]) -> Dict[str, float]:
-    probabilities = {}
-    uefa_probs = uefa_playoff_probabilities(teams)
-    fifa_probs = fifa_playoff_probabilities(teams)
-    for team in teams.values():
-        if team.status == "qualified":
-            probabilities[team.name] = 1.0
-        elif team.status == "uefa_playoff":
-            probabilities[team.name] = uefa_probs.get(team.name, 0.0)
-        elif team.status == "fifa_playoff":
-            probabilities[team.name] = fifa_probs.get(team.name, 0.0)
-        else:
-            probabilities[team.name] = 0.0
-    return probabilities
+    return calculate_qualification_probabilities(
+        teams,
+        uefa_playoff_probabilities_fn=uefa_playoff_probabilities,
+        fifa_playoff_probabilities_fn=fifa_playoff_probabilities,
+    )
 
 
 def sample_knockout_winner(teams: Dict[str, Team], team_a: str, team_b: str, ctx: MatchContext) -> str:
@@ -2287,84 +2199,25 @@ def sample_uefa_path_winner(
     semi_2: Tuple[str, str],
     final_host_path: str,
 ) -> str:
-    finalist_1 = sample_knockout_winner(
+    return calculate_sample_uefa_path_winner(
         teams,
-        semi_1[0],
-        semi_1[1],
-        MatchContext(neutral=False, home_team=semi_1[0], knockout=True, importance=1.2),
-    )
-    finalist_2 = sample_knockout_winner(
-        teams,
-        semi_2[0],
-        semi_2[1],
-        MatchContext(neutral=False, home_team=semi_2[0], knockout=True, importance=1.2),
-    )
-    final_host = finalist_1 if final_host_path == "semi_1" else finalist_2
-    return sample_knockout_winner(
-        teams,
-        finalist_1,
-        finalist_2,
-        MatchContext(neutral=False, home_team=final_host, knockout=True, importance=1.25),
+        semi_1,
+        semi_2,
+        final_host_path,
+        sample_knockout_winner=sample_knockout_winner,
+        MatchContextCls=MatchContext,
     )
 
 
 def sample_playoff_placeholders(teams: Dict[str, Team]) -> Dict[str, str]:
-    resolved = resolved_uefa_path_winners(teams)
-    resolved_fifa = resolved_fifa_path_winners(teams)
-    return {
-        "UEFA_A": resolved.get("UEFA_A")
-        or sample_uefa_path_winner(
-            teams,
-            ("Italy", "Northern Ireland"),
-            ("Wales", "Bosnia and Herzegovina"),
-            "semi_2",
-        ),
-        "UEFA_B": resolved.get("UEFA_B")
-        or sample_uefa_path_winner(
-            teams,
-            ("Ukraine", "Sweden"),
-            ("Poland", "Albania"),
-            "semi_1",
-        ),
-        "UEFA_C": resolved.get("UEFA_C")
-        or sample_uefa_path_winner(
-            teams,
-            ("Turkey", "Romania"),
-            ("Slovakia", "Kosovo"),
-            "semi_2",
-        ),
-        "UEFA_D": resolved.get("UEFA_D")
-        or sample_uefa_path_winner(
-            teams,
-            ("Denmark", "North Macedonia"),
-            ("Czech Republic", "Republic of Ireland"),
-            "semi_2",
-        ),
-        "FIFA_1": resolved_fifa.get("FIFA_1")
-        or sample_knockout_winner(
-            teams,
-            "Dem. Rep. of Congo",
-            sample_knockout_winner(
-                teams,
-                "Jamaica",
-                "New Caledonia",
-                MatchContext(neutral=True, venue_country="Mexico", knockout=True, importance=1.2),
-            ),
-            MatchContext(neutral=True, venue_country="Mexico", knockout=True, importance=1.25),
-        ),
-        "FIFA_2": resolved_fifa.get("FIFA_2")
-        or sample_knockout_winner(
-            teams,
-            "Iraq",
-            sample_knockout_winner(
-                teams,
-                "Bolivia",
-                "Suriname",
-                MatchContext(neutral=True, venue_country="Mexico", knockout=True, importance=1.2),
-            ),
-            MatchContext(neutral=True, venue_country="Mexico", knockout=True, importance=1.25),
-        ),
-    }
+    return calculate_sample_playoff_placeholders(
+        teams,
+        resolved_uefa_path_winners_fn=resolved_uefa_path_winners,
+        resolved_fifa_path_winners_fn=resolved_fifa_path_winners,
+        sample_uefa_path_winner_fn=sample_uefa_path_winner,
+        sample_knockout_winner=sample_knockout_winner,
+        MatchContextCls=MatchContext,
+    )
 
 
 def resolve_group_entry(entry: object, placeholders: Dict[str, str]) -> str:
@@ -3474,118 +3327,17 @@ def load_previous_site_snapshot(
 
 
 def compare_entry_predictions(current_entries: Sequence[dict], previous_entries: Sequence[dict]) -> dict:
-    previous_map = {dashboard_entry_key(entry): entry for entry in previous_entries}
-    movers = []
-    score_changes = []
-    label_changes = []
-    for current in current_entries:
-        previous = previous_map.get(dashboard_entry_key(current))
-        if not previous:
-            continue
-        current_prediction: MatchPrediction = current["prediction"]
-        previous_prediction: MatchPrediction = previous["prediction"]
-        current_label, current_prob = pick_summary(current_prediction)
-        previous_label, previous_prob = pick_summary(previous_prediction)
-        delta = float(current_prob) - float(previous_prob)
-        title = str(current.get("title", "Partido"))
-        abs_delta = abs(delta)
-        if abs_delta >= 0.005 or previous_label != current_label:
-            movers.append(
-                {
-                    "title": title,
-                    "previous_label": previous_label,
-                    "previous_prob": float(previous_prob),
-                    "current_label": current_label,
-                    "current_prob": float(current_prob),
-                    "delta": delta,
-                    "abs_delta": abs_delta,
-                }
-            )
-        previous_score = projected_score_value(previous_prediction)
-        current_score = projected_score_value(current_prediction)
-        if previous_score != current_score:
-            score_changes.append(
-                {
-                    "title": title,
-                    "previous_score": previous_score,
-                    "current_score": current_score,
-                }
-            )
-        if previous_label != current_label:
-            label_changes.append(
-                {
-                    "title": title,
-                    "previous_label": previous_label,
-                    "current_label": current_label,
-                }
-            )
-    movers.sort(key=lambda item: item["abs_delta"], reverse=True)
-    return {
-        "movers": movers[:6],
-        "score_changes": score_changes[:6],
-        "label_changes": label_changes[:6],
-    }
+    return calculate_compare_entry_predictions(
+        current_entries,
+        previous_entries,
+        dashboard_entry_key=dashboard_entry_key,
+        pick_summary=pick_summary,
+        projected_score_value=projected_score_value,
+    )
 
 
 def compare_bracket_payloads(current_bracket: dict, previous_bracket: dict) -> dict:
-    current_matches = current_bracket.get("matches", {}) if current_bracket else {}
-    previous_matches = previous_bracket.get("matches", {}) if previous_bracket else {}
-    stage_order = {"round32": 0, "round16": 1, "quarterfinal": 2, "semifinal": 3, "final": 4, "third_place": 5}
-
-    def matchup_text(match: dict) -> str:
-        return f"{match.get('team_a', '?')} vs {match.get('team_b', '?')}"
-
-    matchup_changes = []
-    favorite_flips = []
-    current_teams = set()
-    previous_teams = set()
-
-    for match_id, current in current_matches.items():
-        current_teams.update(team for team in [current.get("team_a"), current.get("team_b")] if team)
-        previous = previous_matches.get(match_id)
-        if not previous:
-            continue
-        previous_teams.update(team for team in [previous.get("team_a"), previous.get("team_b")] if team)
-        if current.get("team_a") != previous.get("team_a") or current.get("team_b") != previous.get("team_b"):
-            matchup_changes.append(
-                {
-                    "match_id": match_id,
-                    "title": current.get("title", match_id),
-                    "stage": current.get("stage"),
-                    "previous_matchup": matchup_text(previous),
-                    "current_matchup": matchup_text(current),
-                    "current_prob": float(current.get("matchup_prob", 0.0)),
-                }
-            )
-        elif current.get("winner") != previous.get("winner"):
-            favorite_flips.append(
-                {
-                    "match_id": match_id,
-                    "title": current.get("title", match_id),
-                    "stage": current.get("stage"),
-                    "matchup": matchup_text(current),
-                    "previous_winner": previous.get("winner"),
-                    "current_winner": current.get("winner"),
-                    "current_prob": float(current.get("winner_prob", 0.0)),
-                }
-            )
-
-    for previous in previous_matches.values():
-        previous_teams.update(team for team in [previous.get("team_a"), previous.get("team_b")] if team)
-
-    matchup_changes.sort(
-        key=lambda item: (stage_order.get(str(item.get("stage")), 99), -item["current_prob"], str(item["title"]))
-    )
-    favorite_flips.sort(
-        key=lambda item: (stage_order.get(str(item.get("stage")), 99), -item["current_prob"], str(item["title"]))
-    )
-
-    return {
-        "matchup_changes": matchup_changes[:8],
-        "favorite_flips": favorite_flips[:6],
-        "new_teams": sorted(current_teams - previous_teams),
-        "dropped_teams": sorted(previous_teams - current_teams),
-    }
+    return calculate_compare_bracket_payloads(current_bracket, previous_bracket)
 
 
 def build_recent_changes_markdown(
@@ -5767,168 +5519,28 @@ def confidence_bucket(value: float) -> str:
 
 
 def compute_backtest_summary(fixtures: Sequence[dict], teams: Dict[str, Team], top_scores: int) -> dict:
-    completed = []
-    for fixture in fixtures:
-        if fixture.get("projection_only"):
-            continue
-        if not fixture_has_final_result(fixture):
-            continue
-        completed.append(dict(fixture))
-    completed.sort(key=lambda item: (item.get("kickoff_utc") or "", str(item.get("id", ""))))
-
-    if not completed:
-        return asdict(
-            BacktestMetrics(
-                completed_matches=0,
-                regular_time_samples=0,
-                advancement_samples=0,
-                favorite_hit_rate=None,
-                top1_score_hit_rate=None,
-                top3_score_hit_rate=None,
-                brier_result=None,
-                logloss_result=None,
-                brier_advance=None,
-                logloss_advance=None,
-                market_logloss_result=None,
-                calibration_buckets=[],
-            )
-        )
-
-    states = copy_states(empty_persistent_payload(teams))
-    result_brier = []
-    result_logloss = []
-    market_result_logloss = []
-    advance_brier = []
-    advance_logloss = []
-    favorite_hits = 0
-    favorite_total = 0
-    top1_hits = 0
-    top3_hits = 0
-    regular_samples = 0
-    advance_samples = 0
-    calibration = {}
-    regular_predictions: List[Tuple[float, float, float]] = []
-    regular_outcomes: List[str] = []
-    regular_hits: List[int] = []
-
-    for fixture in completed:
-        try:
-            fixture = resolve_fixture_names(fixture, teams)
-        except SystemExit:
-            continue
-        ctx = context_from_fixture(fixture, teams, states)
-        stage = fixture_stage_name(fixture)
-        prediction = predict_match(
-            teams,
-            fixture["team_a"],
-            fixture["team_b"],
-            ctx,
-            top_scores=top_scores,
-            include_advancement=stage != "group",
-            show_factors=False,
-            state_a=normalize_team_state(states.get(fixture["team_a"], {})),
-            state_b=normalize_team_state(states.get(fixture["team_b"], {})),
-        )
-
-        actual_outcome = actual_regular_time_outcome(fixture)
-        if actual_outcome is not None:
-            probs = {"a": prediction.win_a, "draw": prediction.draw, "b": prediction.win_b}
-            regular_samples += 1
-            favorite_total += 1
-            predicted_outcome = max(probs.items(), key=lambda item: item[1])[0]
-            is_hit = 1 if predicted_outcome == actual_outcome else 0
-            if is_hit:
-                favorite_hits += 1
-            regular_hits.append(is_hit)
-            p_actual = max(probs[actual_outcome], 1e-12)
-            result_logloss.append(-math.log(p_actual))
-            result_brier.append(
-                ((probs["a"] - (1.0 if actual_outcome == "a" else 0.0)) ** 2
-                 + (probs["draw"] - (1.0 if actual_outcome == "draw" else 0.0)) ** 2
-                 + (probs["b"] - (1.0 if actual_outcome == "b" else 0.0)) ** 2) / 3.0
-            )
-            regular_predictions.append((probs["a"], probs["draw"], probs["b"]))
-            regular_outcomes.append(actual_outcome)
-            if fixture.get("market_prob_a") is not None and fixture.get("market_prob_draw") is not None and fixture.get("market_prob_b") is not None:
-                market_probs = {
-                    "a": float(fixture["market_prob_a"]),
-                    "draw": float(fixture["market_prob_draw"]),
-                    "b": float(fixture["market_prob_b"]),
-                }
-                market_result_logloss.append(-math.log(max(market_probs[actual_outcome], 1e-12)))
-
-            actual_score = f"{int(fixture['actual_score_a'])}-{int(fixture['actual_score_b'])}"
-            predicted_scores = [score for score, _ in prediction.exact_scores]
-            if predicted_scores:
-                if predicted_scores[0] == actual_score:
-                    top1_hits += 1
-                if actual_score in predicted_scores[:3]:
-                    top3_hits += 1
-
-            bucket = confidence_bucket(float(prediction.statistical_depth.get("confidence_index", 0.0))) if prediction.statistical_depth else "<50%"
-            bucket_state = calibration.setdefault(bucket, {"n": 0, "hit": 0, "avg_conf": 0.0})
-            bucket_state["n"] += 1
-            bucket_state["hit"] += 1 if predicted_outcome == actual_outcome else 0
-            bucket_state["avg_conf"] += float(prediction.statistical_depth.get("confidence_index", 0.0)) if prediction.statistical_depth else 0.0
-
-        actual_advance = actual_advancement_outcome(fixture, teams)
-        if actual_advance is not None and prediction.advance_a is not None and prediction.advance_b is not None:
-            probs = {"a": prediction.advance_a, "b": prediction.advance_b}
-            advance_samples += 1
-            p_actual = max(probs[actual_advance], 1e-12)
-            advance_logloss.append(-math.log(p_actual))
-            advance_brier.append(
-                ((probs["a"] - (1.0 if actual_advance == "a" else 0.0)) ** 2
-                 + (probs["b"] - (1.0 if actual_advance == "b" else 0.0)) ** 2) / 2.0
-            )
-
-        apply_state_updates(teams, states, fixture, ctx, prediction)
-
-    calibration_buckets = []
-    bucket_order = ["<50%", "50-59%", "60-69%", "70-79%", "80%+"]
-    for bucket in bucket_order:
-        payload = calibration.get(bucket)
-        if not payload:
-            continue
-        n = payload["n"]
-        calibration_buckets.append(
-            {
-                "bucket": bucket,
-                "matches": n,
-                "avg_confidence": payload["avg_conf"] / n,
-                "hit_rate": payload["hit"] / n,
-            }
-        )
-
-    brier_parts = brier_decomposition(regular_predictions, regular_outcomes) if regular_predictions else None
-    temporal_windows = summarize_temporal_windows(
-        result_logloss,
-        result_brier,
-        regular_hits,
-        fold_size=PARAMS.temporal_cv_fold_size,
+    return calculate_compute_backtest_summary(
+        fixtures,
+        teams,
+        top_scores,
+        BacktestMetricsCls=BacktestMetrics,
+        fixture_has_final_result=fixture_has_final_result,
+        copy_states=copy_states,
+        empty_persistent_payload=empty_persistent_payload,
+        resolve_fixture_names=resolve_fixture_names,
+        context_from_fixture=context_from_fixture,
+        fixture_stage_name=fixture_stage_name,
+        predict_match=predict_match,
+        normalize_team_state=normalize_team_state,
+        actual_regular_time_outcome=actual_regular_time_outcome,
+        actual_advancement_outcome=actual_advancement_outcome,
+        confidence_bucket=confidence_bucket,
+        apply_state_updates=apply_state_updates,
+        brier_decomposition=brier_decomposition,
+        summarize_temporal_windows=summarize_temporal_windows,
+        avg_or_none=avg_or_none,
+        temporal_cv_fold_size=PARAMS.temporal_cv_fold_size,
     )
-
-    metrics = BacktestMetrics(
-        completed_matches=len(completed),
-        regular_time_samples=regular_samples,
-        advancement_samples=advance_samples,
-        favorite_hit_rate=(favorite_hits / favorite_total) if favorite_total else None,
-        top1_score_hit_rate=(top1_hits / regular_samples) if regular_samples else None,
-        top3_score_hit_rate=(top3_hits / regular_samples) if regular_samples else None,
-        brier_result=avg_or_none(result_brier),
-        logloss_result=avg_or_none(result_logloss),
-        brier_advance=avg_or_none(advance_brier),
-        logloss_advance=avg_or_none(advance_logloss),
-        market_logloss_result=avg_or_none(market_result_logloss),
-        calibration_buckets=calibration_buckets,
-        brier_reliability=(brier_parts or {}).get("reliability"),
-        brier_resolution=(brier_parts or {}).get("resolution"),
-        brier_uncertainty=(brier_parts or {}).get("uncertainty"),
-        temporal_cv_logloss=temporal_windows.get("logloss"),
-        temporal_cv_brier=temporal_windows.get("brier"),
-        temporal_cv_accuracy=temporal_windows.get("accuracy"),
-    )
-    return asdict(metrics)
 
 
 def print_prediction(prediction: MatchPrediction, show_factors: bool = False) -> None:

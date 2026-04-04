@@ -19,6 +19,13 @@ from .tournament import (
     sort_standings,
     standings_entry,
 )
+from .playoffs import (
+    qualification_probabilities,
+    resolved_fifa_path_winners,
+    resolved_uefa_path_winners,
+    sample_playoff_placeholders,
+    sample_uefa_path_winner,
+)
 
 __all__ = [
     "FastRNG",
@@ -29,10 +36,15 @@ __all__ = [
     "penalty_shootout_summary",
     "poisson_sample_fast",
     "project_bracket_batch",
+    "qualification_probabilities",
     "resolve_r32_team",
+    "resolved_fifa_path_winners",
+    "resolved_uefa_path_winners",
     "run_knockout_round",
     "sample_cards",
     "sample_knockout_resolution",
+    "sample_playoff_placeholders",
+    "sample_uefa_path_winner",
     "seed_fast_rng",
     "simulate_group_stage",
     "simulate_match_sample",

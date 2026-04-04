@@ -1,0 +1,40 @@
+from __future__ import annotations
+
+
+def profile_for(
+    team,
+    *,
+    TeamProfileCls,
+    fifa_points_value_fn,
+    fifa_rank_value_fn,
+    fifa_strength_index_fn,
+    resource_index_fn,
+    heritage_index_fn,
+    world_cup_titles,
+    trajectory_index_fn,
+    coach_index_fn,
+    chemistry_index_fn,
+    morale_base_fn,
+    tactical_flexibility_fn,
+    travel_resilience_fn,
+    tempo_proxy_fn,
+    aggregate_squad_fn,
+    historical_snapshot_fn,
+):
+    return TeamProfileCls(
+        fifa_points=fifa_points_value_fn(team),
+        fifa_rank=fifa_rank_value_fn(team),
+        fifa_strength_index=fifa_strength_index_fn(team),
+        resource_index=resource_index_fn(team),
+        heritage_index=heritage_index_fn(team),
+        world_cup_titles=world_cup_titles.get(team.name, 0),
+        trajectory_index=trajectory_index_fn(team),
+        coach_index=coach_index_fn(team),
+        chemistry_index=chemistry_index_fn(team),
+        morale_base=morale_base_fn(team),
+        tactical_flexibility=tactical_flexibility_fn(team),
+        travel_resilience=travel_resilience_fn(team),
+        tempo=tempo_proxy_fn(team),
+        squad=aggregate_squad_fn(team),
+        history=historical_snapshot_fn(team),
+    )
