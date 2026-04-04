@@ -1,3 +1,16 @@
+from .historical import (
+    estimated_fifa_points,
+    fifa_points_are_proxy,
+    fifa_points_bounds,
+    fifa_points_value,
+    fifa_rank_value,
+    fifa_reference_table,
+    fifa_strength_index,
+    historical_features_payload,
+    historical_snapshot,
+    proxy_historical_snapshot,
+)
+from .loader import load_players, load_teams, load_tournament_config, read_fixtures
 from .state import (
     TeamState,
     coerce_team_state,
@@ -13,7 +26,21 @@ __all__ = [
     "coerce_team_state",
     "copy_states",
     "default_team_state",
+    "estimated_fifa_points",
+    "fifa_points_are_proxy",
+    "fifa_points_bounds",
+    "fifa_points_value",
+    "fifa_rank_value",
+    "fifa_reference_table",
+    "fifa_strength_index",
+    "historical_features_payload",
+    "historical_snapshot",
     "initial_team_states",
+    "load_players",
+    "load_teams",
+    "load_tournament_config",
     "normalize_team_state",
+    "proxy_historical_snapshot",
+    "read_fixtures",
     "state_has_activity",
 ]

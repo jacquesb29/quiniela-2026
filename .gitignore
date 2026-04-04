@@ -1,0 +1,8 @@
+**/__pycache__/
+*.py[cod]
+*.tmp
+.DS_Store
+node_modules/
+.next/
+*.tsbuildinfo
+mundial_2026/logs/*.log

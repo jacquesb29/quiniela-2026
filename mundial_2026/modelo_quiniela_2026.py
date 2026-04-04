@@ -41,6 +41,24 @@ from worldcup2026.constants import (
     WORLD_CUP_TITLES,
 )
 from worldcup2026.dashboard.html_builder import render_dashboard_html
+from worldcup2026.data.historical import (
+    estimated_fifa_points as calculate_estimated_fifa_points,
+    fifa_points_are_proxy as calculate_fifa_points_are_proxy,
+    fifa_points_bounds as calculate_fifa_points_bounds,
+    fifa_points_value as calculate_fifa_points_value,
+    fifa_rank_value as calculate_fifa_rank_value,
+    fifa_reference_table as calculate_fifa_reference_table,
+    fifa_strength_index as calculate_fifa_strength_index,
+    historical_features_payload as calculate_historical_features_payload,
+    historical_snapshot as calculate_historical_snapshot,
+    proxy_historical_snapshot as calculate_proxy_historical_snapshot,
+)
+from worldcup2026.data.loader import (
+    load_players as calculate_load_players,
+    load_teams as calculate_load_teams,
+    load_tournament_config as calculate_load_tournament_config,
+    read_fixtures as calculate_read_fixtures,
+)
 from worldcup2026.data.state import (
     coerce_team_state as package_coerce_team_state,
     copy_states as package_copy_states,
@@ -57,6 +75,22 @@ from worldcup2026.distributions import (
 )
 from worldcup2026.logging_utils import log
 from worldcup2026.metrics import avg_or_none, brier_decomposition, summarize_temporal_windows
+from worldcup2026.live.adjustment import (
+    apply_live_pattern_adjustment as calculate_apply_live_pattern_adjustment,
+    live_game_state_adjustment as calculate_live_game_state_adjustment,
+    live_stats_adjustment as calculate_live_stats_adjustment,
+)
+from worldcup2026.live.patterns import (
+    derive_team_live_pattern as calculate_derive_team_live_pattern,
+    detect_live_play_patterns as calculate_detect_live_play_patterns,
+    format_pattern_signal as calculate_format_pattern_signal,
+    stat_share as calculate_stat_share,
+)
+from worldcup2026.live.tactical import (
+    live_signature_metrics as calculate_live_signature_metrics,
+    tactical_signature_from_metrics as calculate_tactical_signature_from_metrics,
+    update_tactical_signature_state as calculate_update_tactical_signature_state,
+)
 from worldcup2026.models.penalties import (
     penalties_probability as calculate_penalties_probability,
     penalty_conversion_probability as calculate_penalty_conversion_probability,
@@ -104,6 +138,10 @@ from worldcup2026.simulation.tournament import (
     simulate_tournament_iteration as calculate_simulate_tournament_iteration,
     sort_standings as calculate_sort_standings,
     standings_entry as calculate_standings_entry,
+)
+from worldcup2026.cli import (
+    build_parser as package_build_parser,
+    dispatch_command as package_dispatch_command,
 )
 from worldcup2026.profiles.indices import (
     chemistry_index as calculate_chemistry_index,
@@ -371,29 +409,15 @@ def live_game_state_adjustment(
     progress: float,
     phase: str,
 ) -> Tuple[float, float]:
-    diff = score_a - score_b
-    urgency = clamp(progress, 0.0, 1.0)
-    lead_suppression = 0.08 if phase == "extra_time" else 0.12
-    chase_boost = 0.12 if phase == "extra_time" else 0.18
-    total_late_boost = 0.04 if phase == "extra_time" else 0.08
-
-    mu_a = base_mu_a
-    mu_b = base_mu_b
-    if diff > 0:
-        lead = clamp(diff, 0, 3)
-        mu_a *= 1.0 - lead_suppression * urgency * lead
-        mu_b *= 1.0 + chase_boost * urgency * lead
-    elif diff < 0:
-        lead = clamp(-diff, 0, 3)
-        mu_b *= 1.0 - lead_suppression * urgency * lead
-        mu_a *= 1.0 + chase_boost * urgency * lead
-
-    if diff != 0:
-        total_push = 1.0 + total_late_boost * urgency * min(abs(diff), 2)
-        mu_a *= total_push
-        mu_b *= total_push
-
-    return clamp(mu_a, 0.01, 4.2), clamp(mu_b, 0.01, 4.2)
+    return calculate_live_game_state_adjustment(
+        base_mu_a,
+        base_mu_b,
+        score_a,
+        score_b,
+        progress,
+        phase,
+        clamp=clamp,
+    )
 
 
 def live_stats_adjustment(
@@ -404,80 +428,23 @@ def live_stats_adjustment(
     phase: str,
     live_stats: Optional[Dict[str, float]] = None,
 ) -> Tuple[float, float]:
-    if not live_stats:
-        return mu_a, mu_b
-
-    xg_a = float(live_stats.get("xg_a") or live_stats.get("xg_proxy_a") or 0.0)
-    xg_b = float(live_stats.get("xg_b") or live_stats.get("xg_proxy_b") or 0.0)
-    shots_a = float(live_stats.get("shots_a", 0.0))
-    shots_b = float(live_stats.get("shots_b", 0.0))
-    sot_a = float(live_stats.get("shots_on_target_a", 0.0))
-    sot_b = float(live_stats.get("shots_on_target_b", 0.0))
-    poss_a = float(live_stats.get("possession_a", 50.0))
-    poss_b = float(live_stats.get("possession_b", 50.0))
-    corners_a = float(live_stats.get("corners_a", 0.0))
-    corners_b = float(live_stats.get("corners_b", 0.0))
-    red_a = float(live_stats.get("red_cards_a", 0.0))
-    red_b = float(live_stats.get("red_cards_b", 0.0))
-
-    if (
-        xg_a <= 0.0
-        and xg_b <= 0.0
-        and shots_a <= 0.0
-        and shots_b <= 0.0
-        and sot_a <= 0.0
-        and sot_b <= 0.0
-        and corners_a <= 0.0
-        and corners_b <= 0.0
-        and red_a <= 0.0
-        and red_b <= 0.0
-    ):
-        return mu_a, mu_b
-
-    scale = 0.18 if phase == "extra_time" else 0.28
-    xg_diff = clamp(xg_a - xg_b, -2.0, 2.0)
-    sot_diff = clamp(sot_a - sot_b, -8.0, 8.0)
-    shots_diff = clamp(shots_a - shots_b, -15.0, 15.0)
-    poss_diff = clamp(poss_a - poss_b, -40.0, 40.0)
-    corners_diff = clamp(corners_a - corners_b, -10.0, 10.0)
-    red_advantage_for_a = clamp(red_b - red_a, -2.0, 2.0)
-
-    edge_signal = (
-        0.42 * xg_diff
-        + 0.06 * sot_diff
-        + 0.015 * shots_diff
-        + 0.004 * poss_diff
-        + 0.012 * corners_diff
-        + 0.48 * red_advantage_for_a
+    return calculate_live_stats_adjustment(
+        base_total_mu,
+        mu_a,
+        mu_b,
+        progress,
+        phase,
+        live_stats,
+        clamp=clamp,
     )
-    edge_signal *= 0.45 + 0.55 * clamp(progress, 0.0, 1.0)
-
-    adjustment_a = clamp(1.0 + scale * edge_signal, 0.62, 1.55)
-    adjustment_b = clamp(1.0 - scale * edge_signal, 0.62, 1.55)
-
-    live_total_xg = xg_a + xg_b
-    if live_total_xg <= 0.0:
-        live_total_xg = float(live_stats.get("xg_proxy_a", 0.0)) + float(live_stats.get("xg_proxy_b", 0.0))
-    expected_so_far = base_total_mu * clamp(progress, 0.15, 1.0)
-    intensity_signal = clamp(live_total_xg - expected_so_far, -1.2, 1.2)
-    tempo_adjustment = clamp(1.0 + (0.10 if phase == "extra_time" else 0.18) * intensity_signal, 0.72, 1.35)
-
-    mu_a *= adjustment_a * tempo_adjustment
-    mu_b *= adjustment_b * tempo_adjustment
-    return clamp(mu_a, 0.01, 4.2), clamp(mu_b, 0.01, 4.2)
 
 
 def stat_share(value: float, other: float, neutral: float = 0.5) -> float:
-    total = value + other
-    if total <= 0.0:
-        return neutral
-    return value / total
+    return calculate_stat_share(value, other, neutral)
 
 
 def format_pattern_signal(label: str, value: float, integer: bool = False, suffix: str = "") -> str:
-    if integer:
-        return f"{label} {int(round(value))}{suffix}"
-    return f"{label} {value:.2f}{suffix}"
+    return calculate_format_pattern_signal(label, value, integer, suffix)
 
 
 def derive_team_live_pattern(
@@ -487,116 +454,14 @@ def derive_team_live_pattern(
     score_for: int,
     score_against: int,
 ) -> Dict[str, object]:
-    other = "b" if side == "a" else "a"
-    shots = float(live_stats.get(f"shots_{side}", 0.0))
-    shots_opp = float(live_stats.get(f"shots_{other}", 0.0))
-    sot = float(live_stats.get(f"shots_on_target_{side}", 0.0))
-    sot_opp = float(live_stats.get(f"shots_on_target_{other}", 0.0))
-    poss = float(live_stats.get(f"possession_{side}", 50.0))
-    corners = float(live_stats.get(f"corners_{side}", 0.0))
-    corners_opp = float(live_stats.get(f"corners_{other}", 0.0))
-    fouls = float(live_stats.get(f"fouls_{side}", 0.0))
-    yellows = float(live_stats.get(f"yellow_cards_{side}", 0.0))
-    reds = float(live_stats.get(f"red_cards_{side}", 0.0))
-    reds_opp = float(live_stats.get(f"red_cards_{other}", 0.0))
-    xg = float(live_stats.get(f"xg_{side}", live_stats.get(f"xg_proxy_{side}", 0.0)))
-    xg_opp = float(live_stats.get(f"xg_{other}", live_stats.get(f"xg_proxy_{other}", 0.0)))
-
-    shot_share = stat_share(shots, shots_opp)
-    sot_share = stat_share(sot, sot_opp)
-    xg_share = stat_share(xg, xg_opp)
-    corner_share = stat_share(corners, corners_opp)
-    xg_per_shot = xg / max(shots, 1.0)
-    on_target_rate = sot / max(shots, 1.0)
-    score_diff = score_for - score_against
-
-    primary = "sin patron dominante claro"
-    secondary = "ritmo equilibrado"
-    attack_bias = 0.0
-    defense_bias = 0.0
-    tempo_bias = 0.0
-
-    if reds > reds_opp:
-        primary = "inferioridad numerica"
-        secondary = "resistencia y repliegue"
-        attack_bias = -0.18
-        defense_bias = -0.06
-        tempo_bias = -0.03
-    elif score_diff > 0 and poss <= 45.0 and shot_share <= 0.46:
-        primary = "bloque bajo y contra"
-        secondary = "protege la ventaja"
-        attack_bias = -0.03
-        defense_bias = 0.10
-        tempo_bias = -0.08
-    elif score_diff < 0 and shot_share >= 0.57 and corner_share >= 0.56:
-        primary = "asedio del empate"
-        secondary = "empuja la ultima linea"
-        attack_bias = 0.12
-        defense_bias = -0.01
-        tempo_bias = 0.10
-    elif poss >= 58.0 and shot_share >= 0.57 and (xg_share >= 0.56 or sot_share >= 0.56):
-        if progress >= 0.30 and corner_share >= 0.55:
-            primary = "dominio territorial"
-            secondary = "asedio sostenido"
-            attack_bias = 0.13
-            defense_bias = 0.05
-            tempo_bias = 0.07
-        else:
-            primary = "control con llegada"
-            secondary = "empuja al rival"
-            attack_bias = 0.09
-            defense_bias = 0.03
-            tempo_bias = 0.03
-    elif poss >= 58.0 and xg_share <= 0.48 and sot <= max(1.0, sot_opp):
-        primary = "control esteril"
-        secondary = "maneja la pelota pero llega poco"
-        attack_bias = -0.06
-        defense_bias = 0.02
-        tempo_bias = -0.05
-    elif poss <= 46.0 and (xg_per_shot >= 0.12 or xg_share >= 0.50) and sot_share >= 0.45:
-        primary = "transicion vertical"
-        secondary = "amenaza al espacio"
-        attack_bias = 0.09
-        defense_bias = 0.00
-        tempo_bias = 0.03
-    elif xg <= 0.15 and shots <= 3.0 and progress >= 0.30:
-        primary = "poca amenaza"
-        secondary = "le cuesta progresar"
-        attack_bias = -0.12
-        defense_bias = -0.01
-        tempo_bias = -0.04
-    elif fouls + yellows >= 8.0 and shots <= 5.0:
-        primary = "presion fisica"
-        secondary = "corta el ritmo"
-        attack_bias = -0.04
-        defense_bias = 0.03
-        tempo_bias = -0.06
-
-    signals = []
-    if abs(poss - 50.0) >= 6.0:
-        signals.append(format_pattern_signal("posesion", poss, suffix="%"))
-    if shots > 0.0:
-        signals.append(format_pattern_signal("tiros", shots, integer=True))
-    if sot > 0.0:
-        signals.append(format_pattern_signal("al arco", sot, integer=True))
-    if xg > 0.0:
-        signals.append(format_pattern_signal("xG live", xg))
-    if corners >= 3.0:
-        signals.append(format_pattern_signal("corners", corners, integer=True))
-    if reds > 0.0:
-        signals.append(format_pattern_signal("rojas", reds, integer=True))
-    if not signals:
-        signals.append("sin señales en vivo suficientes")
-
-    return {
-        "primary": primary,
-        "secondary": secondary,
-        "summary": f"{primary} | {secondary}",
-        "attack_bias": attack_bias,
-        "defense_bias": defense_bias,
-        "tempo_bias": tempo_bias,
-        "signals": signals[:4],
-    }
+    return calculate_derive_team_live_pattern(
+        side,
+        live_stats,
+        progress,
+        score_for,
+        score_against,
+        clamp=clamp,
+    )
 
 
 def detect_live_play_patterns(
@@ -606,64 +471,14 @@ def detect_live_play_patterns(
     score_a: int,
     score_b: int,
 ) -> Optional[Dict[str, object]]:
-    if not live_stats:
-        return None
-    total_signal = sum(
-        float(live_stats.get(key, 0.0))
-        for key in (
-            "shots_a",
-            "shots_b",
-            "shots_on_target_a",
-            "shots_on_target_b",
-            "corners_a",
-            "corners_b",
-            "red_cards_a",
-            "red_cards_b",
-            "yellow_cards_a",
-            "yellow_cards_b",
-        )
+    return calculate_detect_live_play_patterns(
+        live_stats,
+        progress,
+        phase,
+        score_a,
+        score_b,
+        clamp=clamp,
     )
-    total_xg = float(live_stats.get("xg_a", live_stats.get("xg_proxy_a", 0.0))) + float(
-        live_stats.get("xg_b", live_stats.get("xg_proxy_b", 0.0))
-    )
-    if total_signal <= 0.0 and total_xg <= 0.0:
-        return None
-
-    side_a = derive_team_live_pattern("a", live_stats, progress, score_a, score_b)
-    side_b = derive_team_live_pattern("b", live_stats, progress, score_b, score_a)
-
-    shots_total = float(live_stats.get("shots_a", 0.0)) + float(live_stats.get("shots_b", 0.0))
-    sot_total = float(live_stats.get("shots_on_target_a", 0.0)) + float(live_stats.get("shots_on_target_b", 0.0))
-    fouls_total = float(live_stats.get("fouls_a", 0.0)) + float(live_stats.get("fouls_b", 0.0))
-    yellows_total = float(live_stats.get("yellow_cards_a", 0.0)) + float(live_stats.get("yellow_cards_b", 0.0))
-    red_total = float(live_stats.get("red_cards_a", 0.0)) + float(live_stats.get("red_cards_b", 0.0))
-    poss_gap = abs(float(live_stats.get("possession_a", 50.0)) - float(live_stats.get("possession_b", 50.0)))
-
-    if red_total > 0.0 and shots_total >= 10.0:
-        tempo_label = "partido roto"
-        global_tempo_bias = 0.08
-    elif total_xg >= 1.6 or shots_total >= 18.0 or sot_total >= 7.0:
-        tempo_label = "ida y vuelta"
-        global_tempo_bias = 0.07
-    elif (fouls_total >= 22.0 or yellows_total >= 5.0) and total_xg <= 1.0:
-        tempo_label = "trabado y cortado"
-        global_tempo_bias = -0.08
-    elif poss_gap >= 14.0 and shots_total >= 8.0:
-        tempo_label = "control territorial"
-        global_tempo_bias = -0.01
-    elif phase == "extra_time":
-        tempo_label = "prorroga de desgaste"
-        global_tempo_bias = -0.03
-    else:
-        tempo_label = "ritmo equilibrado"
-        global_tempo_bias = 0.0
-
-    return {
-        "a": side_a,
-        "b": side_b,
-        "tempo_label": tempo_label,
-        "global_tempo_bias": global_tempo_bias,
-    }
 
 
 def apply_live_pattern_adjustment(
@@ -672,24 +487,7 @@ def apply_live_pattern_adjustment(
     patterns: Optional[Dict[str, object]],
     phase: str,
 ) -> Tuple[float, float]:
-    if not patterns:
-        return mu_a, mu_b
-
-    scale = 0.11 if phase == "extra_time" else 0.16
-    side_a = patterns.get("a", {})
-    side_b = patterns.get("b", {})
-    tempo_bias = float(patterns.get("global_tempo_bias", 0.0))
-    tempo_bias += 0.5 * (float(side_a.get("tempo_bias", 0.0)) + float(side_b.get("tempo_bias", 0.0)))
-
-    attack_factor_a = clamp(1.0 + scale * float(side_a.get("attack_bias", 0.0)), 0.86, 1.18)
-    attack_factor_b = clamp(1.0 + scale * float(side_b.get("attack_bias", 0.0)), 0.86, 1.18)
-    defense_factor_a = clamp(1.0 - scale * float(side_b.get("defense_bias", 0.0)), 0.84, 1.18)
-    defense_factor_b = clamp(1.0 - scale * float(side_a.get("defense_bias", 0.0)), 0.84, 1.18)
-    tempo_factor = clamp(1.0 + scale * tempo_bias, 0.88, 1.14)
-
-    mu_a *= attack_factor_a * defense_factor_a * tempo_factor
-    mu_b *= attack_factor_b * defense_factor_b * tempo_factor
-    return clamp(mu_a, 0.01, 4.2), clamp(mu_b, 0.01, 4.2)
+    return calculate_apply_live_pattern_adjustment(mu_a, mu_b, patterns, phase, clamp=clamp)
 
 
 def combine_current_score_distribution(
@@ -881,281 +679,97 @@ def poisson_sample(lmbda: float) -> int:
 
 
 def load_players(raw_players: Sequence[dict]) -> Tuple[Player, ...]:
-    players = []
-    for item in raw_players:
-        players.append(
-            Player(
-                name=item["name"],
-                position=item["position"],
-                quality=float(item["quality"]),
-                caps=float(item.get("caps", 0.0)),
-                minutes_share=float(item.get("minutes_share", 0.0)),
-                attack=float(item.get("attack", 0.0)),
-                creation=float(item.get("creation", 0.0)),
-                defense=float(item.get("defense", 0.0)),
-                goalkeeping=float(item.get("goalkeeping", 0.0)),
-                aerial=float(item.get("aerial", 0.0)),
-                discipline=float(item.get("discipline", 0.0)),
-                yellow_rate=float(item.get("yellow_rate", 0.0)),
-                red_rate=float(item.get("red_rate", 0.0)),
-                availability=float(item.get("availability", 0.0)),
-            )
-        )
-    return tuple(players)
+    return calculate_load_players(raw_players, PlayerCls=Player)
 
 
 @lru_cache(maxsize=1)
 def load_teams() -> Dict[str, Team]:
-    payload = json.loads(DATA_FILE.read_text())
-    teams = {}
-    for item in payload["teams"]:
-        teams[item["name"]] = Team(
-            name=item["name"],
-            confederation=item["confederation"],
-            status=item["status"],
-            elo=float(item["elo"]),
-            fifa_points=float(item["fifa_points"]) if item.get("fifa_points") is not None else None,
-            fifa_rank=int(item["fifa_rank"]) if item.get("fifa_rank") is not None else None,
-            host_country=item.get("host_country"),
-            resource_bias=float(item.get("resource_bias", 0.0)),
-            heritage_bias=float(item.get("heritage_bias", 0.0)),
-            coach_bias=float(item.get("coach_bias", 0.0)),
-            discipline_bias=float(item.get("discipline_bias", 0.0)),
-            chemistry_bias=float(item.get("chemistry_bias", 0.0)),
-            attack_bias=float(item.get("attack_bias", 0.0)),
-            defense_bias=float(item.get("defense_bias", 0.0)),
-            players=load_players(item.get("players", [])),
-        )
-    return teams
+    return calculate_load_teams(
+        str(DATA_FILE),
+        TeamCls=Team,
+        load_players_fn=load_players,
+    )
 
 
 def centered(value: float) -> float:
     return value - 0.5
 
 
-FIFA_CONFEDERATION_ADJUST = {
-    "UEFA": 16.0,
-    "CONMEBOL": 18.0,
-    "CAF": -6.0,
-    "AFC": -8.0,
-    "CONCACAF": -10.0,
-    "OFC": -28.0,
-}
-
-
 @lru_cache(maxsize=None)
 def estimated_fifa_points(team: Team) -> float:
-    value = 1050.0 + 0.82 * (team.elo - 1200.0)
-    value += 92.0 * centered(heritage_index(team))
-    value += 58.0 * centered(resource_index(team))
-    value += 34.0 * centered(trajectory_index(team))
-    value += 26.0 * centered(coach_index(team))
-    value += FIFA_CONFEDERATION_ADJUST.get(team.confederation, 0.0)
-    if team.is_host:
-        value += 8.0
-    return clamp(value, 820.0, 2250.0)
+    return calculate_estimated_fifa_points(
+        team,
+        heritage_index=heritage_index,
+        resource_index=resource_index,
+        trajectory_index=trajectory_index,
+        coach_index=coach_index,
+        centered=centered,
+        clamp=clamp,
+    )
 
 
 @lru_cache(maxsize=1)
 def fifa_reference_table() -> Dict[str, Tuple[float, int, bool]]:
-    teams = load_teams()
-    rows = []
-    for team in teams.values():
-        points = float(team.fifa_points) if team.fifa_points is not None else estimated_fifa_points(team)
-        rows.append((team.name, points, team.fifa_rank, team.fifa_points is None))
-
-    rows.sort(key=lambda item: (-item[1], item[0]))
-    table: Dict[str, Tuple[float, int, bool]] = {}
-    for derived_rank, (name, points, explicit_rank, is_proxy) in enumerate(rows, start=1):
-        rank = int(explicit_rank) if explicit_rank is not None else derived_rank
-        table[name] = (points, rank, is_proxy)
-    return table
+    return calculate_fifa_reference_table(
+        load_teams_fn=load_teams,
+        estimated_fifa_points_fn=estimated_fifa_points,
+    )
 
 
 @lru_cache(maxsize=None)
 def fifa_points_value(team: Team) -> float:
-    return fifa_reference_table()[team.name][0]
+    return calculate_fifa_points_value(team, reference_table_fn=fifa_reference_table)
 
 
 @lru_cache(maxsize=None)
 def fifa_rank_value(team: Team) -> int:
-    return fifa_reference_table()[team.name][1]
+    return calculate_fifa_rank_value(team, reference_table_fn=fifa_reference_table)
 
 
 @lru_cache(maxsize=None)
 def fifa_points_are_proxy(team: Team) -> bool:
-    return fifa_reference_table()[team.name][2]
+    return calculate_fifa_points_are_proxy(team, reference_table_fn=fifa_reference_table)
 
 
 @lru_cache(maxsize=1)
 def fifa_points_bounds() -> Tuple[float, float]:
-    values = [points for points, _, _ in fifa_reference_table().values()]
-    return (min(values), max(values))
+    return calculate_fifa_points_bounds(reference_table_fn=fifa_reference_table)
 
 
 @lru_cache(maxsize=None)
 def fifa_strength_index(team: Team) -> float:
-    low, high = fifa_points_bounds()
-    if high <= low:
-        return 0.5
-    return clamp((fifa_points_value(team) - low) / (high - low), 0.0, 1.0)
-
-
-HISTORICAL_TEAM_NAME_ALIASES = {
-    "Curacao": "Curaçao",
-    "Dem. Rep. of Congo": "DR Congo",
-}
+    return calculate_fifa_strength_index(
+        team,
+        points_bounds_fn=fifa_points_bounds,
+        points_value_fn=fifa_points_value,
+        clamp=clamp,
+    )
 
 
 @lru_cache(maxsize=1)
 def historical_features_payload() -> dict:
-    if not HISTORICAL_FEATURES_FILE.exists():
-        return {"meta": {"missing": True}, "teams": {}}
-    try:
-        return json.loads(HISTORICAL_FEATURES_FILE.read_text())
-    except json.JSONDecodeError:
-        return {"meta": {"invalid": True}, "teams": {}}
+    return calculate_historical_features_payload(str(HISTORICAL_FEATURES_FILE))
 
 
 def proxy_historical_snapshot(team: Team) -> HistoricalSnapshot:
-    strength = clamp(0.50 + (team.elo - 1650.0) / 600.0, 0.08, 0.95)
-    attack = clamp(strength + 0.10 * team.attack_bias, 0.05, 0.98)
-    defense = clamp(strength + 0.10 * team.defense_bias, 0.05, 0.98)
-    competitive = clamp(0.42 + (team.elo - 1650.0) / 720.0, 0.08, 0.95)
-    world_cup = clamp(0.26 + 0.10 * WORLD_CUP_TITLES.get(team.name, 0), 0.05, 0.98)
-    shootout = clamp(0.46 + 0.06 * COACH_OVERRIDES.get(team.name, 0.0), 0.05, 0.95)
-    return HistoricalSnapshot(
-        source_names=(HISTORICAL_TEAM_NAME_ALIASES.get(team.name, team.name),),
-        matches_since_1990=0,
-        weighted_matches_since_1990=0.0,
-        points_per_match=1.25,
-        weighted_points_per_match=1.25,
-        goals_for_per_match=1.2,
-        goals_against_per_match=1.2,
-        goal_diff_per_match=0.0,
-        weighted_goals_for_per_match=1.2,
-        weighted_goals_against_per_match=1.2,
-        weighted_goal_diff_per_match=0.0,
-        scoring_rate=0.62,
-        clean_sheet_rate=0.26,
-        competitive_matches_since_1990=0,
-        competitive_points_per_match=1.25,
-        competitive_goal_diff_per_match=0.0,
-        world_cup_matches_since_1990=0,
-        world_cup_points_per_match=0.0,
-        world_cup_goal_diff_per_match=0.0,
-        shootout_matches_since_1990=0,
-        shootout_win_rate=0.5,
-        strength_index=strength,
-        attack_index=attack,
-        defense_index=defense,
-        competitive_index=competitive,
-        world_cup_index=world_cup,
-        shootout_index=shootout,
+    return calculate_proxy_historical_snapshot(
+        team,
+        HistoricalSnapshotCls=HistoricalSnapshot,
+        clamp=clamp,
+        world_cup_titles=WORLD_CUP_TITLES,
+        coach_overrides=COACH_OVERRIDES,
     )
 
 
 @lru_cache(maxsize=None)
 def historical_snapshot(team: Team) -> HistoricalSnapshot:
-    payload = historical_features_payload()
-    row = payload.get("teams", {}).get(team.name)
-    if not row:
-        return proxy_historical_snapshot(team)
-    proxy = proxy_historical_snapshot(team)
-    weighted_matches = float(row.get("weighted_matches_since_1990", 0.0))
-    matches_since_1990 = int(row.get("matches_since_1990", 0))
-    competitive_matches = int(row.get("competitive_matches_since_1990", 0))
-    world_cup_matches = int(row.get("world_cup_matches_since_1990", 0))
-    shootout_matches = int(row.get("shootout_matches_since_1990", 0))
-
-    strength_index = clamp(
-        empirical_bayes_shrinkage(
-            float(row.get("strength_index", proxy.strength_index)),
-            weighted_matches or matches_since_1990,
-            proxy.strength_index,
-            18.0,
-        ),
-        0.0,
-        1.0,
-    )
-    attack_index = clamp(
-        empirical_bayes_shrinkage(
-            float(row.get("attack_index", proxy.attack_index)),
-            weighted_matches or matches_since_1990,
-            proxy.attack_index,
-            18.0,
-        ),
-        0.0,
-        1.0,
-    )
-    defense_index = clamp(
-        empirical_bayes_shrinkage(
-            float(row.get("defense_index", proxy.defense_index)),
-            weighted_matches or matches_since_1990,
-            proxy.defense_index,
-            18.0,
-        ),
-        0.0,
-        1.0,
-    )
-    competitive_index = clamp(
-        empirical_bayes_shrinkage(
-            float(row.get("competitive_index", proxy.competitive_index)),
-            competitive_matches,
-            proxy.competitive_index,
-            12.0,
-        ),
-        0.0,
-        1.0,
-    )
-    world_cup_index = clamp(
-        empirical_bayes_shrinkage(
-            float(row.get("world_cup_index", proxy.world_cup_index)),
-            world_cup_matches,
-            proxy.world_cup_index,
-            6.0,
-        ),
-        0.0,
-        1.0,
-    )
-    shootout_index = clamp(
-        empirical_bayes_shrinkage(
-            float(row.get("shootout_index", proxy.shootout_index)),
-            shootout_matches,
-            proxy.shootout_index,
-            5.0,
-        ),
-        0.0,
-        1.0,
-    )
-    return HistoricalSnapshot(
-        source_names=tuple(row.get("source_names") or [HISTORICAL_TEAM_NAME_ALIASES.get(team.name, team.name)]),
-        matches_since_1990=matches_since_1990,
-        weighted_matches_since_1990=weighted_matches,
-        points_per_match=float(row.get("points_per_match", proxy.points_per_match)),
-        weighted_points_per_match=float(row.get("weighted_points_per_match", proxy.weighted_points_per_match)),
-        goals_for_per_match=float(row.get("goals_for_per_match", 1.2)),
-        goals_against_per_match=float(row.get("goals_against_per_match", 1.2)),
-        goal_diff_per_match=float(row.get("goal_diff_per_match", 0.0)),
-        weighted_goals_for_per_match=float(row.get("weighted_goals_for_per_match", 1.2)),
-        weighted_goals_against_per_match=float(row.get("weighted_goals_against_per_match", 1.2)),
-        weighted_goal_diff_per_match=float(row.get("weighted_goal_diff_per_match", 0.0)),
-        scoring_rate=float(row.get("scoring_rate", 0.62)),
-        clean_sheet_rate=float(row.get("clean_sheet_rate", 0.26)),
-        competitive_matches_since_1990=competitive_matches,
-        competitive_points_per_match=float(row.get("competitive_points_per_match", proxy.competitive_points_per_match)),
-        competitive_goal_diff_per_match=float(row.get("competitive_goal_diff_per_match", 0.0)),
-        world_cup_matches_since_1990=world_cup_matches,
-        world_cup_points_per_match=float(row.get("world_cup_points_per_match", proxy.world_cup_points_per_match)),
-        world_cup_goal_diff_per_match=float(row.get("world_cup_goal_diff_per_match", 0.0)),
-        shootout_matches_since_1990=shootout_matches,
-        shootout_win_rate=float(row.get("shootout_win_rate", proxy.shootout_win_rate)),
-        strength_index=strength_index,
-        attack_index=attack_index,
-        defense_index=defense_index,
-        competitive_index=competitive_index,
-        world_cup_index=world_cup_index,
-        shootout_index=shootout_index,
+    return calculate_historical_snapshot(
+        team,
+        payload_fn=historical_features_payload,
+        proxy_snapshot_fn=proxy_historical_snapshot,
+        HistoricalSnapshotCls=HistoricalSnapshot,
+        empirical_bayes_shrinkage=empirical_bayes_shrinkage,
+        clamp=clamp,
     )
 
 
@@ -2664,7 +2278,7 @@ def simulate_playoffs(teams: Dict[str, Team], iterations: int) -> Dict[str, floa
 
 
 def load_tournament_config(path: Path) -> dict:
-    return json.loads(path.read_text())
+    return calculate_load_tournament_config(path)
 
 
 def sample_uefa_path_winner(
@@ -5801,7 +5415,7 @@ def command_project_dashboard(args: argparse.Namespace, teams: Dict[str, Team]) 
 
 
 def read_fixtures(path: Path) -> List[dict]:
-    return json.loads(path.read_text())
+    return calculate_read_fixtures(path)
 
 
 def iso_timestamp() -> str:
@@ -5940,85 +5554,24 @@ def tactical_signature_from_metrics(
     style_defense_bias: float,
     sample_matches: int,
 ) -> str:
-    if sample_matches <= 0:
-        return "sin muestra suficiente"
-    if style_possession >= 0.22 and style_pressure >= 0.14 and style_chance_quality >= -0.02:
-        return "control territorial"
-    if style_possession >= 0.22 and style_chance_quality < -0.08:
-        return "control esteril"
-    if style_possession <= -0.12 and style_verticality >= 0.12 and style_chance_quality >= 0.0:
-        return "transicion vertical"
-    if style_possession <= -0.18 and style_defense_bias >= 0.08 and style_attack_bias >= -0.02:
-        return "bloque bajo y contra"
-    if style_tempo >= 0.18 and style_pressure >= 0.05:
-        return "ritmo alto"
-    if abs(style_possession) < 0.12 and abs(style_verticality) < 0.12 and abs(style_pressure) < 0.12:
-        return "perfil mixto equilibrado"
-    return "perfil mixto"
+    return calculate_tactical_signature_from_metrics(
+        style_possession,
+        style_verticality,
+        style_pressure,
+        style_chance_quality,
+        style_tempo,
+        style_attack_bias,
+        style_defense_bias,
+        sample_matches,
+    )
 
 
 def live_signature_metrics(side: str, live_stats: Dict[str, float]) -> Optional[Dict[str, float]]:
-    other = "b" if side == "a" else "a"
-    shots = float(live_stats.get(f"shots_{side}", 0.0))
-    shots_opp = float(live_stats.get(f"shots_{other}", 0.0))
-    sot = float(live_stats.get(f"shots_on_target_{side}", 0.0))
-    sot_opp = float(live_stats.get(f"shots_on_target_{other}", 0.0))
-    poss = float(live_stats.get(f"possession_{side}", 50.0))
-    corners = float(live_stats.get(f"corners_{side}", 0.0))
-    corners_opp = float(live_stats.get(f"corners_{other}", 0.0))
-    fouls = float(live_stats.get(f"fouls_{side}", 0.0))
-    fouls_opp = float(live_stats.get(f"fouls_{other}", 0.0))
-    yellows = float(live_stats.get(f"yellow_cards_{side}", 0.0))
-    reds = float(live_stats.get(f"red_cards_{side}", 0.0))
-    reds_opp = float(live_stats.get(f"red_cards_{other}", 0.0))
-    xg = float(live_stats.get(f"xg_{side}", live_stats.get(f"xg_proxy_{side}", 0.0)))
-    xg_opp = float(live_stats.get(f"xg_{other}", live_stats.get(f"xg_proxy_{other}", 0.0)))
-
-    total_signal = shots + shots_opp + sot + sot_opp + corners + corners_opp + xg + xg_opp + fouls + fouls_opp + yellows
-    if total_signal <= 0.0:
-        return None
-
-    poss_norm = clamp((poss - 50.0) / 25.0, -1.0, 1.0)
-    shot_share = clamp((stat_share(shots, shots_opp) - 0.5) * 2.0, -1.0, 1.0)
-    sot_share = clamp((stat_share(sot, sot_opp) - 0.5) * 2.0, -1.0, 1.0)
-    corner_share = clamp((stat_share(corners, corners_opp) - 0.5) * 2.0, -1.0, 1.0)
-    xg_per_shot = xg / max(shots, 1.0)
-    chance_quality = clamp((xg_per_shot - 0.11) / 0.09, -1.0, 1.0)
-    verticality = clamp(0.48 * (-poss_norm) + 0.32 * chance_quality + 0.20 * shot_share, -1.0, 1.0)
-    pressure = clamp(0.45 * shot_share + 0.30 * corner_share + 0.25 * sot_share, -1.0, 1.0)
-    match_intensity = clamp(((shots + shots_opp) + 0.8 * (corners + corners_opp) + 3.0 * (xg + xg_opp)) / 24.0 - 1.0, -1.0, 1.0)
-    tempo = clamp(match_intensity + 0.20 * pressure - 0.10 * clamp((fouls + fouls_opp) / 24.0, 0.0, 1.0), -1.0, 1.0)
-    attack_bias = clamp(0.40 * pressure + 0.35 * chance_quality + 0.25 * verticality, -1.0, 1.0)
-    card_swing = 1.0 if reds_opp > reds else -1.0 if reds > reds_opp else 0.0
-    defense_bias = clamp(0.35 * poss_norm + 0.35 * pressure - 0.18 * tempo + 0.18 * card_swing, -1.0, 1.0)
-    return {
-        "style_possession": poss_norm,
-        "style_verticality": verticality,
-        "style_pressure": pressure,
-        "style_chance_quality": chance_quality,
-        "style_tempo": tempo,
-        "style_attack_bias": attack_bias,
-        "style_defense_bias": defense_bias,
-    }
+    return calculate_live_signature_metrics(side, live_stats, clamp=clamp)
 
 
 def update_tactical_signature_state(state: dict, metrics: Optional[Dict[str, float]]) -> None:
-    if not metrics:
-        return
-    alpha = 0.28
-    for key, value in metrics.items():
-        state[key] = clamp((1.0 - alpha) * float(state.get(key, 0.0)) + alpha * float(value), -1.0, 1.0)
-    state["tactical_sample_matches"] = int(state.get("tactical_sample_matches", 0)) + 1
-    state["tactical_signature"] = tactical_signature_from_metrics(
-        float(state.get("style_possession", 0.0)),
-        float(state.get("style_verticality", 0.0)),
-        float(state.get("style_pressure", 0.0)),
-        float(state.get("style_chance_quality", 0.0)),
-        float(state.get("style_tempo", 0.0)),
-        float(state.get("style_attack_bias", 0.0)),
-        float(state.get("style_defense_bias", 0.0)),
-        int(state.get("tactical_sample_matches", 0)),
-    )
+    calculate_update_tactical_signature_state(state, metrics, clamp=clamp)
 
 
 def fixture_stage_name(fixture: dict) -> str:
@@ -6825,190 +6378,39 @@ def command_list_teams(teams: Dict[str, Team]) -> None:
 
 
 def build_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(
-        description="Modelo probabilistico para quinielas del Mundial 2026."
+    return package_build_parser(
+        state_file=str(STATE_FILE),
+        tournament_config_file=str(TOURNAMENT_CONFIG_FILE),
+        bracket_file=str(BRACKET_FILE),
+        bracket_json_file=str(BRACKET_JSON_FILE),
+        dashboard_html_file=str(DASHBOARD_HTML_FILE),
+        dashboard_md_file=str(DASHBOARD_MD_FILE),
+        fixtures_template_file=str(Path(__file__).with_name("fixtures_template.json")),
     )
-    subparsers = parser.add_subparsers(dest="command", required=True)
-
-    predict = subparsers.add_parser("predict", help="Predice un partido puntual.")
-    predict.add_argument("team_a")
-    predict.add_argument("team_b")
-    predict.add_argument("--neutral", action="store_true", default=False)
-    predict.add_argument("--home-team", default=None)
-    predict.add_argument("--venue-country", default=None)
-    predict.add_argument("--rest-a", type=int, default=None)
-    predict.add_argument("--rest-b", type=int, default=None)
-    predict.add_argument("--injuries-a", type=float, default=None)
-    predict.add_argument("--injuries-b", type=float, default=None)
-    predict.add_argument("--altitude", type=int, default=None)
-    predict.add_argument("--travel-a", type=float, default=None)
-    predict.add_argument("--travel-b", type=float, default=None)
-    predict.add_argument("--knockout", action="store_true")
-    predict.add_argument(
-        "--stage",
-        default=None,
-        help="Etapa real del partido. Acepta group, round32, round16, round8, round4, semifinal, final, third_place.",
-    )
-    predict.add_argument("--morale-a", type=float, default=None)
-    predict.add_argument("--morale-b", type=float, default=None)
-    predict.add_argument("--yellow-cards-a", type=int, default=None)
-    predict.add_argument("--yellow-cards-b", type=int, default=None)
-    predict.add_argument("--red-suspensions-a", type=int, default=None)
-    predict.add_argument("--red-suspensions-b", type=int, default=None)
-    predict.add_argument("--group", default=None)
-    predict.add_argument("--group-points-a", type=int, default=None)
-    predict.add_argument("--group-points-b", type=int, default=None)
-    predict.add_argument("--group-goal-diff-a", type=int, default=None)
-    predict.add_argument("--group-goal-diff-b", type=int, default=None)
-    predict.add_argument("--group-matches-played-a", type=int, default=None)
-    predict.add_argument("--group-matches-played-b", type=int, default=None)
-    predict.add_argument("--weather-stress", type=float, default=None)
-    predict.add_argument("--importance", type=float, default=None)
-    predict.add_argument("--top-scores", type=int, default=6)
-    predict.add_argument("--show-factors", action="store_true")
-    predict.add_argument("--monte-carlo", type=int, default=0)
-    predict.add_argument("--seed", type=int, default=None)
-    predict.add_argument("--state-file", default=str(STATE_FILE))
-    predict.add_argument("--ignore-state", action="store_true")
-
-    power_table = subparsers.add_parser(
-        "power-table", help="Tabla base de fuerza y gol esperado vs rival promedio."
-    )
-    power_table.add_argument("--only-confirmed", action="store_true")
-
-    playoffs = subparsers.add_parser(
-        "playoffs", help="Probabilidades de clasificar desde repechajes."
-    )
-    playoffs.add_argument("--iterations", type=int, default=10000)
-
-    fixtures = subparsers.add_parser(
-        "fixtures", help="Lee un JSON de partidos y genera predicciones."
-    )
-    fixtures.add_argument("path")
-    fixtures.add_argument("--top-scores", type=int, default=5)
-    fixtures.add_argument("--show-factors", action="store_true")
-    fixtures.add_argument("--state-file", default=str(STATE_FILE))
-    fixtures.add_argument("--reset-state", action="store_true")
-    fixtures.add_argument("--no-save-state", action="store_true")
-
-    simulate = subparsers.add_parser(
-        "simulate-tournament",
-        help="Simula el Mundial completo con Monte Carlo a partir de un cuadro en JSON.",
-    )
-    simulate.add_argument(
-        "--config",
-        default=str(TOURNAMENT_CONFIG_FILE),
-        help="Ruta al JSON del cuadro del torneo.",
-    )
-    simulate.add_argument("--iterations", type=int, default=5000)
-    simulate.add_argument("--top", type=int, default=20)
-    simulate.add_argument("--full", action="store_true")
-    simulate.add_argument("--seed", type=int, default=None)
-    simulate.add_argument("--workers", type=int, default=0, help="Procesos para Monte Carlo. 0 = auto.")
-    simulate.add_argument("--progress-every", type=int, default=0)
-    simulate.add_argument("--state-file", default=str(STATE_FILE))
-    simulate.add_argument("--ignore-state", action="store_true")
-
-    project = subparsers.add_parser(
-        "project-bracket",
-        help="Genera una llave proyectada actual en Markdown usando Monte Carlo.",
-    )
-    project.add_argument(
-        "--config",
-        default=str(TOURNAMENT_CONFIG_FILE),
-        help="Ruta al JSON del cuadro del torneo.",
-    )
-    project.add_argument("--iterations", type=int, default=15000)
-    project.add_argument("--seed", type=int, default=None)
-    project.add_argument("--workers", type=int, default=0, help="Procesos para Monte Carlo. 0 = auto.")
-    project.add_argument("--progress-every", type=int, default=0)
-    project.add_argument("--output", default=str(BRACKET_FILE))
-    project.add_argument("--json-output", default=str(BRACKET_JSON_FILE))
-    project.add_argument("--state-file", default=str(STATE_FILE))
-    project.add_argument("--ignore-state", action="store_true")
-
-    dashboard = subparsers.add_parser(
-        "project-dashboard",
-        help="Genera un reporte actual con llave y probabilidades por partido.",
-    )
-    dashboard.add_argument("--fixtures", default=str(Path(__file__).with_name("fixtures_template.json")))
-    dashboard.add_argument("--bracket-file", default=str(BRACKET_FILE))
-    dashboard.add_argument("--bracket-json-file", default=str(BRACKET_JSON_FILE))
-    dashboard.add_argument("--output-html", default=str(DASHBOARD_HTML_FILE))
-    dashboard.add_argument("--output-md", default=str(DASHBOARD_MD_FILE))
-    dashboard.add_argument("--top-scores", type=int, default=5)
-    dashboard.add_argument("--state-file", default=str(STATE_FILE))
-
-    score_prob = subparsers.add_parser(
-        "score-prob",
-        help="Da la probabilidad exacta de un marcador especifico.",
-    )
-    score_prob.add_argument("team_a")
-    score_prob.add_argument("team_b")
-    score_prob.add_argument("goals_a", type=int)
-    score_prob.add_argument("goals_b", type=int)
-    score_prob.add_argument("--neutral", action="store_true", default=False)
-    score_prob.add_argument("--home-team", default=None)
-    score_prob.add_argument("--venue-country", default=None)
-    score_prob.add_argument("--knockout", action="store_true")
-    score_prob.add_argument("--stage", default=None)
-    score_prob.add_argument("--group", default=None)
-    score_prob.add_argument("--state-file", default=str(STATE_FILE))
-    score_prob.add_argument("--ignore-state", action="store_true")
-
-    profile_parser = subparsers.add_parser(
-        "team-profile", help="Muestra todas las variables internas de una seleccion."
-    )
-    profile_parser.add_argument("team")
-
-    state_show = subparsers.add_parser(
-        "state-show", help="Muestra el estado persistente que se actualiza automaticamente."
-    )
-    state_show.add_argument("--team", default=None)
-    state_show.add_argument("--state-file", default=str(STATE_FILE))
-    state_show.add_argument("--full", action="store_true")
-
-    state_reset = subparsers.add_parser(
-        "state-reset", help="Reinicia el archivo de estado persistente del torneo."
-    )
-    state_reset.add_argument("--state-file", default=str(STATE_FILE))
-
-    subparsers.add_parser("list-teams", help="Lista las selecciones cargadas.")
-    return parser
 
 
 def main() -> None:
     parser = build_parser()
     args = parser.parse_args()
     teams = load_teams()
-
-    if args.command == "predict":
-        command_predict(args, teams)
-    elif args.command == "score-prob":
-        command_score_prob(args, teams)
-    elif args.command == "power-table":
-        command_power_table(args, teams)
-    elif args.command == "playoffs":
-        command_playoffs(args, teams)
-    elif args.command == "fixtures":
-        command_fixtures(args, teams)
-    elif args.command == "simulate-tournament":
-        command_simulate_tournament(args, teams)
-    elif args.command == "project-bracket":
-        command_project_bracket(args, teams)
-    elif args.command == "project-dashboard":
-        command_project_dashboard(args, teams)
-    elif args.command == "state-show":
-        command_state_show(args, teams)
-    elif args.command == "state-reset":
-        command_state_reset(args, teams)
-    elif args.command == "list-teams":
-        command_list_teams(teams)
-    elif args.command == "team-profile":
-        team_name = resolve_team_name(args.team, teams)
-        print_team_profile(teams[team_name])
-    else:
-        parser.error("Comando no soportado.")
+    package_dispatch_command(
+        args,
+        teams,
+        parser=parser,
+        command_predict=command_predict,
+        command_score_prob=command_score_prob,
+        command_power_table=command_power_table,
+        command_playoffs=command_playoffs,
+        command_fixtures=command_fixtures,
+        command_simulate_tournament=command_simulate_tournament,
+        command_project_bracket=command_project_bracket,
+        command_project_dashboard=command_project_dashboard,
+        command_state_show=command_state_show,
+        command_state_reset=command_state_reset,
+        command_list_teams=command_list_teams,
+        print_team_profile=print_team_profile,
+        resolve_team_name=resolve_team_name,
+    )
 
 
 if __name__ == "__main__":
