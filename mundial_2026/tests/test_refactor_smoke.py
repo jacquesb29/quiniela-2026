@@ -13,6 +13,7 @@ from worldcup2026.cli import build_parser
 from worldcup2026.live.adjustment import live_game_state_adjustment
 from worldcup2026.live.patterns import detect_live_play_patterns
 from worldcup2026.data.loader import load_tournament_config, read_fixtures
+import modelo_quiniela_2026 as app
 
 
 class RefactorSmokeTest(unittest.TestCase):
@@ -67,6 +68,153 @@ class RefactorSmokeTest(unittest.TestCase):
             fixtures_path.write_text('[{"team_a": "Spain", "team_b": "Uruguay"}]')
             self.assertIn("groups", load_tournament_config(config_path))
             self.assertEqual(read_fixtures(fixtures_path)[0]["team_a"], "Spain")
+
+    def test_bracket_visual_keeps_branch_coherent(self):
+        payload = {
+            "iterations": 100,
+            "matches": {
+                "M81": {
+                    "match_id": "M81",
+                    "title": "Dieciseisavos 9",
+                    "stage": "round32",
+                    "team_a": "Turkey",
+                    "team_b": "Bosnia and Herzegovina",
+                    "winner": "Turkey",
+                    "matchup_prob": 0.14,
+                    "winner_prob": 0.43,
+                    "top_scenarios": [],
+                    "matchup_scenarios": [],
+                },
+                "M82": {
+                    "match_id": "M82",
+                    "title": "Dieciseisavos 10",
+                    "stage": "round32",
+                    "team_a": "Belgium",
+                    "team_b": "Czech Republic",
+                    "winner": "Belgium",
+                    "matchup_prob": 0.15,
+                    "winner_prob": 0.58,
+                    "top_scenarios": [],
+                    "matchup_scenarios": [],
+                },
+                "M83": {
+                    "match_id": "M83",
+                    "title": "Dieciseisavos 11",
+                    "stage": "round32",
+                    "team_a": "Croatia",
+                    "team_b": "Colombia",
+                    "winner": "Croatia",
+                    "matchup_prob": 0.16,
+                    "winner_prob": 0.52,
+                    "top_scenarios": [],
+                    "matchup_scenarios": [],
+                },
+                "M84": {
+                    "match_id": "M84",
+                    "title": "Dieciseisavos 12",
+                    "stage": "round32",
+                    "team_a": "Spain",
+                    "team_b": "Austria",
+                    "winner": "Spain",
+                    "matchup_prob": 0.48,
+                    "winner_prob": 0.73,
+                    "top_scenarios": [],
+                    "matchup_scenarios": [],
+                },
+                "M93": {
+                    "match_id": "M93",
+                    "title": "Octavos 5",
+                    "stage": "round16",
+                    "team_a": "Turkey",
+                    "team_b": "Belgium",
+                    "winner": "Belgium",
+                    "matchup_prob": 0.12,
+                    "winner_prob": 0.50,
+                    "top_scenarios": [],
+                    "matchup_scenarios": [
+                        {
+                            "team_a": "Turkey",
+                            "team_b": "Belgium",
+                            "winner": "Turkey",
+                            "matchup_prob": 0.28,
+                            "conditional_winner_prob": 0.58,
+                            "winner_prob": 0.16,
+                            "conditional_winners": [
+                                {"team": "Turkey", "conditional_prob": 0.58, "overall_prob": 0.16},
+                                {"team": "Belgium", "conditional_prob": 0.42, "overall_prob": 0.12},
+                            ],
+                        },
+                    ],
+                },
+                "M94": {
+                    "match_id": "M94",
+                    "title": "Octavos 6",
+                    "stage": "round16",
+                    "team_a": "Croatia",
+                    "team_b": "Spain",
+                    "winner": "Spain",
+                    "matchup_prob": 0.22,
+                    "winner_prob": 0.73,
+                    "top_scenarios": [],
+                    "matchup_scenarios": [
+                        {
+                            "team_a": "Croatia",
+                            "team_b": "Spain",
+                            "winner": "Spain",
+                            "matchup_prob": 0.22,
+                            "conditional_winner_prob": 0.83,
+                            "winner_prob": 0.18,
+                            "conditional_winners": [
+                                {"team": "Spain", "conditional_prob": 0.83, "overall_prob": 0.18},
+                                {"team": "Croatia", "conditional_prob": 0.17, "overall_prob": 0.04},
+                            ],
+                        },
+                    ],
+                },
+                "M99": {
+                    "match_id": "M99",
+                    "title": "Cuartos 3",
+                    "stage": "quarterfinal",
+                    "team_a": "Belgium",
+                    "team_b": "Spain",
+                    "winner": "Spain",
+                    "matchup_prob": 0.24,
+                    "winner_prob": 0.69,
+                    "top_scenarios": [],
+                    "matchup_scenarios": [
+                        {
+                            "team_a": "Belgium",
+                            "team_b": "Spain",
+                            "winner": "Spain",
+                            "matchup_prob": 0.24,
+                            "conditional_winner_prob": 0.89,
+                            "winner_prob": 0.22,
+                            "conditional_winners": [
+                                {"team": "Spain", "conditional_prob": 0.89, "overall_prob": 0.22},
+                                {"team": "Belgium", "conditional_prob": 0.11, "overall_prob": 0.03},
+                            ],
+                        },
+                        {
+                            "team_a": "Turkey",
+                            "team_b": "Spain",
+                            "winner": "Spain",
+                            "matchup_prob": 0.16,
+                            "conditional_winner_prob": 0.98,
+                            "winner_prob": 0.15,
+                            "conditional_winners": [
+                                {"team": "Spain", "conditional_prob": 0.98, "overall_prob": 0.15},
+                                {"team": "Turkey", "conditional_prob": 0.02, "overall_prob": 0.01},
+                            ],
+                        },
+                    ],
+                },
+            },
+        }
+        html = app.build_bracket_visual_html(payload)
+        self.assertIn("Octavos 5", html)
+        self.assertIn("Cuartos 3", html)
+        self.assertIn("Turkey</span></div><div class=\"team-divider\"></div><div class=\"team-row favorite\"><span class=\"team-name\">Spain", html)
+        self.assertNotIn("Belgium</span></div><div class=\"team-divider\"></div><div class=\"team-row favorite\"><span class=\"team-name\">Spain", html)
 
 
 if __name__ == "__main__":
