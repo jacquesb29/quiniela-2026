@@ -2722,6 +2722,8 @@ def structured_match_projection(match_id: str, aggregate: dict, iterations: int)
     team_a, team_b, winner = modal_outcome
     appearance_counts: Dict[str, int] = {}
     opponent_counts: Dict[str, Dict[str, int]] = {}
+    matchup_counts: Dict[Tuple[str, str], int] = {}
+    matchup_winner_counts: Dict[Tuple[str, str], Dict[str, int]] = {}
     for outcome, count in aggregate["outcomes"].items():
         scenario_a, scenario_b, _ = outcome
         appearance_counts[scenario_a] = appearance_counts.get(scenario_a, 0) + count
@@ -2730,6 +2732,10 @@ def structured_match_projection(match_id: str, aggregate: dict, iterations: int)
         opponent_counts.setdefault(scenario_b, {})
         opponent_counts[scenario_a][scenario_b] = opponent_counts[scenario_a].get(scenario_b, 0) + count
         opponent_counts[scenario_b][scenario_a] = opponent_counts[scenario_b].get(scenario_a, 0) + count
+        matchup_key = (scenario_a, scenario_b)
+        matchup_counts[matchup_key] = matchup_counts.get(matchup_key, 0) + count
+        matchup_winner_counts.setdefault(matchup_key, {})
+        matchup_winner_counts[matchup_key][outcome[2]] = matchup_winner_counts[matchup_key].get(outcome[2], 0) + count
     top_scenarios = []
     for outcome, count in sorted(aggregate["outcomes"].items(), key=lambda item: item[1], reverse=True)[:3]:
         scenario_a, scenario_b, scenario_winner = outcome
@@ -2762,6 +2768,32 @@ def structured_match_projection(match_id: str, aggregate: dict, iterations: int)
             }
             for opponent, count in sorted(counts.items(), key=lambda item: item[1], reverse=True)[:3]
         ]
+    matchup_scenarios = []
+    for (scenario_a, scenario_b), count in sorted(matchup_counts.items(), key=lambda item: item[1], reverse=True):
+        winner_rows = []
+        winners_for_matchup = matchup_winner_counts.get((scenario_a, scenario_b), {})
+        for matchup_winner, winner_count in sorted(winners_for_matchup.items(), key=lambda item: item[1], reverse=True):
+            winner_rows.append(
+                {
+                    "team": matchup_winner,
+                    "conditional_prob": winner_count / float(count),
+                    "overall_prob": winner_count / float(iterations),
+                }
+            )
+        lead_winner = winner_rows[0]["team"] if winner_rows else scenario_a
+        lead_conditional = winner_rows[0]["conditional_prob"] if winner_rows else 0.0
+        lead_overall = winner_rows[0]["overall_prob"] if winner_rows else 0.0
+        matchup_scenarios.append(
+            {
+                "team_a": scenario_a,
+                "team_b": scenario_b,
+                "winner": lead_winner,
+                "matchup_prob": count / float(iterations),
+                "conditional_winner_prob": lead_conditional,
+                "winner_prob": lead_overall,
+                "conditional_winners": winner_rows[:3],
+            }
+        )
     penalty_scores = sorted(aggregate.get("penalty_scores", {}).items(), key=lambda item: item[1], reverse=True)[:3]
     return {
         "match_id": match_id,
@@ -2775,6 +2807,7 @@ def structured_match_projection(match_id: str, aggregate: dict, iterations: int)
         "extra_time_prob": aggregate["went_extra_time"] / float(iterations),
         "penalties_prob": aggregate["went_penalties"] / float(iterations),
         "top_scenarios": top_scenarios,
+        "matchup_scenarios": matchup_scenarios,
         "appearance_probabilities": appearance_probabilities,
         "advance_probabilities": advance_probabilities,
         "opponent_map": opponent_map,
@@ -4557,6 +4590,95 @@ def build_bracket_visual_html(bracket_payload: dict) -> str:
     iterations = bracket_payload.get("iterations")
     sections = {stage_key: (label, stage_matches) for stage_key, label, stage_matches in bracket_stage_sections(bracket_payload)}
 
+    source_map = {
+        match_id: (left_source, right_source, "winner")
+        for round_matches in KNOCKOUT_MATCHES.values()
+        for match_id, left_source, right_source in round_matches
+    }
+    source_map["M104"] = ("M101", "M102", "loser")
+
+    def fallback_visual_match(match: dict) -> dict:
+        winner = str(match.get("winner", "?"))
+        team_a = str(match.get("team_a", "?"))
+        team_b = str(match.get("team_b", "?"))
+        loser = team_b if winner == team_a else team_a
+        conditional_prob = float(match.get("conditional_winner_prob", match.get("winner_prob", 0.0)))
+        visual = dict(match)
+        visual["selected_winner"] = winner
+        visual["selected_loser"] = loser
+        visual["conditional_winner_prob"] = conditional_prob
+        return visual
+
+    def find_consistent_matchup(match: dict, team_a: str, team_b: str) -> Optional[dict]:
+        for scenario in match.get("matchup_scenarios", []):
+            if scenario.get("team_a") == team_a and scenario.get("team_b") == team_b:
+                return scenario
+        return None
+
+    def coherent_visual_matches(payload: dict) -> dict:
+        payload_matches = payload.get("matches", {})
+        resolved: Dict[str, dict] = {}
+        ordered_match_ids = [match["id"] for match in R32_MATCHES]
+        for round_matches in KNOCKOUT_MATCHES.values():
+            ordered_match_ids.extend(match_id for match_id, _, _ in round_matches)
+        ordered_match_ids.append("M104")
+
+        for match_id in ordered_match_ids:
+            match = payload_matches.get(match_id)
+            if not match:
+                continue
+            source_info = source_map.get(match_id)
+            if not source_info:
+                resolved[match_id] = fallback_visual_match(match)
+                continue
+            left_source, right_source, source_kind = source_info
+            left_match = resolved.get(left_source)
+            right_match = resolved.get(right_source)
+            if not left_match or not right_match:
+                resolved[match_id] = fallback_visual_match(match)
+                continue
+            left_team = left_match.get("selected_winner") if source_kind == "winner" else left_match.get("selected_loser")
+            right_team = right_match.get("selected_winner") if source_kind == "winner" else right_match.get("selected_loser")
+            if not left_team or not right_team:
+                resolved[match_id] = fallback_visual_match(match)
+                continue
+            matchup = find_consistent_matchup(match, str(left_team), str(right_team))
+            if not matchup:
+                resolved[match_id] = fallback_visual_match(match)
+                continue
+            conditional_winners = matchup.get("conditional_winners", [])
+            selected_winner = conditional_winners[0]["team"] if conditional_winners else matchup.get("winner", left_team)
+            conditional_prob = (
+                float(conditional_winners[0]["conditional_prob"])
+                if conditional_winners
+                else float(matchup.get("conditional_winner_prob", match.get("winner_prob", 0.0)))
+            )
+            overall_prob = (
+                float(conditional_winners[0]["overall_prob"])
+                if conditional_winners
+                else float(matchup.get("winner_prob", match.get("winner_prob", 0.0)))
+            )
+            visual = dict(match)
+            visual["team_a"] = matchup.get("team_a", match.get("team_a"))
+            visual["team_b"] = matchup.get("team_b", match.get("team_b"))
+            visual["winner"] = selected_winner
+            visual["matchup_prob"] = float(matchup.get("matchup_prob", match.get("matchup_prob", 0.0)))
+            visual["conditional_winner_prob"] = conditional_prob
+            visual["winner_prob"] = overall_prob
+            visual["selected_winner"] = selected_winner
+            visual["selected_loser"] = visual["team_b"] if selected_winner == visual["team_a"] else visual["team_a"]
+            resolved[match_id] = visual
+        return resolved
+
+    visual_matches = coherent_visual_matches(bracket_payload)
+    sections = {
+        stage_key: (
+            label,
+            [visual_matches.get(match.get("match_id")) or match for match in stage_matches],
+        )
+        for stage_key, (label, stage_matches) in sections.items()
+    }
+
     def split_stage(stage_key: str) -> Tuple[List[dict], List[dict]]:
         stage_matches = sections.get(stage_key, ("", []))[1]
         midpoint = len(stage_matches) // 2
@@ -4614,6 +4736,7 @@ def build_bracket_visual_html(bracket_payload: dict) -> str:
         row_b_class = "team-row favorite" if match.get("winner") == match.get("team_b") else "team-row"
         row_a_badge = "<span class=\"team-badge\">Favorito</span>" if "favorite" in row_a_class else ""
         row_b_badge = "<span class=\"team-badge\">Favorito</span>" if "favorite" in row_b_class else ""
+        conditional_prob = float(match.get("conditional_winner_prob", match.get("winner_prob", 0.0)))
         return (
             "<article class=\"bracket-match\">"
             f"<p class=\"match-kicker\">{html.escape(str(match.get('title', '')))}</p>"
@@ -4624,7 +4747,7 @@ def build_bracket_visual_html(bracket_payload: dict) -> str:
             "</div>"
             "<div class=\"bracket-pills\">"
             f"<span>Cruce {format_pct(float(match.get('matchup_prob', 0.0)))}</span>"
-            f"<span>Avanza {winner} {format_pct(float(match.get('winner_prob', 0.0)))}</span>"
+            f"<span>Si se juega, avanza {winner} {format_pct(conditional_prob)}</span>"
             "</div>"
             f"{detail_html}"
             "</article>"
