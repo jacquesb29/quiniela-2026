@@ -5,4 +5,12 @@
 node_modules/
 .next/
 *.tsbuildinfo
+.pytest_cache/
+.mypy_cache/
+.coverage
+coverage.xml
+.venv/
+venv/
+dist/
+build/
 mundial_2026/logs/*.log

@@ -69,6 +69,32 @@ class RefactorSmokeTest(unittest.TestCase):
             self.assertIn("groups", load_tournament_config(config_path))
             self.assertEqual(read_fixtures(fixtures_path)[0]["team_a"], "Spain")
 
+    def test_methodology_mentions_15000_iterations(self):
+        html = app.build_methodology_html({"iterations": 15000}, {"completed_matches": 0})
+        self.assertIn("15.000 iteraciones", html)
+
+    def test_runtime_status_panel_mentions_provider_and_simulations(self):
+        html = app.build_runtime_status_html(
+            [
+                {
+                    "projection": False,
+                    "status_state": "live",
+                    "live_feed_provider": "api_football",
+                    "source": "espn_scoreboard",
+                },
+                {
+                    "projection": False,
+                    "status_state": "final",
+                    "live_feed_provider": None,
+                    "source": "espn_scoreboard",
+                },
+            ],
+            {"iterations": 15000},
+        )
+        self.assertIn("15.000 simulaciones", html)
+        self.assertIn("api_football", html)
+        self.assertIn("1</strong> en vivo", html)
+
     def test_bracket_visual_keeps_branch_coherent(self):
         payload = {
             "iterations": 100,

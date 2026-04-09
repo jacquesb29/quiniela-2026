@@ -3300,6 +3300,7 @@ def dashboard_fixture_entries(
                 "market_prob_a": fixture.get("market_prob_a"),
                 "market_prob_draw": fixture.get("market_prob_draw"),
                 "market_prob_b": fixture.get("market_prob_b"),
+                "source": fixture.get("source"),
                 "projection": False,
             }
         )
@@ -5143,6 +5144,77 @@ def build_methodology_html(bracket_payload: dict, backtest: dict) -> str:
     )
 
 
+def build_runtime_status_html(entries: Sequence[dict], bracket_payload: dict) -> str:
+    fixture_entries = [entry for entry in entries if not entry.get("projection")]
+    live_count = sum(1 for entry in fixture_entries if str(entry.get("status_state") or "").lower() == "live")
+    final_count = sum(1 for entry in fixture_entries if str(entry.get("status_state") or "").lower() == "final")
+    pending_count = sum(1 for entry in fixture_entries if str(entry.get("status_state") or "").lower() not in {"live", "final"})
+    deep_providers = sorted({str(entry.get("live_feed_provider")) for entry in fixture_entries if entry.get("live_feed_provider")})
+    live_sources = sorted({str(entry.get("source")) for entry in fixture_entries if entry.get("source")})
+    if deep_providers:
+        provider_label = " + ".join(deep_providers)
+        feed_depth_label = "Enriquecido"
+    elif live_sources:
+        provider_label = " + ".join(live_sources)
+        feed_depth_label = "Base publica"
+    else:
+        provider_label = "espn_scoreboard"
+        feed_depth_label = "Base publica"
+    iterations = int(bracket_payload.get("iterations", 0) or 0)
+    iterations_label = f"{iterations:,}".replace(",", ".") if iterations else "sin dato"
+    in_play_label = "Activo" if live_count > 0 else "Listo para activarse"
+    cards = [
+        (
+            "Estado operativo",
+            "Publicacion automatica en <strong>GitHub Actions + Pages</strong>. "
+            "Se reconstruye cada <strong>5 minutos</strong> y tambien en cada push a <strong>main</strong>.",
+        ),
+        (
+            "Monte Carlo publicado",
+            f"La llave visible usa <strong>{iterations_label} simulaciones</strong> por corrida. "
+            "Ese numero ya no deberia verse como 1.200.",
+        ),
+        (
+            "Proveedor live activo",
+            f"<strong>{html.escape(provider_label)}</strong> | {html.escape(feed_depth_label)}. "
+            "Si aparece un proveedor profundo, el in-play entra con mas señales del partido.",
+        ),
+        (
+            "Estado del tablero",
+            f"<strong>{len(fixture_entries)}</strong> partidos cargados. "
+            f"<strong>{live_count}</strong> en vivo, <strong>{final_count}</strong> finales y "
+            f"<strong>{pending_count}</strong> pendientes.",
+        ),
+    ]
+    card_html = "".join(
+        (
+            "<article class=\"runtime-card\">"
+            f"<h3>{html.escape(title)}</h3>"
+            f"<p>{body}</p>"
+            "</article>"
+        )
+        for title, body in cards
+    )
+    chip_html = (
+        "<div class=\"runtime-chip-row\">"
+        f"<span class=\"runtime-chip\">In-play <strong>{html.escape(in_play_label)}</strong></span>"
+        f"<span class=\"runtime-chip\">Validacion <strong>{html.escape('latest.json + badge En vivo + minuto')}</strong></span>"
+        f"<span class=\"runtime-chip\">Frecuencia <strong>{html.escape('cada 5 minutos')}</strong></span>"
+        "</div>"
+    )
+    return (
+        "<section class=\"panel runtime-panel\">"
+        "<div class=\"panel-head\"><div>"
+        "<p class=\"eyebrow\">Estado Del Modelo</p>"
+        "<h2>Que esta corriendo ahora mismo</h2>"
+        "<p class=\"lede-tight\">Esta caja resume lo que de verdad esta publicado: cuantas simulaciones usa la llave, que feed live esta activo y cuantas tarjetas del tablero estan en vivo, cerradas o pendientes.</p>"
+        "</div></div>"
+        f"<div class=\"runtime-grid\">{card_html}</div>"
+        f"{chip_html}"
+        "</section>"
+    )
+
+
 def build_dashboard_html(
     entries: Sequence[dict],
     bracket_text: str,
@@ -5393,6 +5465,7 @@ def build_dashboard_html(
 
     bracket_html = html.escape(bracket_text.strip() or "No hay llave generada todavia.")
     bracket_visual_html = build_bracket_visual_html(bracket_payload)
+    runtime_status_html = build_runtime_status_html(entries, bracket_payload)
     methodology_html = build_methodology_html(bracket_payload, backtest)
     global_confidence_html = build_global_confidence_html(entries)
     recent_changes_html = build_recent_changes_html(
@@ -5408,6 +5481,7 @@ def build_dashboard_html(
             "updated_at": html.escape(iso_timestamp()),
             "state_path": html.escape(str(state_path)),
             "fixtures_path": html.escape(str(fixtures_path)),
+            "runtime_status_html": runtime_status_html,
             "methodology_html": methodology_html,
             "global_confidence_html": global_confidence_html,
             "recent_changes_html": recent_changes_html,
