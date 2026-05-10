@@ -38,7 +38,7 @@ Comandos:
   bracket   Genera la llave proyectada actual y la guarda en llave_actual_2026.md.
   dashboard Genera un reporte actual con llave y probabilidades por partido.
   state     Muestra el estado dinamico guardado de una seleccion.
-  reset     Reinicia tournament_state_2026.json.
+  reset     Reinicia runtime/tournament_state_2026.json.
 EOF
 }
 

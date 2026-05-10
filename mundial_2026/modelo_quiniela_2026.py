@@ -191,7 +191,9 @@ from worldcup2026.utils.naming import (
 DATA_FILE = Path(__file__).with_name("teams_2026.json")
 HISTORICAL_FEATURES_FILE = Path(__file__).with_name("historical_features_1990.json")
 TOURNAMENT_CONFIG_FILE = Path(__file__).with_name("tournament_2026_draw.json")
-STATE_FILE = Path(__file__).with_name("tournament_state_2026.json")
+RUNTIME_DIR = Path(__file__).with_name("runtime")
+LEGACY_STATE_FILE = Path(__file__).with_name("tournament_state_2026.json")
+STATE_FILE = RUNTIME_DIR / "tournament_state_2026.json"
 FACTORIALS = [math.factorial(i) for i in range(16)]
 HOST_COUNTRIES = {"Canada", "Mexico", "United States"}
 BRACKET_FILE = Path(__file__).with_name("llave_actual_2026.md")
@@ -5597,6 +5599,8 @@ def normalize_persistent_payload(payload: dict, teams: Dict[str, Team]) -> dict:
 
 
 def load_persistent_payload(path: Path, teams: Dict[str, Team]) -> dict:
+    if path.resolve() == STATE_FILE.resolve() and not path.exists() and LEGACY_STATE_FILE.exists():
+        path = LEGACY_STATE_FILE
     if not path.exists():
         return empty_persistent_payload(teams)
     text = path.read_text()

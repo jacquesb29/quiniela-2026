@@ -40,7 +40,7 @@ La nueva version ya incorpora variables macro, historicas, tacticas, disciplinar
 - `sync_fifa_rankings.py`: refresca `fifa_points` y `fifa_rank` desde el endpoint oficial de FIFA.
 - `fixtures_template.json`: ejemplo de formato para cargar partidos con estado dinamico.
 - `tournament_2026_draw.json`: draw oficial del Mundial 2026 con placeholders de repechaje.
-- `tournament_state_2026.json`: estado persistente que el modelo actualiza automaticamente entre ejecuciones.
+- `runtime/tournament_state_2026.json`: estado persistente que el modelo actualiza automaticamente entre ejecuciones.
 
 Solo se ejecuta `modelo_quiniela_2026.py`. Los archivos `.json` no se ejecutan: se usan como entradas o como estado guardado.
 
@@ -190,7 +190,7 @@ python3 mundial_2026/sync_fifa_rankings.py
 - Para una quiniela completa, lo correcto es cargar el fixture real en JSON y correr `fixtures`.
 - `simulate-tournament` si usa Monte Carlo de verdad: en cada iteracion resuelve repechajes pendientes, simula la fase de grupos, selecciona los ocho mejores terceros, arma la llave y corre todo el knockout hasta la final.
 - La asignacion de mejores terceros a cruces de primera ronda se resuelve con un algoritmo compatible con los grupos elegibles del cuadro oficial. Esa parte es una inferencia de modelado, no una copia textual de una matriz oficial cargada dentro del repo.
-- `fixtures` ahora guarda automaticamente el estado en `tournament_state_2026.json` cuando encuentra partidos con `actual_score_a`, `actual_score_b` y `update_state: true`.
+- `fixtures` ahora guarda automaticamente el estado en `runtime/tournament_state_2026.json` cuando encuentra partidos con `actual_score_a`, `actual_score_b` y `update_state: true`.
 - `predict` usa ese estado automaticamente si no le pasas manualmente moral, tarjetas, puntos de grupo o diferencia de gol.
 - Ese estado ya no solo cambia el contexto del partido: tambien altera la fuerza efectiva del equipo mediante Elo dinamico, forma, fatiga, disponibilidad y disciplina reciente.
 - En knockout, `predict` ya modela empate en 90', proroga, probabilidad de penales y probabilidad total de clasificar.

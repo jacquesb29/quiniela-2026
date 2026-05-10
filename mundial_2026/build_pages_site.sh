@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-SITE_DIR="$SCRIPT_DIR/site"
+SCRIPT_HOME="$(cd "$(dirname "$0")" && pwd)"
+SCRIPT_DIR="${WORLDCUP_PUBLISH_ROOT:-$SCRIPT_HOME}"
+SITE_DIR="${WORLDCUP_PUBLISH_SITE_DIR:-$SCRIPT_DIR/site}"
 export SCRIPT_DIR
 
 mkdir -p "$SITE_DIR"

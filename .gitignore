@@ -14,3 +14,5 @@ venv/
 dist/
 build/
 mundial_2026/logs/*.log
+mundial_2026/runtime/*
+!mundial_2026/runtime/.gitkeep
