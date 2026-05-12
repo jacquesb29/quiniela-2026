@@ -38,6 +38,25 @@ def aggregate_squad(team, *, proxy_players_fn, clamp, SquadAggregateCls):
     )
     goalkeeper_unit = sum(player.goalkeeping for player in starting if player.position == "GK")
     bench_depth = sum(player.quality for player in bench) / len(bench)
+    recent_minutes_load = clamp(sum(player.minutes_share for player in starting) / len(starting), 0.16, 1.00)
+    goalkeeper_minutes_load = clamp(
+        sum(player.minutes_share for player in starting if player.position == "GK"),
+        0.16,
+        1.00,
+    )
+    bench_impact = clamp(
+        sum(
+            0.45 * player.quality
+            + 0.20 * player.attack
+            + 0.15 * player.creation
+            + 0.10 * player.defense
+            + 0.10 * player.availability
+            for player in bench[:5]
+        )
+        / max(len(bench[:5]), 1),
+        0.08,
+        1.00,
+    )
     player_experience = clamp(sum(player.caps for player in starting) / (len(starting) * 100.0), 0.08, 1.00)
     set_piece_attack = clamp(
         (
@@ -95,4 +114,7 @@ def aggregate_squad(team, *, proxy_players_fn, clamp, SquadAggregateCls):
         finishing=finishing,
         shot_creation=shot_creation,
         pressing=pressing,
+        recent_minutes_load=recent_minutes_load,
+        goalkeeper_minutes_load=goalkeeper_minutes_load,
+        bench_impact=bench_impact,
     )

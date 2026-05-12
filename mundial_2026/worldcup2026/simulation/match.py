@@ -319,9 +319,13 @@ def update_simulation_state(
     state_a["elo_shift"] = clamp(state_a["elo_shift"] + elo_delta_a, -220.0, 220.0)
     state_b["elo_shift"] = clamp(state_b["elo_shift"] + elo_delta_b, -220.0, 220.0)
 
-    for state, team_name, score_for, score_against, expected_for, expected_against, actual_result, expected_result, yellows, reds, rest_days, travel_km, injuries in (
-        (state_a, team_a, score_a, score_b, expected_goals_a, expected_goals_b, actual_result_a, expected_result_a, yellows_a, reds_a, ctx.rest_days_a, ctx.travel_km_a, ctx.injuries_a),
-        (state_b, team_b, score_b, score_a, expected_goals_b, expected_goals_a, actual_result_b, expected_result_b, yellows_b, reds_b, ctx.rest_days_b, ctx.travel_km_b, ctx.injuries_b),
+    live_stats = live_stats or {}
+    actual_xg_a = float(live_stats.get("xg_a") or live_stats.get("xg_proxy_a") or expected_goals_a)
+    actual_xg_b = float(live_stats.get("xg_b") or live_stats.get("xg_proxy_b") or expected_goals_b)
+
+    for state, team_name, score_for, score_against, expected_for, expected_against, actual_xg_for, actual_xg_against, actual_result, expected_result, yellows, reds, rest_days, travel_km, injuries, opponent_elo in (
+        (state_a, team_a, score_a, score_b, expected_goals_a, expected_goals_b, actual_xg_a, actual_xg_b, actual_result_a, expected_result_a, yellows_a, reds_a, ctx.rest_days_a, ctx.travel_km_a, ctx.injuries_a, effective_elo_b),
+        (state_b, team_b, score_b, score_a, expected_goals_b, expected_goals_a, actual_xg_b, actual_xg_a, actual_result_b, expected_result_b, yellows_b, reds_b, ctx.rest_days_b, ctx.travel_km_b, ctx.injuries_b, effective_elo_a),
     ):
         team_profile = profile_for(teams[team_name])
         attack_signal = clamp((score_for - expected_for) / 1.8, -1.0, 1.0)
@@ -332,6 +336,16 @@ def update_simulation_state(
         state["recent_form"] = clamp(0.60 * state["recent_form"] + 0.40 * form_signal, -1.0, 1.0)
         state["attack_form"] = clamp(0.58 * state["attack_form"] + 0.42 * attack_signal, -1.0, 1.0)
         state["defense_form"] = clamp(0.58 * state["defense_form"] + 0.42 * defense_signal, -1.0, 1.0)
+        opponent_strength_signal = clamp((opponent_elo - 1700.0) / 320.0, -1.0, 1.0)
+        adjusted_xg_for_signal = clamp((actual_xg_for - 1.15) + 0.18 * opponent_strength_signal, -1.0, 1.0)
+        adjusted_xga_signal = clamp((actual_xg_against - 1.15) - 0.18 * opponent_strength_signal, -1.0, 1.0)
+        state["recent_xg_for_adj"] = clamp(0.66 * state.get("recent_xg_for_adj", 0.0) + 0.34 * adjusted_xg_for_signal, -1.0, 1.0)
+        state["recent_xga_adj"] = clamp(0.66 * state.get("recent_xga_adj", 0.0) + 0.34 * adjusted_xga_signal, -1.0, 1.0)
+        state["recent_opponent_strength"] = clamp(
+            0.64 * state.get("recent_opponent_strength", 0.0) + 0.36 * opponent_strength_signal,
+            -1.0,
+            1.0,
+        )
         morale_delta = clamp(0.08 * form_signal + 0.03 * (1 if actual_result > 0.5 else -1 if actual_result < 0.5 else 0), -0.18, 0.18)
         state["morale"] = clamp(0.72 * state["morale"] + morale_delta, -1.0, 1.0)
 

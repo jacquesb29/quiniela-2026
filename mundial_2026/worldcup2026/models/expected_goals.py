@@ -33,6 +33,13 @@ def context_components(
         group_matches_played = ctx.group_matches_played_a
         lineup_confirmed = ctx.lineup_confirmed_a
         lineup_changes = ctx.lineup_change_count_a
+        market_move = ctx.market_move_a
+        goalkeeper_confirmed = ctx.goalkeeper_confirmed_a
+        goalkeeper_change = ctx.goalkeeper_change_a
+        live_substitutions = ctx.live_substitutions_a
+        live_substitutions_other = ctx.live_substitutions_b
+        substitution_impact = ctx.substitution_impact_a
+        substitution_impact_other = ctx.substitution_impact_b
     else:
         rest_days = ctx.rest_days_b
         other_rest_days = ctx.rest_days_a
@@ -47,6 +54,13 @@ def context_components(
         group_matches_played = ctx.group_matches_played_b
         lineup_confirmed = ctx.lineup_confirmed_b
         lineup_changes = ctx.lineup_change_count_b
+        market_move = ctx.market_move_b
+        goalkeeper_confirmed = ctx.goalkeeper_confirmed_b
+        goalkeeper_change = ctx.goalkeeper_change_b
+        live_substitutions = ctx.live_substitutions_b
+        live_substitutions_other = ctx.live_substitutions_a
+        substitution_impact = ctx.substitution_impact_b
+        substitution_impact_other = ctx.substitution_impact_a
 
     components = {
         "home": 0.0,
@@ -60,6 +74,17 @@ def context_components(
         "altitude": 0.0,
         "rivalry": rivalry_intensity(team, opponent),
         "lineup": (0.01 if lineup_confirmed else 0.0) - 0.018 * clamp(lineup_changes, 0, 6),
+        "goalkeeper_context": (0.014 if goalkeeper_confirmed else 0.0) - (0.045 if goalkeeper_change else 0.0),
+        "substitutions": (
+            0.035 * clamp(substitution_impact - substitution_impact_other, -1.0, 1.0)
+            + 0.012 * clamp(live_substitutions - live_substitutions_other, -5, 5)
+        ),
+        "market_move": 0.22 * clamp(market_move, -0.18, 0.18),
+        "referee": (
+            0.012 * clamp(ctx.referee_penalty_bias, -1.0, 1.0)
+            + 0.010 * clamp(ctx.referee_red_bias, -1.0, 1.0) * (0.5 - profile.squad.discipline_index)
+            - 0.008 * clamp(ctx.referee_yellow_bias, -1.0, 1.0) * (0.55 - profile.squad.discipline_index)
+        ),
         "fatigue": -0.14 * fatigue_level(state),
         "availability": -0.18 * (1.0 - availability_level(state)),
         "recent_form": 0.10 * recent_form_signal(state),
@@ -99,6 +124,8 @@ def attack_metric(team, profile, *, state=None, effective_elo, centered, attack_
     value += 0.18 * centered(profile.squad.midfield_unit)
     value += 0.14 * centered(profile.squad.finishing)
     value += 0.10 * centered(profile.squad.set_piece_attack)
+    value += 0.06 * centered(profile.squad.recent_minutes_load)
+    value += 0.06 * centered(profile.squad.bench_impact)
     value += 0.08 * centered(profile.coach_index)
     value += 0.06 * centered(profile.resource_index)
     value += 0.06 * centered(profile.trajectory_index)
@@ -125,6 +152,9 @@ def defense_metric(team, profile, *, state=None, effective_elo, centered, defens
     value += 0.06 * centered(profile.coach_index)
     value += 0.05 * centered(profile.heritage_index)
     value += 0.04 * centered(profile.squad.set_piece_defense)
+    value += 0.04 * centered(profile.squad.recent_minutes_load)
+    value += 0.05 * centered(profile.squad.goalkeeper_minutes_load)
+    value += 0.05 * centered(profile.squad.bench_impact)
     value += team.defense_bias
     value += 0.30 * defense_form_signal(state)
     value += 0.14 * recent_form_signal(state)
@@ -159,6 +189,9 @@ def expected_goals(
     tactical_tempo_signal,
     fatigue_level,
     availability_level,
+    recent_xg_for_signal,
+    recent_xga_signal,
+    recent_opponent_strength_signal,
     group_pressure,
     clamp,
 ):
@@ -197,6 +230,9 @@ def expected_goals(
     delta_score += 0.14 * (recent_form_signal(state_a) - recent_form_signal(state_b))
     delta_score += 0.10 * (attack_form_signal(state_a) - attack_form_signal(state_b))
     delta_score += 0.08 * (defense_form_signal(state_a) - defense_form_signal(state_b))
+    delta_score += 0.12 * (recent_xg_for_signal(state_a) - recent_xg_for_signal(state_b))
+    delta_score -= 0.10 * (recent_xga_signal(state_a) - recent_xga_signal(state_b))
+    delta_score += 0.04 * (recent_opponent_strength_signal(state_a) - recent_opponent_strength_signal(state_b))
     delta_score += 0.06 * (tactical_attack_signal(state_a) - tactical_attack_signal(state_b))
     delta_score += 0.04 * (tactical_defense_signal(state_a) - tactical_defense_signal(state_b))
     delta_score -= 0.10 * (fatigue_level(state_a) - fatigue_level(state_b))
@@ -238,6 +274,8 @@ def expected_goals(
     total_goals += 0.03 * rivalry_intensity(team_a, team_b)
     total_goals += 0.08 * (attack_form_signal(state_a) + attack_form_signal(state_b))
     total_goals -= 0.05 * (defense_form_signal(state_a) + defense_form_signal(state_b))
+    total_goals += 0.08 * (recent_xg_for_signal(state_a) + recent_xg_for_signal(state_b))
+    total_goals += 0.06 * (recent_xga_signal(state_a) + recent_xga_signal(state_b))
     total_goals += 0.06 * (tactical_tempo_signal(state_a) + tactical_tempo_signal(state_b))
     total_goals += 0.03 * (tactical_attack_signal(state_a) + tactical_attack_signal(state_b))
     total_goals -= 0.02 * (tactical_defense_signal(state_a) + tactical_defense_signal(state_b))
@@ -247,6 +285,7 @@ def expected_goals(
         total_goals = 0.84 * total_goals + 0.16 * clamp(ctx.market_total_line + 0.05, 1.5, 4.6)
     if ctx.market_prob_draw is not None:
         total_goals -= 0.12 * clamp(ctx.market_prob_draw - 0.26, -0.15, 0.22)
+    total_goals -= 0.40 * clamp(ctx.market_move_draw, -0.08, 0.08)
     total_goals = clamp(total_goals, 1.45, 4.55)
 
     mu_a = clamp(total_goals * share_a, 0.07, 4.95)
@@ -272,6 +311,9 @@ def factor_breakdown(
     tactical_attack_signal,
     tactical_defense_signal,
     tactical_tempo_signal,
+    recent_xg_for_signal,
+    recent_xga_signal,
+    recent_opponent_strength_signal,
 ):
     profile_a = profile_for(team_a)
     profile_b = profile_for(team_b)
@@ -295,6 +337,9 @@ def factor_breakdown(
         "defense_diff": profile_a.squad.defense_unit - profile_b.squad.defense_unit,
         "goalkeeper_diff": profile_a.squad.goalkeeper_unit - profile_b.squad.goalkeeper_unit,
         "bench_depth_diff": profile_a.squad.bench_depth - profile_b.squad.bench_depth,
+        "recent_minutes_load_diff": profile_a.squad.recent_minutes_load - profile_b.squad.recent_minutes_load,
+        "goalkeeper_minutes_load_diff": profile_a.squad.goalkeeper_minutes_load - profile_b.squad.goalkeeper_minutes_load,
+        "bench_impact_diff": profile_a.squad.bench_impact - profile_b.squad.bench_impact,
         "experience_diff": profile_a.squad.player_experience - profile_b.squad.player_experience,
         "discipline_diff": profile_a.squad.discipline_index - profile_b.squad.discipline_index,
         "home_diff": context_a["home"] - context_b["home"],
@@ -304,11 +349,18 @@ def factor_breakdown(
         "cards_diff": context_a["cards"] - context_b["cards"],
         "group_pressure_diff": context_a["group_pressure"] - context_b["group_pressure"],
         "recent_form_diff": context_a["recent_form"] - context_b["recent_form"],
+        "goalkeeper_context_diff": context_a["goalkeeper_context"] - context_b["goalkeeper_context"],
+        "substitution_diff": context_a["substitutions"] - context_b["substitutions"],
+        "market_move_diff": context_a["market_move"] - context_b["market_move"],
+        "referee_profile_diff": context_a["referee"] - context_b["referee"],
         "market_prob_diff": (ctx.market_prob_a or 0.0) - (ctx.market_prob_b or 0.0),
         "market_draw_prob": ctx.market_prob_draw or 0.0,
         "market_total_line": ctx.market_total_line or 0.0,
         "attack_form_diff": attack_form_signal(state_a) - attack_form_signal(state_b),
         "defense_form_diff": defense_form_signal(state_a) - defense_form_signal(state_b),
+        "recent_xg_for_adj_diff": recent_xg_for_signal(state_a) - recent_xg_for_signal(state_b),
+        "recent_xga_adj_diff": recent_xga_signal(state_a) - recent_xga_signal(state_b),
+        "recent_opponent_strength_diff": recent_opponent_strength_signal(state_a) - recent_opponent_strength_signal(state_b),
         "fatigue_diff": fatigue_level(state_a) - fatigue_level(state_b),
         "availability_diff": availability_level(state_a) - availability_level(state_b),
         "discipline_trend_diff": discipline_trend(state_a) - discipline_trend(state_b),

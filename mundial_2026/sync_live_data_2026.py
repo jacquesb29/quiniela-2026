@@ -399,19 +399,25 @@ def extract_lineup_data(summary_payload: dict) -> Dict[str, dict]:
             continue
         starters = []
         lineup_confirmed = False
+        goalkeeper_name = None
         for obj in walk_objects(roster):
             name = obj.get("displayName") or obj.get("shortName") or obj.get("name")
             if not name:
                 continue
+            position_blob = nested_text(obj.get("position") or obj.get("athlete", {}).get("position") or "").lower()
             starter_flag = obj.get("starter")
             reserve_flag = obj.get("reserve")
             if starter_flag is True:
                 lineup_confirmed = True
                 starters.append(str(name))
+                if goalkeeper_name is None and any(token in position_blob for token in ("gk", "goalkeeper", "keeper")):
+                    goalkeeper_name = str(name)
             elif obj.get("formation"):
                 lineup_confirmed = True
             elif reserve_flag is False and obj.get("position"):
                 starters.append(str(name))
+                if goalkeeper_name is None and any(token in position_blob for token in ("gk", "goalkeeper", "keeper")):
+                    goalkeeper_name = str(name)
         unique_starters = []
         seen = set()
         for player_name in starters:
@@ -419,9 +425,12 @@ def extract_lineup_data(summary_payload: dict) -> Dict[str, dict]:
                 continue
             seen.add(player_name)
             unique_starters.append(player_name)
+        if goalkeeper_name is None and unique_starters:
+            goalkeeper_name = unique_starters[0]
         lineup_data[side] = {
             "confirmed": lineup_confirmed or len(unique_starters) >= 11,
             "starters": unique_starters[:11],
+            "goalkeeper": goalkeeper_name,
         }
     return lineup_data
 
@@ -857,6 +866,8 @@ def parse_api_football_events(payload: dict, home_name: str, away_name: str, tea
     big_chances = {"a": 0, "b": 0}
     red_cards = {"a": 0, "b": 0}
     yellow_cards = {"a": 0, "b": 0}
+    substitutions = {"a": 0, "b": 0}
+    substitution_logs = {"a": [], "b": []}
 
     for event in payload.get("response") or []:
         raw_team = (event.get("team") or {}).get("name")
@@ -882,6 +893,18 @@ def parse_api_football_events(payload: dict, home_name: str, away_name: str, tea
                 yellow_cards[side] += 1
             if "red" in normalized:
                 red_cards[side] += 1
+
+        normalized_event = f"{event_type} {detail}".lower()
+        if "subst" in normalized_event or "substitution" in normalized_event:
+            substitutions[side] += 1
+            substitution_logs[side].append(
+                {
+                    "minute": minute,
+                    "player": player_name or None,
+                    "detail": detail or None,
+                    "comments": comments or None,
+                }
+            )
 
         if not is_shot_event(event_type, detail):
             continue
@@ -913,6 +936,9 @@ def parse_api_football_events(payload: dict, home_name: str, away_name: str, tea
             enrichment[f"live_yellow_cards_{side}"] = yellow_cards[side]
         if red_cards[side] > 0 and enrichment.get(f"live_red_cards_{side}") is None:
             enrichment[f"live_red_cards_{side}"] = red_cards[side]
+        if substitutions[side] > 0:
+            enrichment[f"live_substitutions_{side}"] = substitutions[side]
+            enrichment[f"live_substitution_log_{side}"] = substitution_logs[side][-8:]
     return enrichment
 
 
@@ -929,15 +955,27 @@ def extract_api_football_lineups(payload: dict, home_name: str, away_name: str, 
             continue
 
         starters = []
+        goalkeeper_name = None
         for player in row.get("startXI") or []:
-            name = ((player.get("player") or {}).get("name") or "").strip()
+            player_payload = player.get("player") or {}
+            name = (player_payload.get("name") or "").strip()
             if name:
                 starters.append(name)
+                position_blob = str(
+                    player_payload.get("pos")
+                    or player_payload.get("position")
+                    or player.get("position")
+                    or ""
+                ).lower()
+                if goalkeeper_name is None and any(token in position_blob for token in ("gk", "goalkeeper", "keeper")):
+                    goalkeeper_name = name
 
         if starters:
             enrichment[f"lineup_confirmed_{side}"] = True
             enrichment[f"starting_xi_{side}"] = starters[:11]
             enrichment[f"lineup_status_{side}"] = "confirmada"
+            enrichment[f"starting_goalkeeper_{side}"] = goalkeeper_name or starters[0]
+            enrichment[f"goalkeeper_confirmed_{side}"] = True
     return enrichment
 
 
@@ -1018,6 +1056,9 @@ def summary_enrichment(event_id: str, kickoff: datetime, status_state: Optional[
         enrichment[f"lineup_confirmed_{prefix}"] = bool(lineup["confirmed"])
         enrichment[f"starting_xi_{prefix}"] = lineup["starters"]
         enrichment[f"lineup_status_{prefix}"] = "confirmada" if lineup["confirmed"] else "sin confirmar"
+        if lineup.get("goalkeeper"):
+            enrichment[f"starting_goalkeeper_{prefix}"] = lineup["goalkeeper"]
+            enrichment[f"goalkeeper_confirmed_{prefix}"] = bool(lineup["confirmed"])
 
     absences = extract_absence_data(payload)
     for side, prefix in (("home", "a"), ("away", "b")):
@@ -1050,10 +1091,93 @@ def annotate_lineup_changes(fixtures: List[dict], previous_by_id: Dict[str, dict
             previous_lineup = (previous or {}).get(f"starting_xi_{side}", [])
             if not current or not previous_lineup:
                 fixture[f"lineup_change_count_{side}"] = 0
+            else:
+                current_set = set(current)
+                previous_set = set(previous_lineup)
+                fixture[f"lineup_change_count_{side}"] = len(current_set.symmetric_difference(previous_set)) // 2
+            current_goalkeeper = str(fixture.get(f"starting_goalkeeper_{side}") or "").strip()
+            previous_goalkeeper = str((previous or {}).get(f"starting_goalkeeper_{side}") or "").strip()
+            fixture[f"goalkeeper_change_{side}"] = bool(
+                current_goalkeeper and previous_goalkeeper and normalize_key(current_goalkeeper) != normalize_key(previous_goalkeeper)
+            )
+
+
+def annotate_market_moves(fixtures: List[dict], previous_by_id: Dict[str, dict]) -> None:
+    for fixture in fixtures:
+        previous = previous_by_id.get(str(fixture.get("id"))) or {}
+        for key in ("a", "draw", "b"):
+            current_value = fixture.get(f"market_prob_{key}")
+            previous_value = previous.get(f"market_prob_{key}")
+            if current_value is None or previous_value is None:
+                fixture[f"market_move_{key}"] = 0.0
                 continue
-            current_set = set(current)
-            previous_set = set(previous_lineup)
-            fixture[f"lineup_change_count_{side}"] = len(current_set.symmetric_difference(previous_set)) // 2
+            fixture[f"market_move_{key}"] = round(float(current_value) - float(previous_value), 4)
+
+
+def build_referee_profiles(previous_by_id: Dict[str, dict]) -> Dict[str, dict]:
+    rows = []
+    for fixture in previous_by_id.values():
+        referee = str(fixture.get("referee") or "").strip()
+        if not referee:
+            continue
+        yellow_total = int(fixture.get("actual_yellows_a", fixture.get("live_yellow_cards_a", 0)) or 0) + int(
+            fixture.get("actual_yellows_b", fixture.get("live_yellow_cards_b", 0)) or 0
+        )
+        red_total = int(fixture.get("actual_reds_a", fixture.get("live_red_cards_a", 0)) or 0) + int(
+            fixture.get("actual_reds_b", fixture.get("live_red_cards_b", 0)) or 0
+        )
+        penalty_events = 0
+        for side in ("a", "b"):
+            for shot in fixture.get(f"live_shot_log_{side}", []) or []:
+                detail = str((shot or {}).get("detail") or "").lower()
+                if "penalty" in detail:
+                    penalty_events += 1
+        rows.append(
+            {
+                "referee": referee,
+                "yellow_total": yellow_total,
+                "red_total": red_total,
+                "penalty_events": penalty_events,
+            }
+        )
+
+    if not rows:
+        return {}
+
+    global_yellow = sum(row["yellow_total"] for row in rows) / max(len(rows), 1)
+    global_red = sum(row["red_total"] for row in rows) / max(len(rows), 1)
+    global_penalties = sum(row["penalty_events"] for row in rows) / max(len(rows), 1)
+
+    grouped: Dict[str, List[dict]] = defaultdict(list)
+    for row in rows:
+        grouped[row["referee"]].append(row)
+
+    profiles: Dict[str, dict] = {}
+    for referee, samples in grouped.items():
+        yellow_avg = sum(item["yellow_total"] for item in samples) / len(samples)
+        red_avg = sum(item["red_total"] for item in samples) / len(samples)
+        penalty_avg = sum(item["penalty_events"] for item in samples) / len(samples)
+        profiles[referee] = {
+            "referee_sample_matches": len(samples),
+            "referee_yellow_bias": max(-1.0, min((yellow_avg - global_yellow) / 3.0, 1.0)),
+            "referee_red_bias": max(-1.0, min((red_avg - global_red) / 1.5, 1.0)),
+            "referee_penalty_bias": max(-1.0, min((penalty_avg - global_penalties) / 1.0, 1.0)),
+        }
+    return profiles
+
+
+def annotate_referee_profiles(fixtures: List[dict], previous_by_id: Dict[str, dict]) -> None:
+    profiles = build_referee_profiles(previous_by_id)
+    for fixture in fixtures:
+        referee = str(fixture.get("referee") or "").strip()
+        profile = profiles.get(referee)
+        if not profile:
+            fixture["referee_sample_matches"] = 0
+            fixture["referee_yellow_bias"] = 0.0
+            fixture["referee_red_bias"] = 0.0
+            fixture["referee_penalty_bias"] = 0.0
+            continue
+        fixture.update(profile)
 
 
 def parse_iso_utc(value: str) -> datetime:
@@ -1492,6 +1616,8 @@ def build_live_fixtures(scoreboard_payload: dict) -> List[dict]:
     assign_group_letters(fixtures)
     attach_rest_and_travel(fixtures, teams)
     annotate_lineup_changes(fixtures, previous_by_id)
+    annotate_market_moves(fixtures, previous_by_id)
+    annotate_referee_profiles(fixtures, previous_by_id)
     return fixtures
 
 

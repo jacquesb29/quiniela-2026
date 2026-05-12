@@ -100,6 +100,69 @@ class RegressionLogicTest(unittest.TestCase):
             self.assertFalse(sync.provider_enabled())
             self.assertEqual(sync.fetch_provider_live_index({}), {})
 
+    def test_update_simulation_state_tracks_recent_xg_signals(self):
+        teams = app.load_teams()
+        states = app.initial_team_states(teams)
+        ctx = app.MatchContext(neutral=True, knockout=False, importance=1.0)
+        app.update_simulation_state(
+            teams,
+            states,
+            "Spain",
+            "Uruguay",
+            ctx,
+            expected_goals_a=1.35,
+            expected_goals_b=0.92,
+            score_a=2,
+            score_b=0,
+            yellows_a=1,
+            reds_a=0,
+            yellows_b=2,
+            reds_b=0,
+            stage="group",
+            live_stats={"xg_a": 1.9, "xg_b": 0.35},
+        )
+        spain = states["Spain"]
+        self.assertGreater(spain["recent_xg_for_adj"], 0.0)
+        self.assertLess(spain["recent_xga_adj"], 0.0)
+        self.assertNotEqual(spain["recent_opponent_strength"], 0.0)
+
+    def test_annotate_market_moves_computes_prob_deltas(self):
+        fixtures = [{"id": "10", "market_prob_a": 0.52, "market_prob_draw": 0.24, "market_prob_b": 0.24}]
+        previous = {"10": {"market_prob_a": 0.48, "market_prob_draw": 0.26, "market_prob_b": 0.26}}
+        sync.annotate_market_moves(fixtures, previous)
+        self.assertAlmostEqual(fixtures[0]["market_move_a"], 0.04, places=4)
+        self.assertAlmostEqual(fixtures[0]["market_move_draw"], -0.02, places=4)
+        self.assertAlmostEqual(fixtures[0]["market_move_b"], -0.02, places=4)
+
+    def test_annotate_referee_profiles_uses_previous_samples(self):
+        previous = {
+            "1": {
+                "id": "1",
+                "referee": "Ref A",
+                "actual_yellows_a": 4,
+                "actual_yellows_b": 3,
+                "actual_reds_a": 1,
+                "actual_reds_b": 0,
+                "live_shot_log_a": [{"detail": "Penalty goal"}],
+                "live_shot_log_b": [],
+            },
+            "2": {
+                "id": "2",
+                "referee": "Ref B",
+                "actual_yellows_a": 1,
+                "actual_yellows_b": 1,
+                "actual_reds_a": 0,
+                "actual_reds_b": 0,
+                "live_shot_log_a": [],
+                "live_shot_log_b": [],
+            },
+        }
+        fixtures = [{"id": "3", "referee": "Ref A"}]
+        sync.annotate_referee_profiles(fixtures, previous)
+        self.assertEqual(fixtures[0]["referee_sample_matches"], 1)
+        self.assertGreater(fixtures[0]["referee_yellow_bias"], 0.0)
+        self.assertGreater(fixtures[0]["referee_red_bias"], 0.0)
+
 
 if __name__ == "__main__":
     unittest.main()

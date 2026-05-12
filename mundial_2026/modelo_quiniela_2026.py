@@ -261,6 +261,9 @@ class SquadAggregate:
     finishing: float
     shot_creation: float
     pressing: float
+    recent_minutes_load: float
+    goalkeeper_minutes_load: float
+    bench_impact: float
 
 
 @dataclass(frozen=True)
@@ -344,10 +347,26 @@ class MatchContext:
     market_prob_draw: Optional[float] = None
     market_prob_b: Optional[float] = None
     market_total_line: Optional[float] = None
+    market_move_a: float = 0.0
+    market_move_draw: float = 0.0
+    market_move_b: float = 0.0
     lineup_confirmed_a: bool = False
     lineup_confirmed_b: bool = False
     lineup_change_count_a: int = 0
     lineup_change_count_b: int = 0
+    starting_goalkeeper_a: Optional[str] = None
+    starting_goalkeeper_b: Optional[str] = None
+    goalkeeper_confirmed_a: bool = False
+    goalkeeper_confirmed_b: bool = False
+    goalkeeper_change_a: bool = False
+    goalkeeper_change_b: bool = False
+    live_substitutions_a: int = 0
+    live_substitutions_b: int = 0
+    substitution_impact_a: float = 0.0
+    substitution_impact_b: float = 0.0
+    referee_yellow_bias: float = 0.0
+    referee_red_bias: float = 0.0
+    referee_penalty_bias: float = 0.0
     importance: float = 1.0
 
 
@@ -648,6 +667,16 @@ def top_factor_drivers(factors: Optional[Dict[str, float]], limit: int = 3) -> L
         "fatigue_diff": "Fatiga",
         "availability_diff": "Disponibilidad",
         "discipline_trend_diff": "Tendencia disciplinaria",
+        "recent_xg_for_adj_diff": "xG reciente ajustado por rival",
+        "recent_xga_adj_diff": "xGA reciente ajustado por rival",
+        "recent_opponent_strength_diff": "Fortaleza reciente de rivales",
+        "recent_minutes_load_diff": "Carga reciente de minutos",
+        "goalkeeper_minutes_load_diff": "Carga reciente del portero",
+        "bench_impact_diff": "Impacto del banquillo",
+        "goalkeeper_context_diff": "Portero confirmado / cambio de portero",
+        "substitution_diff": "Cambios en vivo y banco restante",
+        "market_move_diff": "Movimiento reciente de cuotas",
+        "referee_profile_diff": "Perfil del arbitro",
         "rivalry": "Rivalidad",
     }
     ranked = sorted(
@@ -1090,6 +1119,18 @@ def availability_level(state: Optional[dict]) -> float:
     return clamp(state_float(state, "availability", 1.0), 0.40, 1.0)
 
 
+def recent_xg_for_signal(state: Optional[dict]) -> float:
+    return clamp(state_float(state, "recent_xg_for_adj", 0.0), -1.0, 1.0)
+
+
+def recent_xga_signal(state: Optional[dict]) -> float:
+    return clamp(state_float(state, "recent_xga_adj", 0.0), -1.0, 1.0)
+
+
+def recent_opponent_strength_signal(state: Optional[dict]) -> float:
+    return clamp(state_float(state, "recent_opponent_strength", 0.0), -1.0, 1.0)
+
+
 def discipline_trend(state: Optional[dict]) -> float:
     return clamp(state_float(state, "discipline_drift", 0.0), -1.0, 0.5)
 
@@ -1197,6 +1238,9 @@ def expected_goals(
         tactical_tempo_signal=tactical_tempo_signal,
         fatigue_level=fatigue_level,
         availability_level=availability_level,
+        recent_xg_for_signal=recent_xg_for_signal,
+        recent_xga_signal=recent_xga_signal,
+        recent_opponent_strength_signal=recent_opponent_strength_signal,
         group_pressure=group_pressure,
         clamp=clamp,
     )
@@ -1226,6 +1270,9 @@ def factor_breakdown(
         tactical_attack_signal=tactical_attack_signal,
         tactical_defense_signal=tactical_defense_signal,
         tactical_tempo_signal=tactical_tempo_signal,
+        recent_xg_for_signal=recent_xg_for_signal,
+        recent_xga_signal=recent_xga_signal,
+        recent_opponent_strength_signal=recent_opponent_strength_signal,
     )
 
 
@@ -1302,6 +1349,9 @@ def simulation_state_from_signature(signature: Tuple[float, ...]) -> dict:
         fatigue,
         availability,
         discipline_drift,
+        recent_xg_for_adj,
+        recent_xga_adj,
+        recent_opponent_strength,
         style_attack_bias,
         style_defense_bias,
         style_tempo,
@@ -1314,6 +1364,9 @@ def simulation_state_from_signature(signature: Tuple[float, ...]) -> dict:
         "fatigue": float(fatigue),
         "availability": float(availability),
         "discipline_drift": float(discipline_drift),
+        "recent_xg_for_adj": float(recent_xg_for_adj),
+        "recent_xga_adj": float(recent_xga_adj),
+        "recent_opponent_strength": float(recent_opponent_strength),
         "style_attack_bias": float(style_attack_bias),
         "style_defense_bias": float(style_defense_bias),
         "style_tempo": float(style_tempo),
@@ -1539,9 +1592,26 @@ def predict_match_live(
 ) -> MatchPrediction:
     team_a = teams[team_a_name]
     team_b = teams[team_b_name]
+    profile_a = profile_for(team_a)
+    profile_b = profile_for(team_b)
     base_mu_a, base_mu_b = expected_goals(team_a, team_b, ctx, state_a=state_a, state_b=state_b)
     elapsed_minutes, phase = parse_elapsed_minutes(status_detail, ctx.knockout)
     patterns = None
+    live_stats = dict(live_stats or {})
+    live_stats["substitutions_a"] = max(float(live_stats.get("substitutions_a", 0.0)), float(ctx.live_substitutions_a))
+    live_stats["substitutions_b"] = max(float(live_stats.get("substitutions_b", 0.0)), float(ctx.live_substitutions_b))
+    live_stats["substitution_impact_a"] = float(ctx.substitution_impact_a)
+    live_stats["substitution_impact_b"] = float(ctx.substitution_impact_b)
+    live_stats["bench_remaining_a"] = clamp(
+        profile_a.squad.bench_impact * max(0.0, 1.0 - float(ctx.live_substitutions_a) / 5.0),
+        0.0,
+        1.0,
+    )
+    live_stats["bench_remaining_b"] = clamp(
+        profile_b.squad.bench_impact * max(0.0, 1.0 - float(ctx.live_substitutions_b) / 5.0),
+        0.0,
+        1.0,
+    )
 
     if phase == "penalties":
         patterns = detect_live_play_patterns(
@@ -3042,6 +3112,9 @@ def extract_live_stats_payload(source: dict) -> Dict[str, float]:
         "red_cards",
         "xg",
         "xg_proxy",
+        "substitutions",
+        "substitution_impact",
+        "bench_remaining",
     )
     for stat in stat_names:
         for prefix in ("a", "b"):
@@ -3077,6 +3150,10 @@ def dashboard_live_stats_lines(entry: dict, team_a: str, team_b: str) -> List[st
     if stats.get("big_chances_a") is not None or stats.get("big_chances_b") is not None:
         lines.append(
             f"- Grandes ocasiones: {team_a} {int(stats.get('big_chances_a', 0.0))} | {team_b} {int(stats.get('big_chances_b', 0.0))}"
+        )
+    if stats.get("substitutions_a") is not None or stats.get("substitutions_b") is not None:
+        lines.append(
+            f"- Cambios usados: {team_a} {int(stats.get('substitutions_a', 0.0))} | {team_b} {int(stats.get('substitutions_b', 0.0))}"
         )
     if stats.get("possession_a") is not None or stats.get("possession_b") is not None:
         lines.append(
@@ -3192,6 +3269,8 @@ def dashboard_fixture_entries(
         fixture = resolve_fixture_names(dict(fixture), teams)
         team_a = fixture["team_a"]
         team_b = fixture["team_b"]
+        profile_a = profile_for(teams[team_a])
+        profile_b = profile_for(teams[team_b])
         state_a = normalize_team_state(states.get(team_a, {}))
         state_b = normalize_team_state(states.get(team_b, {}))
         ctx = context_from_fixture(fixture, teams, states)
@@ -3247,10 +3326,18 @@ def dashboard_fixture_entries(
                 "weather_summary": dashboard_weather_summary(fixture),
                 "weather_stress": fixture.get("weather_stress"),
                 "referee": fixture.get("referee"),
+                "referee_sample_matches": int(fixture.get("referee_sample_matches", 0)),
+                "referee_yellow_bias": fixture.get("referee_yellow_bias"),
+                "referee_red_bias": fixture.get("referee_red_bias"),
+                "referee_penalty_bias": fixture.get("referee_penalty_bias"),
                 "lineup_status_a": fixture.get("lineup_status_a"),
                 "lineup_status_b": fixture.get("lineup_status_b"),
                 "lineup_change_count_a": int(fixture.get("lineup_change_count_a", 0)),
                 "lineup_change_count_b": int(fixture.get("lineup_change_count_b", 0)),
+                "starting_goalkeeper_a": fixture.get("starting_goalkeeper_a"),
+                "starting_goalkeeper_b": fixture.get("starting_goalkeeper_b"),
+                "goalkeeper_change_a": bool(fixture.get("goalkeeper_change_a", False)),
+                "goalkeeper_change_b": bool(fixture.get("goalkeeper_change_b", False)),
                 "tactical_signature_a": tactical_signature_text(state_a),
                 "tactical_signature_b": tactical_signature_text(state_b),
                 "tactical_sample_matches_a": int(state_a.get("tactical_sample_matches", 0)),
@@ -3293,6 +3380,20 @@ def dashboard_fixture_entries(
                 "live_corners_b": fixture.get("live_corners_b"),
                 "live_red_cards_a": fixture.get("live_red_cards_a"),
                 "live_red_cards_b": fixture.get("live_red_cards_b"),
+                "live_substitutions_a": fixture.get("live_substitutions_a"),
+                "live_substitutions_b": fixture.get("live_substitutions_b"),
+                "live_substitution_impact_a": ctx.substitution_impact_a,
+                "live_substitution_impact_b": ctx.substitution_impact_b,
+                "live_bench_remaining_a": clamp(
+                    profile_a.squad.bench_impact * max(0.0, 1.0 - float(ctx.live_substitutions_a) / 5.0),
+                    0.0,
+                    1.0,
+                ),
+                "live_bench_remaining_b": clamp(
+                    profile_b.squad.bench_impact * max(0.0, 1.0 - float(ctx.live_substitutions_b) / 5.0),
+                    0.0,
+                    1.0,
+                ),
                 "live_xg_a": fixture.get("live_xg_a"),
                 "live_xg_b": fixture.get("live_xg_b"),
                 "live_xg_proxy_a": fixture.get("live_xg_proxy_a"),
@@ -3302,6 +3403,9 @@ def dashboard_fixture_entries(
                 "market_prob_a": fixture.get("market_prob_a"),
                 "market_prob_draw": fixture.get("market_prob_draw"),
                 "market_prob_b": fixture.get("market_prob_b"),
+                "market_move_a": fixture.get("market_move_a"),
+                "market_move_draw": fixture.get("market_move_draw"),
+                "market_move_b": fixture.get("market_move_b"),
                 "source": fixture.get("source"),
                 "projection": False,
             }
@@ -3730,6 +3834,29 @@ def dashboard_news_lines(entry: dict, team_a: str, team_b: str) -> List[str]:
         lines.append(f"- Impacto noticioso {team_a}: {'; '.join(notes_a[:2])}")
     if notes_b:
         lines.append(f"- Impacto noticioso {team_b}: {'; '.join(notes_b[:2])}")
+    if entry.get("starting_goalkeeper_a") or entry.get("starting_goalkeeper_b"):
+        lines.append(
+            f"- Portero esperado: {team_a} {entry.get('starting_goalkeeper_a') or 'sin confirmar'} | "
+            f"{team_b} {entry.get('starting_goalkeeper_b') or 'sin confirmar'}"
+        )
+    if entry.get("goalkeeper_change_a") or entry.get("goalkeeper_change_b"):
+        lines.append(
+            f"- Cambio de portero respecto a la actualizacion anterior: {team_a} {'si' if entry.get('goalkeeper_change_a') else 'no'} | "
+            f"{team_b} {'si' if entry.get('goalkeeper_change_b') else 'no'}"
+        )
+    if entry.get("referee"):
+        sample_matches = int(entry.get("referee_sample_matches", 0) or 0)
+        lines.append(
+            f"- Arbitro: {entry.get('referee')} | perfil {sample_matches} muestras, amarillas {float(entry.get('referee_yellow_bias', 0.0)):+.2f}, "
+            f"rojas {float(entry.get('referee_red_bias', 0.0)):+.2f}, penales {float(entry.get('referee_penalty_bias', 0.0)):+.2f}"
+        )
+    market_move_a = float(entry.get("market_move_a", 0.0) or 0.0)
+    market_move_draw = float(entry.get("market_move_draw", 0.0) or 0.0)
+    market_move_b = float(entry.get("market_move_b", 0.0) or 0.0)
+    if any(abs(value) >= 0.005 for value in (market_move_a, market_move_draw, market_move_b)):
+        lines.append(
+            f"- Movimiento reciente de cuotas: {team_a} {market_move_a:+.1%} | empate {market_move_draw:+.1%} | {team_b} {market_move_b:+.1%}"
+        )
     return lines
 
 
@@ -3774,10 +3901,25 @@ def adjustment_reason_lines(entry: dict, prediction: MatchPrediction) -> List[st
         lines.append(
             f"- Cambio por cambios en el XI: {prediction.team_a} {entry.get('lineup_change_count_a', 0)} | {prediction.team_b} {entry.get('lineup_change_count_b', 0)}."
         )
+    if entry.get("goalkeeper_change_a") or entry.get("goalkeeper_change_b"):
+        lines.append(
+            f"- Cambio por portero distinto al de la actualizacion anterior: {prediction.team_a} {'si' if entry.get('goalkeeper_change_a') else 'no'} | "
+            f"{prediction.team_b} {'si' if entry.get('goalkeeper_change_b') else 'no'}."
+        )
     if entry.get("weather_stress") is not None and float(entry.get("weather_stress", 0.0)) >= 0.18:
         lines.append(f"- Cambio por clima exigente: estres climatico {float(entry.get('weather_stress', 0.0)):.2f}.")
     if entry.get("market_prob_a") is not None:
         lines.append("- Cambio por cuotas del mercado: se mezclan con la estimacion propia del modelo.")
+    if any(abs(float(entry.get(key, 0.0) or 0.0)) >= 0.005 for key in ("market_move_a", "market_move_draw", "market_move_b")):
+        lines.append(
+            f"- Cambio por movimiento reciente de cuotas: {prediction.team_a} {float(entry.get('market_move_a', 0.0)):+.1%} | "
+            f"empate {float(entry.get('market_move_draw', 0.0)):+.1%} | {prediction.team_b} {float(entry.get('market_move_b', 0.0)):+.1%}."
+        )
+    if entry.get("referee_sample_matches"):
+        lines.append(
+            f"- Cambio por perfil del arbitro: amarillas {float(entry.get('referee_yellow_bias', 0.0)):+.2f}, "
+            f"rojas {float(entry.get('referee_red_bias', 0.0)):+.2f}, penales {float(entry.get('referee_penalty_bias', 0.0)):+.2f}."
+        )
     live_stats = extract_live_stats_payload(entry)
     if live_stats:
         shots_on_target_a = int(live_stats.get("shots_on_target_a", 0.0))
@@ -3794,6 +3936,12 @@ def adjustment_reason_lines(entry: dict, prediction: MatchPrediction) -> List[st
         if red_a or red_b:
             lines.append(
                 f"- Cambio por expulsiones en vivo: rojas {prediction.team_a} {red_a} | {prediction.team_b} {red_b}."
+            )
+        substitutions_a = int(live_stats.get("substitutions_a", 0.0))
+        substitutions_b = int(live_stats.get("substitutions_b", 0.0))
+        if substitutions_a or substitutions_b:
+            lines.append(
+                f"- Cambio por sustituciones y banco restante: cambios {prediction.team_a} {substitutions_a} | {prediction.team_b} {substitutions_b}."
             )
     patterns = infer_entry_patterns(entry, prediction) or {}
     side_a = patterns.get("a")
@@ -5122,7 +5270,7 @@ def build_methodology_html(bracket_payload: dict, backtest: dict) -> str:
         "</article>"
         "<article>"
         "<h3>Estado dinámico</h3>"
-        "<p>Actualiza Elo, forma, fatiga, disponibilidad, disciplina, clima, alineaciones, bajas y mercado a medida que aparecen datos nuevos. Ademas, acumula el estilo reciente de cada seleccion para no arrancar cada cruce desde cero.</p>"
+        "<p>Actualiza Elo, forma, fatiga, disponibilidad, disciplina, clima, alineaciones, bajas, mercado y ahora tambien xG/xGA reciente ajustado por rival. Ademas, acumula el estilo reciente de cada seleccion para no arrancar cada cruce desde cero.</p>"
         "</article>"
         "<article>"
         "<h3>Validacion y calibracion</h3>"
@@ -5130,11 +5278,11 @@ def build_methodology_html(bracket_payload: dict, backtest: dict) -> str:
         "</article>"
         "<article>"
         "<h3>Modo in-play</h3>"
-        "<p>Durante un partido, condiciona las probabilidades por minuto, marcador actual y fase del juego. Si el feed trae datos mas ricos, tambien usa tiros, tiros al arco, posesion, calidad de ocasiones, corners, disciplina y expulsiones para recalcular todo.</p>"
+        "<p>Durante un partido, condiciona las probabilidades por minuto, marcador actual y fase del juego. Si el feed trae datos mas ricos, tambien usa tiros, tiros al arco, posesion, calidad de ocasiones, corners, disciplina, sustituciones, banco restante y el portero confirmado para recalcular todo.</p>"
         "</article>"
         "<article>"
         "<h3>Noticias y bajas</h3>"
-        "<p>Si el feed publica ausencias, cambios de XI o noticias relevantes del partido, esas señales entran como disponibilidad, moral o contexto adicional.</p>"
+        "<p>Si el feed publica ausencias, cambios de XI, movimiento de cuotas, arbitro o noticias relevantes del partido, esas señales entran como disponibilidad, moral o contexto adicional.</p>"
         "</article>"
         "<article>"
         "<h3>Como validar el refresh</h3>"
@@ -5578,7 +5726,7 @@ def initial_team_states(teams: Dict[str, Team]) -> Dict[str, dict]:
 def empty_persistent_payload(teams: Dict[str, Team]) -> dict:
     return {
         "meta": {
-            "version": 3,
+            "version": 4,
             "updated_at": iso_timestamp(),
             "description": "Estado persistente del Mundial 2026 para actualizar automaticamente predicciones futuras.",
         },
@@ -5643,6 +5791,9 @@ def print_state(state_name: str, state: dict) -> None:
     print(f"  Fatiga: {state['fatigue']:.2f}")
     print(f"  Disponibilidad: {state['availability']:.2f}")
     print(f"  Tendencia disciplinaria: {state['discipline_drift']:+.2f}")
+    print(f"  xG reciente ajustado por rival: {state['recent_xg_for_adj']:+.2f}")
+    print(f"  xGA reciente ajustado por rival: {state['recent_xga_adj']:+.2f}")
+    print(f"  Fortaleza reciente de rivales: {state['recent_opponent_strength']:+.2f}")
     print(f"  Firma tactica reciente: {state['tactical_signature']}")
     print(
         f"  Rasgos tacticos: posesion {state['style_possession']:+.2f} | verticalidad {state['style_verticality']:+.2f} | "
@@ -5817,11 +5968,23 @@ def context_from_fixture(
     states: Optional[Dict[str, dict]] = None,
 ) -> MatchContext:
     states = states or {}
+    team_a_name = fixture["team_a"]
+    team_b_name = fixture["team_b"]
+    profile_a = profile_for(teams[team_a_name])
+    profile_b = profile_for(teams[team_b_name])
     state_a = normalize_team_state(states.get(fixture["team_a"], {}))
     state_b = normalize_team_state(states.get(fixture["team_b"], {}))
     stage = fixture_stage_name(fixture)
     knockout = stage != "group"
     default_rest_days = 4 if stage == "group" else 5
+    live_substitutions_a = int(fixture.get("live_substitutions_a", 0) or 0)
+    live_substitutions_b = int(fixture.get("live_substitutions_b", 0) or 0)
+    substitution_impact_a = fixture.get("substitution_impact_a")
+    substitution_impact_b = fixture.get("substitution_impact_b")
+    if substitution_impact_a is None:
+        substitution_impact_a = clamp((live_substitutions_a / 5.0) * (0.55 + 0.90 * profile_a.squad.bench_impact), 0.0, 1.0)
+    if substitution_impact_b is None:
+        substitution_impact_b = clamp((live_substitutions_b / 5.0) * (0.55 + 0.90 * profile_b.squad.bench_impact), 0.0, 1.0)
 
     return MatchContext(
         neutral=bool(fixture.get("neutral", fixture.get("home_team") is None)),
@@ -5857,10 +6020,26 @@ def context_from_fixture(
         market_prob_draw=market_probability(fixture.get("market_prob_draw")),
         market_prob_b=market_probability(fixture.get("market_prob_b")),
         market_total_line=float(fixture["market_total_line"]) if fixture.get("market_total_line") is not None else None,
+        market_move_a=float(fixture.get("market_move_a", 0.0) or 0.0),
+        market_move_draw=float(fixture.get("market_move_draw", 0.0) or 0.0),
+        market_move_b=float(fixture.get("market_move_b", 0.0) or 0.0),
         lineup_confirmed_a=bool(fixture.get("lineup_confirmed_a", False)),
         lineup_confirmed_b=bool(fixture.get("lineup_confirmed_b", False)),
         lineup_change_count_a=int(fixture.get("lineup_change_count_a", 0)),
         lineup_change_count_b=int(fixture.get("lineup_change_count_b", 0)),
+        starting_goalkeeper_a=fixture.get("starting_goalkeeper_a"),
+        starting_goalkeeper_b=fixture.get("starting_goalkeeper_b"),
+        goalkeeper_confirmed_a=bool(fixture.get("goalkeeper_confirmed_a", fixture.get("starting_goalkeeper_a"))),
+        goalkeeper_confirmed_b=bool(fixture.get("goalkeeper_confirmed_b", fixture.get("starting_goalkeeper_b"))),
+        goalkeeper_change_a=bool(fixture.get("goalkeeper_change_a", False)),
+        goalkeeper_change_b=bool(fixture.get("goalkeeper_change_b", False)),
+        live_substitutions_a=live_substitutions_a,
+        live_substitutions_b=live_substitutions_b,
+        substitution_impact_a=float(substitution_impact_a),
+        substitution_impact_b=float(substitution_impact_b),
+        referee_yellow_bias=float(fixture.get("referee_yellow_bias", 0.0) or 0.0),
+        referee_red_bias=float(fixture.get("referee_red_bias", 0.0) or 0.0),
+        referee_penalty_bias=float(fixture.get("referee_penalty_bias", 0.0) or 0.0),
         importance=float(fixture.get("importance", STAGE_IMPORTANCE[stage])),
     )
 
@@ -6085,6 +6264,9 @@ def print_team_profile(team: Team) -> None:
     print(f"  Definicion: {squad.finishing:.2f}")
     print(f"  Generacion de ocasiones: {squad.shot_creation:.2f}")
     print(f"  Presion/recuperacion: {squad.pressing:.2f}")
+    print(f"  Carga reciente de minutos del XI: {squad.recent_minutes_load:.2f}")
+    print(f"  Carga reciente de minutos del portero: {squad.goalkeeper_minutes_load:.2f}")
+    print(f"  Impacto estimado del banquillo: {squad.bench_impact:.2f}")
 
 
 def coalesce(value: Optional[float], fallback: float) -> float:

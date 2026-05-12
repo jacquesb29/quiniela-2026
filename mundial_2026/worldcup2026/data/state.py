@@ -28,6 +28,9 @@ class TeamState:
     fatigue: float = 0.0
     availability: float = 1.0
     discipline_drift: float = 0.0
+    recent_xg_for_adj: float = 0.0
+    recent_xga_adj: float = 0.0
+    recent_opponent_strength: float = 0.0
     style_possession: float = 0.0
     style_verticality: float = 0.0
     style_pressure: float = 0.0
@@ -63,6 +66,9 @@ class TeamState:
         self.fatigue = clamp(float(self.fatigue), 0.0, 1.0)
         self.availability = clamp(float(self.availability), 0.40, 1.0)
         self.discipline_drift = clamp(float(self.discipline_drift), -1.0, 0.5)
+        self.recent_xg_for_adj = clamp(float(self.recent_xg_for_adj), -1.0, 1.0)
+        self.recent_xga_adj = clamp(float(self.recent_xga_adj), -1.0, 1.0)
+        self.recent_opponent_strength = clamp(float(self.recent_opponent_strength), -1.0, 1.0)
         self.yellow_load = clamp(float(self.yellow_load), 0.0, 6.0)
         self.style_possession = clamp(float(self.style_possession), -1.0, 1.0)
         self.style_verticality = clamp(float(self.style_verticality), -1.0, 1.0)
@@ -94,6 +100,9 @@ class TeamState:
             round(self.fatigue, 1),
             round(self.availability, 1),
             round(self.discipline_drift, 1),
+            round(self.recent_xg_for_adj, 1),
+            round(self.recent_xga_adj, 1),
+            round(self.recent_opponent_strength, 1),
             round(self.style_attack_bias, 1),
             round(self.style_defense_bias, 1),
             round(self.style_tempo, 1),
@@ -139,6 +148,9 @@ def state_has_activity(state: Optional[Mapping[str, Any]]) -> bool:
             abs(normalized.attack_form) > 1e-9,
             abs(normalized.defense_form) > 1e-9,
             abs(normalized.discipline_drift) > 1e-9,
+            abs(normalized.recent_xg_for_adj) > 1e-9,
+            abs(normalized.recent_xga_adj) > 1e-9,
+            abs(normalized.recent_opponent_strength) > 1e-9,
             abs(normalized.fatigue) > 1e-9,
             abs(normalized.availability - 1.0) > 1e-9,
             normalized.tactical_sample_matches > 0,

@@ -43,6 +43,12 @@ def live_stats_adjustment(base_total_mu: float, mu_a: float, mu_b: float, progre
     corners_b = float(live_stats.get("corners_b", 0.0))
     red_a = float(live_stats.get("red_cards_a", 0.0))
     red_b = float(live_stats.get("red_cards_b", 0.0))
+    substitutions_a = float(live_stats.get("substitutions_a", 0.0))
+    substitutions_b = float(live_stats.get("substitutions_b", 0.0))
+    substitution_impact_a = float(live_stats.get("substitution_impact_a", 0.0))
+    substitution_impact_b = float(live_stats.get("substitution_impact_b", 0.0))
+    bench_remaining_a = float(live_stats.get("bench_remaining_a", 0.0))
+    bench_remaining_b = float(live_stats.get("bench_remaining_b", 0.0))
 
     if (
         xg_a <= 0.0
@@ -55,6 +61,10 @@ def live_stats_adjustment(base_total_mu: float, mu_a: float, mu_b: float, progre
         and corners_b <= 0.0
         and red_a <= 0.0
         and red_b <= 0.0
+        and substitutions_a <= 0.0
+        and substitutions_b <= 0.0
+        and abs(substitution_impact_a) <= 0.0
+        and abs(substitution_impact_b) <= 0.0
     ):
         return mu_a, mu_b
 
@@ -73,6 +83,9 @@ def live_stats_adjustment(base_total_mu: float, mu_a: float, mu_b: float, progre
         + 0.004 * poss_diff
         + 0.012 * corners_diff
         + 0.48 * red_advantage_for_a
+        + 0.030 * clamp(substitutions_a - substitutions_b, -5.0, 5.0)
+        + 0.18 * clamp(substitution_impact_a - substitution_impact_b, -1.0, 1.0)
+        + 0.06 * clamp(bench_remaining_a - bench_remaining_b, -1.0, 1.0)
     )
     edge_signal *= 0.45 + 0.55 * clamp(progress, 0.0, 1.0)
 
