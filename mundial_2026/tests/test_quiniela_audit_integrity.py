@@ -83,6 +83,14 @@ class QuinielaAuditIntegrityTest(unittest.TestCase):
         workflow = (REPO_ROOT / ".github" / "workflows" / "quiniela-pages.yml").read_text()
         self.assertEqual(app.audit_workflow_text(workflow, 15000), [])
 
+    def test_dashboard_audit_requires_ticket_audit_block(self):
+        html = (
+            "<html><section class=\"certainty-panel\"><h2>Hoja de máxima certeza</h2>"
+            "<p>Picks mas defendibles</p><p>Marcadores exactos mas defendibles</p><p>15000</p></section></html>"
+        )
+        errors = app.audit_dashboard_html(html)
+        self.assertTrue(any("Auditoria del boleto" in error for error in errors))
+
     def build_valid_bracket_matches(self):
         team_pool = [team for members in self.draw_payload["groups"].values() for team in members]
         bracket_matches = {}
@@ -184,6 +192,12 @@ class QuinielaAuditIntegrityTest(unittest.TestCase):
             bracket_path.write_text(json.dumps({"iterations": 15000, "matches": bracket_matches}))
             dashboard_path.write_text(
                 "<html><section class=\"certainty-panel\"><h2>Hoja de máxima certeza</h2>"
+                "<p>Auditoria del boleto</p>"
+                "<p>Picks firmes o preferentes</p>"
+                "<p>Partidos trampa o alta varianza</p>"
+                "<p>Marcadores exactos defendibles</p>"
+                "<p>Brecha minima contra la segunda opcion</p>"
+                "<p>Checklist de auditoria</p>"
                 "<p>Picks mas defendibles</p><p>Marcadores exactos mas defendibles</p><p>15000</p></section></html>"
             )
             workflow_path.write_text(

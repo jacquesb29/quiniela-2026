@@ -4157,12 +4157,75 @@ def quiniela_certainty_profile(entry: dict) -> dict:
     }
 
 
+def quiniela_audit_metrics(profiles: Sequence[dict]) -> dict:
+    if not profiles:
+        return {
+            "total": 0,
+            "firm_or_preferent": 0,
+            "traps": 0,
+            "high_variance": 0,
+            "defensible_scores": 0,
+            "fragile_scores": 0,
+            "low_gap": 0,
+            "avg_certainty": 0.0,
+            "avg_pick_prob": 0.0,
+            "min_gap": 0.0,
+            "min_confidence": 0.0,
+            "ticket_status": "Sin partidos auditables",
+            "warnings": ["No hay partidos reales cargados para auditar el boleto."],
+        }
+    total = len(profiles)
+    firm_or_preferent = sum(1 for item in profiles if item["tier"] in {"Firme", "Preferente"})
+    traps = sum(1 for item in profiles if item["tier"] == "Trampa")
+    high_variance = sum(1 for item in profiles if item["tier"] == "Alta varianza")
+    defensible_scores = sum(1 for item in profiles if float(item["score_prob"]) >= 0.16)
+    fragile_scores = total - defensible_scores
+    low_gap = sum(1 for item in profiles if float(item["gap"]) < 0.10)
+    avg_certainty = sum(float(item["certainty_score"]) for item in profiles) / total
+    avg_pick_prob = sum(float(item["pick_prob"]) for item in profiles) / total
+    min_gap = min(float(item["gap"]) for item in profiles)
+    min_confidence = min(float(item["confidence"]) for item in profiles)
+    warnings = []
+    if low_gap:
+        warnings.append(f"{low_gap} partidos tienen brecha menor a 10 puntos porcentuales contra la segunda opcion.")
+    if traps or high_variance:
+        warnings.append(f"{traps + high_variance} partidos deben tratarse con cobertura o cautela.")
+    if fragile_scores > defensible_scores:
+        warnings.append("La mayoria de marcadores exactos son fragiles; usarlos solo si la quiniela premia marcador.")
+    if avg_certainty < 0.68:
+        warnings.append("La certeza operativa media no es alta; conviene priorizar picks base y evitar jugadas heroicas.")
+    if not warnings:
+        warnings.append("El boleto no muestra alertas críticas en este corte, pero igual debe revisarse alineacion y noticias antes del cierre.")
+    if firm_or_preferent / total >= 0.70 and low_gap <= max(2, total // 8):
+        ticket_status = "Boleto defendible"
+    elif traps + high_variance >= max(4, total // 5):
+        ticket_status = "Boleto con demasiadas trampas"
+    else:
+        ticket_status = "Boleto jugable con coberturas"
+    return {
+        "total": total,
+        "firm_or_preferent": firm_or_preferent,
+        "traps": traps,
+        "high_variance": high_variance,
+        "defensible_scores": defensible_scores,
+        "fragile_scores": fragile_scores,
+        "low_gap": low_gap,
+        "avg_certainty": avg_certainty,
+        "avg_pick_prob": avg_pick_prob,
+        "min_gap": min_gap,
+        "min_confidence": min_confidence,
+        "ticket_status": ticket_status,
+        "warnings": warnings,
+    }
+
+
 def build_max_certainty_markdown(entries: Sequence[dict]) -> List[str]:
     if not entries:
         return ["_Sin partidos cargados para construir una hoja de picks._"]
     profiles = [quiniela_certainty_profile(entry) for entry in entries if not entry.get("projection")]
     if not profiles:
         return ["_Sin partidos reales cargados para construir una hoja de picks._"]
+    audit = quiniela_audit_metrics(profiles)
     safest = sorted(profiles, key=lambda item: (item["certainty_score"], item["pick_prob"], item["gap"]), reverse=True)[:12]
     traps = sorted(
         [item for item in profiles if item["tier"] in {"Trampa", "Alta varianza"}],
@@ -4172,6 +4235,17 @@ def build_max_certainty_markdown(entries: Sequence[dict]) -> List[str]:
     lines = [
         "- Lectura: la certeza operativa no es probabilidad garantizada de acierto; es un ranking conservador que mezcla probabilidad del resultado, diferencia contra la segunda opcion, cobertura de marcadores y acuerdo entre modelos.",
         "- Regla base sin conocer tu quiniela exacta: en partidos firmes juega resultado; en partidos trampa cubre empate/upset; para marcador exacto usa el top score solo si la quiniela lo premia mucho.",
+        "",
+        "### Auditoria del boleto",
+        f"- Estado: {audit['ticket_status']}",
+        f"- Partidos auditados: {audit['total']}",
+        f"- Picks firmes o preferentes: {audit['firm_or_preferent']}",
+        f"- Partidos trampa o alta varianza: {audit['traps'] + audit['high_variance']}",
+        f"- Marcadores exactos defendibles: {audit['defensible_scores']} | fragiles: {audit['fragile_scores']}",
+        f"- Brecha minima contra la segunda opcion: {format_pct(float(audit['min_gap']))}",
+        f"- Certeza operativa media: {format_pct(float(audit['avg_certainty']))}",
+        "- Checklist de auditoria: revisar bajas confirmadas, once inicial, mercado de ultima hora, clima y estado live antes de cerrar el boleto.",
+        "- Alertas: " + " ".join(str(item) for item in audit["warnings"]),
         "",
         "### Picks mas defendibles",
     ]
@@ -4201,6 +4275,7 @@ def build_max_certainty_html(entries: Sequence[dict]) -> str:
     profiles = [quiniela_certainty_profile(entry) for entry in entries if not entry.get("projection")]
     if not profiles:
         return ""
+    audit = quiniela_audit_metrics(profiles)
     safest = sorted(profiles, key=lambda item: (item["certainty_score"], item["pick_prob"], item["gap"]), reverse=True)[:10]
     traps = sorted(
         [item for item in profiles if item["tier"] in {"Trampa", "Alta varianza"}],
@@ -4237,6 +4312,37 @@ def build_max_certainty_html(entries: Sequence[dict]) -> str:
             )
         return "".join(html_rows)
 
+    audit_tiles = (
+        "<div class=\"confidence-tiles quiniela-audit-tiles\">"
+        f"<div class=\"summary-tile\"><span>Estado del boleto</span><strong>{html.escape(str(audit['ticket_status']))}</strong></div>"
+        f"<div class=\"summary-tile\"><span>Partidos auditados</span><strong>{int(audit['total'])}</strong></div>"
+        f"<div class=\"summary-tile\"><span>Picks firmes o preferentes</span><strong>{int(audit['firm_or_preferent'])}</strong></div>"
+        f"<div class=\"summary-tile\"><span>Partidos trampa o alta varianza</span><strong>{int(audit['traps']) + int(audit['high_variance'])}</strong></div>"
+        f"<div class=\"summary-tile\"><span>Marcadores exactos defendibles</span><strong>{int(audit['defensible_scores'])}</strong></div>"
+        f"<div class=\"summary-tile\"><span>Brecha minima contra la segunda opcion</span><strong>{format_pct(float(audit['min_gap']))}</strong></div>"
+        f"<div class=\"summary-tile\"><span>Certeza operativa media</span><strong>{format_pct(float(audit['avg_certainty']))}</strong></div>"
+        "</div>"
+    )
+    warning_rows = "".join(
+        "<li>"
+        f"<strong>{html.escape(str(warning))}</strong>"
+        "<span>Accion: revisar antes de cerrar la quiniela y no sobreapostar marcadores exactos fragiles.</span>"
+        "</li>"
+        for warning in audit["warnings"]
+    )
+    audit_panel = (
+        "<article class=\"ticket-audit-card\">"
+        "<h3>Auditoria del boleto</h3>"
+        "<p class=\"meta\">Esta capa revisa si el boleto esta defendible como estrategia de quiniela: no promete certeza artificial, separa picks base de coberturas y detecta donde el modelo esta mas fragil.</p>"
+        f"{audit_tiles}"
+        "<h4>Checklist de auditoria</h4>"
+        "<ul>"
+        "<li><strong>Antes de cerrar</strong><span>Confirmar bajas, once inicial, portero, cuotas de ultima hora, clima y noticias.</span></li>"
+        "<li><strong>Durante partido en vivo</strong><span>Si la quiniela permite cambios, priorizar minuto, marcador, tiros, xG live, rojas y momentum.</span></li>"
+        f"{warning_rows}"
+        "</ul>"
+        "</article>"
+    )
     trap_rows = rows(traps, "trap") if traps else "<li><strong>Sin trampas fuertes detectadas</strong><span>El corte actual no marca partidos con brecha estrecha crítica.</span><em>Igual revisar alineaciones antes de cerrar.</em></li>"
     return (
         "<section class=\"panel certainty-panel\">"
@@ -4247,6 +4353,7 @@ def build_max_certainty_html(entries: Sequence[dict]) -> str:
         "<p class=\"lede-tight\">Esta seccion traduce el modelo a decisiones de quiniela. No infla probabilidades: ordena los picks por solidez operativa, separa partidos trampa y avisa cuando el marcador exacto es fragil.</p>"
         "</div>"
         "</div>"
+        f"{audit_panel}"
         "<div class=\"certainty-grid\">"
         "<article><h3>Picks mas defendibles</h3><ul>"
         f"{rows(safest, 'safe')}"
@@ -6075,6 +6182,12 @@ def audit_dashboard_html(dashboard_html: str) -> List[str]:
     required_snippets = [
         "Hoja de máxima certeza",
         "certainty-panel",
+        "Auditoria del boleto",
+        "Picks firmes o preferentes",
+        "Partidos trampa o alta varianza",
+        "Marcadores exactos defendibles",
+        "Brecha minima contra la segunda opcion",
+        "Checklist de auditoria",
         "Picks mas defendibles",
         "Marcadores exactos mas defendibles",
         "15000",

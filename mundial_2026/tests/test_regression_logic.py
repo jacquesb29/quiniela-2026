@@ -196,8 +196,46 @@ class RegressionLogicTest(unittest.TestCase):
             ]
         )
         self.assertIn("Hoja de máxima certeza", html)
+        self.assertIn("Auditoria del boleto", html)
+        self.assertIn("Brecha minima contra la segunda opcion", html)
+        self.assertIn("Checklist de auditoria", html)
         self.assertIn("Picks mas defendibles", html)
         self.assertIn("Spain vs Uruguay", html)
+
+    def test_quiniela_audit_metrics_flags_traps_and_fragile_scores(self):
+        firm_prediction = app.MatchPrediction(
+            team_a="Spain",
+            team_b="Uruguay",
+            expected_goals_a=1.8,
+            expected_goals_b=0.7,
+            win_a=0.70,
+            draw=0.18,
+            win_b=0.12,
+            exact_scores=[("2-0", 0.18), ("1-0", 0.15)],
+            statistical_depth={"confidence_index": 0.80, "top3_coverage": 0.46, "model_agreement": 0.78},
+        )
+        trap_prediction = app.MatchPrediction(
+            team_a="Turkey",
+            team_b="Belgium",
+            expected_goals_a=1.1,
+            expected_goals_b=1.0,
+            win_a=0.34,
+            draw=0.33,
+            win_b=0.33,
+            exact_scores=[("1-1", 0.13), ("1-0", 0.10)],
+            statistical_depth={"confidence_index": 0.50, "top3_coverage": 0.34, "model_agreement": 0.54},
+        )
+        profiles = [
+            app.quiniela_certainty_profile({"title": "Spain vs Uruguay", "prediction": firm_prediction, "status_state": "pre"}),
+            app.quiniela_certainty_profile({"title": "Turkey vs Belgium", "prediction": trap_prediction, "status_state": "pre"}),
+        ]
+        audit = app.quiniela_audit_metrics(profiles)
+
+        self.assertEqual(audit["total"], 2)
+        self.assertEqual(audit["firm_or_preferent"], 1)
+        self.assertGreaterEqual(audit["traps"] + audit["high_variance"], 1)
+        self.assertEqual(audit["defensible_scores"], 1)
+        self.assertLess(audit["min_gap"], 0.10)
 
     def test_update_simulation_state_tracks_recent_xg_signals(self):
         teams = app.load_teams()
