@@ -553,6 +553,31 @@ h3 { font-size: 1.05rem; }
   letter-spacing: 0.04em;
   text-transform: uppercase;
 }
+.consensus-panel {
+  background:
+    radial-gradient(circle at 8% 12%, rgba(218, 155, 62, 0.18), transparent 32%),
+    linear-gradient(135deg, rgba(255, 250, 240, 0.96), rgba(241, 247, 239, 0.94));
+}
+.consensus-panel .summary-tile {
+  background: rgba(255, 255, 255, 0.72);
+}
+.consensus-grid article {
+  background: linear-gradient(180deg, rgba(255,255,255,0.78), rgba(15,109,102,0.06));
+  border-color: rgba(15,109,102,0.16);
+}
+.consensus-grid li strong {
+  color: var(--ink);
+}
+.consensus-grid li span {
+  color: var(--muted);
+}
+.consensus-grid li em {
+  background: rgba(15,109,102,0.10);
+  color: var(--accent-dark);
+}
+.override-note {
+  color: var(--accent-dark);
+}
 .chart-grid {
   display: grid;
   gap: 12px;

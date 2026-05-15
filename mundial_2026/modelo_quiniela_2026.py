@@ -200,6 +200,30 @@ BRACKET_FILE = Path(__file__).with_name("llave_actual_2026.md")
 BRACKET_JSON_FILE = Path(__file__).with_name("llave_actual_2026.json")
 DASHBOARD_HTML_FILE = Path(__file__).with_name("dashboard_actual_2026.html")
 DASHBOARD_MD_FILE = Path(__file__).with_name("reporte_actual_2026.md")
+CONSENSUS_CHAMPION_PRIORS = {
+    # Guardrail externo de quiniela: mezcla odds publicas/modelos publicados.
+    # No reemplaza el Monte Carlo; evita que la llave se sobreconcentre en un solo favorito.
+    "Spain": 0.19,
+    "France": 0.15,
+    "England": 0.13,
+    "Argentina": 0.12,
+    "Brazil": 0.11,
+    "Portugal": 0.075,
+    "Germany": 0.075,
+    "Netherlands": 0.05,
+    "Colombia": 0.018,
+    "Croatia": 0.015,
+    "Belgium": 0.014,
+}
+CONSENSUS_CHAMPION_BLEND = 0.50
+QUINIELA_BRACKET_OVERRIDES = {
+    "M93": {
+        "teams": {"Turkey", "Belgium"},
+        "winner": "Belgium",
+        "max_model_edge": 0.08,
+        "reason": "Bélgica queda como pick de quiniela cuando el modelo no separa claramente el cruce; el consenso externo/ranking castiga menos a Bélgica que a Turquía.",
+    },
+}
 
 
 @dataclass(frozen=True)
@@ -3082,6 +3106,155 @@ def format_pct(value: float) -> str:
     return f"{value:.1%}"
 
 
+def conditional_winner_rows(matchup: dict) -> List[dict]:
+    rows = matchup.get("conditional_winners") or []
+    return [row for row in rows if row.get("team")]
+
+
+def conditional_winner_for_team(matchup: dict, team: str) -> Optional[dict]:
+    for row in conditional_winner_rows(matchup):
+        if row.get("team") == team:
+            return row
+    return None
+
+
+def quiniela_override_for_match(match_id: str, matchup: dict, selected_winner: str) -> Optional[dict]:
+    override = QUINIELA_BRACKET_OVERRIDES.get(match_id)
+    if not override:
+        return None
+    teams = {matchup.get("team_a"), matchup.get("team_b")}
+    if teams != set(override["teams"]):
+        return None
+    target = str(override["winner"])
+    if selected_winner == target:
+        return None
+    rows = conditional_winner_rows(matchup)
+    if not rows:
+        return None
+    target_row = conditional_winner_for_team(matchup, target)
+    if target_row is None:
+        return None
+    top_prob = float(rows[0].get("conditional_prob", 0.0) or 0.0)
+    target_prob = float(target_row.get("conditional_prob", 0.0) or 0.0)
+    model_edge = max(0.0, top_prob - target_prob)
+    if model_edge > float(override.get("max_model_edge", 0.0)):
+        return None
+    return {
+        "winner": target,
+        "conditional_prob": target_prob,
+        "overall_prob": float(target_row.get("overall_prob", 0.0) or 0.0),
+        "model_winner": selected_winner,
+        "model_winner_prob": top_prob,
+        "model_edge": model_edge,
+        "reason": str(override.get("reason", "")),
+    }
+
+
+def champion_probabilities_from_bracket(bracket_payload: dict) -> Dict[str, float]:
+    final_match = (bracket_payload.get("matches") or {}).get("M103", {})
+    raw = final_match.get("advance_probabilities") or {}
+    return {
+        str(team): float(prob)
+        for team, prob in raw.items()
+        if float(prob or 0.0) > 0.0
+    }
+
+
+def consensus_distribution_for_teams(team_names: Sequence[str], model_probs: Dict[str, float]) -> Dict[str, float]:
+    explicit = {
+        team: float(CONSENSUS_CHAMPION_PRIORS[team])
+        for team in team_names
+        if team in CONSENSUS_CHAMPION_PRIORS
+    }
+    explicit_sum = sum(explicit.values())
+    missing = [team for team in team_names if team not in explicit]
+    missing_model_sum = sum(model_probs.get(team, 0.0) for team in missing)
+    remaining = max(0.0, 1.0 - explicit_sum)
+    consensus = dict(explicit)
+    if missing:
+        for team in missing:
+            share = model_probs.get(team, 0.0) / missing_model_sum if missing_model_sum > 0 else 1.0 / len(missing)
+            consensus[team] = remaining * share
+    total = sum(consensus.values())
+    if total <= 0:
+        return {team: 1.0 / max(len(team_names), 1) for team in team_names}
+    return {team: value / total for team, value in consensus.items()}
+
+
+def consensus_adjusted_champion_probabilities(bracket_payload: dict) -> List[dict]:
+    model_probs = champion_probabilities_from_bracket(bracket_payload)
+    if not model_probs:
+        return []
+    team_names = sorted(model_probs)
+    consensus = consensus_distribution_for_teams(team_names, model_probs)
+    model_total = sum(model_probs.values())
+    normalized_model = {team: value / model_total for team, value in model_probs.items()} if model_total > 0 else model_probs
+    rows = []
+    for team in team_names:
+        model_prob = float(normalized_model.get(team, 0.0))
+        consensus_prob = float(consensus.get(team, 0.0))
+        adjusted = (1.0 - CONSENSUS_CHAMPION_BLEND) * model_prob + CONSENSUS_CHAMPION_BLEND * consensus_prob
+        rows.append(
+            {
+                "team": team,
+                "model_prob": model_prob,
+                "consensus_prob": consensus_prob,
+                "adjusted_prob": adjusted,
+                "delta": model_prob - consensus_prob,
+            }
+        )
+    total = sum(row["adjusted_prob"] for row in rows)
+    if total > 0:
+        for row in rows:
+            row["adjusted_prob"] = float(row["adjusted_prob"]) / total
+    return sorted(rows, key=lambda row: row["adjusted_prob"], reverse=True)
+
+
+def consensus_bracket_alerts(bracket_payload: dict) -> List[dict]:
+    alerts = []
+    for match_id, override in QUINIELA_BRACKET_OVERRIDES.items():
+        match = (bracket_payload.get("matches") or {}).get(match_id)
+        if not match:
+            continue
+        matchup = None
+        for scenario in match.get("matchup_scenarios", []):
+            if {scenario.get("team_a"), scenario.get("team_b")} == set(override["teams"]):
+                matchup = scenario
+                break
+        if matchup is None and {match.get("team_a"), match.get("team_b")} == set(override["teams"]):
+            matchup = match
+        if matchup is None:
+            continue
+        rows = conditional_winner_rows(matchup)
+        if not rows:
+            continue
+        target = str(override["winner"])
+        target_row = conditional_winner_for_team(matchup, target)
+        if target_row is None:
+            continue
+        model_winner = str(rows[0].get("team"))
+        model_prob = float(rows[0].get("conditional_prob", 0.0) or 0.0)
+        target_prob = float(target_row.get("conditional_prob", 0.0) or 0.0)
+        model_edge = max(0.0, model_prob - target_prob)
+        applies = model_winner != target and model_edge <= float(override.get("max_model_edge", 0.0))
+        alerts.append(
+            {
+                "match_id": match_id,
+                "title": match.get("title", match_id),
+                "team_a": matchup.get("team_a"),
+                "team_b": matchup.get("team_b"),
+                "model_winner": model_winner,
+                "model_prob": model_prob,
+                "recommended_winner": target if applies else model_winner,
+                "recommended_prob": target_prob if applies else model_prob,
+                "model_edge": model_edge,
+                "applies": applies,
+                "reason": str(override.get("reason", "")),
+            }
+        )
+    return alerts
+
+
 def dashboard_stage_label(stage: str, group: Optional[str]) -> str:
     if stage == "group" and group:
         return f"Grupo {group}"
@@ -4387,6 +4560,109 @@ def build_max_certainty_html(entries: Sequence[dict]) -> str:
     )
 
 
+def build_consensus_guardrail_markdown(bracket_payload: dict) -> List[str]:
+    rows = consensus_adjusted_champion_probabilities(bracket_payload)
+    alerts = consensus_bracket_alerts(bracket_payload)
+    if not rows and not alerts:
+        return ["_Sin llave generada para comparar contra consenso externo._"]
+    lines = [
+        "- Lectura: esta capa no reemplaza el modelo. Lo calibra contra consenso externo para evitar dos errores típicos de quiniela: sobreconcentrarse en un favorito y dejar vivo muy poco a contendientes fuertes.",
+        f"- Mezcla usada para campeón recomendado: {format_pct(1.0 - CONSENSUS_CHAMPION_BLEND)} modelo propio + {format_pct(CONSENSUS_CHAMPION_BLEND)} consenso externo.",
+    ]
+    if rows:
+        leader = rows[0]
+        lines.append(
+            f"- Campeón recomendado de boleto: {leader['team']} | probabilidad calibrada {format_pct(float(leader['adjusted_prob']))} | modelo puro {format_pct(float(leader['model_prob']))} | consenso {format_pct(float(leader['consensus_prob']))}."
+        )
+        lines.append("- Top calibrado de campeón:")
+        for row in rows[:8]:
+            direction = "sobreponderado" if float(row["delta"]) > 0.04 else "subponderado" if float(row["delta"]) < -0.025 else "alineado"
+            lines.append(
+                f"  - {row['team']}: calibrado {format_pct(float(row['adjusted_prob']))} | modelo {format_pct(float(row['model_prob']))} | consenso {format_pct(float(row['consensus_prob']))} | {direction}"
+            )
+    if alerts:
+        lines.extend(["", "### Ajustes estratégicos de llave"])
+        for alert in alerts:
+            status = "Aplicar en boleto" if alert["applies"] else "Mantener modelo"
+            lines.append(
+                f"- {alert['title']}: {alert['team_a']} vs {alert['team_b']} | modelo {alert['model_winner']} {format_pct(float(alert['model_prob']))} | boleto {alert['recommended_winner']} {format_pct(float(alert['recommended_prob']))} | margen {format_pct(float(alert['model_edge']))} | {status}."
+            )
+    return lines
+
+
+def build_consensus_guardrail_html(bracket_payload: dict) -> str:
+    rows = consensus_adjusted_champion_probabilities(bracket_payload)
+    alerts = consensus_bracket_alerts(bracket_payload)
+    if not rows and not alerts:
+        return ""
+
+    def champion_rows() -> str:
+        html_rows = []
+        for row in rows[:8]:
+            delta = float(row["delta"])
+            if delta > 0.04:
+                tag = "Modelo alto"
+            elif delta < -0.025:
+                tag = "Modelo bajo"
+            else:
+                tag = "Alineado"
+            html_rows.append(
+                "<li>"
+                f"<strong>{html.escape(str(row['team']))}</strong>"
+                f"<span>Calibrado {format_pct(float(row['adjusted_prob']))} | modelo {format_pct(float(row['model_prob']))} | consenso {format_pct(float(row['consensus_prob']))}</span>"
+                f"<em>{html.escape(tag)}</em>"
+                "</li>"
+            )
+        return "".join(html_rows)
+
+    def alert_rows() -> str:
+        if not alerts:
+            return "<li><strong>Sin ajustes de llave</strong><span>No hay cruces donde el consenso recomiende apartarse del modelo.</span><em>Mantener modelo</em></li>"
+        html_rows = []
+        for alert in alerts:
+            status = "Aplicar en boleto" if alert["applies"] else "Mantener modelo"
+            html_rows.append(
+                "<li>"
+                f"<strong>{html.escape(str(alert['title']))}: {html.escape(str(alert['team_a']))} vs {html.escape(str(alert['team_b']))}</strong>"
+                f"<span>Modelo: {html.escape(str(alert['model_winner']))} {format_pct(float(alert['model_prob']))} | boleto: {html.escape(str(alert['recommended_winner']))} {format_pct(float(alert['recommended_prob']))} | margen {format_pct(float(alert['model_edge']))}</span>"
+                f"<em>{html.escape(status)}</em>"
+                "</li>"
+            )
+        return "".join(html_rows)
+
+    leader = rows[0] if rows else None
+    leader_tile = (
+        f"<div class=\"summary-tile\"><span>Campeón recomendado</span><strong>{html.escape(str(leader['team']))}</strong></div>"
+        f"<div class=\"summary-tile\"><span>Probabilidad calibrada</span><strong>{format_pct(float(leader['adjusted_prob']))}</strong></div>"
+        if leader
+        else ""
+    )
+    return (
+        "<section class=\"panel consensus-panel\">"
+        "<div class=\"panel-head\">"
+        "<div>"
+        "<p class=\"eyebrow\">Guardrail de consenso</p>"
+        "<h2>Ajustes para boleto de quiniela</h2>"
+        "<p class=\"lede-tight\">Esta capa compara la llave contra consenso externo y corrige solo donde el modelo esta demasiado concentrado o el cruce es casi 50/50. No promete ganar; reduce sesgos evitables antes de cerrar el boleto.</p>"
+        "</div>"
+        "</div>"
+        "<div class=\"confidence-tiles\">"
+        f"{leader_tile}"
+        f"<div class=\"summary-tile\"><span>Peso modelo propio</span><strong>{format_pct(1.0 - CONSENSUS_CHAMPION_BLEND)}</strong></div>"
+        f"<div class=\"summary-tile\"><span>Peso consenso externo</span><strong>{format_pct(CONSENSUS_CHAMPION_BLEND)}</strong></div>"
+        "</div>"
+        "<div class=\"certainty-grid consensus-grid\">"
+        "<article><h3>Campeón calibrado</h3><ul>"
+        f"{champion_rows()}"
+        "</ul></article>"
+        "<article><h3>Ajustes de llave recomendados</h3><ul>"
+        f"{alert_rows()}"
+        "</ul></article>"
+        "</div>"
+        "</section>"
+    )
+
+
 def build_dashboard_markdown(
     entries: Sequence[dict],
     bracket_text: str,
@@ -4411,6 +4687,8 @@ def build_dashboard_markdown(
     lines.extend(build_global_confidence_markdown(entries))
     lines.extend(["", "## Hoja de maxima certeza para quiniela", ""])
     lines.extend(build_max_certainty_markdown(entries))
+    lines.extend(["", "## Ajustes contra consenso externo", ""])
+    lines.extend(build_consensus_guardrail_markdown(bracket_payload))
     lines.extend(["", "## Que cambio desde la ultima actualizacion", ""])
     lines.extend(
         build_recent_changes_markdown(
@@ -5167,6 +5445,12 @@ def coherent_bracket_matches(bracket_payload: dict) -> Dict[str, dict]:
             if conditional_winners
             else float(matchup.get("winner_prob", match.get("winner_prob", 0.0)))
         )
+        override = quiniela_override_for_match(match_id, matchup, str(selected_winner))
+        original_winner = selected_winner
+        if override:
+            selected_winner = override["winner"]
+            conditional_prob = float(override["conditional_prob"])
+            overall_prob = float(override["overall_prob"])
         visual = dict(match)
         visual["team_a"] = matchup.get("team_a", match.get("team_a"))
         visual["team_b"] = matchup.get("team_b", match.get("team_b"))
@@ -5176,6 +5460,12 @@ def coherent_bracket_matches(bracket_payload: dict) -> Dict[str, dict]:
         visual["winner_prob"] = overall_prob
         visual["selected_winner"] = selected_winner
         visual["selected_loser"] = visual["team_b"] if selected_winner == visual["team_a"] else visual["team_a"]
+        if override:
+            visual["quiniela_override"] = True
+            visual["model_winner"] = original_winner
+            visual["model_winner_prob"] = float(override["model_winner_prob"])
+            visual["model_edge"] = float(override["model_edge"])
+            visual["override_reason"] = override["reason"]
         resolved[match_id] = visual
     return resolved
 
@@ -5225,6 +5515,13 @@ def build_bracket_visual_html(bracket_payload: dict) -> str:
                 f"<strong>Penales:</strong> {format_pct(float(match.get('penalties_prob', 0.0)))}"
                 "</div>"
             )
+        if match.get("quiniela_override"):
+            extra_parts.append(
+                "<div class=\"mini override-note\">"
+                f"<strong>Ajuste de quiniela:</strong> el modelo puro favorecia a {html.escape(str(match.get('model_winner', '')))} "
+                f"por solo {format_pct(float(match.get('model_edge', 0.0)))} de margen; el boleto recomienda {winner} por consenso externo."
+                "</div>"
+            )
         penalty_scores = match.get("top_penalty_scores", [])
         if penalty_scores:
             extra_parts.append(
@@ -5248,8 +5545,9 @@ def build_bracket_visual_html(bracket_payload: dict) -> str:
 
         row_a_class = "team-row favorite" if match.get("winner") == match.get("team_a") else "team-row"
         row_b_class = "team-row favorite" if match.get("winner") == match.get("team_b") else "team-row"
-        row_a_badge = "<span class=\"team-badge\">Favorito</span>" if "favorite" in row_a_class else ""
-        row_b_badge = "<span class=\"team-badge\">Favorito</span>" if "favorite" in row_b_class else ""
+        badge_text = "Boleto" if match.get("quiniela_override") else "Favorito"
+        row_a_badge = f"<span class=\"team-badge\">{badge_text}</span>" if "favorite" in row_a_class else ""
+        row_b_badge = f"<span class=\"team-badge\">{badge_text}</span>" if "favorite" in row_b_class else ""
         conditional_prob = float(match.get("conditional_winner_prob", match.get("winner_prob", 0.0)))
         return (
             "<article class=\"bracket-match\">"
@@ -5982,6 +6280,7 @@ def build_dashboard_html(
     methodology_html = build_methodology_html(bracket_payload, backtest)
     global_confidence_html = build_global_confidence_html(entries)
     max_certainty_html = build_max_certainty_html(entries)
+    consensus_guardrail_html = build_consensus_guardrail_html(bracket_payload)
     recent_changes_html = build_recent_changes_html(
         entries,
         previous_entries or [],
@@ -5999,6 +6298,7 @@ def build_dashboard_html(
             "methodology_html": methodology_html,
             "global_confidence_html": global_confidence_html,
             "max_certainty_html": max_certainty_html,
+            "consensus_guardrail_html": consensus_guardrail_html,
             "recent_changes_html": recent_changes_html,
             "backtesting_html": backtesting_html,
             "bracket_visual_html": bracket_visual_html,
@@ -6178,10 +6478,17 @@ def audit_bracket_payload(bracket_payload: dict, teams: Dict[str, Team], min_ite
                         break
             if published is None:
                 errors.append(f"{match_id} publica un cruce que no existe entre sus escenarios simulados.")
-            elif match.get("winner") != published.get("winner"):
-                errors.append(f"{match_id} no publica el favorito condicional del cruce mostrado.")
-            elif abs(float(match.get("matchup_prob", 0.0) or 0.0) - float(published.get("matchup_prob", 0.0) or 0.0)) > 0.000001:
-                errors.append(f"{match_id} mezcla probabilidad del escenario con probabilidad del cruce mostrado.")
+            else:
+                override = bool(match.get("quiniela_override"))
+                if match.get("winner") != published.get("winner"):
+                    winner_rows = conditional_winner_rows(published)
+                    published_teams = {row.get("team") for row in winner_rows}
+                    if not override:
+                        errors.append(f"{match_id} no publica el favorito condicional del cruce mostrado.")
+                    elif match.get("winner") not in published_teams or not match.get("override_reason"):
+                        errors.append(f"{match_id} aplica ajuste de quiniela sin trazabilidad suficiente.")
+                if abs(float(match.get("matchup_prob", 0.0) or 0.0) - float(published.get("matchup_prob", 0.0) or 0.0)) > 0.000001:
+                    errors.append(f"{match_id} mezcla probabilidad del escenario con probabilidad del cruce mostrado.")
             if "conditional_winner_prob" not in match:
                 errors.append(f"{match_id} no separa probabilidad condicional de avanzar si el cruce se juega.")
     def sourced_team(match: dict, source_kind: str) -> Optional[str]:
@@ -6231,6 +6538,8 @@ def audit_dashboard_html(dashboard_html: str) -> List[str]:
         "Checklist de auditoria",
         "Picks mas defendibles",
         "Marcadores exactos mas defendibles",
+        "Ajustes para boleto de quiniela",
+        "Guardrail de consenso",
         "15000",
     ]
     for snippet in required_snippets:
