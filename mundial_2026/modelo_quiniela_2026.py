@@ -2852,8 +2852,6 @@ def stage_for_match_id(match_id: str) -> str:
 
 
 def structured_match_projection(match_id: str, aggregate: dict, iterations: int) -> dict:
-    modal_outcome, modal_count = max(aggregate["outcomes"].items(), key=lambda item: item[1])
-    team_a, team_b, winner = modal_outcome
     appearance_counts: Dict[str, int] = {}
     opponent_counts: Dict[str, Dict[str, int]] = {}
     matchup_counts: Dict[Tuple[str, str], int] = {}
@@ -2928,6 +2926,10 @@ def structured_match_projection(match_id: str, aggregate: dict, iterations: int)
                 "conditional_winners": winner_rows[:3],
             }
         )
+    primary_matchup = matchup_scenarios[0]
+    team_a = primary_matchup["team_a"]
+    team_b = primary_matchup["team_b"]
+    winner = primary_matchup["winner"]
     penalty_scores = sorted(aggregate.get("penalty_scores", {}).items(), key=lambda item: item[1], reverse=True)[:3]
     return {
         "match_id": match_id,
@@ -2936,8 +2938,9 @@ def structured_match_projection(match_id: str, aggregate: dict, iterations: int)
         "team_a": team_a,
         "team_b": team_b,
         "winner": winner,
-        "matchup_prob": modal_count / float(iterations),
-        "winner_prob": aggregate["winner"][winner] / float(iterations),
+        "matchup_prob": primary_matchup["matchup_prob"],
+        "conditional_winner_prob": primary_matchup["conditional_winner_prob"],
+        "winner_prob": primary_matchup["winner_prob"],
         "extra_time_prob": aggregate["went_extra_time"] / float(iterations),
         "penalties_prob": aggregate["went_penalties"] / float(iterations),
         "top_scenarios": top_scenarios,
@@ -2959,13 +2962,15 @@ def format_match_projection(match_id: str, aggregate: dict, iterations: int) -> 
     winner = projection["winner"]
     outcome_prob = projection["matchup_prob"]
     winner_prob = projection["winner_prob"]
+    conditional_winner_prob = projection.get("conditional_winner_prob", winner_prob)
     extra_time_prob = projection["extra_time_prob"]
     penalties_prob = projection["penalties_prob"]
     lines = [
         f"### {BRACKET_MATCH_TITLES.get(match_id, match_id)}",
         f"- Cruce que aparece mas veces en la simulacion: {team_a} vs {team_b}",
         f"- Probabilidad de que este cruce ocurra: {outcome_prob:.1%}",
-        f"- Equipo con mas probabilidad de salir de esta llave: {winner} ({winner_prob:.1%})",
+        f"- Favorito si ese cruce se juega: {winner} ({conditional_winner_prob:.1%})",
+        f"- Probabilidad global de que {winner} salga de este casillero: {winner_prob:.1%}",
     ]
     alternatives = [
         f"{scenario['team_a']} vs {scenario['team_b']} | gana mas probable {scenario['winner']} | este escenario aparece {scenario['prob']:.1%}"
@@ -3830,7 +3835,9 @@ def projected_bracket_entries(
                 "projection_note": (
                     f"Cruce mas probable hoy: {team_a} vs {team_b} | "
                     f"probabilidad de que se de {format_pct(match_projection['matchup_prob'])} | "
-                    f"favorito para avanzar si se juega hoy: {match_projection['winner']} {format_pct(match_projection['winner_prob'])}"
+                    f"favorito para avanzar si se juega hoy: {match_projection['winner']} "
+                    f"{format_pct(float(match_projection.get('conditional_winner_prob', match_projection['winner_prob'])))} | "
+                    f"probabilidad global de ese avance: {format_pct(match_projection['winner_prob'])}"
                 ),
                 "projection_alternatives": match_projection.get("top_scenarios", [])[1:],
                 "projection_penalties": match_projection.get("penalties_prob", 0.0),
@@ -6157,6 +6164,17 @@ def audit_bracket_payload(bracket_payload: dict, teams: Dict[str, Team], min_ite
         penalties_prob = float(match.get("penalties_prob", 0.0) or 0.0)
         if penalties_prob > 0.01 and not match.get("top_penalty_scores"):
             errors.append(f"{match_id} tiene probabilidad de penales pero no publica marcadores probables de tanda.")
+        matchup_scenarios = match.get("matchup_scenarios") or []
+        if matchup_scenarios:
+            lead = matchup_scenarios[0]
+            if (match.get("team_a"), match.get("team_b")) != (lead.get("team_a"), lead.get("team_b")):
+                errors.append(f"{match_id} no publica el cruce mas probable como cruce principal.")
+            if match.get("winner") != lead.get("winner"):
+                errors.append(f"{match_id} no publica el favorito condicional del cruce principal.")
+            if abs(float(match.get("matchup_prob", 0.0) or 0.0) - float(lead.get("matchup_prob", 0.0) or 0.0)) > 0.000001:
+                errors.append(f"{match_id} mezcla probabilidad del escenario con probabilidad del cruce.")
+            if "conditional_winner_prob" not in match:
+                errors.append(f"{match_id} no separa probabilidad condicional de avanzar si el cruce se juega.")
     def sourced_team(match: dict, source_kind: str) -> Optional[str]:
         if source_kind == "winner":
             return match.get("winner")

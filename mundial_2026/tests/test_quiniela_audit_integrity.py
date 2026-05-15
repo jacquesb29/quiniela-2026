@@ -106,6 +106,7 @@ class QuinielaAuditIntegrityTest(unittest.TestCase):
                 "team_b": team_b,
                 "winner": winner,
                 "matchup_prob": 0.2,
+                "conditional_winner_prob": 0.6,
                 "winner_prob": 0.6,
                 "penalties_prob": 0.12,
                 "top_penalty_scores": [{"score": "5-4", "prob": 0.08}],
@@ -171,6 +172,15 @@ class QuinielaAuditIntegrityTest(unittest.TestCase):
         errors = app.audit_bracket_payload({"iterations": 15000, "matches": bracket_matches}, teams, 15000)
 
         self.assertTrue(any("M73" in error and "marcadores probables de tanda" in error for error in errors))
+
+    def test_bracket_audit_rejects_exact_scenario_probability_as_matchup_probability(self):
+        teams = app.load_teams()
+        bracket_matches = self.build_valid_bracket_matches()
+        bracket_matches["M73"]["matchup_prob"] = 0.12
+
+        errors = app.audit_bracket_payload({"iterations": 15000, "matches": bracket_matches}, teams, 15000)
+
+        self.assertTrue(any("M73" in error and "probabilidad del escenario" in error for error in errors))
 
     def test_coherent_bracket_matches_rewrites_raw_modal_branch_for_publish(self):
         bracket_matches = self.build_valid_bracket_matches()
