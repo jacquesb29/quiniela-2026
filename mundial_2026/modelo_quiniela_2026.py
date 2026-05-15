@@ -216,6 +216,8 @@ CONSENSUS_CHAMPION_PRIORS = {
     "Belgium": 0.014,
 }
 CONSENSUS_CHAMPION_BLEND = 0.50
+CONSENSUS_CHAMPION_MIN_BLEND = 0.08
+CONSENSUS_LIVE_PROGRESS_WEIGHT = 0.55
 QUINIELA_BRACKET_OVERRIDES = {
     "M93": {
         "teams": {"Turkey", "Belgium"},
@@ -3181,7 +3183,38 @@ def consensus_distribution_for_teams(team_names: Sequence[str], model_probs: Dic
     return {team: value / total for team, value in consensus.items()}
 
 
-def consensus_adjusted_champion_probabilities(bracket_payload: dict) -> List[dict]:
+def consensus_live_update_context(entries: Optional[Sequence[dict]] = None) -> dict:
+    fixture_entries = [entry for entry in entries or [] if not entry.get("projection")]
+    total = len(fixture_entries)
+    live_count = sum(1 for entry in fixture_entries if fixture_is_live(entry))
+    final_count = sum(1 for entry in fixture_entries if fixture_is_final(entry))
+    pending_count = max(total - live_count - final_count, 0)
+    weighted_progress = (
+        clamp((final_count + CONSENSUS_LIVE_PROGRESS_WEIGHT * live_count) / total, 0.0, 1.0)
+        if total
+        else 0.0
+    )
+    consensus_blend = clamp(
+        CONSENSUS_CHAMPION_BLEND * (1.0 - 0.84 * weighted_progress),
+        CONSENSUS_CHAMPION_MIN_BLEND,
+        CONSENSUS_CHAMPION_BLEND,
+    )
+    return {
+        "total": total,
+        "live_count": live_count,
+        "final_count": final_count,
+        "pending_count": pending_count,
+        "weighted_progress": weighted_progress,
+        "consensus_blend": consensus_blend,
+        "model_blend": 1.0 - consensus_blend,
+    }
+
+
+def consensus_champion_blend(entries: Optional[Sequence[dict]] = None) -> float:
+    return float(consensus_live_update_context(entries)["consensus_blend"])
+
+
+def consensus_adjusted_champion_probabilities(bracket_payload: dict, entries: Optional[Sequence[dict]] = None) -> List[dict]:
     model_probs = champion_probabilities_from_bracket(bracket_payload)
     if not model_probs:
         return []
@@ -3189,11 +3222,13 @@ def consensus_adjusted_champion_probabilities(bracket_payload: dict) -> List[dic
     consensus = consensus_distribution_for_teams(team_names, model_probs)
     model_total = sum(model_probs.values())
     normalized_model = {team: value / model_total for team, value in model_probs.items()} if model_total > 0 else model_probs
+    consensus_blend = consensus_champion_blend(entries)
+    model_blend = 1.0 - consensus_blend
     rows = []
     for team in team_names:
         model_prob = float(normalized_model.get(team, 0.0))
         consensus_prob = float(consensus.get(team, 0.0))
-        adjusted = (1.0 - CONSENSUS_CHAMPION_BLEND) * model_prob + CONSENSUS_CHAMPION_BLEND * consensus_prob
+        adjusted = model_blend * model_prob + consensus_blend * consensus_prob
         rows.append(
             {
                 "team": team,
@@ -3201,6 +3236,8 @@ def consensus_adjusted_champion_probabilities(bracket_payload: dict) -> List[dic
                 "consensus_prob": consensus_prob,
                 "adjusted_prob": adjusted,
                 "delta": model_prob - consensus_prob,
+                "model_blend": model_blend,
+                "consensus_blend": consensus_blend,
             }
         )
     total = sum(row["adjusted_prob"] for row in rows)
@@ -4560,14 +4597,16 @@ def build_max_certainty_html(entries: Sequence[dict]) -> str:
     )
 
 
-def build_consensus_guardrail_markdown(bracket_payload: dict) -> List[str]:
-    rows = consensus_adjusted_champion_probabilities(bracket_payload)
+def build_consensus_guardrail_markdown(bracket_payload: dict, entries: Optional[Sequence[dict]] = None) -> List[str]:
+    context = consensus_live_update_context(entries)
+    rows = consensus_adjusted_champion_probabilities(bracket_payload, entries)
     alerts = consensus_bracket_alerts(bracket_payload)
     if not rows and not alerts:
         return ["_Sin llave generada para comparar contra consenso externo._"]
     lines = [
         "- Lectura: esta capa no reemplaza el modelo. Lo calibra contra consenso externo para evitar dos errores típicos de quiniela: sobreconcentrarse en un favorito y dejar vivo muy poco a contendientes fuertes.",
-        f"- Mezcla usada para campeón recomendado: {format_pct(1.0 - CONSENSUS_CHAMPION_BLEND)} modelo propio + {format_pct(CONSENSUS_CHAMPION_BLEND)} consenso externo.",
+        f"- Mezcla dinamica usada para campeon recomendado: {format_pct(float(context['model_blend']))} modelo propio/live + {format_pct(float(context['consensus_blend']))} consenso externo.",
+        f"- Actualizacion live de esa mezcla: {int(context['final_count'])} partidos finales, {int(context['live_count'])} en vivo y {int(context['pending_count'])} pendientes. A medida que entran resultados reales, el consenso externo pesa menos y la simulacion Monte Carlo vigente pesa mas.",
     ]
     if rows:
         leader = rows[0]
@@ -4590,8 +4629,9 @@ def build_consensus_guardrail_markdown(bracket_payload: dict) -> List[str]:
     return lines
 
 
-def build_consensus_guardrail_html(bracket_payload: dict) -> str:
-    rows = consensus_adjusted_champion_probabilities(bracket_payload)
+def build_consensus_guardrail_html(bracket_payload: dict, entries: Optional[Sequence[dict]] = None) -> str:
+    context = consensus_live_update_context(entries)
+    rows = consensus_adjusted_champion_probabilities(bracket_payload, entries)
     alerts = consensus_bracket_alerts(bracket_payload)
     if not rows and not alerts:
         return ""
@@ -4643,13 +4683,14 @@ def build_consensus_guardrail_html(bracket_payload: dict) -> str:
         "<div>"
         "<p class=\"eyebrow\">Guardrail de consenso</p>"
         "<h2>Ajustes para boleto de quiniela</h2>"
-        "<p class=\"lede-tight\">Esta capa compara la llave contra consenso externo y corrige solo donde el modelo esta demasiado concentrado o el cruce es casi 50/50. No promete ganar; reduce sesgos evitables antes de cerrar el boleto.</p>"
+        "<p class=\"lede-tight\">Esta capa compara la llave contra consenso externo, pero ya no es fija: cada corrida reduce el peso del consenso cuando hay partidos en vivo o finalizados. Asi las probabilidades de campeon pasan de consenso pretorneo a evidencia real del Mundial.</p>"
         "</div>"
         "</div>"
         "<div class=\"confidence-tiles\">"
         f"{leader_tile}"
-        f"<div class=\"summary-tile\"><span>Peso modelo propio</span><strong>{format_pct(1.0 - CONSENSUS_CHAMPION_BLEND)}</strong></div>"
-        f"<div class=\"summary-tile\"><span>Peso consenso externo</span><strong>{format_pct(CONSENSUS_CHAMPION_BLEND)}</strong></div>"
+        f"<div class=\"summary-tile\"><span>Peso modelo/live</span><strong>{format_pct(float(context['model_blend']))}</strong></div>"
+        f"<div class=\"summary-tile\"><span>Peso consenso externo</span><strong>{format_pct(float(context['consensus_blend']))}</strong></div>"
+        f"<div class=\"summary-tile\"><span>Partidos usados</span><strong>{int(context['final_count'])} final / {int(context['live_count'])} live</strong></div>"
         "</div>"
         "<div class=\"certainty-grid consensus-grid\">"
         "<article><h3>Campeón calibrado</h3><ul>"
@@ -4688,7 +4729,7 @@ def build_dashboard_markdown(
     lines.extend(["", "## Hoja de maxima certeza para quiniela", ""])
     lines.extend(build_max_certainty_markdown(entries))
     lines.extend(["", "## Ajustes contra consenso externo", ""])
-    lines.extend(build_consensus_guardrail_markdown(bracket_payload))
+    lines.extend(build_consensus_guardrail_markdown(bracket_payload, entries))
     lines.extend(["", "## Que cambio desde la ultima actualizacion", ""])
     lines.extend(
         build_recent_changes_markdown(
@@ -6280,7 +6321,7 @@ def build_dashboard_html(
     methodology_html = build_methodology_html(bracket_payload, backtest)
     global_confidence_html = build_global_confidence_html(entries)
     max_certainty_html = build_max_certainty_html(entries)
-    consensus_guardrail_html = build_consensus_guardrail_html(bracket_payload)
+    consensus_guardrail_html = build_consensus_guardrail_html(bracket_payload, entries)
     recent_changes_html = build_recent_changes_html(
         entries,
         previous_entries or [],

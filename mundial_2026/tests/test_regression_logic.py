@@ -173,6 +173,29 @@ class RegressionLogicTest(unittest.TestCase):
         self.assertIn("<strong>1</strong> finales", html)
         self.assertIn("<strong>1</strong> pendientes", html)
 
+    def test_consensus_champion_blend_decays_with_live_and_final_results(self):
+        pending = [{"projection": False, "status_state": "pre"} for _ in range(4)]
+        live = [{"projection": False, "status_state": "in"} for _ in range(4)]
+        final = [{"projection": False, "status_state": "post"} for _ in range(4)]
+        pending_blend = app.consensus_champion_blend(pending)
+        live_blend = app.consensus_champion_blend(live)
+        final_blend = app.consensus_champion_blend(final)
+        self.assertAlmostEqual(pending_blend, app.CONSENSUS_CHAMPION_BLEND)
+        self.assertLess(live_blend, pending_blend)
+        self.assertLess(final_blend, live_blend)
+        self.assertGreaterEqual(final_blend, app.CONSENSUS_CHAMPION_MIN_BLEND)
+
+    def test_consensus_adjusted_champion_table_moves_toward_model_after_results(self):
+        bracket_payload = {"matches": {"M103": {"advance_probabilities": {"Spain": 0.70, "France": 0.30}}}}
+        pending_entries = [{"projection": False, "status_state": "pre"} for _ in range(8)]
+        final_entries = [{"projection": False, "status_state": "post"} for _ in range(8)]
+        pending_rows = app.consensus_adjusted_champion_probabilities(bracket_payload, pending_entries)
+        final_rows = app.consensus_adjusted_champion_probabilities(bracket_payload, final_entries)
+        pending_spain = next(row for row in pending_rows if row["team"] == "Spain")
+        final_spain = next(row for row in final_rows if row["team"] == "Spain")
+        self.assertGreater(float(final_spain["adjusted_prob"]), float(pending_spain["adjusted_prob"]))
+        self.assertGreater(float(final_spain["model_blend"]), float(pending_spain["model_blend"]))
+
     def test_live_summary_fetch_accepts_live_and_final_synonyms(self):
         far_kickoff = datetime.now(timezone.utc) + timedelta(days=90)
         self.assertTrue(sync.should_fetch_summary(far_kickoff, "live"))
