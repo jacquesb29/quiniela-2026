@@ -32,6 +32,20 @@ class RefactorSmokeTest(unittest.TestCase):
         self.assertEqual(args.command, "project-bracket")
         self.assertEqual(args.iterations, 32)
 
+    def test_cli_parser_accepts_audit_quiniela(self):
+        parser = build_parser(
+            state_file="state.json",
+            tournament_config_file="config.json",
+            bracket_file="bracket.md",
+            bracket_json_file="bracket.json",
+            dashboard_html_file="dashboard.html",
+            dashboard_md_file="dashboard.md",
+            fixtures_template_file="fixtures.json",
+        )
+        args = parser.parse_args(["audit-quiniela", "--min-iterations", "15000"])
+        self.assertEqual(args.command, "audit-quiniela")
+        self.assertEqual(args.min_iterations, 15000)
+
     def test_live_adjustment_boosts_trailing_team_late(self):
         mu_a, mu_b = live_game_state_adjustment(1.0, 1.0, 1, 0, 0.9, "regulation", clamp=lambda v, lo, hi: max(lo, min(hi, v)))
         self.assertLess(mu_a, 1.0)

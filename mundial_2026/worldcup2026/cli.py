@@ -99,6 +99,14 @@ def build_parser(
     dashboard.add_argument("--top-scores", type=int, default=5)
     dashboard.add_argument("--state-file", default=state_file)
 
+    audit = subparsers.add_parser("audit-quiniela", help="Audita datos, llave, dashboard y workflow antes de publicar.")
+    audit.add_argument("--config", default=tournament_config_file)
+    audit.add_argument("--bracket-json-file", default=bracket_json_file)
+    audit.add_argument("--dashboard-html", default=dashboard_html_file)
+    audit.add_argument("--fixtures", default=fixtures_template_file)
+    audit.add_argument("--workflow-file", default=".github/workflows/quiniela-pages.yml")
+    audit.add_argument("--min-iterations", type=int, default=15000)
+
     score_prob = subparsers.add_parser("score-prob", help="Da la probabilidad exacta de un marcador especifico.")
     score_prob.add_argument("team_a")
     score_prob.add_argument("team_b")
@@ -141,6 +149,7 @@ def dispatch_command(
     command_simulate_tournament,
     command_project_bracket,
     command_project_dashboard,
+    command_audit_quiniela,
     command_state_show,
     command_state_reset,
     command_list_teams,
@@ -163,6 +172,8 @@ def dispatch_command(
         command_project_bracket(args, teams)
     elif args.command == "project-dashboard":
         command_project_dashboard(args, teams)
+    elif args.command == "audit-quiniela":
+        command_audit_quiniela(args, teams)
     elif args.command == "state-show":
         command_state_show(args, teams)
     elif args.command == "state-reset":

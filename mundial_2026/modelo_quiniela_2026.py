@@ -3052,6 +3052,7 @@ def command_project_bracket(args: argparse.Namespace, teams: Dict[str, Team]) ->
             for match_id, aggregate in match_aggregate.items()
         },
     }
+    structured["matches"] = coherent_bracket_matches(structured)
     output_path = Path(args.output)
     output_json_path = Path(args.json_output)
     output_path.write_text(content)
@@ -4970,10 +4971,8 @@ def bracket_stage_sections(bracket_payload: dict) -> List[Tuple[str, str, List[d
     return sections
 
 
-def build_bracket_visual_html(bracket_payload: dict) -> str:
-    iterations = bracket_payload.get("iterations")
-    sections = {stage_key: (label, stage_matches) for stage_key, label, stage_matches in bracket_stage_sections(bracket_payload)}
-
+def coherent_bracket_matches(bracket_payload: dict) -> Dict[str, dict]:
+    payload_matches = bracket_payload.get("matches", {})
     source_map = {
         match_id: (left_source, right_source, "winner")
         for round_matches in KNOCKOUT_MATCHES.values()
@@ -4981,7 +4980,7 @@ def build_bracket_visual_html(bracket_payload: dict) -> str:
     }
     source_map["M104"] = ("M101", "M102", "loser")
 
-    def fallback_visual_match(match: dict) -> dict:
+    def fallback_match(match: dict) -> dict:
         winner = str(match.get("winner", "?"))
         team_a = str(match.get("team_a", "?"))
         team_b = str(match.get("team_b", "?"))
@@ -4994,67 +4993,73 @@ def build_bracket_visual_html(bracket_payload: dict) -> str:
         return visual
 
     def find_consistent_matchup(match: dict, team_a: str, team_b: str) -> Optional[dict]:
+        fallback = None
         for scenario in match.get("matchup_scenarios", []):
             if scenario.get("team_a") == team_a and scenario.get("team_b") == team_b:
                 return scenario
-        return None
+            if {scenario.get("team_a"), scenario.get("team_b")} == {team_a, team_b}:
+                fallback = scenario
+        return fallback
 
-    def coherent_visual_matches(payload: dict) -> dict:
-        payload_matches = payload.get("matches", {})
-        resolved: Dict[str, dict] = {}
-        ordered_match_ids = [match["id"] for match in R32_MATCHES]
-        for round_matches in KNOCKOUT_MATCHES.values():
-            ordered_match_ids.extend(match_id for match_id, _, _ in round_matches)
-        ordered_match_ids.append("M104")
+    resolved: Dict[str, dict] = {}
+    ordered_match_ids = [match["id"] for match in R32_MATCHES]
+    for round_matches in KNOCKOUT_MATCHES.values():
+        ordered_match_ids.extend(match_id for match_id, _, _ in round_matches)
+    ordered_match_ids.append("M104")
 
-        for match_id in ordered_match_ids:
-            match = payload_matches.get(match_id)
-            if not match:
-                continue
-            source_info = source_map.get(match_id)
-            if not source_info:
-                resolved[match_id] = fallback_visual_match(match)
-                continue
-            left_source, right_source, source_kind = source_info
-            left_match = resolved.get(left_source)
-            right_match = resolved.get(right_source)
-            if not left_match or not right_match:
-                resolved[match_id] = fallback_visual_match(match)
-                continue
-            left_team = left_match.get("selected_winner") if source_kind == "winner" else left_match.get("selected_loser")
-            right_team = right_match.get("selected_winner") if source_kind == "winner" else right_match.get("selected_loser")
-            if not left_team or not right_team:
-                resolved[match_id] = fallback_visual_match(match)
-                continue
-            matchup = find_consistent_matchup(match, str(left_team), str(right_team))
-            if not matchup:
-                resolved[match_id] = fallback_visual_match(match)
-                continue
-            conditional_winners = matchup.get("conditional_winners", [])
-            selected_winner = conditional_winners[0]["team"] if conditional_winners else matchup.get("winner", left_team)
-            conditional_prob = (
-                float(conditional_winners[0]["conditional_prob"])
-                if conditional_winners
-                else float(matchup.get("conditional_winner_prob", match.get("winner_prob", 0.0)))
-            )
-            overall_prob = (
-                float(conditional_winners[0]["overall_prob"])
-                if conditional_winners
-                else float(matchup.get("winner_prob", match.get("winner_prob", 0.0)))
-            )
-            visual = dict(match)
-            visual["team_a"] = matchup.get("team_a", match.get("team_a"))
-            visual["team_b"] = matchup.get("team_b", match.get("team_b"))
-            visual["winner"] = selected_winner
-            visual["matchup_prob"] = float(matchup.get("matchup_prob", match.get("matchup_prob", 0.0)))
-            visual["conditional_winner_prob"] = conditional_prob
-            visual["winner_prob"] = overall_prob
-            visual["selected_winner"] = selected_winner
-            visual["selected_loser"] = visual["team_b"] if selected_winner == visual["team_a"] else visual["team_a"]
-            resolved[match_id] = visual
-        return resolved
+    for match_id in ordered_match_ids:
+        match = payload_matches.get(match_id)
+        if not match:
+            continue
+        source_info = source_map.get(match_id)
+        if not source_info:
+            resolved[match_id] = fallback_match(match)
+            continue
+        left_source, right_source, source_kind = source_info
+        left_match = resolved.get(left_source)
+        right_match = resolved.get(right_source)
+        if not left_match or not right_match:
+            resolved[match_id] = fallback_match(match)
+            continue
+        left_team = left_match.get("selected_winner") if source_kind == "winner" else left_match.get("selected_loser")
+        right_team = right_match.get("selected_winner") if source_kind == "winner" else right_match.get("selected_loser")
+        if not left_team or not right_team:
+            resolved[match_id] = fallback_match(match)
+            continue
+        matchup = find_consistent_matchup(match, str(left_team), str(right_team))
+        if not matchup:
+            resolved[match_id] = fallback_match(match)
+            continue
+        conditional_winners = matchup.get("conditional_winners", [])
+        selected_winner = conditional_winners[0]["team"] if conditional_winners else matchup.get("winner", left_team)
+        conditional_prob = (
+            float(conditional_winners[0]["conditional_prob"])
+            if conditional_winners
+            else float(matchup.get("conditional_winner_prob", match.get("winner_prob", 0.0)))
+        )
+        overall_prob = (
+            float(conditional_winners[0]["overall_prob"])
+            if conditional_winners
+            else float(matchup.get("winner_prob", match.get("winner_prob", 0.0)))
+        )
+        visual = dict(match)
+        visual["team_a"] = matchup.get("team_a", match.get("team_a"))
+        visual["team_b"] = matchup.get("team_b", match.get("team_b"))
+        visual["winner"] = selected_winner
+        visual["matchup_prob"] = float(matchup.get("matchup_prob", match.get("matchup_prob", 0.0)))
+        visual["conditional_winner_prob"] = conditional_prob
+        visual["winner_prob"] = overall_prob
+        visual["selected_winner"] = selected_winner
+        visual["selected_loser"] = visual["team_b"] if selected_winner == visual["team_a"] else visual["team_a"]
+        resolved[match_id] = visual
+    return resolved
 
-    visual_matches = coherent_visual_matches(bracket_payload)
+
+def build_bracket_visual_html(bracket_payload: dict) -> str:
+    iterations = bracket_payload.get("iterations")
+    sections = {stage_key: (label, stage_matches) for stage_key, label, stage_matches in bracket_stage_sections(bracket_payload)}
+
+    visual_matches = coherent_bracket_matches(bracket_payload)
     sections = {
         stage_key: (
             label,
@@ -5936,6 +5941,216 @@ def command_project_dashboard(args: argparse.Namespace, teams: Dict[str, Team]) 
     output_html.write_text(html_content)
     print(f"Reporte Markdown guardado en {output_md}")
     print(f"Reporte HTML guardado en {output_html}")
+
+
+def expected_bracket_match_ids() -> set:
+    ids = {match["id"] for match in R32_MATCHES}
+    ids.update(match_id for round_matches in KNOCKOUT_MATCHES.values() for match_id, _, _ in round_matches)
+    ids.add("M104")
+    return ids
+
+
+def audit_tournament_draw(config: dict, teams: Dict[str, Team]) -> List[str]:
+    errors: List[str] = []
+    groups = config.get("groups", {})
+    if len(groups) != 12:
+        errors.append(f"El sorteo debe tener 12 grupos; tiene {len(groups)}.")
+    group_teams = []
+    for group_name, members in sorted(groups.items()):
+        if len(members) != 4:
+            errors.append(f"Grupo {group_name} debe tener 4 equipos; tiene {len(members)}.")
+        group_teams.extend(members)
+    if len(group_teams) != 48:
+        errors.append(f"El sorteo debe tener 48 equipos; tiene {len(group_teams)}.")
+    duplicates = sorted({team for team in group_teams if group_teams.count(team) > 1})
+    if duplicates:
+        errors.append("Equipos duplicados en sorteo: " + ", ".join(duplicates))
+    missing = [team for team in group_teams if team not in teams]
+    if missing:
+        errors.append("Equipos del sorteo no existen en teams_2026.json: " + ", ".join(missing))
+    not_qualified = [team for team in group_teams if team in teams and teams[team].status != "qualified"]
+    if not_qualified:
+        errors.append("Equipos no clasificados aparecen en el sorteo: " + ", ".join(not_qualified))
+    for team in ("Bosnia and Herzegovina", "Dem. Rep. of Congo", "Iraq"):
+        if team not in group_teams:
+            errors.append(f"Falta clasificado resuelto en el sorteo: {team}.")
+    for team in ("Italy", "Jamaica", "Bolivia", "Suriname", "New Caledonia"):
+        if team in group_teams:
+            errors.append(f"Equipo eliminado aparece indebidamente en el sorteo: {team}.")
+    return errors
+
+
+def audit_fixtures_payload(fixtures: Sequence[dict], teams: Dict[str, Team]) -> List[str]:
+    errors: List[str] = []
+    ids = []
+    for index, fixture in enumerate(fixtures):
+        if fixture.get("projection_only"):
+            continue
+        fixture_id = str(fixture.get("id") or fixture.get("match_id") or index)
+        ids.append(fixture_id)
+        for key in ("team_a", "team_b"):
+            raw_name = fixture.get(key)
+            if not raw_name:
+                errors.append(f"Fixture {fixture_id} no tiene {key}.")
+                continue
+            try:
+                team_name = resolve_team_name(str(raw_name), teams)
+            except SystemExit:
+                errors.append(f"Fixture {fixture_id} tiene equipo no reconocido: {raw_name}.")
+                continue
+            if teams[team_name].status != "qualified":
+                errors.append(f"Fixture {fixture_id} usa equipo no clasificado: {team_name}.")
+        status = normalized_match_status_state(fixture.get("status_state"))
+        if status == "live" and not fixture_has_live_score(fixture):
+            errors.append(f"Fixture {fixture_id} esta en vivo pero no tiene marcador live completo.")
+    duplicate_ids = sorted({fixture_id for fixture_id in ids if ids.count(fixture_id) > 1})
+    if duplicate_ids:
+        errors.append("Fixtures con ids duplicados: " + ", ".join(duplicate_ids))
+    return errors
+
+
+def audit_bracket_payload(bracket_payload: dict, teams: Dict[str, Team], min_iterations: int) -> List[str]:
+    errors: List[str] = []
+    iterations = int(bracket_payload.get("iterations", 0) or 0)
+    if iterations < min_iterations:
+        errors.append(f"La llave usa {iterations} simulaciones; minimo requerido {min_iterations}.")
+    matches = bracket_payload.get("matches", {})
+    missing_ids = sorted(expected_bracket_match_ids() - set(matches))
+    if missing_ids:
+        errors.append("Faltan partidos de llave en JSON: " + ", ".join(missing_ids))
+    for match_id, match in matches.items():
+        team_a = match.get("team_a")
+        team_b = match.get("team_b")
+        winner = match.get("winner")
+        if not team_a or not team_b:
+            errors.append(f"{match_id} no tiene ambos equipos.")
+            continue
+        if team_a not in teams:
+            errors.append(f"{match_id} contiene equipo A no reconocido: {team_a}.")
+        if team_b not in teams:
+            errors.append(f"{match_id} contiene equipo B no reconocido: {team_b}.")
+        if winner not in {team_a, team_b}:
+            errors.append(f"{match_id} tiene ganador incoherente: {winner} no esta entre {team_a} y {team_b}.")
+        for prob_key in ("matchup_prob", "winner_prob"):
+            if prob_key in match:
+                prob = float(match.get(prob_key) or 0.0)
+                if prob < 0.0 or prob > 1.0:
+                    errors.append(f"{match_id} tiene {prob_key} fuera de rango: {prob}.")
+    def sourced_team(match: dict, source_kind: str) -> Optional[str]:
+        if source_kind == "winner":
+            return match.get("winner")
+        if source_kind == "loser":
+            winner = match.get("winner")
+            team_a = match.get("team_a")
+            team_b = match.get("team_b")
+            if winner == team_a:
+                return team_b
+            if winner == team_b:
+                return team_a
+        return None
+
+    source_map = {
+        match_id: (left_source, right_source, "winner")
+        for round_matches in KNOCKOUT_MATCHES.values()
+        for match_id, left_source, right_source in round_matches
+    }
+    source_map["M104"] = ("M101", "M102", "loser")
+    for match_id, (left_source, right_source, source_kind) in source_map.items():
+        match = matches.get(match_id)
+        left = matches.get(left_source)
+        right = matches.get(right_source)
+        if not match or not left or not right:
+            continue
+        expected_pair = {sourced_team(left, source_kind), sourced_team(right, source_kind)}
+        actual_pair = {match.get("team_a"), match.get("team_b")}
+        if None not in expected_pair and expected_pair != actual_pair:
+            errors.append(
+                f"{match_id} no sigue la rama proyectada: esperaba {sorted(expected_pair)}, recibio {sorted(actual_pair)}."
+            )
+    return errors
+
+
+def audit_dashboard_html(dashboard_html: str) -> List[str]:
+    errors = []
+    required_snippets = [
+        "Hoja de máxima certeza",
+        "certainty-panel",
+        "Picks mas defendibles",
+        "Marcadores exactos mas defendibles",
+        "15000",
+    ]
+    for snippet in required_snippets:
+        if snippet not in dashboard_html:
+            errors.append(f"Dashboard no contiene bloque requerido: {snippet}.")
+    if "&lt;section class=&quot;certainty-panel&quot;&gt;" in dashboard_html:
+        errors.append("Dashboard escapo el HTML del modulo de maxima certeza.")
+    return errors
+
+
+def audit_workflow_text(workflow_text: str, min_iterations: int) -> List[str]:
+    errors = []
+    required = [
+        "cron: \"*/5 * * * *\"",
+        f"--iterations {min_iterations}",
+        "python3 -m unittest discover -s mundial_2026/tests",
+        "audit-quiniela",
+        "API_FOOTBALL_KEY",
+        "cancel-in-progress: false",
+    ]
+    for snippet in required:
+        if snippet not in workflow_text:
+            errors.append(f"Workflow no contiene requisito: {snippet}.")
+    return errors
+
+
+def run_quiniela_audit(
+    teams: Dict[str, Team],
+    *,
+    config_path: Path,
+    bracket_json_path: Path,
+    dashboard_html_path: Path,
+    fixtures_path: Path,
+    workflow_path: Path,
+    min_iterations: int = 15000,
+) -> List[str]:
+    errors: List[str] = []
+    config = load_tournament_config(config_path)
+    errors.extend(audit_tournament_draw(config, teams))
+    if fixtures_path.exists():
+        errors.extend(audit_fixtures_payload(read_fixtures(fixtures_path), teams))
+    else:
+        errors.append(f"No existe archivo de fixtures: {fixtures_path}.")
+    if bracket_json_path.exists():
+        errors.extend(audit_bracket_payload(load_bracket_json(bracket_json_path), teams, min_iterations))
+    else:
+        errors.append(f"No existe JSON de llave: {bracket_json_path}.")
+    if dashboard_html_path.exists():
+        errors.extend(audit_dashboard_html(dashboard_html_path.read_text()))
+    else:
+        errors.append(f"No existe dashboard HTML: {dashboard_html_path}.")
+    if workflow_path.exists():
+        errors.extend(audit_workflow_text(workflow_path.read_text(), min_iterations))
+    else:
+        errors.append(f"No existe workflow: {workflow_path}.")
+    return errors
+
+
+def command_audit_quiniela(args: argparse.Namespace, teams: Dict[str, Team]) -> None:
+    errors = run_quiniela_audit(
+        teams,
+        config_path=Path(args.config),
+        bracket_json_path=Path(args.bracket_json_file),
+        dashboard_html_path=Path(args.dashboard_html),
+        fixtures_path=Path(args.fixtures),
+        workflow_path=Path(args.workflow_file),
+        min_iterations=int(args.min_iterations),
+    )
+    if errors:
+        print("AUDITORIA QUINIELA: FALLA")
+        for error in errors:
+            print(f"- {error}")
+        raise SystemExit(1)
+    print("AUDITORIA QUINIELA: OK")
 
 
 def read_fixtures(path: Path) -> List[dict]:
@@ -6825,6 +7040,7 @@ def main() -> None:
         command_simulate_tournament=command_simulate_tournament,
         command_project_bracket=command_project_bracket,
         command_project_dashboard=command_project_dashboard,
+        command_audit_quiniela=command_audit_quiniela,
         command_state_show=command_state_show,
         command_state_reset=command_state_reset,
         command_list_teams=command_list_teams,

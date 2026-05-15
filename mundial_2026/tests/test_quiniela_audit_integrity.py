@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import sys
+import tempfile
 import unittest
 from pathlib import Path
 
@@ -73,8 +74,138 @@ class QuinielaAuditIntegrityTest(unittest.TestCase):
         workflow = (REPO_ROOT / ".github" / "workflows" / "quiniela-pages.yml").read_text()
         self.assertRegex(workflow, r"cron:\s*[\"']\*/5 \* \* \* \*[\"']")
         self.assertIn("--iterations 15000", workflow)
+        self.assertIn("python3 -m unittest discover -s mundial_2026/tests", workflow)
+        self.assertIn("audit-quiniela", workflow)
         self.assertIn("API_FOOTBALL_KEY", workflow)
         self.assertIn("cancel-in-progress: false", workflow)
+
+    def test_audit_workflow_text_requires_publish_gate(self):
+        workflow = (REPO_ROOT / ".github" / "workflows" / "quiniela-pages.yml").read_text()
+        self.assertEqual(app.audit_workflow_text(workflow, 15000), [])
+
+    def build_valid_bracket_matches(self):
+        team_pool = [team for members in self.draw_payload["groups"].values() for team in members]
+        bracket_matches = {}
+        previous_winners = {}
+        previous_losers = {}
+
+        def match_record(match_id, stage, team_a, team_b, winner):
+            loser = team_b if winner == team_a else team_a
+            return {
+                "match_id": match_id,
+                "stage": stage,
+                "team_a": team_a,
+                "team_b": team_b,
+                "winner": winner,
+                "matchup_prob": 0.2,
+                "winner_prob": 0.6,
+                "matchup_scenarios": [
+                    {
+                        "team_a": team_a,
+                        "team_b": team_b,
+                        "winner": winner,
+                        "matchup_prob": 0.2,
+                        "conditional_winner_prob": 0.6,
+                        "winner_prob": 0.12,
+                        "conditional_winners": [
+                            {"team": winner, "conditional_prob": 0.6, "overall_prob": 0.12},
+                            {"team": loser, "conditional_prob": 0.4, "overall_prob": 0.08},
+                        ],
+                    }
+                ],
+            }
+
+        for index, match in enumerate(app.R32_MATCHES):
+            team_a = team_pool[(index * 2) % len(team_pool)]
+            team_b = team_pool[(index * 2 + 1) % len(team_pool)]
+            winner = team_a
+            bracket_matches[match["id"]] = match_record(match["id"], "round32", team_a, team_b, winner)
+            previous_winners[match["id"]] = winner
+            previous_losers[match["id"]] = team_b
+
+        for stage, matches in app.KNOCKOUT_MATCHES.items():
+            for match_id, left_source, right_source in matches:
+                team_a = previous_winners[left_source]
+                team_b = previous_winners[right_source]
+                winner = team_a
+                bracket_matches[match_id] = match_record(match_id, stage, team_a, team_b, winner)
+                previous_winners[match_id] = winner
+                previous_losers[match_id] = team_b
+
+        bracket_matches["M104"] = match_record(
+            "M104",
+            "third_place",
+            previous_losers["M101"],
+            previous_losers["M102"],
+            previous_losers["M101"],
+        )
+        return bracket_matches
+
+    def test_bracket_audit_requires_third_place_semifinal_losers(self):
+        teams = app.load_teams()
+        bracket_matches = self.build_valid_bracket_matches()
+        self.assertEqual(app.audit_bracket_payload({"iterations": 15000, "matches": bracket_matches}, teams, 15000), [])
+
+        bad_matches = json.loads(json.dumps(bracket_matches))
+        bad_matches["M104"]["team_a"] = bad_matches["M101"]["winner"]
+        bad_matches["M104"]["team_b"] = bad_matches["M102"]["winner"]
+        bad_matches["M104"]["winner"] = bad_matches["M101"]["winner"]
+        errors = app.audit_bracket_payload({"iterations": 15000, "matches": bad_matches}, teams, 15000)
+        self.assertTrue(any("M104" in error and "rama proyectada" in error for error in errors))
+
+    def test_coherent_bracket_matches_rewrites_raw_modal_branch_for_publish(self):
+        bracket_matches = self.build_valid_bracket_matches()
+        raw_matches = json.loads(json.dumps(bracket_matches))
+        raw_matches["M104"]["team_a"] = raw_matches["M101"]["winner"]
+        raw_matches["M104"]["team_b"] = raw_matches["M102"]["winner"]
+        raw_matches["M104"]["winner"] = raw_matches["M101"]["winner"]
+
+        coherent = app.coherent_bracket_matches({"matches": raw_matches})
+
+        self.assertEqual(coherent["M104"]["team_a"], bracket_matches["M104"]["team_a"])
+        self.assertEqual(coherent["M104"]["team_b"], bracket_matches["M104"]["team_b"])
+        self.assertEqual(coherent["M104"]["winner"], bracket_matches["M104"]["winner"])
+
+    def test_run_quiniela_audit_passes_with_minimal_valid_generated_artifacts(self):
+        teams = app.load_teams()
+        draw = self.draw_payload
+        first_group = draw["groups"]["A"]
+        bracket_matches = self.build_valid_bracket_matches()
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            tmp = Path(tmpdir)
+            config_path = tmp / "draw.json"
+            fixtures_path = tmp / "fixtures.json"
+            bracket_path = tmp / "bracket.json"
+            dashboard_path = tmp / "index.html"
+            workflow_path = tmp / "workflow.yml"
+            config_path.write_text(json.dumps(draw))
+            fixtures_path.write_text(json.dumps([{"id": "1", "team_a": first_group[0], "team_b": first_group[1], "status_state": "pre"}]))
+            bracket_path.write_text(json.dumps({"iterations": 15000, "matches": bracket_matches}))
+            dashboard_path.write_text(
+                "<html><section class=\"certainty-panel\"><h2>Hoja de máxima certeza</h2>"
+                "<p>Picks mas defendibles</p><p>Marcadores exactos mas defendibles</p><p>15000</p></section></html>"
+            )
+            workflow_path.write_text(
+                'cron: "*/5 * * * *"\n'
+                "python3 -m unittest discover -s mundial_2026/tests\n"
+                "python3 mundial_2026/modelo_quiniela_2026.py project-bracket --iterations 15000\n"
+                "python3 mundial_2026/modelo_quiniela_2026.py audit-quiniela\n"
+                "API_FOOTBALL_KEY\n"
+                "cancel-in-progress: false\n"
+            )
+            self.assertEqual(
+                app.run_quiniela_audit(
+                    teams,
+                    config_path=config_path,
+                    bracket_json_path=bracket_path,
+                    dashboard_html_path=dashboard_path,
+                    fixtures_path=fixtures_path,
+                    workflow_path=workflow_path,
+                    min_iterations=15000,
+                ),
+                [],
+            )
 
 
 if __name__ == "__main__":
