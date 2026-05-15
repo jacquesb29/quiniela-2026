@@ -50,3 +50,4 @@ class ModelHyperparameters:
 
 
 PARAMS = ModelHyperparameters()
+MIN_MONTE_CARLO_ITERATIONS = 15000

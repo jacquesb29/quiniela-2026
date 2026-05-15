@@ -28,9 +28,28 @@ class RefactorSmokeTest(unittest.TestCase):
             dashboard_md_file="dashboard.md",
             fixtures_template_file="fixtures.json",
         )
-        args = parser.parse_args(["project-bracket", "--iterations", "32"])
+        args = parser.parse_args(["project-bracket"])
         self.assertEqual(args.command, "project-bracket")
-        self.assertEqual(args.iterations, 32)
+        self.assertEqual(args.iterations, app.MIN_MONTE_CARLO_ITERATIONS)
+
+    def test_cli_parser_defaults_all_tournament_monte_carlo_to_15000(self):
+        parser = build_parser(
+            state_file="state.json",
+            tournament_config_file="config.json",
+            bracket_file="bracket.md",
+            bracket_json_file="bracket.json",
+            dashboard_html_file="dashboard.html",
+            dashboard_md_file="dashboard.md",
+            fixtures_template_file="fixtures.json",
+        )
+        for command in ("project-bracket", "simulate-tournament", "playoffs"):
+            args = parser.parse_args([command])
+            self.assertEqual(args.iterations, 15000)
+
+    def test_monte_carlo_guard_rejects_less_than_15000(self):
+        with self.assertRaises(SystemExit):
+            app.ensure_minimum_monte_carlo_iterations(14999, label="test")
+        app.ensure_minimum_monte_carlo_iterations(15000, label="test")
 
     def test_cli_parser_accepts_audit_quiniela(self):
         parser = build_parser(

@@ -3,6 +3,8 @@ from __future__ import annotations
 import argparse
 from pathlib import Path
 
+from worldcup2026.config import MIN_MONTE_CARLO_ITERATIONS
+
 
 def build_parser(
     *,
@@ -58,7 +60,7 @@ def build_parser(
     power_table.add_argument("--only-confirmed", action="store_true")
 
     playoffs = subparsers.add_parser("playoffs", help="Probabilidades de clasificar desde repechajes.")
-    playoffs.add_argument("--iterations", type=int, default=10000)
+    playoffs.add_argument("--iterations", type=int, default=MIN_MONTE_CARLO_ITERATIONS)
 
     fixtures = subparsers.add_parser("fixtures", help="Lee un JSON de partidos y genera predicciones.")
     fixtures.add_argument("path")
@@ -70,7 +72,7 @@ def build_parser(
 
     simulate = subparsers.add_parser("simulate-tournament", help="Simula el Mundial completo con Monte Carlo a partir de un cuadro en JSON.")
     simulate.add_argument("--config", default=tournament_config_file, help="Ruta al JSON del cuadro del torneo.")
-    simulate.add_argument("--iterations", type=int, default=5000)
+    simulate.add_argument("--iterations", type=int, default=MIN_MONTE_CARLO_ITERATIONS)
     simulate.add_argument("--top", type=int, default=20)
     simulate.add_argument("--full", action="store_true")
     simulate.add_argument("--seed", type=int, default=None)
@@ -81,7 +83,7 @@ def build_parser(
 
     project = subparsers.add_parser("project-bracket", help="Genera una llave proyectada actual en Markdown usando Monte Carlo.")
     project.add_argument("--config", default=tournament_config_file, help="Ruta al JSON del cuadro del torneo.")
-    project.add_argument("--iterations", type=int, default=15000)
+    project.add_argument("--iterations", type=int, default=MIN_MONTE_CARLO_ITERATIONS)
     project.add_argument("--seed", type=int, default=None)
     project.add_argument("--workers", type=int, default=0, help="Procesos para Monte Carlo. 0 = auto.")
     project.add_argument("--progress-every", type=int, default=0)
@@ -105,7 +107,7 @@ def build_parser(
     audit.add_argument("--dashboard-html", default=dashboard_html_file)
     audit.add_argument("--fixtures", default=fixtures_template_file)
     audit.add_argument("--workflow-file", default=".github/workflows/quiniela-pages.yml")
-    audit.add_argument("--min-iterations", type=int, default=15000)
+    audit.add_argument("--min-iterations", type=int, default=MIN_MONTE_CARLO_ITERATIONS)
 
     score_prob = subparsers.add_parser("score-prob", help="Da la probabilidad exacta de un marcador especifico.")
     score_prob.add_argument("team_a")

@@ -17,7 +17,7 @@ from pathlib import Path
 from typing import Dict, List, Optional, Sequence, Tuple
 
 from worldcup2026.calibration import empirical_bayes_shrinkage
-from worldcup2026.config import PARAMS
+from worldcup2026.config import MIN_MONTE_CARLO_ITERATIONS, PARAMS
 from worldcup2026.constants import (
     BRACKET_MATCH_TITLES,
     COACH_OVERRIDES,
@@ -2722,7 +2722,17 @@ def _project_bracket_batch(
     )
 
 
+def ensure_minimum_monte_carlo_iterations(iterations: int, *, label: str, allow_zero: bool = False) -> None:
+    if allow_zero and iterations == 0:
+        return
+    if iterations < MIN_MONTE_CARLO_ITERATIONS:
+        raise SystemExit(
+            f"{label} requiere al menos {MIN_MONTE_CARLO_ITERATIONS} simulaciones Monte Carlo; recibio {iterations}."
+        )
+
+
 def command_simulate_tournament(args: argparse.Namespace, teams: Dict[str, Team]) -> None:
+    ensure_minimum_monte_carlo_iterations(args.iterations, label="simulate-tournament")
     if args.seed is not None:
         seed_all_rng(args.seed)
 
@@ -2975,6 +2985,7 @@ def format_match_projection(match_id: str, aggregate: dict, iterations: int) -> 
 
 
 def command_project_bracket(args: argparse.Namespace, teams: Dict[str, Team]) -> None:
+    ensure_minimum_monte_carlo_iterations(args.iterations, label="project-bracket")
     if args.seed is not None:
         seed_all_rng(args.seed)
 
@@ -6249,6 +6260,7 @@ def run_quiniela_audit(
 
 
 def command_audit_quiniela(args: argparse.Namespace, teams: Dict[str, Team]) -> None:
+    ensure_minimum_monte_carlo_iterations(int(args.min_iterations), label="audit-quiniela --min-iterations")
     errors = run_quiniela_audit(
         teams,
         config_path=Path(args.config),
@@ -6892,6 +6904,7 @@ def command_predict(args: argparse.Namespace, teams: Dict[str, Team]) -> None:
     monte_carlo_iterations = getattr(args, "monte_carlo", 0)
     seed = getattr(args, "seed", None)
     if monte_carlo_iterations and monte_carlo_iterations > 0:
+        ensure_minimum_monte_carlo_iterations(monte_carlo_iterations, label="predict --monte-carlo")
         if seed is not None:
             seed_all_rng(seed)
         summary = monte_carlo_match_summary(
@@ -7025,6 +7038,7 @@ def command_power_table(args: argparse.Namespace, teams: Dict[str, Team]) -> Non
 
 
 def command_playoffs(args: argparse.Namespace, teams: Dict[str, Team]) -> None:
+    ensure_minimum_monte_carlo_iterations(args.iterations, label="playoffs --iterations", allow_zero=True)
     exact = qualification_probabilities(teams)
     simulated = simulate_playoffs(teams, args.iterations) if args.iterations > 0 else {}
     contenders = [team for team in teams.values() if team.status in {"uefa_playoff", "fifa_playoff"}]
