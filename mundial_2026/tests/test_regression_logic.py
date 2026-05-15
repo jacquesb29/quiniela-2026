@@ -3,6 +3,7 @@ from __future__ import annotations
 import dataclasses
 import sys
 import unittest
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from types import SimpleNamespace
 from unittest import mock
@@ -99,6 +100,50 @@ class RegressionLogicTest(unittest.TestCase):
         with mock.patch.object(sync, "API_FOOTBALL_KEY", ""):
             self.assertFalse(sync.provider_enabled())
             self.assertEqual(sync.fetch_provider_live_index({}), {})
+
+    def test_dashboard_live_mode_accepts_live_status_synonym(self):
+        teams = app.load_teams()
+        states = app.initial_team_states(teams)
+        entries = app.dashboard_fixture_entries(
+            [
+                {
+                    "team_a": "Spain",
+                    "team_b": "Uruguay",
+                    "status_state": "live",
+                    "status_detail": "45'",
+                    "live_score_a": 1,
+                    "live_score_b": 0,
+                    "neutral": True,
+                    "stage": "group",
+                }
+            ],
+            teams,
+            states,
+            top_scores=0,
+        )
+        prediction = entries[0]["prediction"]
+        self.assertEqual(prediction.current_score_a, 1)
+        self.assertEqual(prediction.current_score_b, 0)
+
+    def test_runtime_status_counts_provider_status_variants(self):
+        html = app.build_runtime_status_html(
+            [
+                {"projection": False, "status_state": "in"},
+                {"projection": False, "status_state": "post"},
+                {"projection": False, "status_state": "pre"},
+            ],
+            {"iterations": 15000},
+        )
+        self.assertIn("<strong>1</strong> en vivo", html)
+        self.assertIn("<strong>1</strong> finales", html)
+        self.assertIn("<strong>1</strong> pendientes", html)
+
+    def test_live_summary_fetch_accepts_live_and_final_synonyms(self):
+        far_kickoff = datetime.now(timezone.utc) + timedelta(days=90)
+        self.assertTrue(sync.should_fetch_summary(far_kickoff, "live"))
+        self.assertTrue(sync.should_fetch_summary(far_kickoff, "final"))
+        self.assertTrue(sync.should_fetch_summary(far_kickoff, "in"))
+        self.assertTrue(sync.should_fetch_summary(far_kickoff, "post"))
 
     def test_update_simulation_state_tracks_recent_xg_signals(self):
         teams = app.load_teams()

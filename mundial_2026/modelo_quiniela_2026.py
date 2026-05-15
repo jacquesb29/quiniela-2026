@@ -1964,6 +1964,58 @@ def pretty_status(status: str) -> str:
     }.get(status, status)
 
 
+LIVE_STATUS_STATES = {
+    "in",
+    "live",
+    "in_progress",
+    "in-progress",
+    "halftime",
+    "half_time",
+    "half-time",
+    "ht",
+    "extra_time",
+    "extra-time",
+    "et",
+    "penalties",
+    "shootout",
+}
+FINAL_STATUS_STATES = {
+    "post",
+    "final",
+    "finished",
+    "full_time",
+    "full-time",
+    "ft",
+    "aet",
+    "after_extra_time",
+    "after-extra-time",
+    "penalties_final",
+    "after_penalties",
+    "after-penalties",
+}
+
+
+def normalized_match_status_state(status_state: Optional[str]) -> str:
+    status = str(status_state or "").strip().lower()
+    if status in LIVE_STATUS_STATES:
+        return "live"
+    if status in FINAL_STATUS_STATES:
+        return "final"
+    return "pending"
+
+
+def fixture_is_live(entry: dict) -> bool:
+    return normalized_match_status_state(entry.get("status_state")) == "live"
+
+
+def fixture_is_final(entry: dict) -> bool:
+    return normalized_match_status_state(entry.get("status_state")) == "final"
+
+
+def fixture_has_live_score(entry: dict) -> bool:
+    return entry.get("live_score_a") is not None and entry.get("live_score_b") is not None
+
+
 UEFA_PLAYOFF_PATHS = {
     "UEFA_A": {
         "semi_1": ("Italy", "Northern Ireland"),
@@ -3275,7 +3327,7 @@ def dashboard_fixture_entries(
         state_b = normalize_team_state(states.get(team_b, {}))
         ctx = context_from_fixture(fixture, teams, states)
         stage = fixture_stage_name(fixture)
-        if fixture.get("status_state") == "in" and fixture.get("live_score_a") is not None and fixture.get("live_score_b") is not None:
+        if fixture_is_live(fixture) and fixture_has_live_score(fixture):
             prediction = predict_match_live(
                 teams,
                 team_a,
@@ -3880,7 +3932,7 @@ def adjustment_reason_lines(entry: dict, prediction: MatchPrediction) -> List[st
             f"- Cambio por el estilo reciente de cada equipo: {prediction.team_a} {entry.get('tactical_signature_a', 'sin muestra suficiente')} | "
             f"{prediction.team_b} {entry.get('tactical_signature_b', 'sin muestra suficiente')}."
         )
-    if entry.get("status_state") == "in" and prediction.current_score_a is not None and prediction.current_score_b is not None:
+    if fixture_is_live(entry) and prediction.current_score_a is not None and prediction.current_score_b is not None:
         minute_text = f"{prediction.elapsed_minutes:.1f}" if prediction.elapsed_minutes is not None else "?"
         lines.append(
             f"- Cambio por el partido en vivo: marcador {prediction.team_a} {prediction.current_score_a} - {prediction.current_score_b} {prediction.team_b} en el minuto {minute_text}."
@@ -4409,7 +4461,7 @@ def build_global_confidence_markdown(entries: Sequence[dict]) -> List[str]:
         market_gap = depth.get("market_gap")
         if market_gap is not None:
             ranked_market.append((abs(float(market_gap)), entry))
-        if entry.get("status_state") == "in":
+        if fixture_is_live(entry):
             live_matches += 1
 
     avg_confidence = sum(item[0] for item in ranked) / len(ranked)
@@ -4495,7 +4547,7 @@ def build_global_confidence_html(entries: Sequence[dict]) -> str:
         market_gap = depth.get("market_gap")
         if market_gap is not None:
             ranked_market.append((abs(float(market_gap)), entry))
-        if entry.get("status_state") == "in":
+        if fixture_is_live(entry):
             live_matches += 1
 
     avg_confidence = sum(item[0] for item in ranked) / len(ranked)
@@ -5296,9 +5348,9 @@ def build_methodology_html(bracket_payload: dict, backtest: dict) -> str:
 
 def build_runtime_status_html(entries: Sequence[dict], bracket_payload: dict) -> str:
     fixture_entries = [entry for entry in entries if not entry.get("projection")]
-    live_count = sum(1 for entry in fixture_entries if str(entry.get("status_state") or "").lower() == "live")
-    final_count = sum(1 for entry in fixture_entries if str(entry.get("status_state") or "").lower() == "final")
-    pending_count = sum(1 for entry in fixture_entries if str(entry.get("status_state") or "").lower() not in {"live", "final"})
+    live_count = sum(1 for entry in fixture_entries if fixture_is_live(entry))
+    final_count = sum(1 for entry in fixture_entries if fixture_is_final(entry))
+    pending_count = max(len(fixture_entries) - live_count - final_count, 0)
     deep_providers = sorted({str(entry.get("live_feed_provider")) for entry in fixture_entries if entry.get("live_feed_provider")})
     live_sources = sorted({str(entry.get("source")) for entry in fixture_entries if entry.get("source")})
     if deep_providers:

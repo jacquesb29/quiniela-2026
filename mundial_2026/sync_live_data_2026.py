@@ -327,7 +327,14 @@ def match_lookup_key(team_a: str, team_b: str) -> Tuple[str, str]:
 
 def should_fetch_summary(kickoff: datetime, status_state: Optional[str]) -> bool:
     now = datetime.now(timezone.utc)
-    if status_state in {"in", "post"}:
+    if str(status_state or "").strip().lower() in {
+        "in",
+        "live",
+        "in_progress",
+        "post",
+        "final",
+        "finished",
+    }:
         return True
     return abs((kickoff - now).total_seconds()) <= SUMMARY_FETCH_WINDOW_DAYS * 86400
 
