@@ -456,6 +456,8 @@ def simulate_match_sample(
     loser = None
     went_extra_time = False
     went_penalties = False
+    penalty_score_a = None
+    penalty_score_b = None
     if stage != "group":
         resolution = sample_knockout_resolution_fn(
             teams[team_a],
@@ -474,6 +476,8 @@ def simulate_match_sample(
         score_b = resolution["score_b"]
         went_extra_time = resolution["went_extra_time"]
         went_penalties = resolution["went_penalties"]
+        penalty_score_a = resolution.get("penalty_score_a")
+        penalty_score_b = resolution.get("penalty_score_b")
 
     update_simulation_state_fn(
         teams,
@@ -504,4 +508,6 @@ def simulate_match_sample(
         "loser": loser,
         "went_extra_time": went_extra_time,
         "went_penalties": went_penalties,
+        "penalty_score_a": penalty_score_a,
+        "penalty_score_b": penalty_score_b,
     }

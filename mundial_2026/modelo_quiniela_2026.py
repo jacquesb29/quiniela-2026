@@ -6154,6 +6154,9 @@ def audit_bracket_payload(bracket_payload: dict, teams: Dict[str, Team], min_ite
                 prob = float(match.get(prob_key) or 0.0)
                 if prob < 0.0 or prob > 1.0:
                     errors.append(f"{match_id} tiene {prob_key} fuera de rango: {prob}.")
+        penalties_prob = float(match.get("penalties_prob", 0.0) or 0.0)
+        if penalties_prob > 0.01 and not match.get("top_penalty_scores"):
+            errors.append(f"{match_id} tiene probabilidad de penales pero no publica marcadores probables de tanda.")
     def sourced_team(match: dict, source_kind: str) -> Optional[str]:
         if source_kind == "winner":
             return match.get("winner")

@@ -15,7 +15,7 @@ if str(PACKAGE_ROOT) not in sys.path:
 import modelo_quiniela_2026 as app
 import sync_live_data_2026 as sync
 from worldcup2026.live.adjustment import live_game_state_adjustment, live_stats_adjustment
-from worldcup2026.simulation.match import sample_knockout_resolution
+from worldcup2026.simulation.match import sample_knockout_resolution, simulate_match_sample
 from worldcup2026.types import KnockoutResolution
 
 
@@ -86,6 +86,41 @@ class RegressionLogicTest(unittest.TestCase):
         self.assertTrue(result["went_penalties"])
         self.assertEqual(result["winner"], "Spain")
         self.assertEqual(result["loser"], "Portugal")
+        self.assertEqual(result["penalty_score_a"], 5)
+        self.assertEqual(result["penalty_score_b"], 4)
+
+    def test_simulated_knockout_match_preserves_penalty_scores_for_bracket_audit(self):
+        teams = {
+            "Spain": SimpleNamespace(name="Spain"),
+            "Portugal": SimpleNamespace(name="Portugal"),
+        }
+        states = {"Spain": {}, "Portugal": {}}
+        result = simulate_match_sample(
+            teams,
+            states,
+            "Spain",
+            "Portugal",
+            "round16",
+            build_simulation_context_fn=lambda *args, **kwargs: SimpleNamespace(importance=1.0),
+            ensure_state=lambda states, team: states[team],
+            cached_simulation_expected_goals=lambda *args, **kwargs: (1.1, 1.0),
+            simulation_state_signature=lambda state: (),
+            sample_score=lambda *args, **kwargs: (1, 1),
+            sample_cards_fn=lambda *args, **kwargs: (0, 0, 0, 0),
+            sample_knockout_resolution_fn=lambda *args, **kwargs: {
+                "winner": "Spain",
+                "loser": "Portugal",
+                "score_a": 1,
+                "score_b": 1,
+                "went_extra_time": True,
+                "went_penalties": True,
+                "penalty_score_a": 5,
+                "penalty_score_b": 4,
+            },
+            update_simulation_state_fn=lambda *args, **kwargs: None,
+        )
+
+        self.assertTrue(result["went_penalties"])
         self.assertEqual(result["penalty_score_a"], 5)
         self.assertEqual(result["penalty_score_b"], 4)
 
