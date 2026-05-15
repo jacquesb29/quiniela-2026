@@ -6166,13 +6166,22 @@ def audit_bracket_payload(bracket_payload: dict, teams: Dict[str, Team], min_ite
             errors.append(f"{match_id} tiene probabilidad de penales pero no publica marcadores probables de tanda.")
         matchup_scenarios = match.get("matchup_scenarios") or []
         if matchup_scenarios:
-            lead = matchup_scenarios[0]
-            if (match.get("team_a"), match.get("team_b")) != (lead.get("team_a"), lead.get("team_b")):
-                errors.append(f"{match_id} no publica el cruce mas probable como cruce principal.")
-            if match.get("winner") != lead.get("winner"):
-                errors.append(f"{match_id} no publica el favorito condicional del cruce principal.")
-            if abs(float(match.get("matchup_prob", 0.0) or 0.0) - float(lead.get("matchup_prob", 0.0) or 0.0)) > 0.000001:
-                errors.append(f"{match_id} mezcla probabilidad del escenario con probabilidad del cruce.")
+            published = None
+            for scenario in matchup_scenarios:
+                if (match.get("team_a"), match.get("team_b")) == (scenario.get("team_a"), scenario.get("team_b")):
+                    published = scenario
+                    break
+            if published is None:
+                for scenario in matchup_scenarios:
+                    if {match.get("team_a"), match.get("team_b")} == {scenario.get("team_a"), scenario.get("team_b")}:
+                        published = scenario
+                        break
+            if published is None:
+                errors.append(f"{match_id} publica un cruce que no existe entre sus escenarios simulados.")
+            elif match.get("winner") != published.get("winner"):
+                errors.append(f"{match_id} no publica el favorito condicional del cruce mostrado.")
+            elif abs(float(match.get("matchup_prob", 0.0) or 0.0) - float(published.get("matchup_prob", 0.0) or 0.0)) > 0.000001:
+                errors.append(f"{match_id} mezcla probabilidad del escenario con probabilidad del cruce mostrado.")
             if "conditional_winner_prob" not in match:
                 errors.append(f"{match_id} no separa probabilidad condicional de avanzar si el cruce se juega.")
     def sourced_team(match: dict, source_kind: str) -> Optional[str]:
