@@ -20,6 +20,7 @@ def render_dashboard_html(context: Dict[str, Any]) -> str:
         "runtime_status_html",
         "methodology_html",
         "global_confidence_html",
+        "max_certainty_html",
         "recent_changes_html",
         "backtesting_html",
         "bracket_visual_html",

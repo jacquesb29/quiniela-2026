@@ -14,6 +14,7 @@ Fecha de auditoria: 2026-05-15.
 
 ## Como usarlo para la quiniela
 
+- La web incluye una hoja de maxima certeza: ordena picks por solidez operativa, separa partidos trampa y marca cuando el marcador exacto es fragil.
 - Usa la llave proyectada como mapa de escenarios, no como verdad fija. El ganador de cada cruce puede cambiar si cambia el rival que llega.
 - Para picks de fase de grupos, separa partidos con favorito claro de partidos parejos. En partidos parejos conviene revisar empate, contexto de grupo y valor relativo de cuota/modelo.
 - Para knockout, revisa siempre probabilidad de avanzar, marcador probable, prorroga y penales. No basta con ver "favorito".

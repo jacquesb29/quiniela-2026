@@ -145,6 +145,60 @@ class RegressionLogicTest(unittest.TestCase):
         self.assertTrue(sync.should_fetch_summary(far_kickoff, "in"))
         self.assertTrue(sync.should_fetch_summary(far_kickoff, "post"))
 
+    def test_quiniela_certainty_profile_prefers_clear_favorite(self):
+        prediction = app.MatchPrediction(
+            team_a="Spain",
+            team_b="Uruguay",
+            expected_goals_a=1.7,
+            expected_goals_b=0.8,
+            win_a=0.68,
+            draw=0.20,
+            win_b=0.12,
+            exact_scores=[("2-0", 0.18), ("1-0", 0.16), ("2-1", 0.11)],
+            statistical_depth={
+                "confidence_index": 0.78,
+                "top3_coverage": 0.45,
+                "model_agreement": 0.76,
+            },
+        )
+        profile = app.quiniela_certainty_profile(
+            {
+                "title": "Spain vs Uruguay",
+                "stage_label": "Grupo H",
+                "prediction": prediction,
+                "status_state": "pre",
+            }
+        )
+        self.assertEqual(profile["pick_code"], "1")
+        self.assertEqual(profile["tier"], "Firme")
+        self.assertGreater(profile["certainty_score"], 0.65)
+
+    def test_max_certainty_html_renders_pick_sheet(self):
+        prediction = app.MatchPrediction(
+            team_a="Spain",
+            team_b="Uruguay",
+            expected_goals_a=1.7,
+            expected_goals_b=0.8,
+            win_a=0.68,
+            draw=0.20,
+            win_b=0.12,
+            exact_scores=[("2-0", 0.18), ("1-0", 0.16), ("2-1", 0.11)],
+            statistical_depth={"confidence_index": 0.78, "top3_coverage": 0.45, "model_agreement": 0.76},
+        )
+        html = app.build_max_certainty_html(
+            [
+                {
+                    "title": "Spain vs Uruguay",
+                    "stage_label": "Grupo H",
+                    "prediction": prediction,
+                    "status_state": "pre",
+                }
+            ]
+        )
+        self.assertIn("Hoja de máxima certeza", html)
+        self.assertIn("Picks mas defendibles", html)
+        self.assertIn("Spain vs Uruguay", html)
+
     def test_update_simulation_state_tracks_recent_xg_signals(self):
         teams = app.load_teams()
         states = app.initial_team_states(teams)

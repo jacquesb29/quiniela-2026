@@ -13,6 +13,7 @@ from worldcup2026.cli import build_parser
 from worldcup2026.live.adjustment import live_game_state_adjustment
 from worldcup2026.live.patterns import detect_live_play_patterns
 from worldcup2026.data.loader import load_tournament_config, read_fixtures
+from worldcup2026.dashboard.html_builder import render_dashboard_html
 import modelo_quiniela_2026 as app
 
 
@@ -94,6 +95,26 @@ class RefactorSmokeTest(unittest.TestCase):
         self.assertIn("15.000 simulaciones", html)
         self.assertIn("api_football", html)
         self.assertIn("1</strong> en vivo", html)
+
+    def test_dashboard_renderer_keeps_max_certainty_html_unescaped(self):
+        html = render_dashboard_html(
+            {
+                "updated_at": "2026-05-15T00:00:00",
+                "state_path": "state.json",
+                "fixtures_path": "fixtures.json",
+                "runtime_status_html": "",
+                "methodology_html": "",
+                "global_confidence_html": "",
+                "max_certainty_html": "<section class=\"certainty-panel\"><h2>Hoja de máxima certeza</h2></section>",
+                "recent_changes_html": "",
+                "backtesting_html": "",
+                "bracket_visual_html": "",
+                "bracket_html": "",
+                "cards_html": "",
+            }
+        )
+        self.assertIn('<section class="certainty-panel">', html)
+        self.assertNotIn("&lt;section class=&quot;certainty-panel&quot;&gt;", html)
 
     def test_bracket_visual_keeps_branch_coherent(self):
         payload = {

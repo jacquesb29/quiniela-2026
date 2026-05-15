@@ -4082,6 +4082,185 @@ def top_result_summary(prediction: MatchPrediction) -> str:
     return f"{best_label} {format_pct(best_prob)}"
 
 
+def quiniela_outcome_options(prediction: MatchPrediction) -> List[Tuple[float, str, str]]:
+    return [
+        (float(prediction.win_a), f"Gana {prediction.team_a}", "1"),
+        (float(prediction.draw), "Empate", "X"),
+        (float(prediction.win_b), f"Gana {prediction.team_b}", "2"),
+    ]
+
+
+def quiniela_certainty_profile(entry: dict) -> dict:
+    prediction: MatchPrediction = entry["prediction"]
+    outcomes = sorted(quiniela_outcome_options(prediction), key=lambda item: item[0], reverse=True)
+    best_prob, best_label, best_code = outcomes[0]
+    second_prob, second_label, second_code = outcomes[1]
+    gap = best_prob - second_prob
+    depth = prediction.statistical_depth or {}
+    confidence = float(depth.get("confidence_index", best_prob))
+    top3 = float(depth.get("top3_coverage", 0.0))
+    agreement = depth.get("model_agreement")
+    agreement_value = float(agreement) if agreement is not None else 0.5
+    market_gap_raw = depth.get("market_gap")
+    market_gap = float(market_gap_raw) if market_gap_raw is not None else 0.0
+    score, score_prob = prediction.exact_scores[0] if prediction.exact_scores else (projected_score_value(prediction), 0.0)
+    certainty_score = clamp(
+        0.42 * confidence
+        + 0.34 * best_prob
+        + 0.13 * gap
+        + 0.07 * agreement_value
+        + 0.04 * top3
+        - 0.06 * market_gap,
+        0.0,
+        0.99,
+    )
+    if best_prob >= 0.66 and gap >= 0.18 and confidence >= 0.70:
+        tier = "Firme"
+        action = "usar como pick base"
+    elif best_prob >= 0.58 and gap >= 0.12:
+        tier = "Preferente"
+        action = "usar si no hay mejor cobertura"
+    elif prediction.draw >= 0.27 and gap < 0.12:
+        tier = "Trampa"
+        action = "cubrir empate si las reglas lo permiten"
+    else:
+        tier = "Alta varianza"
+        action = "evitar jugada heroica; priorizar cobertura"
+    score_note = (
+        "marcador relativamente defendible"
+        if score_prob >= 0.16
+        else "marcador exacto fragil; usar solo si la quiniela lo exige"
+    )
+    return {
+        "title": entry["title"],
+        "stage_label": entry.get("stage_label", ""),
+        "pick_label": best_label,
+        "pick_code": best_code,
+        "pick_prob": best_prob,
+        "second_label": second_label,
+        "second_code": second_code,
+        "second_prob": second_prob,
+        "gap": gap,
+        "certainty_score": certainty_score,
+        "confidence": confidence,
+        "top3": top3,
+        "agreement": agreement_value,
+        "market_gap": market_gap_raw,
+        "score": score,
+        "score_prob": float(score_prob),
+        "tier": tier,
+        "action": action,
+        "score_note": score_note,
+        "projection": bool(entry.get("projection")),
+        "status": normalized_match_status_state(entry.get("status_state")),
+    }
+
+
+def build_max_certainty_markdown(entries: Sequence[dict]) -> List[str]:
+    if not entries:
+        return ["_Sin partidos cargados para construir una hoja de picks._"]
+    profiles = [quiniela_certainty_profile(entry) for entry in entries if not entry.get("projection")]
+    if not profiles:
+        return ["_Sin partidos reales cargados para construir una hoja de picks._"]
+    safest = sorted(profiles, key=lambda item: (item["certainty_score"], item["pick_prob"], item["gap"]), reverse=True)[:12]
+    traps = sorted(
+        [item for item in profiles if item["tier"] in {"Trampa", "Alta varianza"}],
+        key=lambda item: (item["gap"], item["pick_prob"]),
+    )[:8]
+    score_picks = sorted(profiles, key=lambda item: (item["score_prob"], item["top3"]), reverse=True)[:8]
+    lines = [
+        "- Lectura: la certeza operativa no es probabilidad garantizada de acierto; es un ranking conservador que mezcla probabilidad del resultado, diferencia contra la segunda opcion, cobertura de marcadores y acuerdo entre modelos.",
+        "- Regla base sin conocer tu quiniela exacta: en partidos firmes juega resultado; en partidos trampa cubre empate/upset; para marcador exacto usa el top score solo si la quiniela lo premia mucho.",
+        "",
+        "### Picks mas defendibles",
+    ]
+    for item in safest:
+        lines.append(
+            f"- {item['title']}: {item['pick_label']} ({format_pct(item['pick_prob'])}) | certeza operativa {format_pct(item['certainty_score'])} | marcador {item['score']} ({format_pct(item['score_prob'])}) | {item['tier']}: {item['action']}"
+        )
+    lines.extend(["", "### Partidos que no conviene jugar con exceso de confianza"])
+    if traps:
+        for item in traps:
+            lines.append(
+                f"- {item['title']}: pick principal {item['pick_label']} {format_pct(item['pick_prob'])}, segunda opcion {item['second_label']} {format_pct(item['second_prob'])} | brecha {format_pct(item['gap'])} | {item['action']}"
+            )
+    else:
+        lines.append("- No hay partidos marcados como trampa en este corte.")
+    lines.extend(["", "### Marcadores exactos mas defendibles"])
+    for item in score_picks:
+        lines.append(
+            f"- {item['title']}: {item['score']} ({format_pct(item['score_prob'])}) | top-3 marcadores {format_pct(item['top3'])} | {item['score_note']}"
+        )
+    return lines
+
+
+def build_max_certainty_html(entries: Sequence[dict]) -> str:
+    if not entries:
+        return ""
+    profiles = [quiniela_certainty_profile(entry) for entry in entries if not entry.get("projection")]
+    if not profiles:
+        return ""
+    safest = sorted(profiles, key=lambda item: (item["certainty_score"], item["pick_prob"], item["gap"]), reverse=True)[:10]
+    traps = sorted(
+        [item for item in profiles if item["tier"] in {"Trampa", "Alta varianza"}],
+        key=lambda item: (item["gap"], item["pick_prob"]),
+    )[:6]
+    score_picks = sorted(profiles, key=lambda item: (item["score_prob"], item["top3"]), reverse=True)[:6]
+
+    def rows(items: Sequence[dict], mode: str) -> str:
+        html_rows = []
+        for item in items:
+            if mode == "safe":
+                detail = (
+                    f"{item['pick_label']} {format_pct(item['pick_prob'])} | "
+                    f"certeza operativa {format_pct(item['certainty_score'])} | "
+                    f"marcador {item['score']} {format_pct(item['score_prob'])}"
+                )
+            elif mode == "trap":
+                detail = (
+                    f"Pick principal {item['pick_label']} {format_pct(item['pick_prob'])}; "
+                    f"segunda opcion {item['second_label']} {format_pct(item['second_prob'])}; "
+                    f"brecha {format_pct(item['gap'])}"
+                )
+            else:
+                detail = (
+                    f"Marcador {item['score']} {format_pct(item['score_prob'])} | "
+                    f"top-3 marcadores {format_pct(item['top3'])} | {item['score_note']}"
+                )
+            html_rows.append(
+                "<li>"
+                f"<strong>{html.escape(str(item['title']))}</strong>"
+                f"<span>{html.escape(detail)}</span>"
+                f"<em>{html.escape(str(item['tier']))}: {html.escape(str(item['action']))}</em>"
+                "</li>"
+            )
+        return "".join(html_rows)
+
+    trap_rows = rows(traps, "trap") if traps else "<li><strong>Sin trampas fuertes detectadas</strong><span>El corte actual no marca partidos con brecha estrecha crítica.</span><em>Igual revisar alineaciones antes de cerrar.</em></li>"
+    return (
+        "<section class=\"panel certainty-panel\">"
+        "<div class=\"panel-head\">"
+        "<div>"
+        "<p class=\"eyebrow\">Modo quiniela</p>"
+        "<h2>Hoja de máxima certeza</h2>"
+        "<p class=\"lede-tight\">Esta seccion traduce el modelo a decisiones de quiniela. No infla probabilidades: ordena los picks por solidez operativa, separa partidos trampa y avisa cuando el marcador exacto es fragil.</p>"
+        "</div>"
+        "</div>"
+        "<div class=\"certainty-grid\">"
+        "<article><h3>Picks mas defendibles</h3><ul>"
+        f"{rows(safest, 'safe')}"
+        "</ul></article>"
+        "<article><h3>Partidos para cubrir o tratar con cuidado</h3><ul>"
+        f"{trap_rows}"
+        "</ul></article>"
+        "<article><h3>Marcadores exactos mas defendibles</h3><ul>"
+        f"{rows(score_picks, 'score')}"
+        "</ul></article>"
+        "</div>"
+        "</section>"
+    )
+
+
 def build_dashboard_markdown(
     entries: Sequence[dict],
     bracket_text: str,
@@ -4104,6 +4283,8 @@ def build_dashboard_markdown(
         "",
     ]
     lines.extend(build_global_confidence_markdown(entries))
+    lines.extend(["", "## Hoja de maxima certeza para quiniela", ""])
+    lines.extend(build_max_certainty_markdown(entries))
     lines.extend(["", "## Que cambio desde la ultima actualizacion", ""])
     lines.extend(
         build_recent_changes_markdown(
@@ -5670,6 +5851,7 @@ def build_dashboard_html(
     runtime_status_html = build_runtime_status_html(entries, bracket_payload)
     methodology_html = build_methodology_html(bracket_payload, backtest)
     global_confidence_html = build_global_confidence_html(entries)
+    max_certainty_html = build_max_certainty_html(entries)
     recent_changes_html = build_recent_changes_html(
         entries,
         previous_entries or [],
@@ -5686,6 +5868,7 @@ def build_dashboard_html(
             "runtime_status_html": runtime_status_html,
             "methodology_html": methodology_html,
             "global_confidence_html": global_confidence_html,
+            "max_certainty_html": max_certainty_html,
             "recent_changes_html": recent_changes_html,
             "backtesting_html": backtesting_html,
             "bracket_visual_html": bracket_visual_html,
