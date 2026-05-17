@@ -6048,9 +6048,111 @@ def build_backtesting_html(backtest: dict) -> str:
     )
 
 
-def build_methodology_html(bracket_payload: dict, backtest: dict) -> str:
+def build_methodology_quality_html(
+    entries: Optional[Sequence[dict]],
+    bracket_payload: dict,
+    backtest: dict,
+) -> str:
+    fixture_entries = [entry for entry in (entries or []) if not entry.get("projection")]
+    total_fixtures = len(fixture_entries)
+    live_count = sum(1 for entry in fixture_entries if fixture_is_live(entry))
+    final_count = sum(1 for entry in fixture_entries if fixture_is_final(entry))
+    goal_consensus_count = sum(1 for entry in fixture_entries if entry.get("market_total_line") is not None)
+    iterations = int(bracket_payload.get("iterations", 0) or 0)
+    champion_rows = consensus_adjusted_champion_probabilities(bracket_payload, entries)
+    consensus_context = consensus_live_update_context(entries)
+    completed_matches = int(backtest.get("completed_matches", 0) or 0)
+
+    checks = [
+        {
+            "label": "Monte Carlo",
+            "status": "OK" if iterations >= 15000 else "Revisar",
+            "tone": "ok" if iterations >= 15000 else "warn",
+            "detail": (
+                f"{iterations:,}".replace(",", ".")
+                + " simulaciones por corrida; minimo operativo exigido: 15.000."
+                if iterations
+                else "La llave no reporta numero de simulaciones."
+            ),
+        },
+        {
+            "label": "Consenso externo campeon",
+            "status": "Activo" if champion_rows else "Pendiente",
+            "tone": "ok" if champion_rows else "warn",
+            "detail": (
+                "Probabilidades de campeon mezcladas dinamicamente: "
+                f"{format_pct(float(consensus_context.get('model_blend', 0.0)))} modelo/live y "
+                f"{format_pct(float(consensus_context.get('consensus_blend', 0.0)))} consenso externo."
+                if champion_rows
+                else "Falta una llave con campeones agregados para calcular el guardrail externo."
+            ),
+        },
+        {
+            "label": "Pronostico de goles",
+            "status": "Activo" if goal_consensus_count else "Listo",
+            "tone": "ok" if goal_consensus_count else "neutral",
+            "detail": (
+                f"{goal_consensus_count}/{total_fixtures} partidos tienen linea externa seria de goles para ajustar el total esperado."
+                if total_fixtures
+                else "Sin fixtures cargados todavia."
+            )
+            if goal_consensus_count
+            else (
+                "El modelo publica goles esperados, marcador entero principal y over/under; cuando entre una linea externa, ajusta la brecha automaticamente."
+                if total_fixtures
+                else "Sin fixtures cargados todavia."
+            ),
+        },
+        {
+            "label": "In-play cada 5 minutos",
+            "status": "Activo" if live_count else "Preparado",
+            "tone": "ok" if live_count else "neutral",
+            "detail": (
+                f"{live_count} partidos en vivo y {final_count} cerrados. El workflow recalcula cada 5 minutos y en cada push."
+                if total_fixtures
+                else "El workflow esta listo, pero no hay partidos para monitorear."
+            ),
+        },
+        {
+            "label": "Backtesting y calibracion",
+            "status": "Activo" if completed_matches else "Sin muestra",
+            "tone": "ok" if completed_matches else "neutral",
+            "detail": (
+                f"{completed_matches} partidos cerrados reconstruidos secuencialmente con log-loss, Brier y calibracion por tramos."
+                if completed_matches
+                else "Todavia no hay resultados reales suficientes; el modulo queda listo para medir en cuanto haya partidos cerrados."
+            ),
+        },
+    ]
+    rows = []
+    for check in checks:
+        rows.append(
+            "<article class=\"method-quality-card\">"
+            f"<span class=\"method-status {html.escape(str(check['tone']))}\">{html.escape(str(check['status']))}</span>"
+            f"<h3>{html.escape(str(check['label']))}</h3>"
+            f"<p>{html.escape(str(check['detail']))}</p>"
+            "</article>"
+        )
+    return (
+        "<div class=\"method-quality\">"
+        "<div class=\"method-quality-head\">"
+        "<p class=\"eyebrow\">Semaforo metodologico</p>"
+        "<h3>Control de calidad del pronostico</h3>"
+        "<p>Este bloque separa lo que ya esta activo de lo que esta preparado para activarse cuando entren partidos, goles, noticias y feed live reales.</p>"
+        "</div>"
+        f"<div class=\"method-quality-grid\">{''.join(rows)}</div>"
+        "</div>"
+    )
+
+
+def build_methodology_html(
+    bracket_payload: dict,
+    backtest: dict,
+    entries: Optional[Sequence[dict]] = None,
+) -> str:
     iterations = int(bracket_payload.get("iterations", 0) or 0)
     montecarlo_line = f"{iterations:,}".replace(",", ".") + " iteraciones" if iterations else "iteraciones variables"
+    quality_html = build_methodology_quality_html(entries, bracket_payload, backtest)
     return (
         "<section class=\"panel methodology\">"
         "<div class=\"panel-head\">"
@@ -6060,6 +6162,7 @@ def build_methodology_html(bracket_payload: dict, backtest: dict) -> str:
         "<p class=\"lede-tight\">La idea aqui no es complicar por complicar. El modelo ya es fuerte para quiniela; lo que mas valor agrega ahora es que explique bien por que cambia y que luego podamos medir con datos reales si viene acertando.</p>"
         "</div>"
         "</div>"
+        f"{quality_html}"
         "<div class=\"method-grid\">"
         "<article>"
         "<h3>Partido a partido</h3>"
@@ -6438,7 +6541,7 @@ def build_dashboard_html(
     bracket_html = html.escape(bracket_text.strip() or "No hay llave generada todavia.")
     bracket_visual_html = build_bracket_visual_html(bracket_payload)
     runtime_status_html = build_runtime_status_html(entries, bracket_payload)
-    methodology_html = build_methodology_html(bracket_payload, backtest)
+    methodology_html = build_methodology_html(bracket_payload, backtest, entries)
     global_confidence_html = build_global_confidence_html(entries)
     max_certainty_html = build_max_certainty_html(entries)
     consensus_guardrail_html = build_consensus_guardrail_html(bracket_payload, entries)
@@ -6701,6 +6804,9 @@ def audit_dashboard_html(dashboard_html: str) -> List[str]:
         "Marcadores exactos mas defendibles",
         "Ajustes para boleto de quiniela",
         "Guardrail de consenso",
+        "Semaforo metodologico",
+        "Control de calidad del pronostico",
+        "Pronóstico de goles",
         "15000",
     ]
     for snippet in required_snippets:

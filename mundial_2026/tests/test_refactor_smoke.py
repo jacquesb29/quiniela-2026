@@ -106,6 +106,9 @@ class RefactorSmokeTest(unittest.TestCase):
     def test_methodology_mentions_15000_iterations(self):
         html = app.build_methodology_html({"iterations": 15000}, {"completed_matches": 0})
         self.assertIn("15.000 iteraciones", html)
+        self.assertIn("Semaforo metodologico", html)
+        self.assertIn("Control de calidad del pronostico", html)
+        self.assertIn("15.000 simulaciones", html)
 
     def test_runtime_status_panel_mentions_provider_and_simulations(self):
         html = app.build_runtime_status_html(

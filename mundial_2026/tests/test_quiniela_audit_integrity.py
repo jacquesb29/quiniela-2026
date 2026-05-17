@@ -220,7 +220,9 @@ class QuinielaAuditIntegrityTest(unittest.TestCase):
                 "<p>Brecha minima contra la segunda opcion</p>"
                 "<p>Checklist de auditoria</p>"
                 "<p>Picks mas defendibles</p><p>Marcadores exactos mas defendibles</p>"
-                "<p>Guardrail de consenso</p><p>Ajustes para boleto de quiniela</p><p>15000</p></section></html>"
+                "<p>Guardrail de consenso</p><p>Ajustes para boleto de quiniela</p>"
+                "<p>Semaforo metodologico</p><p>Control de calidad del pronostico</p>"
+                "<p>Pronóstico de goles</p><p>15000</p></section></html>"
             )
             workflow_path.write_text(
                 'cron: "*/5 * * * *"\n'
