@@ -6285,6 +6285,78 @@ def build_runtime_status_html(entries: Sequence[dict], bracket_payload: dict) ->
     )
 
 
+def build_landing_proof_html(entries: Sequence[dict], bracket_payload: dict, backtest: dict) -> str:
+    fixture_entries = [entry for entry in entries if not entry.get("projection")]
+    live_count = sum(1 for entry in fixture_entries if fixture_is_live(entry))
+    final_count = sum(1 for entry in fixture_entries if fixture_is_final(entry))
+    pending_count = max(len(fixture_entries) - live_count - final_count, 0)
+    iterations = int(bracket_payload.get("iterations", 0) or 0)
+    iterations_label = f"{iterations:,}".replace(",", ".") if iterations else "sin dato"
+    champion_rows = consensus_adjusted_champion_probabilities(bracket_payload, entries)
+    completed_matches = int(backtest.get("completed_matches", 0) or 0)
+    goal_consensus_count = sum(1 for entry in fixture_entries if entry.get("market_total_line") is not None)
+    model_status = "Activo" if iterations >= 15000 and champion_rows else "En preparacion"
+    live_status = "En vivo" if live_count else "Listo"
+    evidence_cards = [
+        (
+            "Motor probado",
+            f"{iterations_label} simulaciones Monte Carlo, ensamble de modelos y auditoria bloqueante antes de publicar.",
+            "ok" if iterations >= 15000 else "warn",
+        ),
+        (
+            "Actualizacion real",
+            f"GitHub Actions regenera cada 5 minutos. Estado actual: {live_count} live, {final_count} final, {pending_count} pendientes.",
+            "ok",
+        ),
+        (
+            "Decision de quiniela",
+            "Separa picks firmes, partidos trampa, marcadores defendibles y coberturas. No fuerza una falsa certeza del 90%.",
+            "ok",
+        ),
+        (
+            "Contraste externo",
+            "Mezcla consenso de campeon y lineas serias de goles cuando existen, sin dejar que tapen el modelo propio.",
+            "ok" if champion_rows or goal_consensus_count else "neutral",
+        ),
+        (
+            "Calibracion",
+            f"{completed_matches} partidos cerrados reconstruidos con log-loss, Brier y tramos de confianza.",
+            "ok" if completed_matches else "neutral",
+        ),
+        (
+            "In-play",
+            "Cuando empieza el partido recalcula marcador, probabilidades y goles restantes con minuto, score y eventos disponibles.",
+            "ok" if live_count else "neutral",
+        ),
+    ]
+    card_html = "".join(
+        (
+            f"<article class=\"proof-card {html.escape(tone)}\">"
+            f"<h3>{html.escape(title)}</h3>"
+            f"<p>{html.escape(detail)}</p>"
+            "</article>"
+        )
+        for title, detail, tone in evidence_cards
+    )
+    return (
+        "<section class=\"panel landing-proof\" id=\"prueba-operacional\">"
+        "<div class=\"proof-layout\">"
+        "<div class=\"proof-copy\">"
+        "<p class=\"eyebrow\">Prueba operacional</p>"
+        "<h2>Como sabes que no es una pagina bonita pegada encima de numeros muertos</h2>"
+        "<p class=\"lede-tight\">El sitio publica evidencia de funcionamiento: simulaciones, frecuencia de refresco, auditoria, calibracion, consenso externo y estado in-play. Para ganar la quiniela, esta capa importa tanto como el pronostico: te dice cuando confiar, cuando cubrir y cuando no sobreapostar un partido abierto.</p>"
+        "<div class=\"proof-status-row\">"
+        f"<span>Modelo <strong>{html.escape(model_status)}</strong></span>"
+        f"<span>In-play <strong>{html.escape(live_status)}</strong></span>"
+        f"<span>Fixtures <strong>{len(fixture_entries)}</strong></span>"
+        "</div>"
+        "</div>"
+        f"<div class=\"proof-grid\">{card_html}</div>"
+        "</div>"
+        "</section>"
+    )
+
+
 def build_dashboard_html(
     entries: Sequence[dict],
     bracket_text: str,
@@ -6540,6 +6612,7 @@ def build_dashboard_html(
 
     bracket_html = html.escape(bracket_text.strip() or "No hay llave generada todavia.")
     bracket_visual_html = build_bracket_visual_html(bracket_payload)
+    landing_proof_html = build_landing_proof_html(entries, bracket_payload, backtest)
     runtime_status_html = build_runtime_status_html(entries, bracket_payload)
     methodology_html = build_methodology_html(bracket_payload, backtest, entries)
     global_confidence_html = build_global_confidence_html(entries)
@@ -6558,6 +6631,7 @@ def build_dashboard_html(
             "updated_at": html.escape(iso_timestamp()),
             "state_path": html.escape(str(state_path)),
             "fixtures_path": html.escape(str(fixtures_path)),
+            "landing_proof_html": landing_proof_html,
             "runtime_status_html": runtime_status_html,
             "methodology_html": methodology_html,
             "global_confidence_html": global_confidence_html,
@@ -6793,6 +6867,9 @@ def audit_dashboard_html(dashboard_html: str) -> List[str]:
     errors = []
     required_snippets = [
         "Hoja de máxima certeza",
+        "Quiniela Intelligence 2026",
+        "Prueba operacional",
+        "Una sala de decisión",
         "certainty-panel",
         "Auditoria del boleto",
         "Picks firmes o preferentes",

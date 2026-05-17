@@ -132,12 +132,31 @@ class RefactorSmokeTest(unittest.TestCase):
         self.assertIn("api_football", html)
         self.assertIn("1</strong> en vivo", html)
 
+    def test_landing_proof_explains_operational_robustness(self):
+        html = app.build_landing_proof_html(
+            [{"projection": False, "status_state": "pre", "market_total_line": 2.5}],
+            {
+                "iterations": 15000,
+                "matches": {
+                    "final": {
+                        "winner": "Spain",
+                        "winner_prob": 0.3,
+                    }
+                },
+            },
+            {"completed_matches": 0},
+        )
+        self.assertIn("Prueba operacional", html)
+        self.assertIn("15.000 simulaciones", html)
+        self.assertIn("No fuerza una falsa certeza", html)
+
     def test_dashboard_renderer_keeps_max_certainty_html_unescaped(self):
         html = render_dashboard_html(
             {
                 "updated_at": "2026-05-15T00:00:00",
                 "state_path": "state.json",
                 "fixtures_path": "fixtures.json",
+                "landing_proof_html": "<section class=\"landing-proof\"><h2>Prueba operacional</h2></section>",
                 "runtime_status_html": "",
                 "methodology_html": "",
                 "global_confidence_html": "",
@@ -149,6 +168,9 @@ class RefactorSmokeTest(unittest.TestCase):
                 "cards_html": "",
             }
         )
+        self.assertIn("Quiniela Intelligence 2026", html)
+        self.assertIn("Una sala de decisión", html)
+        self.assertIn('<section class="landing-proof">', html)
         self.assertIn('<section class="certainty-panel">', html)
         self.assertNotIn("&lt;section class=&quot;certainty-panel&quot;&gt;", html)
 

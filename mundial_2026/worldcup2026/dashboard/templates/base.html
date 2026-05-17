@@ -3,63 +3,87 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Dashboard Mundial 2026</title>
+  <title>Quiniela Intelligence 2026</title>
   <style>{{ css }}</style>
 </head>
 <body>
   <main>
-    <section class="panel hero">
+    <header class="landing-nav">
+      <a class="brand" href="#">
+        <span class="brand-mark">QI</span>
+        <span>Quiniela Intelligence 2026</span>
+      </a>
+      <nav>
+        <a href="#modelo">Modelo</a>
+        <a href="#boleto">Boleto</a>
+        <a href="#llave">Llave</a>
+        <a href="#partidos">Partidos</a>
+      </nav>
+    </header>
+
+    <section class="hero landing-hero">
       <div class="hero-grid">
-        <div>
-          <p class="eyebrow">Modelo Dinámico | Mundial 2026</p>
-          <h1>Pronóstico En Vivo y Hoja de Ruta</h1>
-          <p class="lede">Cada partido mezcla un stack estadistico con modelo principal, contraste, ajuste de baja anotacion, Elo, puntos FIFA complementarios, forma reciente, clima, alineaciones, bajas, mercado y estado del torneo. Si un juego está en curso, las probabilidades ya se condicionan al minuto y al marcador actual.</p>
+        <div class="hero-copy">
+          <p class="eyebrow">Mundial 2026 | Motor privado de quiniela</p>
+          <h1>Una sala de decisión para jugar la quiniela con ventaja.</h1>
+          <p class="lede">Pronósticos, goles, llave, picks defendibles, partidos trampa y actualización in-play en una sola web. El objetivo no es vender certeza falsa: es reducir errores, detectar valor y elegir cuándo cubrir.</p>
+          <div class="hero-actions">
+            <a class="primary-action" href="#boleto">Ver hoja de máxima certeza</a>
+            <a class="secondary-action" href="#modelo">Auditar el modelo</a>
+          </div>
           <div class="summary-grid">
             <div class="summary-tile">
               <span>Última actualización</span>
               <strong>{{ updated_at }}</strong>
             </div>
             <div class="summary-tile">
+              <span>Monte Carlo mínimo</span>
+              <strong>15.000 simulaciones</strong>
+            </div>
+            <div class="summary-tile">
               <span>Frecuencia cloud</span>
               <strong>Cada 5 minutos</strong>
             </div>
             <div class="summary-tile">
-              <span>Estado del torneo</span>
-              <strong>Elo + forma + fatiga + disciplina</strong>
-            </div>
-            <div class="summary-tile">
-              <span>Origen operativo</span>
+              <span>Publicación</span>
               <strong>GitHub Actions + Pages</strong>
             </div>
           </div>
         </div>
-        <div class="hero-notes">
-          <article class="hero-note">
-            <h3>Qué significan las métricas</h3>
-            <p><strong>Marcador proyectado</strong> muestra el resultado entero mas probable. <strong>Pronóstico de goles</strong> separa el marcador entero, el promedio total estimado, ambos equipos anotan y los umbrales de goles. Si el feed trae una linea seria de goles/over-under, el modelo se calibra contra esa referencia y muestra la brecha. <strong>Probabilidades de resultado</strong> es la chance de victoria, empate o derrota en ese mismo corte. <strong>Puntos FIFA</strong> entran como señal estructural secundaria, con menos peso que Elo. <strong>Historia desde 1990</strong> suma memoria de rendimiento competitivo, mundialista, ataque, defensa y penales. <strong>Coincidencia entre modelos</strong> ayuda a separar picks claros de partidos realmente parejos.</p>
-          </article>
-          <article class="hero-note">
-            <h3>Durante un partido</h3>
-            <p>El dashboard pasa a modo in-play: usa minuto, marcador actual y fase del juego para recalcular el resultado final más probable, el resto de goles esperados y los marcadores finales mas probables en cada corte de actualizacion.</p>
-          </article>
-          <article class="hero-note">
-            <h3>Trazabilidad</h3>
-            <p>Estado usado: {{ state_path }}<br>Fixtures leídos: {{ fixtures_path }}</p>
-          </article>
-          <article class="hero-note">
-            <h3>Como validar el in-play</h3>
-            <p>Si el partido esta en vivo, revisa la hora superior, el badge En vivo, el minuto modelado y el archivo <a href="latest.json" style="color:#fff3d7;">latest.json</a>. Todo eso se regenera en cada corrida de GitHub Actions y debe mover probabilidades y marcadores proyectados cuando cambie el estado del juego.</p>
-          </article>
-        </div>
+        <aside class="hero-command-center" aria-label="Resumen del sistema">
+          <div class="command-topline">
+            <span class="live-dot"></span>
+            <span>Sistema operativo</span>
+          </div>
+          <h2>Modelo vivo, no una tabla estática</h2>
+          <div class="command-metric">
+            <span>Stack</span>
+            <strong>Poisson bivariante + contraste + ajuste baja anotación + ensamble</strong>
+          </div>
+          <div class="command-metric">
+            <span>In-play</span>
+            <strong>Minuto, marcador, eventos, tiros, disciplina y disponibilidad cuando el feed los trae</strong>
+          </div>
+          <div class="command-metric">
+            <span>Salida para quiniela</span>
+            <strong>Pick, marcador entero, goles, riesgo, cobertura y explicación</strong>
+          </div>
+          <p class="command-note">La ventaja aparece cuando el modelo separa picks firmes de partidos abiertos y evita convertir intuiciones ruidosas en apuestas de alta confianza.</p>
+        </aside>
       </div>
     </section>
+
+    {{ landing_proof_html }}
     {{ runtime_status_html }}
+    <div id="modelo"></div>
     {{ methodology_html }}
     {{ global_confidence_html }}
+    <div id="boleto"></div>
     {{ max_certainty_html }}
     {{ consensus_guardrail_html }}
     {{ recent_changes_html }}
     {{ backtesting_html }}
+    <div id="llave"></div>
     {{ bracket_visual_html }}
     <section class="panel">
       <div class="panel-head">
@@ -72,7 +96,7 @@
       <h2>Llave actual</h2>
       <pre>{{ bracket_html }}</pre>
     </section>
-    <section class="cards">
+    <section id="partidos" class="cards">
       {{ cards_html }}
     </section>
   </main>

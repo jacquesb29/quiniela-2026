@@ -86,6 +86,7 @@ class QuinielaAuditIntegrityTest(unittest.TestCase):
     def test_dashboard_audit_requires_ticket_audit_block(self):
         html = (
             "<html><section class=\"certainty-panel\"><h2>Hoja de máxima certeza</h2>"
+            "<p>Quiniela Intelligence 2026</p><p>Prueba operacional</p><p>Una sala de decisión</p>"
             "<p>Picks mas defendibles</p><p>Marcadores exactos mas defendibles</p><p>15000</p></section></html>"
         )
         errors = app.audit_dashboard_html(html)
@@ -214,6 +215,7 @@ class QuinielaAuditIntegrityTest(unittest.TestCase):
             dashboard_path.write_text(
                 "<html><section class=\"certainty-panel\"><h2>Hoja de máxima certeza</h2>"
                 "<p>Auditoria del boleto</p>"
+                "<p>Quiniela Intelligence 2026</p><p>Prueba operacional</p><p>Una sala de decisión</p>"
                 "<p>Picks firmes o preferentes</p>"
                 "<p>Partidos trampa o alta varianza</p>"
                 "<p>Marcadores exactos defendibles</p>"
