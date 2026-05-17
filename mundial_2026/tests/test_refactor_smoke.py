@@ -151,7 +151,8 @@ class RefactorSmokeTest(unittest.TestCase):
 
     def test_bracket_visual_keeps_branch_coherent(self):
         payload = {
-            "iterations": 100,
+            "iterations": 15000,
+            "updated_at": "2026-05-17T15:43:15",
             "matches": {
                 "M81": {
                     "match_id": "M81",
@@ -291,6 +292,9 @@ class RefactorSmokeTest(unittest.TestCase):
             },
         }
         html = app.build_bracket_visual_html(payload)
+        self.assertIn("Llave actualizada", html)
+        self.assertIn("2026-05-17T15:43:15", html)
+        self.assertIn("15.000 simulaciones", html)
         self.assertIn("Octavos 5", html)
         self.assertIn("Cuartos 3", html)
         self.assertIn("Turkey</span></div><div class=\"team-divider\"></div><div class=\"team-row favorite\"><span class=\"team-name\">Spain", html)

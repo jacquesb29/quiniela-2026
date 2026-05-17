@@ -204,6 +204,29 @@ h3 { font-size: 1.05rem; }
 .bracket-panel {
   padding-bottom: 22px;
 }
+.bracket-update-card {
+  min-width: 230px;
+  border: 1px solid rgba(15,109,102,0.14);
+  background: linear-gradient(180deg, rgba(255,255,255,0.78), rgba(15,109,102,0.07));
+  border-radius: 18px;
+  padding: 12px 14px;
+  box-shadow: 0 10px 24px rgba(12, 41, 45, 0.06);
+}
+.bracket-update-card span {
+  margin: 0 0 4px;
+  color: var(--muted);
+  font-size: 0.70rem;
+}
+.bracket-update-card strong {
+  display: block;
+  margin: 0 0 9px;
+  color: var(--accent-dark);
+  font-size: 0.92rem;
+  font-variant-numeric: tabular-nums;
+}
+.bracket-update-card strong:last-child {
+  margin-bottom: 0;
+}
 .bracket-shell {
   position: relative;
   overflow-x: auto;

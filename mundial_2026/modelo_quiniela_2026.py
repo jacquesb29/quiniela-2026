@@ -5513,6 +5513,8 @@ def coherent_bracket_matches(bracket_payload: dict) -> Dict[str, dict]:
 
 def build_bracket_visual_html(bracket_payload: dict) -> str:
     iterations = bracket_payload.get("iterations")
+    updated_at = str(bracket_payload.get("updated_at") or "sin timestamp")
+    iterations_label = f"{int(iterations):,}".replace(",", ".") if iterations else "sin dato"
     sections = {stage_key: (label, stage_matches) for stage_key, label, stage_matches in bracket_stage_sections(bracket_payload)}
 
     visual_matches = coherent_bracket_matches(bracket_payload)
@@ -5728,6 +5730,14 @@ def build_bracket_visual_html(bracket_payload: dict) -> str:
             f"<p class=\"lede-tight\">Llave Monte Carlo dinámica con {int(iterations)} iteraciones publicadas. "
             "El cuadro se abre en dos ramas y converge hacia la final. Cada cruce muestra la combinación que más aparece hoy en esa zona; si la probabilidad del cruce es baja, esa parte de la llave sigue abierta y puede cambiar con resultados reales.</p>"
         )
+    update_stamp = (
+        "<aside class=\"bracket-update-card\">"
+        "<span>Llave actualizada</span>"
+        f"<strong>{html.escape(updated_at)}</strong>"
+        "<span>Monte Carlo vigente</span>"
+        f"<strong>{html.escape(iterations_label)} simulaciones</strong>"
+        "</aside>"
+    )
     return (
         "<section class=\"panel bracket-panel\">"
         "<div class=\"panel-head\">"
@@ -5736,6 +5746,7 @@ def build_bracket_visual_html(bracket_payload: dict) -> str:
         "<h2>Llave Proyectada</h2>"
         f"{subtitle}"
         "</div>"
+        f"{update_stamp}"
         "</div>"
         "<div class=\"bracket-shell\">"
         "<div class=\"bracket-canvas\">"
