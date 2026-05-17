@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from worldcup2026.config import PARAMS
+
 
 def context_components(
     team,
@@ -282,7 +284,15 @@ def expected_goals(
     total_goals -= 0.10 * (fatigue_level(state_a) + fatigue_level(state_b))
     total_goals -= 0.07 * ((1.0 - availability_level(state_a)) + (1.0 - availability_level(state_b)))
     if ctx.market_total_line is not None:
-        total_goals = 0.84 * total_goals + 0.16 * clamp(ctx.market_total_line + 0.05, 1.5, 4.6)
+        consensus_total = clamp(ctx.market_total_line + PARAMS.goal_consensus_total_offset, 1.5, 4.6)
+        gap = abs(total_goals - consensus_total)
+        if gap >= PARAMS.goal_consensus_extreme_gap:
+            consensus_weight = PARAMS.goal_consensus_extreme_gap_weight
+        elif gap >= PARAMS.goal_consensus_high_gap:
+            consensus_weight = PARAMS.goal_consensus_high_gap_weight
+        else:
+            consensus_weight = PARAMS.goal_consensus_base_weight
+        total_goals = (1.0 - consensus_weight) * total_goals + consensus_weight * consensus_total
     if ctx.market_prob_draw is not None:
         total_goals -= 0.12 * clamp(ctx.market_prob_draw - 0.26, -0.15, 0.22)
     total_goals -= 0.40 * clamp(ctx.market_move_draw, -0.08, 0.08)

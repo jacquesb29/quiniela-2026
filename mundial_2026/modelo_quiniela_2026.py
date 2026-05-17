@@ -218,6 +218,14 @@ CONSENSUS_CHAMPION_PRIORS = {
 CONSENSUS_CHAMPION_BLEND = 0.50
 CONSENSUS_CHAMPION_MIN_BLEND = 0.08
 CONSENSUS_LIVE_PROGRESS_WEIGHT = 0.55
+GOAL_CONSENSUS_TOTAL_FIELDS = (
+    "market_total_line",
+    "consensus_total_goals",
+    "external_total_goals",
+    "external_goal_total",
+    "bookmaker_total_line",
+    "serious_total_line",
+)
 QUINIELA_BRACKET_OVERRIDES = {
     "M93": {
         "teams": {"Turkey", "Belgium"},
@@ -581,8 +589,10 @@ def compute_statistical_depth(
     result_probs = [max(win_a, 1e-12), max(draw, 1e-12), max(win_b, 1e-12)]
     entropy = -sum(prob * math.log(prob) for prob in result_probs) / math.log(3.0)
     both_score = sum(prob for (goals_a, goals_b), prob in final_dist.items() if goals_a > 0 and goals_b > 0)
+    expected_total_goals = sum((goals_a + goals_b) * prob for (goals_a, goals_b), prob in final_dist.items())
     clean_sheet_a = sum(prob for (_, goals_b), prob in final_dist.items() if goals_b == 0)
     clean_sheet_b = sum(prob for (goals_a, _), prob in final_dist.items() if goals_a == 0)
+    over_1_5 = sum(prob for (goals_a, goals_b), prob in final_dist.items() if goals_a + goals_b >= 2)
     over_2_5 = sum(prob for (goals_a, goals_b), prob in final_dist.items() if goals_a + goals_b >= 3)
     under_2_5 = 1.0 - over_2_5
     over_3_5 = sum(prob for (goals_a, goals_b), prob in final_dist.items() if goals_a + goals_b >= 4)
@@ -621,15 +631,30 @@ def compute_statistical_depth(
             + abs(draw - float(ctx.market_prob_draw))
             + abs(win_b - float(ctx.market_prob_b))
         ) / 3.0
+    goal_consensus_line = float(ctx.market_total_line) if ctx and ctx.market_total_line is not None else None
+    goal_consensus_gap = expected_total_goals - goal_consensus_line if goal_consensus_line is not None else None
+    if goal_consensus_gap is None:
+        goal_consensus_status = "sin consenso externo de goles"
+    elif abs(goal_consensus_gap) < 0.25:
+        goal_consensus_status = "alineado"
+    elif abs(goal_consensus_gap) < 0.55:
+        goal_consensus_status = "ajuste moderado aplicado"
+    else:
+        goal_consensus_status = "ajuste fuerte aplicado"
 
     return {
         "confidence_index": confidence,
         "entropy_index": entropy,
+        "expected_total_goals": expected_total_goals,
+        "goal_consensus_line": goal_consensus_line,
+        "goal_consensus_gap": goal_consensus_gap,
+        "goal_consensus_status": goal_consensus_status,
         "top_outcome_prob": top_outcome_prob,
         "second_outcome_prob": second_outcome_prob,
         "both_teams_score": both_score,
         "clean_sheet_a": clean_sheet_a,
         "clean_sheet_b": clean_sheet_b,
+        "over_1_5": over_1_5,
         "over_2_5": over_2_5,
         "under_2_5": under_2_5,
         "over_3_5": over_3_5,
@@ -1101,6 +1126,32 @@ def market_probability(value: Optional[float]) -> Optional[float]:
     if value is None:
         return None
     return clamp(float(value), 0.01, 0.98)
+
+
+def goal_consensus_total_line(fixture: dict) -> Optional[float]:
+    for field in GOAL_CONSENSUS_TOTAL_FIELDS:
+        value = fixture.get(field)
+        if value is None or value == "":
+            continue
+        try:
+            return clamp(float(value), 1.35, 4.75)
+        except (TypeError, ValueError):
+            continue
+    return None
+
+
+def goal_consensus_source(fixture: dict) -> Optional[str]:
+    if fixture.get("market_total_line") is not None:
+        return str(fixture.get("market_provider") or "mercado over/under")
+    if fixture.get("consensus_total_goals") is not None:
+        return str(fixture.get("consensus_goal_provider") or "consenso externo de goles")
+    if fixture.get("external_total_goals") is not None or fixture.get("external_goal_total") is not None:
+        return str(fixture.get("external_goal_provider") or "pronostico externo de goles")
+    if fixture.get("bookmaker_total_line") is not None:
+        return str(fixture.get("market_provider") or "bookmaker total line")
+    if fixture.get("serious_total_line") is not None:
+        return str(fixture.get("consensus_goal_provider") or "referencia seria de goles")
+    return None
 
 
 def discipline_absence_penalty(profile: TeamProfile, yellow_cards: int, red_suspensions: int) -> float:
@@ -3682,6 +3733,8 @@ def dashboard_fixture_entries(
                 "market_prob_a": fixture.get("market_prob_a"),
                 "market_prob_draw": fixture.get("market_prob_draw"),
                 "market_prob_b": fixture.get("market_prob_b"),
+                "market_total_line": goal_consensus_total_line(fixture),
+                "goal_consensus_source": goal_consensus_source(fixture),
                 "market_move_a": fixture.get("market_move_a"),
                 "market_move_draw": fixture.get("market_move_draw"),
                 "market_move_b": fixture.get("market_move_b"),
@@ -4041,6 +4094,8 @@ def projected_bracket_entries(
                 "live_score_b": base_fixture.get("live_score_b"),
                 "weather_summary": dashboard_weather_summary(base_fixture),
                 "weather_stress": base_fixture.get("weather_stress"),
+                "market_total_line": goal_consensus_total_line(base_fixture),
+                "goal_consensus_source": goal_consensus_source(base_fixture),
                 "projection": True,
                 "projection_note": (
                     f"Cruce mas probable hoy: {team_a} vs {team_b} | "
@@ -4783,6 +4838,9 @@ def build_dashboard_markdown(
                 f"empate {format_pct(float(entry.get('market_prob_draw', 0.0)))} | "
                 f"{prediction.team_b} {format_pct(float(entry.get('market_prob_b', 0.0)))}"
             )
+        if entry.get("market_total_line") is not None:
+            provider = entry.get("goal_consensus_source") or "consenso externo"
+            lines.append(f"- Referencia seria de goles ({provider}): total {float(entry['market_total_line']):.2f}")
         if entry.get("lineup_status_a") or entry.get("lineup_status_b"):
             lines.append(
                 f"- Alineaciones: {prediction.team_a} {entry.get('lineup_status_a', 'sin confirmar')} | "
@@ -4914,6 +4972,7 @@ def statistical_depth_lines(prediction: MatchPrediction) -> List[str]:
     confidence = float(depth.get("confidence_index", 0.0))
     pick_label, pick_prob = pick_summary(prediction)
     both_score = float(depth.get("both_teams_score", 0.0))
+    expected_total_goals = float(depth.get("expected_total_goals", prediction.expected_goals_a + prediction.expected_goals_b))
     over_2_5 = float(depth.get("over_2_5", 0.0))
     top3_coverage = float(depth.get("top3_coverage", 0.0))
     clean_sheet_a = float(depth.get("clean_sheet_a", 0.0))
@@ -4929,6 +4988,14 @@ def statistical_depth_lines(prediction: MatchPrediction) -> List[str]:
     lines.append(
         f"- Escenario de goles: ambos marcan {format_pct(both_score)} | mas de 2.5 goles {format_pct(over_2_5)}"
     )
+    if depth.get("goal_consensus_line") is not None:
+        lines.append(
+            f"- Calibracion de goles vs consenso externo: modelo {expected_total_goals:.2f} goles totales | consenso {float(depth['goal_consensus_line']):.2f} | brecha {float(depth.get('goal_consensus_gap', 0.0)):+.2f} ({depth.get('goal_consensus_status')})."
+        )
+    else:
+        lines.append(
+            f"- Goles totales esperados por el modelo: {expected_total_goals:.2f}. Sin linea externa de goles cargada para ese partido."
+        )
     lines.append(
         f"- Probabilidad de que no reciba goles: {prediction.team_a} {format_pct(clean_sheet_a)} | {prediction.team_b} {format_pct(clean_sheet_b)}"
     )
@@ -4964,6 +5031,12 @@ def statistical_depth_html(prediction: MatchPrediction) -> str:
         market_html = (
             f"<div><span>Diferencia vs mercado</span><strong>{format_pct(float(market_gap))}</strong></div>"
         )
+    goal_consensus_html = ""
+    if depth.get("goal_consensus_line") is not None:
+        goal_consensus_html = (
+            f"<div><span>Consenso externo de goles</span><strong>{float(depth['goal_consensus_line']):.2f}</strong></div>"
+            f"<div><span>Brecha modelo-consenso</span><strong>{float(depth.get('goal_consensus_gap', 0.0)):+.2f}</strong></div>"
+        )
     agreement_html = ""
     if model_agreement is not None:
         agreement_html = f"<div><span>Coincidencia entre modelos</span><strong>{format_pct(float(model_agreement))}</strong></div>"
@@ -4989,7 +5062,9 @@ def statistical_depth_html(prediction: MatchPrediction) -> str:
         f"<p class=\"meta\"><strong>{html.escape(confidence_tier(confidence))}</strong> | pick actual: {html.escape(pick_label)} {format_pct(pick_prob)}</p>"
         "<div class=\"depth-grid\">"
         f"<div><span>Confianza del pronóstico</span><strong>{format_pct(confidence)}</strong></div>"
+        f"<div><span>Goles totales esperados</span><strong>{float(depth.get('expected_total_goals', prediction.expected_goals_a + prediction.expected_goals_b)):.2f}</strong></div>"
         f"<div><span>Ambos marcan</span><strong>{format_pct(float(depth.get('both_teams_score', 0.0)))}</strong></div>"
+        f"<div><span>Mas de 1.5 goles</span><strong>{format_pct(float(depth.get('over_1_5', 0.0)))}</strong></div>"
         f"<div><span>Mas de 2.5 goles</span><strong>{format_pct(float(depth.get('over_2_5', 0.0)))}</strong></div>"
         f"<div><span>Probabilidad cubierta por los 3 marcadores mas probables</span><strong>{format_pct(float(depth.get('top3_coverage', 0.0)))}</strong></div>"
         f"<div><span>Prob. de que {html.escape(prediction.team_a)} no reciba goles</span><strong>{format_pct(float(depth.get('clean_sheet_a', 0.0)))}</strong></div>"
@@ -4998,9 +5073,38 @@ def statistical_depth_html(prediction: MatchPrediction) -> str:
         f"<div><span>Probabilidad de esa ventaja</span><strong>{format_pct(float(depth.get('modal_margin_prob', 0.0)))}</strong></div>"
         f"{agreement_html}"
         f"{market_html}"
+        f"{goal_consensus_html}"
         "</div>"
         f"{stack_html}"
         f"{drivers_html}"
+        "</div>"
+    )
+
+
+def goal_forecast_html(entry: dict, prediction: MatchPrediction) -> str:
+    depth = prediction.statistical_depth or {}
+    expected_total = float(depth.get("expected_total_goals", prediction.expected_goals_a + prediction.expected_goals_b))
+    consensus_line = depth.get("goal_consensus_line")
+    source = entry.get("goal_consensus_source") or "consenso externo"
+    if consensus_line is not None:
+        consensus_note = (
+            f"Calibrado contra {html.escape(str(source))}: linea {float(consensus_line):.2f}, "
+            f"brecha final {float(depth.get('goal_consensus_gap', 0.0)):+.2f} ({html.escape(str(depth.get('goal_consensus_status', 'alineado')))})."
+        )
+    else:
+        consensus_note = "Sin linea externa de goles cargada; usa el modelo propio y se ajustara automaticamente si el feed trae mercado/consenso de goles."
+    return (
+        "<div class=\"goal-forecast-block\">"
+        "<h4>Pronóstico de goles</h4>"
+        "<div class=\"goal-forecast-grid\">"
+        f"<div><span>Marcador entero principal</span><strong>{html.escape(projected_score_value(prediction))}</strong></div>"
+        f"<div><span>Promedio total estimado</span><strong>{expected_total:.2f}</strong></div>"
+        f"<div><span>Mas de 1.5 goles</span><strong>{format_pct(float(depth.get('over_1_5', 0.0)))}</strong></div>"
+        f"<div><span>Mas de 2.5 goles</span><strong>{format_pct(float(depth.get('over_2_5', 0.0)))}</strong></div>"
+        f"<div><span>Ambos equipos anotan</span><strong>{format_pct(float(depth.get('both_teams_score', 0.0)))}</strong></div>"
+        f"<div><span>Estado vs consenso</span><strong>{html.escape(str(depth.get('goal_consensus_status', 'sin consenso externo')))}</strong></div>"
+        "</div>"
+        f"<p class=\"meta\">{consensus_note}</p>"
         "</div>"
     )
 
@@ -6152,6 +6256,9 @@ def build_dashboard_html(
                 f"empate {format_pct(float(entry.get('market_prob_draw', 0.0)))} | "
                 f"{html.escape(prediction.team_b)} {format_pct(float(entry.get('market_prob_b', 0.0)))}</p>"
             )
+        if entry.get("market_total_line") is not None:
+            provider = entry.get("goal_consensus_source") or "consenso externo"
+            market_html += f"<p class=\"meta\">Referencia seria de goles ({html.escape(str(provider))}): total {float(entry['market_total_line']):.2f}</p>"
 
         lineup_html = ""
         if entry.get("lineup_status_a") or entry.get("lineup_status_b"):
@@ -6237,6 +6344,7 @@ def build_dashboard_html(
                     + "</p>"
                 )
         depth_html = statistical_depth_html(prediction)
+        goal_forecast_block_html = goal_forecast_html(entry, prediction)
         model_compare_html = model_comparison_html(prediction)
 
         knockout_html = ""
@@ -6311,6 +6419,7 @@ def build_dashboard_html(
             f"<div class=\"metric metric-probs\"><span>{html.escape(top_result_label(prediction))}</span><strong>{html.escape(top_result_summary(prediction))}</strong></div>"
             "</div>"
             f"{average_goals_html}"
+            f"{goal_forecast_block_html}"
             f"<div class=\"prob-block\">{probability_rows_html}</div>"
             f"{remaining_goals_html}"
             f"{depth_html}"
@@ -6985,7 +7094,7 @@ def context_from_fixture(
         market_prob_a=market_probability(fixture.get("market_prob_a")),
         market_prob_draw=market_probability(fixture.get("market_prob_draw")),
         market_prob_b=market_probability(fixture.get("market_prob_b")),
-        market_total_line=float(fixture["market_total_line"]) if fixture.get("market_total_line") is not None else None,
+        market_total_line=goal_consensus_total_line(fixture),
         market_move_a=float(fixture.get("market_move_a", 0.0) or 0.0),
         market_move_draw=float(fixture.get("market_move_draw", 0.0) or 0.0),
         market_move_b=float(fixture.get("market_move_b", 0.0) or 0.0),

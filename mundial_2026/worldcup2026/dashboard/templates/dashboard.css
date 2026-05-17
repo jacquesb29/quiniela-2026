@@ -821,6 +821,28 @@ strong {
   margin: 0 0 10px;
   color: var(--accent-dark);
 }
+.goal-forecast-block {
+  margin-top: 14px;
+  padding: 14px;
+  border-radius: 18px;
+  background: linear-gradient(135deg, rgba(15,109,102,0.12), rgba(181,131,47,0.09));
+  border: 1px solid rgba(15,109,102,0.18);
+}
+.goal-forecast-block h4 {
+  margin: 0 0 10px;
+  color: var(--accent-dark);
+}
+.goal-forecast-grid {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+.goal-forecast-grid div {
+  background: rgba(255,255,255,0.52);
+  border: 1px solid rgba(15,109,102,0.09);
+  border-radius: 14px;
+  padding: 10px 12px;
+}
 .depth-grid {
   display: grid;
   gap: 10px;

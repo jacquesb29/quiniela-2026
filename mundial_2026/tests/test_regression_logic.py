@@ -342,6 +342,40 @@ class RegressionLogicTest(unittest.TestCase):
         self.assertLess(spain["recent_xga_adj"], 0.0)
         self.assertNotEqual(spain["recent_opponent_strength"], 0.0)
 
+    def test_goal_consensus_line_accepts_serious_forecast_aliases(self):
+        self.assertAlmostEqual(app.goal_consensus_total_line({"consensus_total_goals": 2.35}), 2.35)
+        self.assertAlmostEqual(app.goal_consensus_total_line({"bookmaker_total_line": "2.5"}), 2.5)
+        self.assertIsNone(app.goal_consensus_total_line({"market_total_line": "sin dato"}))
+
+    def test_market_total_line_shrinks_goal_total_when_model_is_far(self):
+        teams = app.load_teams()
+        states = app.initial_team_states(teams)
+        base_ctx = app.MatchContext(neutral=True, knockout=False, importance=1.0)
+        low_total_ctx = dataclasses.replace(base_ctx, market_total_line=1.50)
+        base_prediction = app.predict_match(
+            teams,
+            "Spain",
+            "Uruguay",
+            base_ctx,
+            top_scores=3,
+            state_a=states["Spain"],
+            state_b=states["Uruguay"],
+        )
+        adjusted_prediction = app.predict_match(
+            teams,
+            "Spain",
+            "Uruguay",
+            low_total_ctx,
+            top_scores=3,
+            state_a=states["Spain"],
+            state_b=states["Uruguay"],
+        )
+        base_total = base_prediction.expected_goals_a + base_prediction.expected_goals_b
+        adjusted_total = adjusted_prediction.expected_goals_a + adjusted_prediction.expected_goals_b
+        self.assertLess(adjusted_total, base_total)
+        self.assertIn("aplicado", adjusted_prediction.statistical_depth["goal_consensus_status"])
+        self.assertIn("Pronóstico de goles", app.goal_forecast_html({"goal_consensus_source": "mercado"}, adjusted_prediction))
+
     def test_annotate_market_moves_computes_prob_deltas(self):
         fixtures = [{"id": "10", "market_prob_a": 0.52, "market_prob_draw": 0.24, "market_prob_b": 0.24}]
         previous = {"10": {"market_prob_a": 0.48, "market_prob_draw": 0.26, "market_prob_b": 0.26}}

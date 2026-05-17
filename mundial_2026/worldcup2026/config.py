@@ -29,6 +29,12 @@ class ModelHyperparameters:
     model_primary_min: float = 0.40
     model_market_bonus_strength: float = 0.30
     model_consensus_strength: float = 1.0
+    goal_consensus_base_weight: float = 0.18
+    goal_consensus_high_gap_weight: float = 0.34
+    goal_consensus_extreme_gap_weight: float = 0.46
+    goal_consensus_high_gap: float = 0.45
+    goal_consensus_extreme_gap: float = 0.75
+    goal_consensus_total_offset: float = 0.03
     confidence_base: float = 0.10
     confidence_top_outcome_weight: float = 0.60
     confidence_gap_weight: float = 0.25
