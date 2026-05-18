@@ -125,16 +125,28 @@ class RefactorSmokeTest(unittest.TestCase):
                     "live_feed_provider": None,
                     "source": "espn_scoreboard",
                 },
+                {
+                    "projection": True,
+                    "status_state": "pre",
+                    "live_feed_provider": None,
+                    "source": "bracket_projection",
+                },
             ],
             {"iterations": 15000},
         )
         self.assertIn("15.000 simulaciones", html)
         self.assertIn("api_football", html)
         self.assertIn("1</strong> en vivo", html)
+        self.assertIn("3</strong> partidos del Mundial modelados", html)
+        self.assertIn("2</strong> con fixture/live directo", html)
+        self.assertIn("1</strong> cruces eliminatorios proyectados", html)
 
     def test_landing_proof_explains_operational_robustness(self):
         html = app.build_landing_proof_html(
-            [{"projection": False, "status_state": "pre", "market_total_line": 2.5}],
+            [
+                {"projection": False, "status_state": "pre", "market_total_line": 2.5},
+                {"projection": True, "status_state": "pre"},
+            ],
             {
                 "iterations": 15000,
                 "matches": {
@@ -149,6 +161,7 @@ class RefactorSmokeTest(unittest.TestCase):
         self.assertIn("Prueba operacional", html)
         self.assertIn("15.000 simulaciones", html)
         self.assertIn("No fuerza una falsa certeza", html)
+        self.assertIn("Modela 2 partidos: 1 fixtures directos y 1 cruces de llave proyectados", html)
 
     def test_dashboard_renderer_keeps_max_certainty_html_unescaped(self):
         html = render_dashboard_html(

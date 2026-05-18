@@ -6216,6 +6216,8 @@ def build_methodology_html(
 
 def build_runtime_status_html(entries: Sequence[dict], bracket_payload: dict) -> str:
     fixture_entries = [entry for entry in entries if not entry.get("projection")]
+    projected_entries = [entry for entry in entries if entry.get("projection")]
+    modeled_total = len(fixture_entries) + len(projected_entries)
     live_count = sum(1 for entry in fixture_entries if fixture_is_live(entry))
     final_count = sum(1 for entry in fixture_entries if fixture_is_final(entry))
     pending_count = max(len(fixture_entries) - live_count - final_count, 0)
@@ -6251,9 +6253,11 @@ def build_runtime_status_html(entries: Sequence[dict], bracket_payload: dict) ->
         ),
         (
             "Estado del tablero",
-            f"<strong>{len(fixture_entries)}</strong> partidos cargados. "
-            f"<strong>{live_count}</strong> en vivo, <strong>{final_count}</strong> finales y "
-            f"<strong>{pending_count}</strong> pendientes.",
+            f"<strong>{modeled_total}</strong> partidos del Mundial modelados: "
+            f"<strong>{len(fixture_entries)}</strong> con fixture/live directo y "
+            f"<strong>{len(projected_entries)}</strong> cruces eliminatorios proyectados. "
+            f"Estado live de fixtures directos: <strong>{live_count}</strong> en vivo, "
+            f"<strong>{final_count}</strong> finales y <strong>{pending_count}</strong> pendientes.",
         ),
     ]
     card_html = "".join(
@@ -6287,6 +6291,8 @@ def build_runtime_status_html(entries: Sequence[dict], bracket_payload: dict) ->
 
 def build_landing_proof_html(entries: Sequence[dict], bracket_payload: dict, backtest: dict) -> str:
     fixture_entries = [entry for entry in entries if not entry.get("projection")]
+    projected_entries = [entry for entry in entries if entry.get("projection")]
+    modeled_total = len(fixture_entries) + len(projected_entries)
     live_count = sum(1 for entry in fixture_entries if fixture_is_live(entry))
     final_count = sum(1 for entry in fixture_entries if fixture_is_final(entry))
     pending_count = max(len(fixture_entries) - live_count - final_count, 0)
@@ -6305,7 +6311,7 @@ def build_landing_proof_html(entries: Sequence[dict], bracket_payload: dict, bac
         ),
         (
             "Actualizacion real",
-            f"GitHub Actions regenera cada 5 minutos. Estado actual: {live_count} live, {final_count} final, {pending_count} pendientes.",
+            f"GitHub Actions regenera cada 5 minutos. Modela {modeled_total} partidos: {len(fixture_entries)} fixtures directos y {len(projected_entries)} cruces de llave proyectados. Estado directo: {live_count} live, {final_count} final, {pending_count} pendientes.",
             "ok",
         ),
         (
@@ -6348,7 +6354,7 @@ def build_landing_proof_html(entries: Sequence[dict], bracket_payload: dict, bac
         "<div class=\"proof-status-row\">"
         f"<span>Modelo <strong>{html.escape(model_status)}</strong></span>"
         f"<span>In-play <strong>{html.escape(live_status)}</strong></span>"
-        f"<span>Fixtures <strong>{len(fixture_entries)}</strong></span>"
+        f"<span>Partidos modelados <strong>{modeled_total}</strong></span>"
         "</div>"
         "</div>"
         f"<div class=\"proof-grid\">{card_html}</div>"
