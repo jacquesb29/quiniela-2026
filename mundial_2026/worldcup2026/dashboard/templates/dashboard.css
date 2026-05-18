@@ -1074,6 +1074,38 @@ h3 { font-size: 1.05rem; }
   letter-spacing: 0.04em;
   text-transform: uppercase;
 }
+.strategy-panel {
+  background:
+    radial-gradient(circle at 88% 14%, rgba(181, 131, 47, 0.20), transparent 30%),
+    linear-gradient(135deg, rgba(255, 250, 240, 0.98), rgba(235, 244, 232, 0.96));
+}
+.strategy-panel .summary-tile {
+  background: rgba(255,255,255,0.76);
+  border: 1px solid rgba(15,109,102,0.14);
+}
+.strategy-panel .summary-tile span {
+  color: var(--muted);
+}
+.strategy-panel .summary-tile strong {
+  color: var(--accent-dark);
+}
+.strategy-grid article {
+  background: rgba(255,255,255,0.68);
+  border-color: rgba(15,109,102,0.14);
+}
+.strategy-grid li {
+  border-bottom-color: rgba(15,109,102,0.16);
+}
+.strategy-grid li strong {
+  color: var(--ink);
+}
+.strategy-grid li span {
+  color: var(--muted);
+}
+.strategy-grid li em {
+  background: rgba(15,109,102,0.10);
+  color: var(--accent-dark);
+}
 .consensus-panel {
   background:
     radial-gradient(circle at 8% 12%, rgba(218, 155, 62, 0.18), transparent 32%),

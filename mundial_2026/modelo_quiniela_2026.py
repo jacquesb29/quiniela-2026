@@ -4528,6 +4528,255 @@ def quiniela_audit_metrics(profiles: Sequence[dict]) -> dict:
     }
 
 
+def team_public_popularity_index(team_name: str) -> float:
+    teams = load_teams()
+    team = teams.get(team_name)
+    if not team:
+        return 0.50
+    profile = profile_for(team)
+    elo_index = clamp((float(team.elo) - 1350.0) / 520.0, 0.0, 1.0)
+    title_index = clamp(float(profile.world_cup_titles) / 5.0, 0.0, 1.0)
+    return clamp(
+        0.30 * profile.fifa_strength_index
+        + 0.22 * profile.heritage_index
+        + 0.16 * profile.resource_index
+        + 0.12 * profile.history.world_cup_index
+        + 0.10 * elo_index
+        + 0.10 * title_index,
+        0.0,
+        1.0,
+    )
+
+
+def public_pick_proxy(prediction: MatchPrediction) -> Dict[str, float]:
+    """Proxy de como podria escoger un participante promedio por nombre/fama.
+
+    No pretende ser una encuesta; sirve para encontrar picks donde el modelo
+    tiene ventaja relativa frente a una quiniela llenada por favoritos obvios.
+    """
+
+    pop_a = team_public_popularity_index(prediction.team_a)
+    pop_b = team_public_popularity_index(prediction.team_b)
+    pop_total = max(pop_a + pop_b, 1e-9)
+    pop_share_a = pop_a / pop_total
+    pop_share_b = pop_b / pop_total
+    draw_bias = 0.04 + (0.04 if prediction.draw >= 0.30 else 0.0)
+    fame_bonus_a = 0.03 if pop_a > pop_b + 0.08 else 0.0
+    fame_bonus_b = 0.03 if pop_b > pop_a + 0.08 else 0.0
+    raw = {
+        "1": 0.42 * float(prediction.win_a) + 0.50 * pop_share_a + 0.04 + fame_bonus_a,
+        "X": 0.38 * float(prediction.draw) + draw_bias,
+        "2": 0.42 * float(prediction.win_b) + 0.50 * pop_share_b + 0.04 + fame_bonus_b,
+    }
+    total = sum(raw.values()) or 1.0
+    return {key: value / total for key, value in raw.items()}
+
+
+def quiniela_strategy_profile(entry: dict) -> dict:
+    prediction: MatchPrediction = entry["prediction"]
+    base = quiniela_certainty_profile(entry)
+    options = sorted(quiniela_outcome_options(prediction), key=lambda item: item[0], reverse=True)
+    public_probs = public_pick_proxy(prediction)
+    option_by_code = {code: (prob, label) for prob, label, code in options}
+    public_code = max(public_probs, key=lambda code: public_probs[code])
+    public_prob = float(public_probs[public_code])
+    popular_model_prob, popular_label = option_by_code[public_code]
+    best_code = str(base["pick_code"])
+    best_public_prob = float(public_probs.get(best_code, 0.0))
+    edge_vs_public = float(base["pick_prob"]) - best_public_prob
+    expected_gain_vs_popular = float(base["pick_prob"]) - float(popular_model_prob)
+    leverage_score = clamp(float(base["pick_prob"]) * (1.0 - best_public_prob) + max(0.0, edge_vs_public), 0.0, 1.0)
+
+    second_prob = float(base["second_prob"])
+    second_code = str(base["second_code"])
+    second_public_prob = float(public_probs.get(second_code, 0.0))
+    second_edge = second_prob - second_public_prob
+
+    if float(base["pick_prob"]) >= 0.66 and float(base["gap"]) >= 0.18:
+        strategy_tier = "Base fuerte"
+        strategy_action = "No inventar: jugar el pick del modelo."
+    elif (
+        public_code != best_code and expected_gain_vs_popular >= 0.025 and float(base["pick_prob"]) >= 0.44
+    ) or (edge_vs_public >= 0.055 and 0.44 <= float(base["pick_prob"]) < 0.66):
+        strategy_tier = "Diferencial positivo"
+        strategy_action = "Usarlo para sacar ventaja si otros siguen el favorito popular."
+    elif second_edge >= 0.035 and second_prob >= 0.26 and float(base["gap"]) <= 0.12:
+        strategy_tier = "Cobertura inteligente"
+        strategy_action = f"Considerar cobertura con {base['second_label']} si el formato permite doble opcion."
+    elif float(base["gap"]) < 0.08 or float(base["pick_prob"]) < 0.48:
+        strategy_tier = "Alta varianza"
+        strategy_action = "No gastar aqui un diferencial heroico; cubrir o aceptar riesgo."
+    else:
+        strategy_tier = "Base controlada"
+        strategy_action = "Jugar el pick del modelo, sin sobreponderar marcador exacto."
+
+    return {
+        **base,
+        "public_code": public_code,
+        "public_label": popular_label,
+        "public_prob": public_prob,
+        "popular_model_prob": float(popular_model_prob),
+        "best_public_prob": best_public_prob,
+        "edge_vs_public": edge_vs_public,
+        "expected_gain_vs_popular": expected_gain_vs_popular,
+        "leverage_score": leverage_score,
+        "second_edge": second_edge,
+        "strategy_tier": strategy_tier,
+        "strategy_action": strategy_action,
+    }
+
+
+def quiniela_strategy_metrics(strategy_profiles: Sequence[dict]) -> dict:
+    if not strategy_profiles:
+        return {
+            "total": 0,
+            "expected_model_hits": 0.0,
+            "expected_popular_hits": 0.0,
+            "expected_gain": 0.0,
+            "expected_exact_scores": 0.0,
+            "variance_sd": 0.0,
+            "range_low": 0.0,
+            "range_high": 0.0,
+            "differentials": 0,
+            "coverage": 0,
+        }
+    total = len(strategy_profiles)
+    expected_model_hits = sum(float(item["pick_prob"]) for item in strategy_profiles)
+    expected_popular_hits = sum(float(item["popular_model_prob"]) for item in strategy_profiles)
+    expected_exact_scores = sum(float(item["score_prob"]) for item in strategy_profiles)
+    variance_sd = math.sqrt(sum(float(item["pick_prob"]) * (1.0 - float(item["pick_prob"])) for item in strategy_profiles))
+    differentials = sum(1 for item in strategy_profiles if item["strategy_tier"] == "Diferencial positivo")
+    coverage = sum(1 for item in strategy_profiles if item["strategy_tier"] in {"Cobertura inteligente", "Alta varianza"})
+    return {
+        "total": total,
+        "expected_model_hits": expected_model_hits,
+        "expected_popular_hits": expected_popular_hits,
+        "expected_gain": expected_model_hits - expected_popular_hits,
+        "expected_exact_scores": expected_exact_scores,
+        "variance_sd": variance_sd,
+        "range_low": max(0.0, expected_model_hits - 1.64 * variance_sd),
+        "range_high": min(float(total), expected_model_hits + 1.64 * variance_sd),
+        "differentials": differentials,
+        "coverage": coverage,
+    }
+
+
+def build_quiniela_strategy_markdown(entries: Sequence[dict]) -> List[str]:
+    if not entries:
+        return ["_Sin partidos cargados para optimizar estrategia de quiniela._"]
+    profiles = [quiniela_strategy_profile(entry) for entry in entries]
+    metrics = quiniela_strategy_metrics(profiles)
+    differentials = sorted(
+        [item for item in profiles if item["strategy_tier"] == "Diferencial positivo"],
+        key=lambda item: (item["expected_gain_vs_popular"], item["leverage_score"], item["pick_prob"]),
+        reverse=True,
+    )[:10]
+    coverage = sorted(
+        [item for item in profiles if item["strategy_tier"] in {"Cobertura inteligente", "Alta varianza"}],
+        key=lambda item: (item["gap"], -item["second_edge"]),
+    )[:10]
+    lines = [
+        "### Estrategia para ganar la quiniela",
+        "- Objetivo: aumentar expectativa y ventaja relativa frente a un boleto popular, no inflar porcentajes.",
+        f"- Aciertos esperados del boleto modelo: {metrics['expected_model_hits']:.1f}/{int(metrics['total'])}.",
+        f"- Boleto popular por nombre estimado: {metrics['expected_popular_hits']:.1f}/{int(metrics['total'])}. Ventaja esperada del modelo: {metrics['expected_gain']:+.1f} picks.",
+        f"- Marcadores exactos esperados: {metrics['expected_exact_scores']:.1f}/{int(metrics['total'])}.",
+        f"- Rango estadistico aproximado de resultados principales: {metrics['range_low']:.0f}-{metrics['range_high']:.0f} aciertos.",
+        "",
+        "### Diferenciales positivos",
+    ]
+    if differentials:
+        for item in differentials:
+            lines.append(
+                f"- {item['title']}: {item['pick_label']} {format_pct(item['pick_prob'])}; boleto popular por nombre {item['public_label']} {format_pct(item['public_prob'])}; edge de seleccion {item['edge_vs_public']:+.1%}; ganancia esperada {item['expected_gain_vs_popular']:+.1%}."
+            )
+    else:
+        lines.append("- No hay diferenciales positivos fuertes en este corte; conviene priorizar acierto base.")
+    lines.extend(["", "### Partidos para cubrir o no sobrearriesgar"])
+    if coverage:
+        for item in coverage:
+            lines.append(
+                f"- {item['title']}: {item['pick_label']} {format_pct(item['pick_prob'])}; segunda opcion {item['second_label']} {format_pct(item['second_prob'])}; {item['strategy_action']}"
+            )
+    else:
+        lines.append("- No hay coberturas críticas en este corte.")
+    return lines
+
+
+def build_quiniela_strategy_html(entries: Sequence[dict]) -> str:
+    if not entries:
+        return ""
+    profiles = [quiniela_strategy_profile(entry) for entry in entries]
+    metrics = quiniela_strategy_metrics(profiles)
+    base_strong = sorted(
+        [item for item in profiles if item["strategy_tier"] == "Base fuerte"],
+        key=lambda item: (item["pick_prob"], item["certainty_score"]),
+        reverse=True,
+    )[:8]
+    differentials = sorted(
+        [item for item in profiles if item["strategy_tier"] == "Diferencial positivo"],
+        key=lambda item: (item["expected_gain_vs_popular"], item["leverage_score"], item["pick_prob"]),
+        reverse=True,
+    )[:8]
+    coverage = sorted(
+        [item for item in profiles if item["strategy_tier"] in {"Cobertura inteligente", "Alta varianza"}],
+        key=lambda item: (item["gap"], -item["second_edge"]),
+    )[:8]
+
+    def strategy_rows(items: Sequence[dict], empty: str) -> str:
+        if not items:
+            return f"<li><strong>{html.escape(empty)}</strong><span>En este corte no hay suficientes casos para esta categoria.</span></li>"
+        rows = []
+        for item in items:
+            detail = (
+                f"{item['pick_label']} {format_pct(float(item['pick_prob']))} | "
+                f"boleto popular por nombre: {item['public_label']} {format_pct(float(item['public_prob']))} | "
+                f"edge de selección {item['edge_vs_public']:+.1%} | "
+                f"ganancia esperada {item['expected_gain_vs_popular']:+.1%}"
+            )
+            rows.append(
+                "<li>"
+                f"<strong>{html.escape(str(item['title']))}</strong>"
+                f"<span>{html.escape(detail)}</span>"
+                f"<em>{html.escape(str(item['strategy_tier']))}: {html.escape(str(item['strategy_action']))}</em>"
+                "</li>"
+            )
+        return "".join(rows)
+
+    tiles = (
+        "<div class=\"confidence-tiles strategy-tiles\">"
+        f"<div class=\"summary-tile\"><span>Aciertos esperados 1X2</span><strong>{metrics['expected_model_hits']:.1f}/{int(metrics['total'])}</strong></div>"
+        f"<div class=\"summary-tile\"><span>Rango estadistico 90%</span><strong>{metrics['range_low']:.0f}-{metrics['range_high']:.0f}</strong></div>"
+        f"<div class=\"summary-tile\"><span>Ventaja vs boleto popular</span><strong>{metrics['expected_gain']:+.1f} picks</strong></div>"
+        f"<div class=\"summary-tile\"><span>Marcadores exactos esperados</span><strong>{metrics['expected_exact_scores']:.1f}/{int(metrics['total'])}</strong></div>"
+        f"<div class=\"summary-tile\"><span>Diferenciales positivos</span><strong>{int(metrics['differentials'])}</strong></div>"
+        f"<div class=\"summary-tile\"><span>Partidos a cubrir</span><strong>{int(metrics['coverage'])}</strong></div>"
+        "</div>"
+    )
+    return (
+        "<section class=\"panel strategy-panel\">"
+        "<div class=\"panel-head\"><div>"
+        "<p class=\"eyebrow\">Optimización del boleto</p>"
+        "<h2>Estrategia para ganar la quiniela</h2>"
+        "<p class=\"lede-tight\">Esta capa busca subir tus probabilidades de ganar la quiniela: maximiza aciertos esperados, separa picks seguros de diferenciales y evita copiar ciegamente al favorito popular cuando el modelo ve otra cosa.</p>"
+        "<p class=\"meta\">No se inflan probabilidades: se mejora la estrategia. El proxy de boleto popular por nombre estima cómo llenaría alguien sobreponderando ranking, fama e historia; sirve para detectar dónde el modelo puede darte ventaja relativa.</p>"
+        "</div></div>"
+        f"{tiles}"
+        "<div class=\"certainty-grid strategy-grid\">"
+        "<article><h3>Base fuerte: no inventar</h3><ul>"
+        f"{strategy_rows(base_strong, 'Sin base fuerte suficiente')}"
+        "</ul></article>"
+        "<article><h3>Diferenciales que pueden subir tu upside</h3><ul>"
+        f"{strategy_rows(differentials, 'Sin diferenciales positivos fuertes')}"
+        "</ul></article>"
+        "<article><h3>Coberturas y partidos peligrosos</h3><ul>"
+        f"{strategy_rows(coverage, 'Sin coberturas criticas')}"
+        "</ul></article>"
+        "</div>"
+        "</section>"
+    )
+
+
 def build_max_certainty_markdown(entries: Sequence[dict]) -> List[str]:
     if not entries:
         return ["_Sin partidos cargados para construir una hoja de picks._"]
@@ -4809,6 +5058,8 @@ def build_dashboard_markdown(
     lines.extend(build_global_confidence_markdown(entries))
     lines.extend(["", "## Hoja de maxima certeza para quiniela", ""])
     lines.extend(build_max_certainty_markdown(entries))
+    lines.extend(["", "## Estrategia para ganar la quiniela", ""])
+    lines.extend(build_quiniela_strategy_markdown(entries))
     lines.extend(["", "## Ajustes contra consenso externo", ""])
     lines.extend(build_consensus_guardrail_markdown(bracket_payload, entries))
     lines.extend(["", "## Que cambio desde la ultima actualizacion", ""])
@@ -6649,6 +6900,7 @@ def build_dashboard_html(
     methodology_html = build_methodology_html(bracket_payload, backtest, entries)
     global_confidence_html = build_global_confidence_html(entries)
     max_certainty_html = build_max_certainty_html(entries)
+    strategy_html = build_quiniela_strategy_html(entries)
     consensus_guardrail_html = build_consensus_guardrail_html(bracket_payload, entries)
     recent_changes_html = build_recent_changes_html(
         entries,
@@ -6668,6 +6920,7 @@ def build_dashboard_html(
             "methodology_html": methodology_html,
             "global_confidence_html": global_confidence_html,
             "max_certainty_html": max_certainty_html,
+            "strategy_html": strategy_html,
             "consensus_guardrail_html": consensus_guardrail_html,
             "recent_changes_html": recent_changes_html,
             "backtesting_html": backtesting_html,
@@ -6911,6 +7164,9 @@ def audit_dashboard_html(dashboard_html: str) -> List[str]:
         "No son 72 en total",
         "Solo compara partidos con los mismos dos equipos",
         "Si cambia el cruce proyectado",
+        "Estrategia para ganar la quiniela",
+        "Ventaja vs boleto popular",
+        "Diferenciales positivos",
         "certainty-panel",
         "Auditoria del boleto",
         "Picks firmes o preferentes",

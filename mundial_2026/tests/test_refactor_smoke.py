@@ -175,6 +175,7 @@ class RefactorSmokeTest(unittest.TestCase):
                 "methodology_html": "",
                 "global_confidence_html": "",
                 "max_certainty_html": "<section class=\"certainty-panel\"><h2>Hoja de máxima certeza</h2></section>",
+                "strategy_html": "<section class=\"strategy-panel\"><h2>Estrategia para ganar la quiniela</h2><p>Ventaja vs boleto popular</p><p>Diferenciales positivos</p></section>",
                 "recent_changes_html": "",
                 "backtesting_html": "",
                 "bracket_visual_html": "",
@@ -194,6 +195,8 @@ class RefactorSmokeTest(unittest.TestCase):
         self.assertNotIn("Partidos modelados: 72 de fase de grupos", html)
         self.assertIn('<section class="landing-proof">', html)
         self.assertIn('<section class="certainty-panel">', html)
+        self.assertIn('<section class="strategy-panel">', html)
+        self.assertIn("Estrategia para ganar la quiniela", html)
         self.assertNotIn("&lt;section class=&quot;certainty-panel&quot;&gt;", html)
 
     def test_recent_change_comparison_does_not_mix_changed_matchups_as_pick_moves(self):
