@@ -6881,6 +6881,8 @@ def audit_dashboard_html(dashboard_html: str) -> List[str]:
         "Monte Carlo vigente",
         "15.000 simulaciones por corrida",
         "actualiza llave, picks, goles y marcadores",
+        "Partidos totales del Mundial 2026",
+        "No son 72 en total",
         "certainty-panel",
         "Auditoria del boleto",
         "Picks firmes o preferentes",

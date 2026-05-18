@@ -461,6 +461,17 @@ h3 { font-size: 1.05rem; }
   color: var(--muted);
   line-height: 1.42;
 }
+.bento-card p strong {
+  color: var(--ink);
+}
+.bento-footnote {
+  margin-top: 10px !important;
+  padding-top: 10px;
+  border-top: 1px dashed rgba(15,109,102,0.20);
+  color: var(--accent-dark) !important;
+  font-size: 0.90rem;
+  font-weight: 800;
+}
 .dashboard-gateway {
   margin: 28px 0 18px;
   padding: clamp(20px, 4vw, 34px);
