@@ -187,6 +187,8 @@ class RefactorSmokeTest(unittest.TestCase):
         self.assertIn("Primero decide como una mesa profesional", html)
         self.assertIn("Monte Carlo vigente", html)
         self.assertIn("15.000 simulaciones por corrida", html)
+        self.assertIn("Partidos del formato completo: 72 de fase de grupos + 32 cruces eliminatorios proyectados.", html)
+        self.assertNotIn("Partidos modelados: 72 de fase de grupos", html)
         self.assertIn('<section class="landing-proof">', html)
         self.assertIn('<section class="certainty-panel">', html)
         self.assertNotIn("&lt;section class=&quot;certainty-panel&quot;&gt;", html)
