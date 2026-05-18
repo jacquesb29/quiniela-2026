@@ -88,6 +88,8 @@ class QuinielaAuditIntegrityTest(unittest.TestCase):
             "<html><section class=\"certainty-panel\"><h2>Hoja de máxima certeza</h2>"
             "<p>Quiniela Intelligence 2026</p><p>Prueba operacional</p><p>Una sala de decisión</p>"
             "<p>De datos a boleto</p><p>Primero decide como una mesa profesional</p>"
+            "<p>Monte Carlo vigente</p><p>15.000 simulaciones por corrida</p>"
+            "<p>actualiza llave, picks, goles y marcadores</p>"
             "<p>Picks mas defendibles</p><p>Marcadores exactos mas defendibles</p><p>15000</p></section></html>"
         )
         errors = app.audit_dashboard_html(html)
@@ -218,6 +220,8 @@ class QuinielaAuditIntegrityTest(unittest.TestCase):
                 "<p>Auditoria del boleto</p>"
                 "<p>Quiniela Intelligence 2026</p><p>Prueba operacional</p><p>Una sala de decisión</p>"
                 "<p>De datos a boleto</p><p>Primero decide como una mesa profesional</p>"
+                "<p>Monte Carlo vigente</p><p>15.000 simulaciones por corrida</p>"
+                "<p>actualiza llave, picks, goles y marcadores</p>"
                 "<p>Picks firmes o preferentes</p>"
                 "<p>Partidos trampa o alta varianza</p>"
                 "<p>Marcadores exactos defendibles</p>"
