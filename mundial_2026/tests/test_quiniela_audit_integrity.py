@@ -237,6 +237,9 @@ class QuinielaAuditIntegrityTest(unittest.TestCase):
                 "<p>Checklist de auditoria</p>"
                 "<p>Picks mas defendibles</p><p>Marcadores exactos mas defendibles</p>"
                 "<p>Guardrail de consenso</p><p>Ajustes para boleto de quiniela</p>"
+                "<p>Metodologia de estimadores externos</p><p>Ratings tipo Elo / ClubElo</p>"
+                "<p>Ranking FIFA oficial</p><p>SPI / modelos ofensivo-defensivos</p>"
+                "<p>Mercado y consenso profesional</p>"
                 "<p>Semaforo metodologico</p><p>Control de calidad del pronostico</p>"
                 "<p>Pronóstico de goles</p><p>15000</p></section></html>"
             )

@@ -4982,6 +4982,7 @@ def build_consensus_guardrail_markdown(bracket_payload: dict, entries: Optional[
         "- Lectura: esta capa no reemplaza el modelo. Lo calibra contra consenso externo para evitar dos errores típicos de quiniela: sobreconcentrarse en un favorito y dejar vivo muy poco a contendientes fuertes.",
         f"- Mezcla dinamica usada para campeon recomendado: {format_pct(float(context['model_blend']))} modelo propio/live + {format_pct(float(context['consensus_blend']))} consenso externo.",
         f"- Actualizacion live de esa mezcla: {int(context['final_count'])} partidos finales, {int(context['live_count'])} en vivo y {int(context['pending_count'])} pendientes. A medida que entran resultados reales, el consenso externo pesa menos y la simulacion Monte Carlo vigente pesa mas.",
+        "- Metodologia externa incorporada como guardrail: ratings tipo Elo/FIFA, fuerza ofensiva-defensiva tipo SPI, consenso de mercado y simulacion Monte Carlo para dependencias de llave.",
     ]
     if rows:
         leader = rows[0]
@@ -5002,6 +5003,36 @@ def build_consensus_guardrail_markdown(bracket_payload: dict, entries: Optional[
                 f"- {alert['title']}: {alert['team_a']} vs {alert['team_b']} | modelo {alert['model_winner']} {format_pct(float(alert['model_prob']))} | boleto {alert['recommended_winner']} {format_pct(float(alert['recommended_prob']))} | margen {format_pct(float(alert['model_edge']))} | {status}."
             )
     return lines
+
+
+def external_estimator_methodology_items() -> List[dict]:
+    return [
+        {
+            "name": "Ratings tipo Elo / ClubElo",
+            "signal": "Diferencia de fuerza entre equipos, localia/neutralidad, margen e importancia del partido.",
+            "usage": "Se usa como señal de fuerza relativa y como control para no sobrerreaccionar a un solo resultado.",
+        },
+        {
+            "name": "Ranking FIFA oficial",
+            "signal": "Puntos acumulados con peso de resultado, expectativa previa e importancia del partido.",
+            "usage": "Entra como variable estructural: no predice solo, pero ayuda a calibrar jerarquia inicial.",
+        },
+        {
+            "name": "SPI / modelos ofensivo-defensivos",
+            "signal": "Ataque y defensa convertidos a goles esperados y probabilidades de marcador.",
+            "usage": "El modelo replica esa logica con goles esperados, distribucion de marcadores y ensamble Poisson/Dixon-Coles.",
+        },
+        {
+            "name": "Mercado y consenso profesional",
+            "signal": "Probabilidades implicitas, lineas de goles y consenso pretorneo de campeon.",
+            "usage": "Funciona como guardrail: corrige extremos, pero pierde peso cuando aparecen datos reales del Mundial.",
+        },
+        {
+            "name": "Monte Carlo de torneo",
+            "signal": "Miles de rutas completas para grupos, cruces, prorroga, penales y dependencias de llave.",
+            "usage": "15.000 simulaciones por corrida para que una victoria real recalcule cruces y probabilidades posteriores.",
+        },
+    ]
 
 
 def build_consensus_guardrail_html(bracket_payload: dict, entries: Optional[Sequence[dict]] = None) -> str:
@@ -5045,6 +5076,18 @@ def build_consensus_guardrail_html(bracket_payload: dict, entries: Optional[Sequ
             )
         return "".join(html_rows)
 
+    def methodology_rows() -> str:
+        html_rows = []
+        for item in external_estimator_methodology_items():
+            html_rows.append(
+                "<li>"
+                f"<strong>{html.escape(str(item['name']))}</strong>"
+                f"<span>{html.escape(str(item['signal']))}</span>"
+                f"<em>{html.escape(str(item['usage']))}</em>"
+                "</li>"
+            )
+        return "".join(html_rows)
+
     leader = rows[0] if rows else None
     leader_tile = (
         f"<div class=\"summary-tile\"><span>Campeón recomendado</span><strong>{html.escape(str(leader['team']))}</strong></div>"
@@ -5073,6 +5116,9 @@ def build_consensus_guardrail_html(bracket_payload: dict, entries: Optional[Sequ
         "</ul></article>"
         "<article><h3>Ajustes de llave recomendados</h3><ul>"
         f"{alert_rows()}"
+        "</ul></article>"
+        "<article><h3>Metodologia de estimadores externos</h3><ul>"
+        f"{methodology_rows()}"
         "</ul></article>"
         "</div>"
         "</section>"
@@ -7225,6 +7271,11 @@ def audit_dashboard_html(dashboard_html: str) -> List[str]:
         "Marcadores exactos mas defendibles",
         "Ajustes para boleto de quiniela",
         "Guardrail de consenso",
+        "Metodologia de estimadores externos",
+        "Ratings tipo Elo / ClubElo",
+        "Ranking FIFA oficial",
+        "SPI / modelos ofensivo-defensivos",
+        "Mercado y consenso profesional",
         "Semaforo metodologico",
         "Control de calidad del pronostico",
         "Pronóstico de goles",
