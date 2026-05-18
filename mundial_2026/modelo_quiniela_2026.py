@@ -5823,6 +5823,28 @@ def build_provider_matrix_html(entries: Sequence[dict]) -> str:
     )
 
 
+def provider_stack_summary(entries: Optional[Sequence[dict]] = None) -> dict:
+    fixture_entries = [entry for entry in (entries or []) if not entry.get("projection")]
+    live_sources = sorted({str(entry.get("source")) for entry in fixture_entries if entry.get("source")})
+    deep_sources = sorted({str(entry.get("live_feed_provider")) for entry in fixture_entries if entry.get("live_feed_provider")})
+    active = " + ".join(deep_sources or live_sources or ["espn_scoreboard"])
+    prepared = [
+        "API-Football",
+        "Sportmonks",
+        "Sportradar",
+        "Opta",
+        "The Odds API",
+        "NewsAPI",
+        "GDELT",
+    ]
+    return {
+        "active": active,
+        "prepared": prepared,
+        "deep_active": bool(deep_sources),
+        "fixture_count": len(fixture_entries),
+    }
+
+
 def build_agentic_learning_markdown(entries: Sequence[dict], bracket_payload: dict, backtest: dict) -> List[str]:
     fixture_entries = [entry for entry in entries if not entry.get("projection")]
     final_count = sum(1 for entry in fixture_entries if fixture_is_final(entry))
@@ -6771,10 +6793,12 @@ def coherent_bracket_matches(bracket_payload: dict) -> Dict[str, dict]:
     return resolved
 
 
-def build_bracket_visual_html(bracket_payload: dict) -> str:
+def build_bracket_visual_html(bracket_payload: dict, entries: Optional[Sequence[dict]] = None) -> str:
     iterations = bracket_payload.get("iterations")
     updated_at = str(bracket_payload.get("updated_at") or "sin timestamp")
     iterations_label = f"{int(iterations):,}".replace(",", ".") if iterations else "sin dato"
+    provider_stack = provider_stack_summary(entries)
+    provider_mode = "live profundo activo" if provider_stack["deep_active"] else "base + proveedores preparados"
     sections = {stage_key: (label, stage_matches) for stage_key, label, stage_matches in bracket_stage_sections(bracket_payload)}
 
     visual_matches = coherent_bracket_matches(bracket_payload)
@@ -6996,7 +7020,16 @@ def build_bracket_visual_html(bracket_payload: dict) -> str:
         f"<strong>{html.escape(updated_at)}</strong>"
         "<span>Monte Carlo vigente</span>"
         f"<strong>{html.escape(iterations_label)} simulaciones</strong>"
+        "<span>Proveedor activo</span>"
+        f"<strong>{html.escape(str(provider_stack['active']))}</strong>"
         "</aside>"
+    )
+    provider_note = (
+        "<div class=\"bracket-provider-strip\">"
+        f"<span>Stack de datos de la llave: {html.escape(provider_mode)}</span>"
+        f"<strong>Activo: {html.escape(str(provider_stack['active']))}</strong>"
+        f"<em>Preparado: {html.escape(' + '.join(str(item) for item in provider_stack['prepared']))}</em>"
+        "</div>"
     )
     return (
         "<section class=\"panel bracket-panel\">"
@@ -7008,6 +7041,7 @@ def build_bracket_visual_html(bracket_payload: dict) -> str:
         "</div>"
         f"{update_stamp}"
         "</div>"
+        f"{provider_note}"
         "<div class=\"bracket-shell\">"
         "<div class=\"bracket-canvas\">"
         f"{bracket_svg}"
@@ -7773,7 +7807,7 @@ def build_dashboard_html(
         cards.append("<section class=\"card\"><h3>Sin partidos cargados</h3><p class=\"meta\">Agrega partidos a fixtures_template.json para ver probabilidades aqui.</p></section>")
 
     bracket_html = html.escape(bracket_text.strip() or "No hay llave generada todavia.")
-    bracket_visual_html = build_bracket_visual_html(bracket_payload)
+    bracket_visual_html = build_bracket_visual_html(bracket_payload, entries)
     landing_proof_html = build_landing_proof_html(entries, bracket_payload, backtest)
     runtime_status_html = build_runtime_status_html(entries, bracket_payload)
     methodology_html = build_methodology_html(bracket_payload, backtest, entries)
