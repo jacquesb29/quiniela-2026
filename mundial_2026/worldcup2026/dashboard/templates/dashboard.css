@@ -252,6 +252,13 @@ h3 { font-size: 1.05rem; }
   font-size: 1.05rem;
   color: #fffdf7;
 }
+.summary-tile small {
+  display: block;
+  margin-top: 6px;
+  color: rgba(247, 243, 234, 0.68);
+  font-size: 0.72rem;
+  line-height: 1.35;
+}
 .hero-command-center {
   align-self: stretch;
   display: flex;
@@ -1088,6 +1095,9 @@ h3 { font-size: 1.05rem; }
 }
 .strategy-panel .summary-tile strong {
   color: var(--accent-dark);
+}
+.strategy-panel .summary-tile small {
+  color: var(--muted);
 }
 .strategy-grid article {
   background: rgba(255,255,255,0.68);

@@ -175,7 +175,7 @@ class RefactorSmokeTest(unittest.TestCase):
                 "methodology_html": "",
                 "global_confidence_html": "",
                 "max_certainty_html": "<section class=\"certainty-panel\"><h2>Hoja de máxima certeza</h2></section>",
-                "strategy_html": "<section class=\"strategy-panel\"><h2>Estrategia para ganar la quiniela</h2><p>Ventaja vs boleto popular</p><p>Diferenciales positivos</p></section>",
+                "strategy_html": "<section class=\"strategy-panel\"><h2>Estrategia para ganar la quiniela</h2><p>Ventaja vs boleto popular</p><p>Diferenciales positivos</p><p>Cobertura recomendada</p><p>Marcadores exactos top-1 esperados</p></section>",
                 "recent_changes_html": "",
                 "backtesting_html": "",
                 "bracket_visual_html": "",

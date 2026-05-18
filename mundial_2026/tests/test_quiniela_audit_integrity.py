@@ -93,6 +93,7 @@ class QuinielaAuditIntegrityTest(unittest.TestCase):
             "<p>Partidos totales del Mundial 2026</p><p>No son 72 en total</p>"
             "<p>Solo compara partidos con los mismos dos equipos</p><p>Si cambia el cruce proyectado</p>"
             "<p>Estrategia para ganar la quiniela</p><p>Ventaja vs boleto popular</p><p>Diferenciales positivos</p>"
+            "<p>Cobertura recomendada</p><p>Marcadores exactos top-1 esperados</p>"
             "<p>Picks mas defendibles</p><p>Marcadores exactos mas defendibles</p><p>15000</p></section></html>"
         )
         errors = app.audit_dashboard_html(html)
@@ -228,6 +229,7 @@ class QuinielaAuditIntegrityTest(unittest.TestCase):
                 "<p>Partidos totales del Mundial 2026</p><p>No son 72 en total</p>"
                 "<p>Solo compara partidos con los mismos dos equipos</p><p>Si cambia el cruce proyectado</p>"
                 "<p>Estrategia para ganar la quiniela</p><p>Ventaja vs boleto popular</p><p>Diferenciales positivos</p>"
+                "<p>Cobertura recomendada</p><p>Marcadores exactos top-1 esperados</p>"
                 "<p>Picks firmes o preferentes</p>"
                 "<p>Partidos trampa o alta varianza</p>"
                 "<p>Marcadores exactos defendibles</p>"

@@ -4634,30 +4634,60 @@ def quiniela_strategy_metrics(strategy_profiles: Sequence[dict]) -> dict:
             "expected_popular_hits": 0.0,
             "expected_gain": 0.0,
             "expected_exact_scores": 0.0,
+            "expected_top3_scores": 0.0,
+            "exact_score_range_low": 0.0,
+            "exact_score_range_high": 0.0,
             "variance_sd": 0.0,
             "range_low": 0.0,
             "range_high": 0.0,
             "differentials": 0,
-            "coverage": 0,
+            "coverage_min": 0,
+            "coverage_recommended": 0,
+            "coverage_aggressive": 0,
         }
     total = len(strategy_profiles)
     expected_model_hits = sum(float(item["pick_prob"]) for item in strategy_profiles)
     expected_popular_hits = sum(float(item["popular_model_prob"]) for item in strategy_profiles)
     expected_exact_scores = sum(float(item["score_prob"]) for item in strategy_profiles)
+    expected_top3_scores = sum(float(item["top3"]) for item in strategy_profiles)
+    exact_score_sd = math.sqrt(
+        sum(float(item["score_prob"]) * (1.0 - float(item["score_prob"])) for item in strategy_profiles)
+    )
     variance_sd = math.sqrt(sum(float(item["pick_prob"]) * (1.0 - float(item["pick_prob"])) for item in strategy_profiles))
     differentials = sum(1 for item in strategy_profiles if item["strategy_tier"] == "Diferencial positivo")
-    coverage = sum(1 for item in strategy_profiles if item["strategy_tier"] in {"Cobertura inteligente", "Alta varianza"})
+    coverage_min = sum(1 for item in strategy_profiles if item["strategy_tier"] in {"Cobertura inteligente", "Alta varianza"})
+    coverage_recommended = sum(
+        1
+        for item in strategy_profiles
+        if item["strategy_tier"] in {"Cobertura inteligente", "Alta varianza"}
+        or float(item["pick_prob"]) < 0.62
+        or float(item["gap"]) < 0.14
+        or (float(item["second_prob"]) >= 0.25 and float(item["second_edge"]) >= 0.005)
+    )
+    coverage_aggressive = sum(
+        1
+        for item in strategy_profiles
+        if item["strategy_tier"] in {"Cobertura inteligente", "Alta varianza"}
+        or float(item["pick_prob"]) < 0.70
+        or float(item["gap"]) < 0.20
+        or float(item["second_prob"]) >= 0.22
+    )
     return {
         "total": total,
         "expected_model_hits": expected_model_hits,
         "expected_popular_hits": expected_popular_hits,
         "expected_gain": expected_model_hits - expected_popular_hits,
         "expected_exact_scores": expected_exact_scores,
+        "expected_top3_scores": expected_top3_scores,
+        "exact_score_range_low": max(0.0, expected_exact_scores - 1.64 * exact_score_sd),
+        "exact_score_range_high": min(float(total), expected_exact_scores + 1.64 * exact_score_sd),
         "variance_sd": variance_sd,
         "range_low": max(0.0, expected_model_hits - 1.64 * variance_sd),
         "range_high": min(float(total), expected_model_hits + 1.64 * variance_sd),
         "differentials": differentials,
-        "coverage": coverage,
+        "coverage_min": coverage_min,
+        "coverage_recommended": coverage_recommended,
+        "coverage_aggressive": coverage_aggressive,
     }
 
 
@@ -4680,8 +4710,10 @@ def build_quiniela_strategy_markdown(entries: Sequence[dict]) -> List[str]:
         "- Objetivo: aumentar expectativa y ventaja relativa frente a un boleto popular, no inflar porcentajes.",
         f"- Aciertos esperados del boleto modelo: {metrics['expected_model_hits']:.1f}/{int(metrics['total'])}.",
         f"- Boleto popular por nombre estimado: {metrics['expected_popular_hits']:.1f}/{int(metrics['total'])}. Ventaja esperada del modelo: {metrics['expected_gain']:+.1f} picks.",
-        f"- Marcadores exactos esperados: {metrics['expected_exact_scores']:.1f}/{int(metrics['total'])}.",
+        f"- Marcadores exactos esperados top-1: {metrics['expected_exact_scores']:.1f}/{int(metrics['total'])}, con rango realista 90% de {metrics['exact_score_range_low']:.0f}-{metrics['exact_score_range_high']:.0f}.",
+        f"- Si la quiniela permite alternativas de marcador, los 3 marcadores principales por partido cubren {metrics['expected_top3_scores']:.1f}/{int(metrics['total'])} en expectativa.",
         f"- Rango estadistico aproximado de resultados principales: {metrics['range_low']:.0f}-{metrics['range_high']:.0f} aciertos.",
+        f"- Cobertura minima/recomendada/agresiva: {int(metrics['coverage_min'])}/{int(metrics['coverage_recommended'])}/{int(metrics['coverage_aggressive'])} partidos.",
         "",
         "### Diferenciales positivos",
     ]
@@ -4719,7 +4751,14 @@ def build_quiniela_strategy_html(entries: Sequence[dict]) -> str:
         reverse=True,
     )[:8]
     coverage = sorted(
-        [item for item in profiles if item["strategy_tier"] in {"Cobertura inteligente", "Alta varianza"}],
+        [
+            item
+            for item in profiles
+            if item["strategy_tier"] in {"Cobertura inteligente", "Alta varianza"}
+            or float(item["pick_prob"]) < 0.62
+            or float(item["gap"]) < 0.14
+            or (float(item["second_prob"]) >= 0.25 and float(item["second_edge"]) >= 0.005)
+        ],
         key=lambda item: (item["gap"], -item["second_edge"]),
     )[:8]
 
@@ -4748,9 +4787,12 @@ def build_quiniela_strategy_html(entries: Sequence[dict]) -> str:
         f"<div class=\"summary-tile\"><span>Aciertos esperados 1X2</span><strong>{metrics['expected_model_hits']:.1f}/{int(metrics['total'])}</strong></div>"
         f"<div class=\"summary-tile\"><span>Rango estadistico 90%</span><strong>{metrics['range_low']:.0f}-{metrics['range_high']:.0f}</strong></div>"
         f"<div class=\"summary-tile\"><span>Ventaja vs boleto popular</span><strong>{metrics['expected_gain']:+.1f} picks</strong></div>"
-        f"<div class=\"summary-tile\"><span>Marcadores exactos esperados</span><strong>{metrics['expected_exact_scores']:.1f}/{int(metrics['total'])}</strong></div>"
+        f"<div class=\"summary-tile\"><span>Marcadores exactos top-1 esperados</span><strong>{metrics['expected_exact_scores']:.1f}/{int(metrics['total'])}</strong><small>Rango 90%: {metrics['exact_score_range_low']:.0f}-{metrics['exact_score_range_high']:.0f}</small></div>"
+        f"<div class=\"summary-tile\"><span>Top-3 marcadores por partido</span><strong>{metrics['expected_top3_scores']:.1f}/{int(metrics['total'])}</strong><small>Solo si puedes usar alternativas de marcador.</small></div>"
         f"<div class=\"summary-tile\"><span>Diferenciales positivos</span><strong>{int(metrics['differentials'])}</strong></div>"
-        f"<div class=\"summary-tile\"><span>Partidos a cubrir</span><strong>{int(metrics['coverage'])}</strong></div>"
+        f"<div class=\"summary-tile\"><span>Partidos a cubrir minimo</span><strong>{int(metrics['coverage_min'])}</strong><small>Solo trampas evidentes.</small></div>"
+        f"<div class=\"summary-tile\"><span>Cobertura recomendada</span><strong>{int(metrics['coverage_recommended'])}</strong><small>Si la quiniela permite dobles.</small></div>"
+        f"<div class=\"summary-tile\"><span>Cobertura agresiva</span><strong>{int(metrics['coverage_aggressive'])}</strong><small>Si necesitas diferenciarte mucho.</small></div>"
         "</div>"
     )
     return (
@@ -7167,6 +7209,8 @@ def audit_dashboard_html(dashboard_html: str) -> List[str]:
         "Estrategia para ganar la quiniela",
         "Ventaja vs boleto popular",
         "Diferenciales positivos",
+        "Cobertura recomendada",
+        "Marcadores exactos top-1 esperados",
         "certainty-panel",
         "Auditoria del boleto",
         "Picks firmes o preferentes",
