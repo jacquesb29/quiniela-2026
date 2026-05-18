@@ -6876,6 +6876,8 @@ def audit_dashboard_html(dashboard_html: str) -> List[str]:
         "Quiniela Intelligence 2026",
         "Prueba operacional",
         "Una sala de decisión",
+        "De datos a boleto",
+        "Primero decide como una mesa profesional",
         "certainty-panel",
         "Auditoria del boleto",
         "Picks firmes o preferentes",

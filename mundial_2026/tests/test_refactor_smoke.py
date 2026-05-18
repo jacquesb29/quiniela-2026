@@ -183,6 +183,8 @@ class RefactorSmokeTest(unittest.TestCase):
         )
         self.assertIn("Quiniela Intelligence 2026", html)
         self.assertIn("Una sala de decisión", html)
+        self.assertIn("De datos a boleto", html)
+        self.assertIn("Primero decide como una mesa profesional", html)
         self.assertIn('<section class="landing-proof">', html)
         self.assertIn('<section class="certainty-panel">', html)
         self.assertNotIn("&lt;section class=&quot;certainty-panel&quot;&gt;", html)

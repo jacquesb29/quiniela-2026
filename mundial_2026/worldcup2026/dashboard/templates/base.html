@@ -73,9 +73,57 @@
       </div>
     </section>
 
+    <section class="landing-showcase">
+      <div class="showcase-copy">
+        <p class="eyebrow">De datos a boleto</p>
+        <h2>Primero decide como una mesa profesional. Luego revisa el reporte.</h2>
+        <p>La parte técnica sigue abajo, pero la primera pantalla ahora funciona como producto: te muestra el flujo de decisión, la promesa del sistema y qué debes usar para llenar la quiniela.</p>
+      </div>
+      <div class="decision-flow" aria-label="Flujo del modelo">
+        <article>
+          <span>01</span>
+          <strong>Captura señales</strong>
+          <p>Fixture, Elo, FIFA, historia, clima, bajas, mercado, noticias y eventos live.</p>
+        </article>
+        <article>
+          <span>02</span>
+          <strong>Simula escenarios</strong>
+          <p>15.000 Monte Carlo, ensamble estadístico, goles, llave y calibración.</p>
+        </article>
+        <article>
+          <span>03</span>
+          <strong>Convierte a boleto</strong>
+          <p>Pick principal, marcador defendible, riesgo, cobertura y partidos trampa.</p>
+        </article>
+      </div>
+      <div class="landing-bento">
+        <article class="bento-card bento-large">
+          <p class="eyebrow">Para ganar la quiniela</p>
+          <h3>La ventaja no es adivinar todo. Es fallar menos que los demás.</h3>
+          <p>El sistema prioriza picks defendibles, detecta cruces frágiles y evita inflar la confianza cuando el partido está realmente abierto.</p>
+        </article>
+        <article class="bento-card">
+          <span class="bento-stat">104</span>
+          <p>Partidos modelados: 72 de fase de grupos y 32 cruces eliminatorios proyectados.</p>
+        </article>
+        <article class="bento-card">
+          <span class="bento-stat">5 min</span>
+          <p>Refresh automático cuando haya partidos en vivo y cuando el feed actualice eventos.</p>
+        </article>
+        <article class="bento-card">
+          <span class="bento-stat">Auditado</span>
+          <p>Si falta Monte Carlo, auditoría, goles, consenso o la hoja de certeza, la pipeline debe fallar.</p>
+        </article>
+      </div>
+    </section>
+
     {{ landing_proof_html }}
     {{ runtime_status_html }}
-    <div id="modelo"></div>
+    <section class="dashboard-gateway" id="modelo">
+      <p class="eyebrow">Centro de control</p>
+      <h2>Ahora sí: la parte técnica que sostiene la decisión</h2>
+      <p>Debajo está el tablero completo: metodología, confianza global, hoja de máxima certeza, consenso externo, backtesting, llave y tarjetas partido a partido.</p>
+    </section>
     {{ methodology_html }}
     {{ global_confidence_html }}
     <div id="boleto"></div>
