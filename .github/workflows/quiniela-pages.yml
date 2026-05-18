@@ -47,6 +47,12 @@ jobs:
           API_FOOTBALL_KEY: ${{ secrets.API_FOOTBALL_KEY }}
           API_FOOTBALL_BASE_URL: ${{ vars.API_FOOTBALL_BASE_URL }}
           API_FOOTBALL_HOST: ${{ vars.API_FOOTBALL_HOST }}
+          SPORTMONKS_TOKEN: ${{ secrets.SPORTMONKS_TOKEN }}
+          THE_ODDS_API_KEY: ${{ secrets.THE_ODDS_API_KEY }}
+          NEWSAPI_KEY: ${{ secrets.NEWSAPI_KEY }}
+          GDELT_DOC_API: ${{ vars.GDELT_DOC_API }}
+          SPORTRADAR_KEY: ${{ secrets.SPORTRADAR_KEY }}
+          OPTA_KEY: ${{ secrets.OPTA_KEY }}
         run: |
           python3 mundial_2026/sync_live_data_2026.py
           python3 mundial_2026/modelo_quiniela_2026.py state-reset

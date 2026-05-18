@@ -100,6 +100,8 @@ class QuinielaAuditIntegrityTest(unittest.TestCase):
             "<p>Prediccion potenciada</p><p>Probabilidad pura vs conviccion</p>"
             "<p>Conviccion reforzada media</p><p>Fuerza estructural media</p><p>Watchlist de riesgo</p>"
             "<p>Agentes de aprendizaje</p><p>Noticias multi-fuente</p><p>No solo ESPN</p><p>Eficiencia operativa</p>"
+            "<p>Mapa de proveedores</p><p>API-Football</p><p>Sportmonks</p><p>Sportradar</p><p>Opta</p>"
+            "<p>The Odds API</p><p>NewsAPI</p><p>GDELT</p><p>StatsBomb</p><p>ScoreBat</p>"
             "<p>Picks mas defendibles</p><p>Marcadores exactos mas defendibles</p><p>15000</p></section></html>"
         )
         errors = app.audit_dashboard_html(html)
@@ -252,6 +254,8 @@ class QuinielaAuditIntegrityTest(unittest.TestCase):
                 "<p>Prediccion potenciada</p><p>Probabilidad pura vs conviccion</p>"
                 "<p>Conviccion reforzada media</p><p>Fuerza estructural media</p><p>Watchlist de riesgo</p>"
                 "<p>Agentes de aprendizaje</p><p>Noticias multi-fuente</p><p>No solo ESPN</p><p>Eficiencia operativa</p>"
+                "<p>Mapa de proveedores</p><p>API-Football</p><p>Sportmonks</p><p>Sportradar</p><p>Opta</p>"
+                "<p>The Odds API</p><p>NewsAPI</p><p>GDELT</p><p>StatsBomb</p><p>ScoreBat</p>"
                 "<p>Semaforo metodologico</p><p>Control de calidad del pronostico</p>"
                 "<p>Pronóstico de goles</p><p>15000</p></section></html>"
             )

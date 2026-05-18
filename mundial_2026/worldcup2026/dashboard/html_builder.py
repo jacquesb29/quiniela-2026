@@ -23,6 +23,7 @@ def render_dashboard_html(context: Dict[str, Any]) -> str:
         "calibration_depth_html",
         "prediction_power_html",
         "agentic_learning_html",
+        "provider_matrix_html",
         "global_confidence_html",
         "max_certainty_html",
         "strategy_html",

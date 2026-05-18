@@ -199,6 +199,7 @@ python3 mundial_2026/sync_fifa_rankings.py
 - El dataset ya trae `fifa_points`, `fifa_rank` y `fifa_country_code` oficiales; si quieres refrescarlos mas adelante, usa `sync_fifa_rankings.py`.
 - Alineaciones confirmadas, cambios de XI, arbitro y bajas/ausencias estan preparados en modo best-effort: se cargan automaticamente si el feed publico los expone para ese partido.
 - `sync_live_data_2026.py` tambien puede enriquecer partidos en vivo con un proveedor mas profundo de eventos y estadisticas. Si defines `API_FOOTBALL_KEY`, el pipeline intenta usar API-Football para lineups, eventos y stats live, manteniendo ESPN como base y fallback.
+- La web ya muestra un mapa de proveedores para no depender solo de ESPN. El orden practico recomendado es: ESPN como fallback, API-Football como live profundo ya cableado, Sportmonks como segundo live profundo, The Odds API/OddsJam/Pinnacle/Betfair como mercado, NewsAPI/GDELT/fuentes oficiales como noticias, y Sportradar/Opta/Stats Perform como capa enterprise si hay contrato.
 - La llave publicada en el dashboard cloud ahora usa 15000 iteraciones por defecto para reducir ruido Monte Carlo frente a configuraciones mas chicas.
 - Si un partido real se va a proroga o penales y lo marcas en el JSON, el estado acumula fatiga adicional y baja de disponibilidad para el siguiente partido.
 - Si corriges un resultado viejo, lo correcto es ejecutar `state-reset` y luego volver a correr `fixtures` sobre el archivo completo en orden cronologico.
@@ -253,6 +254,10 @@ Secrets/vars opcionales del workflow:
 - `API_FOOTBALL_KEY`: API key del proveedor live profundo
 - `API_FOOTBALL_BASE_URL`: override del endpoint base si lo necesitas
 - `API_FOOTBALL_HOST`: host header del proveedor, por defecto `v3.football.api-sports.io`
+- `SPORTMONKS_TOKEN`: sugerido como segundo proveedor live profundo; requiere implementar adaptador antes de que afecte el modelo.
+- `THE_ODDS_API_KEY`: sugerido para consenso de mercado y lineas de goles; requiere adaptador.
+- `NEWSAPI_KEY` o `GDELT_DOC_API`: sugeridos para noticias multi-fuente, lesiones y bajas; requieren adaptador y filtros.
+- `SPORTRADAR_KEY` / `OPTA_KEY`: opciones enterprise si tienes contrato y SLA.
 
 Archivos publicados en el sitio:
 

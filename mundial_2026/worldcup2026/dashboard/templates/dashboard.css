@@ -1061,6 +1061,41 @@ h3 { font-size: 1.05rem; }
   background: rgba(15,109,102,0.10);
   color: var(--accent-dark) !important;
 }
+.provider-panel {
+  background:
+    radial-gradient(circle at 92% 12%, rgba(181,131,47,0.18), transparent 34%),
+    linear-gradient(135deg, rgba(255,252,244,0.98), rgba(236,246,244,0.96));
+}
+.provider-panel .summary-tile {
+  background: #fffdf7;
+  border: 1px solid rgba(15,109,102,0.18);
+  box-shadow: 0 14px 34px rgba(20, 42, 38, 0.07);
+}
+.provider-panel .summary-tile span,
+.provider-panel .summary-tile small {
+  color: #4d5b57;
+  opacity: 1;
+}
+.provider-panel .summary-tile strong {
+  color: #102120;
+}
+.provider-grid {
+  grid-template-columns: minmax(0, 1.6fr) minmax(280px, 0.8fr);
+}
+.provider-grid article {
+  background: rgba(255,255,255,0.76);
+  border-color: rgba(15,109,102,0.15);
+}
+.provider-grid li strong {
+  color: var(--ink) !important;
+}
+.provider-grid li span {
+  color: var(--muted) !important;
+}
+.provider-grid li em {
+  background: rgba(181,131,47,0.13);
+  color: #71501c !important;
+}
 .confidence-panel a {
   color: var(--accent-dark);
   text-decoration: none;

@@ -5571,6 +5571,258 @@ def sports_news_source_policy_items() -> List[dict]:
     ]
 
 
+def live_provider_catalog() -> List[dict]:
+    return [
+        {
+            "name": "ESPN scoreboard",
+            "category": "Base publica",
+            "priority": "Fallback actual",
+            "coverage": "Calendario, marcador, estado, resumen, odds y noticias si el endpoint lo expone.",
+            "integration": "Ya integrado",
+            "env": "sin key",
+            "role": "Mantenerlo como piso: nunca debe ser el unico proveedor cuando haya partidos en vivo.",
+        },
+        {
+            "name": "API-Football / API-SPORTS",
+            "category": "Live profundo",
+            "priority": "Prioridad 1",
+            "coverage": "Fixtures live, lineups, eventos, estadisticas, tiros, tarjetas, sustituciones y xG si viene en el feed.",
+            "integration": "Ya cableado",
+            "env": "API_FOOTBALL_KEY",
+            "role": "Primer proveedor real para in-play: activa eventos minuto a minuto y estadisticas live.",
+        },
+        {
+            "name": "Sportmonks Football API",
+            "category": "Live profundo",
+            "priority": "Prioridad 2",
+            "coverage": "Livescores, eventos, World Cup 2026, odds, lineups, stats y endpoints de partidos en vivo.",
+            "integration": "Requiere adaptador",
+            "env": "SPORTMONKS_TOKEN",
+            "role": "Mejor segundo proveedor practico: buena documentacion y cobertura directa para apps de Mundial.",
+        },
+        {
+            "name": "Sportradar Soccer API",
+            "category": "Enterprise live",
+            "priority": "Prioridad 3",
+            "coverage": "Soccer API, timelines, cobertura por competicion, feeds oficiales, odds y datos editoriales segun contrato.",
+            "integration": "Requiere contrato",
+            "env": "SPORTRADAR_KEY",
+            "role": "Proveedor premium para robustez y SLA; ideal si quieres maxima fiabilidad.",
+        },
+        {
+            "name": "Opta / Stats Perform",
+            "category": "Enterprise xG/eventos",
+            "priority": "Prioridad 4",
+            "coverage": "Opta live, data feeds, play-by-play, xG, player/team stats, historico, predicciones y FIFA packages.",
+            "integration": "Requiere contrato",
+            "env": "OPTA_KEY",
+            "role": "La mejor capa profesional si se consigue acceso; no es normalmente gratis.",
+        },
+        {
+            "name": "StatsBomb",
+            "category": "Historico + xG",
+            "priority": "Referencia metodologica",
+            "coverage": "Open data historica con eventos, lineups y 360 en competiciones seleccionadas; live/pro depende de contrato.",
+            "integration": "Referencia/open data",
+            "env": "STATSBOMB_TOKEN",
+            "role": "Excelente para calibrar xG, eventos y backtesting, no como feed live gratuito del Mundial.",
+        },
+        {
+            "name": "The Odds API",
+            "category": "Mercado/odds",
+            "priority": "Prioridad mercado",
+            "coverage": "Odds por deporte, eventos, scores, h2h, totales, historico y event odds segun plan.",
+            "integration": "Requiere adaptador",
+            "env": "THE_ODDS_API_KEY",
+            "role": "Ancla externa para detectar si el modelo se esta alejando demasiado del mercado.",
+        },
+        {
+            "name": "OddsJam / Pinnacle / Betfair Exchange",
+            "category": "Mercado avanzado",
+            "priority": "Referencia mercado",
+            "coverage": "Movimiento de lineas, liquidez, cuotas sharp y consenso de apuestas segun acceso.",
+            "integration": "Requiere contrato/API",
+            "env": "ODDS_PROVIDER_KEY",
+            "role": "Sirve para calibrar picks cerrados y detectar steam moves de ultima hora.",
+        },
+        {
+            "name": "NewsAPI",
+            "category": "Noticias",
+            "priority": "Prioridad noticias",
+            "coverage": "Busqueda de articulos por palabra, fecha, dominio, idioma, relevancia y fuente.",
+            "integration": "Requiere adaptador",
+            "env": "NEWSAPI_KEY",
+            "role": "Capa para lesiones, bajas, alineaciones probables y contexto de seleccion sin depender de ESPN.",
+        },
+        {
+            "name": "GDELT",
+            "category": "Noticias abiertas",
+            "priority": "Backup noticias",
+            "coverage": "Monitoreo global de noticias y menciones; util para alertas amplias y diversidad de fuentes.",
+            "integration": "Requiere adaptador",
+            "env": "GDELT_DOC_API",
+            "role": "Muy util para no depender de una sola prensa; requiere filtrado fuerte para ruido.",
+        },
+        {
+            "name": "FIFA Match Centre / fuentes oficiales",
+            "category": "Oficial",
+            "priority": "Validacion oficial",
+            "coverage": "Partidos, Match Centre, plantillas, sanciones, sedes, comunicados y estado oficial.",
+            "integration": "Best-effort/manual/API si existe",
+            "env": "FIFA_SOURCE_URLS",
+            "role": "Fuente de verdad para confirmar datos criticos antes de mover probabilidades.",
+        },
+        {
+            "name": "Federaciones y clubes",
+            "category": "Oficial/noticias",
+            "priority": "Validacion lesiones",
+            "coverage": "Convocatorias, lesionados, suspensiones, entrenamiento, ruedas de prensa y XI.",
+            "integration": "RSS/web/manual",
+            "env": "OFFICIAL_FEED_URLS",
+            "role": "Mejor fuente para noticias que afecten disponibilidad real de jugadores.",
+        },
+        {
+            "name": "football-data.org",
+            "category": "Fixture/resultados",
+            "priority": "Backup abierto",
+            "coverage": "Competiciones, equipos, partidos y resultados via API v4.",
+            "integration": "Requiere adaptador",
+            "env": "FOOTBALL_DATA_KEY",
+            "role": "Buen backup de calendario/resultados; no reemplaza eventos live profundos.",
+        },
+        {
+            "name": "TheSportsDB",
+            "category": "Free/backup",
+            "priority": "Backup gratuito",
+            "coverage": "JSON API, datos, arte, eventos, highlights y livescores premium cada 2 minutos.",
+            "integration": "Requiere adaptador",
+            "env": "THESPORTSDB_KEY",
+            "role": "Backup economico para datos publicos, arte y highlights; menor profundidad analitica.",
+        },
+        {
+            "name": "ScoreBat",
+            "category": "Video/highlights",
+            "priority": "Contexto visual",
+            "coverage": "Highlights, clips de goles, streams publicos disponibles y embeds oficiales.",
+            "integration": "Requiere adaptador",
+            "env": "SCOREBAT_KEY",
+            "role": "No mejora el modelo numerico directamente, pero ayuda a revisar jugadas y narrativa.",
+        },
+        {
+            "name": "SofaScore / FotMob / Flashscore / 365Scores",
+            "category": "Referencia no oficial",
+            "priority": "Solo con licencia",
+            "coverage": "Eventos, ratings, momentum y estadisticas en vivo segun plataforma.",
+            "integration": "No scrapear sin permiso",
+            "env": "LICENSED_LIVESCORE_KEY",
+            "role": "Buenos para contrastar visualmente; no conviene automatizar sin API/licencia clara.",
+        },
+    ]
+
+
+def provider_catalog_metrics() -> dict:
+    catalog = live_provider_catalog()
+    return {
+        "total": len(catalog),
+        "wired": sum(1 for item in catalog if "Ya" in item["integration"]),
+        "adapters": sum(1 for item in catalog if "adaptador" in item["integration"].lower()),
+        "enterprise": sum(1 for item in catalog if "contrato" in item["integration"].lower()),
+        "reference": sum(1 for item in catalog if "Referencia" in item["priority"] or "Validacion" in item["priority"]),
+    }
+
+
+def build_provider_matrix_markdown() -> List[str]:
+    metrics = provider_catalog_metrics()
+    lines = [
+        "### Mapa de proveedores buscados",
+        f"- Proveedores catalogados: {metrics['total']} | ya cableados: {metrics['wired']} | adaptadores pendientes: {metrics['adapters']} | enterprise/contrato: {metrics['enterprise']}.",
+        "- Regla: ESPN queda como fallback; el objetivo es activar API-Football y sumar Sportmonks/The Odds API/NewsAPI o equivalente si tienes keys.",
+    ]
+    for item in live_provider_catalog():
+        lines.append(
+            f"- {item['name']} ({item['category']}): {item['coverage']} Integracion: {item['integration']} | env: {item['env']}."
+        )
+    return lines
+
+
+def build_provider_matrix_html(entries: Sequence[dict]) -> str:
+    fixture_entries = [entry for entry in entries if not entry.get("projection")]
+    live_sources = sorted({str(entry.get("source")) for entry in fixture_entries if entry.get("source")})
+    deep_sources = sorted({str(entry.get("live_feed_provider")) for entry in fixture_entries if entry.get("live_feed_provider")})
+    active_label = " + ".join(deep_sources or live_sources or ["feed base publico"])
+    metrics = provider_catalog_metrics()
+
+    def tile(label: str, value: str, note: str) -> str:
+        return (
+            "<div class=\"summary-tile\">"
+            f"<span>{html.escape(label)}</span><strong>{html.escape(value)}</strong><small>{html.escape(note)}</small>"
+            "</div>"
+        )
+
+    priority_order = {
+        "Live profundo": 0,
+        "Enterprise live": 1,
+        "Enterprise xG/eventos": 1,
+        "Mercado/odds": 2,
+        "Mercado avanzado": 2,
+        "Noticias": 3,
+        "Noticias abiertas": 3,
+        "Oficial": 4,
+        "Oficial/noticias": 4,
+        "Historico + xG": 5,
+        "Fixture/resultados": 6,
+        "Free/backup": 7,
+        "Video/highlights": 8,
+        "Referencia no oficial": 9,
+        "Base publica": 10,
+    }
+    catalog = sorted(live_provider_catalog(), key=lambda item: (priority_order.get(item["category"], 99), item["name"]))
+    rows = "".join(
+        "<li>"
+        f"<strong>{html.escape(str(item['name']))}</strong>"
+        f"<span>{html.escape(str(item['category']))} | {html.escape(str(item['coverage']))}</span>"
+        f"<em>{html.escape(str(item['priority']))}: {html.escape(str(item['integration']))} | {html.escape(str(item['env']))}</em>"
+        "</li>"
+        for item in catalog
+    )
+    best_next = [
+        "Activar API_FOOTBALL_KEY si aun no esta en GitHub Secrets.",
+        "Agregar SPORTMONKS_TOKEN como segundo proveedor live profundo.",
+        "Agregar THE_ODDS_API_KEY para consenso de mercado.",
+        "Agregar NEWSAPI_KEY o GDELT para lesiones/noticias multi-fuente.",
+    ]
+    next_rows = "".join(
+        "<li>"
+        f"<strong>{html.escape(item)}</strong>"
+        "<span>Esto aumenta robustez; no garantiza acertar mas si el proveedor no cubre Mundial 2026 o no trae datos live profundos.</span>"
+        "</li>"
+        for item in best_next
+    )
+    return (
+        "<section class=\"panel provider-panel\">"
+        "<div class=\"panel-head\"><div>"
+        "<p class=\"eyebrow\">Mapa de proveedores</p>"
+        "<h2>No depender solo de ESPN</h2>"
+        "<p class=\"lede-tight\">ESPN queda como base y fallback. Para in-play serio, el stack ideal combina un proveedor live profundo, una fuente de mercado, fuentes oficiales y noticias multi-fuente. Abajo queda el mapa de proveedores posibles y el estado de integracion.</p>"
+        "</div></div>"
+        "<div class=\"confidence-tiles\">"
+        f"{tile('Fuente activa visible', active_label, 'Lo que esta entrando en este corte publicado.')}"
+        f"{tile('Proveedores catalogados', str(int(metrics['total'])), 'Live, odds, noticias, historico, oficial y video.')}"
+        f"{tile('Ya cableados', str(int(metrics['wired'])), 'ESPN base + API-Football si hay key.')}"
+        f"{tile('Adaptadores pendientes', str(int(metrics['adapters'])), 'Se pueden sumar con API keys y mapeo de campos.')}"
+        "</div>"
+        "<div class=\"certainty-grid provider-grid\">"
+        "<article><h3>Proveedores posibles</h3><ul>"
+        f"{rows}"
+        "</ul></article>"
+        "<article><h3>Siguiente paso recomendado</h3><ul>"
+        f"{next_rows}"
+        "</ul></article>"
+        "</div>"
+        "</section>"
+    )
+
+
 def build_agentic_learning_markdown(entries: Sequence[dict], bracket_payload: dict, backtest: dict) -> List[str]:
     fixture_entries = [entry for entry in entries if not entry.get("projection")]
     final_count = sum(1 for entry in fixture_entries if fixture_is_final(entry))
@@ -5586,6 +5838,7 @@ def build_agentic_learning_markdown(entries: Sequence[dict], bracket_payload: di
     ]
     for item in agentic_learning_items():
         lines.append(f"- {item['agent']}: {item['job']} {item['learns']}")
+    lines.extend(["", *build_provider_matrix_markdown()])
     return lines
 
 
@@ -5600,6 +5853,7 @@ def build_agentic_learning_html(entries: Sequence[dict], bracket_payload: dict, 
     live_sources = sorted({str(entry.get("source")) for entry in fixture_entries if entry.get("source")})
     deep_sources = sorted({str(entry.get("live_feed_provider")) for entry in fixture_entries if entry.get("live_feed_provider")})
     source_label = " + ".join(deep_sources or live_sources or ["feed base publico"])
+    prepared_stack = "API-Football + Sportmonks + Sportradar + Opta + Odds + News"
 
     def tile(label: str, value: str, note: str) -> str:
         return (
@@ -5634,7 +5888,7 @@ def build_agentic_learning_html(entries: Sequence[dict], bracket_payload: dict, 
         f"{tile('Monte Carlo activo', iterations_label + ' simulaciones', 'La auditoria exige al menos 15.000 por corrida.')}"
         f"{tile('Eficiencia operativa', 'apto para 5 min', 'Cache, ensamble ligero y auditoria automatica para refrescar sin esperar horas.')}"
         f"{tile('Datos ya incorporados', f'{final_count} final / {live_count} live', f'Ademas {projected_count} cruces de llave recalculables.')}"
-        f"{tile('Noticias multi-fuente', 'No solo ESPN', f'Fuente activa visible: {source_label}.')}"
+        f"{tile('Noticias multi-fuente', 'No solo ESPN', f'Fuente activa visible: {source_label}; stack preparado: {prepared_stack}.')}"
         "</div>"
         "<div class=\"certainty-grid agentic-grid\">"
         "<article><h3>Como aprende el sistema</h3><ul>"
@@ -7526,6 +7780,7 @@ def build_dashboard_html(
     calibration_depth_html = build_calibration_depth_html(entries, backtest)
     prediction_power_html = build_prediction_power_html(entries)
     agentic_learning_html = build_agentic_learning_html(entries, bracket_payload, backtest)
+    provider_matrix_html = build_provider_matrix_html(entries)
     global_confidence_html = build_global_confidence_html(entries)
     max_certainty_html = build_max_certainty_html(entries)
     strategy_html = build_quiniela_strategy_html(entries)
@@ -7549,6 +7804,7 @@ def build_dashboard_html(
             "calibration_depth_html": calibration_depth_html,
             "prediction_power_html": prediction_power_html,
             "agentic_learning_html": agentic_learning_html,
+            "provider_matrix_html": provider_matrix_html,
             "global_confidence_html": global_confidence_html,
             "max_certainty_html": max_certainty_html,
             "strategy_html": strategy_html,
@@ -7831,6 +8087,16 @@ def audit_dashboard_html(dashboard_html: str) -> List[str]:
         "Noticias multi-fuente",
         "No solo ESPN",
         "Eficiencia operativa",
+        "Mapa de proveedores",
+        "API-Football",
+        "Sportmonks",
+        "Sportradar",
+        "Opta",
+        "The Odds API",
+        "NewsAPI",
+        "GDELT",
+        "StatsBomb",
+        "ScoreBat",
         "Semaforo metodologico",
         "Control de calidad del pronostico",
         "Pronóstico de goles",
