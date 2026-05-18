@@ -1015,18 +1015,19 @@ h3 { font-size: 1.05rem; }
   color: var(--accent-dark);
 }
 .power-grid article {
-  background: rgba(255,255,255,0.70);
-  border-color: rgba(15,109,102,0.15);
+  background: rgba(255,255,255,0.78) !important;
+  border-color: rgba(15,109,102,0.15) !important;
+  box-shadow: 0 14px 34px rgba(20, 42, 38, 0.06);
 }
 .power-grid li strong {
-  color: var(--ink);
+  color: var(--ink) !important;
 }
 .power-grid li span {
-  color: var(--muted);
+  color: var(--muted) !important;
 }
 .power-grid li em {
-  background: rgba(15,109,102,0.10);
-  color: var(--accent-dark);
+  background: rgba(15,109,102,0.10) !important;
+  color: var(--accent-dark) !important;
 }
 .agentic-panel {
   background:
