@@ -228,7 +228,7 @@ class RegressionLogicTest(unittest.TestCase):
             }
         )
         self.assertEqual(profile["pick_code"], "1")
-        self.assertEqual(profile["tier"], "Firme")
+        self.assertEqual(profile["tier"], "Pick base claro")
         self.assertGreater(profile["certainty_score"], 0.65)
 
     def test_max_certainty_html_renders_pick_sheet(self):

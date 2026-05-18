@@ -4425,17 +4425,17 @@ def quiniela_certainty_profile(entry: dict) -> dict:
         0.99,
     )
     if best_prob >= 0.66 and gap >= 0.18 and confidence >= 0.70:
-        tier = "Firme"
-        action = "usar como pick base"
+        tier = "Pick base claro"
+        action = "jugar el resultado principal sin cubrir, salvo noticia fuerte de ultima hora"
     elif best_prob >= 0.58 and gap >= 0.12:
-        tier = "Preferente"
-        action = "usar si no hay mejor cobertura"
+        tier = "Pick principal"
+        action = "jugar el resultado principal; cubrir solo si necesitas reducir riesgo"
     elif prediction.draw >= 0.27 and gap < 0.12:
-        tier = "Trampa"
-        action = "cubrir empate si las reglas lo permiten"
+        tier = "Partido cerrado"
+        action = "no venderlo como fijo: el empate esta cerca y conviene cubrir si las reglas lo permiten"
     else:
-        tier = "Alta varianza"
-        action = "evitar jugada heroica; priorizar cobertura"
+        tier = "Riesgo alto"
+        action = "cubrir o evitar como fijo; marcador exacto solo si la quiniela lo exige"
     score_note = (
         "marcador relativamente defendible"
         if score_prob >= 0.16
@@ -4484,9 +4484,9 @@ def quiniela_audit_metrics(profiles: Sequence[dict]) -> dict:
             "warnings": ["No hay partidos reales cargados para auditar el boleto."],
         }
     total = len(profiles)
-    firm_or_preferent = sum(1 for item in profiles if item["tier"] in {"Firme", "Preferente"})
-    traps = sum(1 for item in profiles if item["tier"] == "Trampa")
-    high_variance = sum(1 for item in profiles if item["tier"] == "Alta varianza")
+    firm_or_preferent = sum(1 for item in profiles if item["tier"] in {"Pick base claro", "Pick principal"})
+    traps = sum(1 for item in profiles if item["tier"] == "Partido cerrado")
+    high_variance = sum(1 for item in profiles if item["tier"] == "Riesgo alto")
     defensible_scores = sum(1 for item in profiles if float(item["score_prob"]) >= 0.16)
     fragile_scores = total - defensible_scores
     low_gap = sum(1 for item in profiles if float(item["gap"]) < 0.10)
@@ -4508,7 +4508,7 @@ def quiniela_audit_metrics(profiles: Sequence[dict]) -> dict:
     if firm_or_preferent / total >= 0.70 and low_gap <= max(2, total // 8):
         ticket_status = "Boleto defendible"
     elif traps + high_variance >= max(4, total // 5):
-        ticket_status = "Boleto con demasiadas trampas"
+        ticket_status = "Boleto con demasiados partidos cerrados"
     else:
         ticket_status = "Boleto jugable con coberturas"
     return {
@@ -4607,8 +4607,8 @@ def quiniela_strategy_profile(entry: dict) -> dict:
             f"agrega tambien {base['second_label']}. Si solo permite uno, usa el pick base pero no lo trates como fijo."
         )
     elif float(base["gap"]) < 0.08 or float(base["pick_prob"]) < 0.48:
-        strategy_tier = "Alta varianza"
-        strategy_action = "No gastar aqui un diferencial heroico; cubrir o aceptar riesgo."
+        strategy_tier = "Riesgo alto"
+        strategy_action = "No gastes aqui un diferencial heroico: cubre o acepta el riesgo con marcador sugerido."
     else:
         strategy_tier = "Base controlada"
         strategy_action = "Jugar el pick del modelo, sin sobreponderar marcador exacto."
@@ -4658,11 +4658,11 @@ def quiniela_strategy_metrics(strategy_profiles: Sequence[dict]) -> dict:
     )
     variance_sd = math.sqrt(sum(float(item["pick_prob"]) * (1.0 - float(item["pick_prob"])) for item in strategy_profiles))
     differentials = sum(1 for item in strategy_profiles if item["strategy_tier"] == "Diferencial positivo")
-    coverage_min = sum(1 for item in strategy_profiles if item["strategy_tier"] in {"Cubrir si puedes", "Alta varianza"})
+    coverage_min = sum(1 for item in strategy_profiles if item["strategy_tier"] in {"Cubrir si puedes", "Riesgo alto"})
     coverage_recommended = sum(
         1
         for item in strategy_profiles
-        if item["strategy_tier"] in {"Cubrir si puedes", "Alta varianza"}
+        if item["strategy_tier"] in {"Cubrir si puedes", "Riesgo alto"}
         or float(item["pick_prob"]) < 0.62
         or float(item["gap"]) < 0.14
         or (float(item["second_prob"]) >= 0.25 and float(item["second_edge"]) >= 0.005)
@@ -4670,7 +4670,7 @@ def quiniela_strategy_metrics(strategy_profiles: Sequence[dict]) -> dict:
     coverage_aggressive = sum(
         1
         for item in strategy_profiles
-        if item["strategy_tier"] in {"Cubrir si puedes", "Alta varianza"}
+        if item["strategy_tier"] in {"Cubrir si puedes", "Riesgo alto"}
         or float(item["pick_prob"]) < 0.70
         or float(item["gap"]) < 0.20
         or float(item["second_prob"]) >= 0.22
@@ -4705,7 +4705,7 @@ def build_quiniela_strategy_markdown(entries: Sequence[dict]) -> List[str]:
         reverse=True,
     )[:10]
     coverage = sorted(
-        [item for item in profiles if item["strategy_tier"] in {"Cubrir si puedes", "Alta varianza"}],
+        [item for item in profiles if item["strategy_tier"] in {"Cubrir si puedes", "Riesgo alto"}],
         key=lambda item: (item["gap"], -item["second_edge"]),
     )[:10]
     lines = [
@@ -4713,8 +4713,9 @@ def build_quiniela_strategy_markdown(entries: Sequence[dict]) -> List[str]:
         "- Objetivo: aumentar expectativa y ventaja relativa frente a un boleto popular, no inflar porcentajes.",
         f"- Aciertos esperados del boleto modelo: {metrics['expected_model_hits']:.1f}/{int(metrics['total'])}.",
         f"- Boleto popular por nombre estimado: {metrics['expected_popular_hits']:.1f}/{int(metrics['total'])}. Ventaja esperada del modelo: {metrics['expected_gain']:+.1f} picks.",
-        f"- Marcadores exactos esperados top-1: {metrics['expected_exact_scores']:.1f}/{int(metrics['total'])}, con rango realista 90% de {metrics['exact_score_range_low']:.0f}-{metrics['exact_score_range_high']:.0f}.",
-        f"- Si la quiniela permite alternativas de marcador, los 3 marcadores principales por partido cubren {metrics['expected_top3_scores']:.1f}/{int(metrics['total'])} en expectativa.",
+        f"- Marcador exacto principal esperado: {metrics['expected_exact_scores']:.1f}/{int(metrics['total'])}. Esto NO mide acierto de ganador; mide cuantas veces esperarias acertar el marcador unico mas probable.",
+        f"- Rango realista 90% del marcador exacto principal: {metrics['exact_score_range_low']:.0f}-{metrics['exact_score_range_high']:.0f} aciertos.",
+        f"- Si la quiniela permite poner 3 marcadores alternativos por partido, la cobertura esperada sube a {metrics['expected_top3_scores']:.1f}/{int(metrics['total'])}.",
         f"- Rango estadistico aproximado de resultados principales: {metrics['range_low']:.0f}-{metrics['range_high']:.0f} aciertos.",
         f"- Cobertura minima/recomendada/agresiva: {int(metrics['coverage_min'])}/{int(metrics['coverage_recommended'])}/{int(metrics['coverage_aggressive'])} partidos.",
         "",
@@ -4731,7 +4732,7 @@ def build_quiniela_strategy_markdown(entries: Sequence[dict]) -> List[str]:
     if coverage:
         for item in coverage:
             lines.append(
-                f"- {item['title']}: {item['pick_label']} {format_pct(item['pick_prob'])}; segunda opcion {item['second_label']} {format_pct(item['second_prob'])}; {item['strategy_action']}"
+                f"- {item['title']}: {item['pick_label']} {format_pct(item['pick_prob'])}; marcador sugerido {item['score']} {format_pct(item['score_prob'])}; segunda opcion {item['second_label']} {format_pct(item['second_prob'])}; {item['strategy_action']}"
             )
     else:
         lines.append("- No hay coberturas críticas en este corte.")
@@ -4757,7 +4758,7 @@ def build_quiniela_strategy_html(entries: Sequence[dict]) -> str:
         [
             item
             for item in profiles
-            if item["strategy_tier"] in {"Cubrir si puedes", "Alta varianza"}
+            if item["strategy_tier"] in {"Cubrir si puedes", "Riesgo alto"}
             or float(item["pick_prob"]) < 0.62
             or float(item["gap"]) < 0.14
             or (float(item["second_prob"]) >= 0.25 and float(item["second_edge"]) >= 0.005)
@@ -4790,11 +4791,11 @@ def build_quiniela_strategy_html(entries: Sequence[dict]) -> str:
         f"<div class=\"summary-tile\"><span>Aciertos esperados 1X2</span><strong>{metrics['expected_model_hits']:.1f}/{int(metrics['total'])}</strong></div>"
         f"<div class=\"summary-tile\"><span>Rango estadistico 90%</span><strong>{metrics['range_low']:.0f}-{metrics['range_high']:.0f}</strong></div>"
         f"<div class=\"summary-tile\"><span>Ventaja vs boleto popular</span><strong>{metrics['expected_gain']:+.1f} picks</strong></div>"
-        f"<div class=\"summary-tile\"><span>Marcadores exactos top-1 esperados</span><strong>{metrics['expected_exact_scores']:.1f}/{int(metrics['total'])}</strong><small>Rango 90%: {metrics['exact_score_range_low']:.0f}-{metrics['exact_score_range_high']:.0f}</small></div>"
-        f"<div class=\"summary-tile\"><span>Top-3 marcadores por partido</span><strong>{metrics['expected_top3_scores']:.1f}/{int(metrics['total'])}</strong><small>Solo si puedes usar alternativas de marcador.</small></div>"
+        f"<div class=\"summary-tile\"><span>Marcador exacto principal</span><strong>{metrics['expected_exact_scores']:.1f}/{int(metrics['total'])}</strong><small>Es el marcador unico mas probable de cada partido, no el acierto 1X2. Rango 90%: {metrics['exact_score_range_low']:.0f}-{metrics['exact_score_range_high']:.0f}</small></div>"
+        f"<div class=\"summary-tile\"><span>Si puedes poner 3 marcadores</span><strong>{metrics['expected_top3_scores']:.1f}/{int(metrics['total'])}</strong><small>Cobertura esperada usando los tres marcadores mas probables por partido.</small></div>"
         f"<div class=\"summary-tile\"><span>Diferenciales positivos</span><strong>{int(metrics['differentials'])}</strong></div>"
-        f"<div class=\"summary-tile\"><span>Partidos a cubrir minimo</span><strong>{int(metrics['coverage_min'])}</strong><small>Solo trampas evidentes.</small></div>"
-        f"<div class=\"summary-tile\"><span>Cobertura recomendada</span><strong>{int(metrics['coverage_recommended'])}</strong><small>Si la quiniela permite dobles.</small></div>"
+        f"<div class=\"summary-tile\"><span>Partidos a cubrir minimo</span><strong>{int(metrics['coverage_min'])}</strong><small>Solo partidos cerrados o de riesgo alto.</small></div>"
+        f"<div class=\"summary-tile\"><span>Cobertura recomendada</span><strong>{int(metrics['coverage_recommended'])}</strong><small>Si tu formato permite dos resultados, agrega la segunda opcion indicada.</small></div>"
         f"<div class=\"summary-tile\"><span>Cobertura agresiva</span><strong>{int(metrics['coverage_aggressive'])}</strong><small>Si necesitas diferenciarte mucho.</small></div>"
         "</div>"
     )
@@ -4831,19 +4832,19 @@ def build_max_certainty_markdown(entries: Sequence[dict]) -> List[str]:
     audit = quiniela_audit_metrics(profiles)
     safest = sorted(profiles, key=lambda item: (item["certainty_score"], item["pick_prob"], item["gap"]), reverse=True)[:12]
     traps = sorted(
-        [item for item in profiles if item["tier"] in {"Trampa", "Alta varianza"}],
+        [item for item in profiles if item["tier"] in {"Partido cerrado", "Riesgo alto"}],
         key=lambda item: (item["gap"], item["pick_prob"]),
     )[:8]
     score_picks = sorted(profiles, key=lambda item: (item["score_prob"], item["top3"]), reverse=True)[:8]
     lines = [
         "- Lectura: la certeza operativa no es probabilidad garantizada de acierto; es un ranking conservador que mezcla probabilidad del resultado, diferencia contra la segunda opcion, cobertura de marcadores y acuerdo entre modelos.",
-        "- Regla base sin conocer tu quiniela exacta: en partidos firmes juega resultado; en partidos trampa cubre empate/upset; para marcador exacto usa el top score solo si la quiniela lo premia mucho.",
+        "- Regla base sin conocer tu quiniela exacta: en picks base juega resultado; en partidos cerrados cubre empate/upset si el formato lo permite; para marcador exacto usa el marcador principal solo si la quiniela lo premia mucho.",
         "",
         "### Auditoria del boleto",
         f"- Estado: {audit['ticket_status']}",
         f"- Partidos auditados: {audit['total']}",
-        f"- Picks firmes o preferentes: {audit['firm_or_preferent']}",
-        f"- Partidos trampa o alta varianza: {audit['traps'] + audit['high_variance']}",
+        f"- Picks base o principales: {audit['firm_or_preferent']}",
+        f"- Partidos cerrados o de riesgo alto: {audit['traps'] + audit['high_variance']}",
         f"- Marcadores exactos defendibles: {audit['defensible_scores']} | fragiles: {audit['fragile_scores']}",
         f"- Brecha minima contra la segunda opcion: {format_pct(float(audit['min_gap']))}",
         f"- Certeza operativa media: {format_pct(float(audit['avg_certainty']))}",
@@ -4860,14 +4861,14 @@ def build_max_certainty_markdown(entries: Sequence[dict]) -> List[str]:
     if traps:
         for item in traps:
             lines.append(
-                f"- {item['title']}: pick principal {item['pick_label']} {format_pct(item['pick_prob'])}, segunda opcion {item['second_label']} {format_pct(item['second_prob'])} | brecha {format_pct(item['gap'])} | {item['action']}"
+                f"- {item['title']}: pick principal {item['pick_label']} {format_pct(item['pick_prob'])}, marcador sugerido {item['score']} {format_pct(item['score_prob'])}, segunda opcion {item['second_label']} {format_pct(item['second_prob'])} | brecha {format_pct(item['gap'])} | {item['action']}"
             )
     else:
-        lines.append("- No hay partidos marcados como trampa en este corte.")
+        lines.append("- No hay partidos cerrados críticos en este corte.")
     lines.extend(["", "### Marcadores exactos mas defendibles"])
     for item in score_picks:
         lines.append(
-            f"- {item['title']}: {item['score']} ({format_pct(item['score_prob'])}) | top-3 marcadores {format_pct(item['top3'])} | {item['score_note']}"
+            f"- {item['title']}: {item['score']} ({format_pct(item['score_prob'])}) | cobertura con tres marcadores {format_pct(item['top3'])} | {item['score_note']}"
         )
     return lines
 
@@ -4881,7 +4882,7 @@ def build_max_certainty_html(entries: Sequence[dict]) -> str:
     audit = quiniela_audit_metrics(profiles)
     safest = sorted(profiles, key=lambda item: (item["certainty_score"], item["pick_prob"], item["gap"]), reverse=True)[:10]
     traps = sorted(
-        [item for item in profiles if item["tier"] in {"Trampa", "Alta varianza"}],
+        [item for item in profiles if item["tier"] in {"Partido cerrado", "Riesgo alto"}],
         key=lambda item: (item["gap"], item["pick_prob"]),
     )[:6]
     score_picks = sorted(profiles, key=lambda item: (item["score_prob"], item["top3"]), reverse=True)[:6]
@@ -4898,13 +4899,14 @@ def build_max_certainty_html(entries: Sequence[dict]) -> str:
             elif mode == "trap":
                 detail = (
                     f"Pick principal {item['pick_label']} {format_pct(item['pick_prob'])}; "
+                    f"marcador sugerido {item['score']} {format_pct(item['score_prob'])}; "
                     f"segunda opcion {item['second_label']} {format_pct(item['second_prob'])}; "
                     f"brecha {format_pct(item['gap'])}"
                 )
             else:
                 detail = (
                     f"Marcador {item['score']} {format_pct(item['score_prob'])} | "
-                    f"top-3 marcadores {format_pct(item['top3'])} | {item['score_note']}"
+                    f"cobertura con tres marcadores {format_pct(item['top3'])} | {item['score_note']}"
                 )
             html_rows.append(
                 "<li>"
@@ -4919,8 +4921,8 @@ def build_max_certainty_html(entries: Sequence[dict]) -> str:
         "<div class=\"confidence-tiles quiniela-audit-tiles\">"
         f"<div class=\"summary-tile\"><span>Estado del boleto</span><strong>{html.escape(str(audit['ticket_status']))}</strong></div>"
         f"<div class=\"summary-tile\"><span>Partidos auditados</span><strong>{int(audit['total'])}</strong></div>"
-        f"<div class=\"summary-tile\"><span>Picks firmes o preferentes</span><strong>{int(audit['firm_or_preferent'])}</strong></div>"
-        f"<div class=\"summary-tile\"><span>Partidos trampa o alta varianza</span><strong>{int(audit['traps']) + int(audit['high_variance'])}</strong></div>"
+        f"<div class=\"summary-tile\"><span>Picks base o principales</span><strong>{int(audit['firm_or_preferent'])}</strong></div>"
+        f"<div class=\"summary-tile\"><span>Partidos cerrados o de riesgo alto</span><strong>{int(audit['traps']) + int(audit['high_variance'])}</strong></div>"
         f"<div class=\"summary-tile\"><span>Marcadores exactos defendibles</span><strong>{int(audit['defensible_scores'])}</strong></div>"
         f"<div class=\"summary-tile\"><span>Brecha minima contra la segunda opcion</span><strong>{format_pct(float(audit['min_gap']))}</strong></div>"
         f"<div class=\"summary-tile\"><span>Certeza operativa media</span><strong>{format_pct(float(audit['avg_certainty']))}</strong></div>"
@@ -4946,14 +4948,14 @@ def build_max_certainty_html(entries: Sequence[dict]) -> str:
         "</ul>"
         "</article>"
     )
-    trap_rows = rows(traps, "trap") if traps else "<li><strong>Sin trampas fuertes detectadas</strong><span>El corte actual no marca partidos con brecha estrecha crítica.</span><em>Igual revisar alineaciones antes de cerrar.</em></li>"
+    trap_rows = rows(traps, "trap") if traps else "<li><strong>Sin partidos cerrados críticos</strong><span>El corte actual no marca partidos con brecha estrecha crítica.</span><em>Igual revisar alineaciones antes de cerrar.</em></li>"
     return (
         "<section class=\"panel certainty-panel\">"
         "<div class=\"panel-head\">"
         "<div>"
         "<p class=\"eyebrow\">Modo quiniela</p>"
         "<h2>Hoja de máxima certeza</h2>"
-        "<p class=\"lede-tight\">Esta seccion traduce el modelo a decisiones de quiniela. No infla probabilidades: ordena los picks por solidez operativa, separa partidos trampa y avisa cuando el marcador exacto es fragil.</p>"
+        "<p class=\"lede-tight\">Esta seccion traduce el modelo a decisiones de quiniela. No infla probabilidades: ordena los picks por solidez operativa, separa partidos cerrados y avisa cuando el marcador exacto es fragil.</p>"
         "</div>"
         "</div>"
         f"{audit_panel}"
@@ -5271,7 +5273,7 @@ def build_calibration_depth_html(entries: Sequence[dict], backtest: dict) -> str
         "<div class=\"panel-head\"><div>"
         "<p class=\"eyebrow\">Calibracion avanzada</p>"
         "<h2>Como evitamos que el modelo se sobreconfie</h2>"
-        "<p class=\"lede-tight\">Profundizar la metodologia si vale la pena, pero solo si se traduce en mejores decisiones de quiniela. Esta capa muestra los frenos estadisticos que corrigen probabilidades extremas y separan pick fuerte de partido trampa.</p>"
+        "<p class=\"lede-tight\">Profundizar la metodologia si vale la pena, pero solo si se traduce en mejores decisiones de quiniela. Esta capa muestra los frenos estadisticos que corrigen probabilidades extremas y separan pick fuerte de partido cerrado.</p>"
         "</div></div>"
         "<div class=\"confidence-tiles\">"
         f"{tile('Estado de calibracion', str(metrics['calibration_state']), str(metrics['calibration_action']))}"
@@ -5286,6 +5288,366 @@ def build_calibration_depth_html(entries: Sequence[dict], backtest: dict) -> str
         "<p>No fuerzan una confianza artificial de 90%: reducen sobreconfianza, activan cobertura y hacen que el modelo aprenda con resultados reales.</p>"
         "</div>"
         f"<div class=\"method-quality-grid\">{rows}</div>"
+        "</div>"
+        "</section>"
+    )
+
+
+def professional_team_strength_index(team_name: str) -> float:
+    team = load_teams().get(team_name)
+    if not team:
+        return 0.50
+    profile = profile_for(team)
+    elo_index = clamp((float(team.elo) - 1320.0) / 620.0, 0.0, 1.0)
+    fifa_rank_index = clamp(1.0 - (float(profile.fifa_rank) - 1.0) / 85.0, 0.0, 1.0)
+    squad_index = clamp(
+        0.24 * profile.squad.squad_quality
+        + 0.18 * profile.squad.attack_unit
+        + 0.17 * profile.squad.midfield_unit
+        + 0.17 * profile.squad.defense_unit
+        + 0.10 * profile.squad.goalkeeper_unit
+        + 0.08 * profile.squad.bench_depth
+        + 0.06 * profile.squad.player_experience,
+        0.0,
+        1.0,
+    )
+    history_index = clamp(
+        0.36 * profile.history.strength_index
+        + 0.24 * profile.history.competitive_index
+        + 0.22 * profile.history.world_cup_index
+        + 0.10 * profile.history.attack_index
+        + 0.08 * profile.history.defense_index,
+        0.0,
+        1.0,
+    )
+    return clamp(
+        0.22 * elo_index
+        + 0.17 * profile.fifa_strength_index
+        + 0.16 * fifa_rank_index
+        + 0.16 * squad_index
+        + 0.12 * history_index
+        + 0.07 * profile.resource_index
+        + 0.05 * profile.coach_index
+        + 0.03 * profile.chemistry_index
+        + 0.02 * profile.heritage_index,
+        0.0,
+        1.0,
+    )
+
+
+def professional_pick_support(prediction: MatchPrediction, pick_code: str) -> float:
+    strength_a = professional_team_strength_index(prediction.team_a)
+    strength_b = professional_team_strength_index(prediction.team_b)
+    if pick_code == "1":
+        return clamp(0.50 + 0.92 * (strength_a - strength_b), 0.05, 0.98)
+    if pick_code == "2":
+        return clamp(0.50 + 0.92 * (strength_b - strength_a), 0.05, 0.98)
+    parity = 1.0 - abs(strength_a - strength_b)
+    return clamp(0.32 + 0.38 * parity + 0.70 * max(0.0, float(prediction.draw) - 0.25), 0.05, 0.90)
+
+
+def prediction_power_profile(entry: dict) -> dict:
+    prediction: MatchPrediction = entry["prediction"]
+    base = quiniela_strategy_profile(entry)
+    market_gap_raw = base.get("market_gap")
+    market_gap = abs(float(market_gap_raw)) if market_gap_raw is not None else 0.0
+    market_alignment = 1.0 if market_gap_raw is None else clamp(1.0 - 1.8 * market_gap, 0.0, 1.0)
+    gap_strength = clamp(float(base["gap"]) / 0.28, 0.0, 1.0)
+    structural_support = professional_pick_support(prediction, str(base["pick_code"]))
+    draw_risk = clamp(float(prediction.draw) + max(0.0, 0.14 - float(base["gap"])), 0.0, 1.0)
+    conviction = clamp(
+        0.42
+        + 0.30 * float(base["pick_prob"])
+        + 0.12 * gap_strength
+        + 0.11 * float(base["agreement"])
+        + 0.10 * structural_support
+        + 0.07 * float(base["certainty_score"])
+        + 0.05 * float(base["top3"])
+        + 0.04 * market_alignment
+        - 0.10 * draw_risk,
+        0.05,
+        0.99,
+    )
+    if conviction >= 0.88 and float(base["pick_prob"]) >= 0.55:
+        power_tier = "Potenciado alto"
+        power_action = "Puede ser pick central del boleto."
+    elif conviction >= 0.78:
+        power_tier = "Potenciado jugable"
+        power_action = "Usar como pick, pero revisar cobertura si el margen es pequeno."
+    elif conviction >= 0.66:
+        power_tier = "Potenciado con cautela"
+        power_action = "No subirlo demasiado: jugar solo si necesitas cubrir ese tramo."
+    else:
+        power_tier = "No potenciar"
+        power_action = "Mantener como partido de riesgo o cobertura."
+    drivers = []
+    if structural_support >= 0.62:
+        drivers.append("fuerza estructural")
+    if float(base["agreement"]) >= 0.72:
+        drivers.append("modelos alineados")
+    if float(base["gap"]) >= 0.14:
+        drivers.append("brecha clara")
+    if float(base["edge_vs_public"]) >= 0.04:
+        drivers.append("edge vs boleto popular")
+    if market_alignment >= 0.70:
+        drivers.append("sin choque fuerte con mercado")
+    if not drivers:
+        drivers.append("senal moderada")
+    return {
+        **base,
+        "structural_support": structural_support,
+        "market_alignment": market_alignment,
+        "draw_risk": draw_risk,
+        "power_conviction": conviction,
+        "power_boost": conviction - float(base["pick_prob"]),
+        "power_tier": power_tier,
+        "power_action": power_action,
+        "power_drivers": drivers[:3],
+    }
+
+
+def prediction_power_metrics(profiles: Sequence[dict]) -> dict:
+    if not profiles:
+        return {
+            "total": 0,
+            "avg_conviction": 0.0,
+            "avg_boost": 0.0,
+            "high_power": 0,
+            "watchlist": 0,
+            "avg_structural": 0.0,
+        }
+    total = len(profiles)
+    return {
+        "total": total,
+        "avg_conviction": sum(float(item["power_conviction"]) for item in profiles) / total,
+        "avg_boost": sum(float(item["power_boost"]) for item in profiles) / total,
+        "high_power": sum(1 for item in profiles if item["power_tier"] == "Potenciado alto"),
+        "watchlist": sum(1 for item in profiles if item["power_tier"] in {"Potenciado con cautela", "No potenciar"}),
+        "avg_structural": sum(float(item["structural_support"]) for item in profiles) / total,
+    }
+
+
+def build_prediction_power_markdown(entries: Sequence[dict]) -> List[str]:
+    profiles = [prediction_power_profile(entry) for entry in entries]
+    metrics = prediction_power_metrics(profiles)
+    strongest = sorted(
+        profiles,
+        key=lambda item: (item["power_conviction"], item["pick_prob"], item["gap"]),
+        reverse=True,
+    )[:10]
+    lines = [
+        "### Prediccion potenciada",
+        "- Lectura: no es una probabilidad nueva; es una conviccion reforzada para decidir boleto.",
+        f"- Conviccion reforzada media: {format_pct(float(metrics['avg_conviction']))}.",
+        f"- Picks de potencia alta: {int(metrics['high_power'])}/{int(metrics['total'])}; watchlist: {int(metrics['watchlist'])}.",
+    ]
+    for item in strongest:
+        lines.append(
+            f"- {item['title']}: {item['pick_label']} | probabilidad pura {format_pct(float(item['pick_prob']))} | conviccion reforzada {format_pct(float(item['power_conviction']))} | drivers: {', '.join(item['power_drivers'])}."
+        )
+    return lines
+
+
+def build_prediction_power_html(entries: Sequence[dict]) -> str:
+    if not entries:
+        return ""
+    profiles = [prediction_power_profile(entry) for entry in entries]
+    metrics = prediction_power_metrics(profiles)
+    strongest = sorted(
+        profiles,
+        key=lambda item: (item["power_conviction"], item["pick_prob"], item["gap"]),
+        reverse=True,
+    )[:8]
+    caution = sorted(
+        [item for item in profiles if item["power_tier"] in {"Potenciado con cautela", "No potenciar"}],
+        key=lambda item: (item["power_conviction"], item["pick_prob"]),
+    )[:8]
+
+    def tile(label: str, value: str, note: str = "") -> str:
+        note_html = f"<small>{html.escape(note)}</small>" if note else ""
+        return (
+            "<div class=\"summary-tile\">"
+            f"<span>{html.escape(label)}</span><strong>{html.escape(value)}</strong>{note_html}"
+            "</div>"
+        )
+
+    def rows(items: Sequence[dict], empty: str) -> str:
+        if not items:
+            return f"<li><strong>{html.escape(empty)}</strong><span>Sin casos en este corte.</span></li>"
+        rendered = []
+        for item in items:
+            rendered.append(
+                "<li>"
+                f"<strong>{html.escape(str(item['title']))}</strong>"
+                f"<span>{html.escape(str(item['pick_label']))}: probabilidad pura {format_pct(float(item['pick_prob']))} | conviccion reforzada {format_pct(float(item['power_conviction']))} | fuerza estructural {format_pct(float(item['structural_support']))}</span>"
+                f"<em>{html.escape(str(item['power_tier']))}: {html.escape(str(item['power_action']))} Drivers: {html.escape(', '.join(item['power_drivers']))}</em>"
+                "</li>"
+            )
+        return "".join(rendered)
+
+    return (
+        "<section class=\"panel power-panel\">"
+        "<div class=\"panel-head\"><div>"
+        "<p class=\"eyebrow\">Prediccion potenciada</p>"
+        "<h2>Probabilidad pura vs conviccion para jugar la quiniela</h2>"
+        "<p class=\"lede-tight\">Aqui potenciamos la decision sin maquillar la probabilidad: cruzamos la prediccion base con fuerza estructural FIFA/Elo/squad/historia, acuerdo entre modelos, mercado y riesgo de empate.</p>"
+        "<p class=\"meta\">La conviccion reforzada no es una probabilidad de que ocurra el resultado; es un indice de decision para ordenar el boleto y saber donde puedes jugar mas firme.</p>"
+        "</div></div>"
+        "<div class=\"confidence-tiles\">"
+        f"{tile('Conviccion reforzada media', format_pct(float(metrics['avg_conviction'])), 'Indice de decision, no probabilidad pura.')}"
+        f"{tile('Picks de potencia alta', str(int(metrics['high_power'])) + '/' + str(int(metrics['total'])), 'Candidatos a columna vertebral del boleto.')}"
+        f"{tile('Fuerza estructural media', format_pct(float(metrics['avg_structural'])), 'FIFA, Elo, squad, historia y recursos.')}"
+        f"{tile('Watchlist de riesgo', str(int(metrics['watchlist'])), 'Partidos que no conviene vender como fijos.')}"
+        "</div>"
+        "<div class=\"certainty-grid power-grid\">"
+        "<article><h3>Picks mas potenciados</h3><ul>"
+        f"{rows(strongest, 'Sin picks potenciados')}"
+        "</ul></article>"
+        "<article><h3>No forzar como fijo</h3><ul>"
+        f"{rows(caution, 'Sin watchlist')}"
+        "</ul></article>"
+        "</div>"
+        "</section>"
+    )
+
+
+def agentic_learning_items() -> List[dict]:
+    return [
+        {
+            "agent": "Agente de ingesta",
+            "job": "Lee fixtures, estado del partido, mercado, noticias, bajas, alineaciones y proveedor live cuando exista.",
+            "learns": "No inventa datos: solo convierte fuentes disponibles en senales trazables.",
+        },
+        {
+            "agent": "Agente de senales",
+            "job": "Traduce cada dato a variables futbolisticas: disponibilidad, forma, fatiga, tarjetas, momentum, tiros, ocasiones y riesgo de empate.",
+            "learns": "Si un evento cambia el partido, ajusta goles restantes, probabilidad de resultado y marcador exacto.",
+        },
+        {
+            "agent": "Agente predictivo",
+            "job": "Combina Poisson/Dixon-Coles, Elo/FIFA, ensamble ligero, consenso externo y Monte Carlo de torneo.",
+            "learns": "Cuando cambia un resultado, recalcula grupos, cruces, llave, campeon y boletos recomendados.",
+        },
+        {
+            "agent": "Agente de calibracion",
+            "job": "Mide Brier, log-loss, buckets de confianza y backtesting temporal.",
+            "learns": "Baja la agresividad si el modelo esta sobreconfiado y sube cobertura si los modelos discrepan.",
+        },
+        {
+            "agent": "Agente de quiniela",
+            "job": "Convierte probabilidades en decisiones: pick base, marcador principal, segunda opcion y cobertura.",
+            "learns": "Optimiza contra un boleto popular estimado para buscar ventaja relativa, no solo acierto bruto.",
+        },
+        {
+            "agent": "Agente auditor",
+            "job": "Bloquea publicacion si faltan 15.000 simulaciones, llave coherente, consenso, goles, auditoria o refresh de 5 minutos.",
+            "learns": "Cada falla deja una regla verificable para que el pipeline no publique una version incompleta.",
+        },
+    ]
+
+
+def sports_news_source_policy_items() -> List[dict]:
+    return [
+        {
+            "source": "ESPN / scoreboard publico",
+            "use": "Base de calendario, estado y resultado cuando no hay feed mas profundo.",
+        },
+        {
+            "source": "FIFA Match Centre / datos oficiales",
+            "use": "Confirmacion de partido, sedes, plantillas, sanciones, XI y eventos oficiales si el feed esta disponible.",
+        },
+        {
+            "source": "Reuters / AP / BBC / Sky / The Athletic / Guardian",
+            "use": "Noticias confirmadas, bajas, lesiones, decisiones tecnicas y contexto prepartido.",
+        },
+        {
+            "source": "Federaciones, clubes y cuentas oficiales",
+            "use": "Validacion de lesionados, convocatorias, suspensiones y cambios de portero o once.",
+        },
+        {
+            "source": "Proveedor live profundo",
+            "use": "Tiros, tiros al arco, calidad de ocasion, corners, rojas, sustituciones, xG live y secuencia minuto a minuto.",
+        },
+    ]
+
+
+def build_agentic_learning_markdown(entries: Sequence[dict], bracket_payload: dict, backtest: dict) -> List[str]:
+    fixture_entries = [entry for entry in entries if not entry.get("projection")]
+    final_count = sum(1 for entry in fixture_entries if fixture_is_final(entry))
+    live_count = sum(1 for entry in fixture_entries if fixture_is_live(entry))
+    iterations = int(bracket_payload.get("iterations", 0) or 0)
+    lines = [
+        "### Agentes de aprendizaje",
+        "- Lectura: esto no es un chatbot generando opiniones. Es un pipeline de agentes que ingiere datos, los transforma en senales, predice, calibra, decide y audita.",
+        f"- Monte Carlo vigente: {iterations:,} simulaciones por corrida.".replace(",", "."),
+        f"- Aprendizaje real disponible hoy: {final_count} partidos finalizados y {live_count} en vivo dentro del fixture cargado.",
+        f"- Backtesting/calibracion: {int(backtest.get('completed_matches', 0) or 0)} partidos cerrados reconstruidos.",
+        "- Noticias multi-fuente: no depende solo de ESPN; ESPN puede ser fuente base, pero el modelo acepta fuentes oficiales, prensa internacional, mercado y proveedor live profundo.",
+    ]
+    for item in agentic_learning_items():
+        lines.append(f"- {item['agent']}: {item['job']} {item['learns']}")
+    return lines
+
+
+def build_agentic_learning_html(entries: Sequence[dict], bracket_payload: dict, backtest: dict) -> str:
+    fixture_entries = [entry for entry in entries if not entry.get("projection")]
+    live_count = sum(1 for entry in fixture_entries if fixture_is_live(entry))
+    final_count = sum(1 for entry in fixture_entries if fixture_is_final(entry))
+    projected_count = sum(1 for entry in entries if entry.get("projection"))
+    iterations = int(bracket_payload.get("iterations", 0) or 0)
+    iterations_label = f"{iterations:,}".replace(",", ".") if iterations else "sin dato"
+    completed = int(backtest.get("completed_matches", 0) or 0)
+    live_sources = sorted({str(entry.get("source")) for entry in fixture_entries if entry.get("source")})
+    deep_sources = sorted({str(entry.get("live_feed_provider")) for entry in fixture_entries if entry.get("live_feed_provider")})
+    source_label = " + ".join(deep_sources or live_sources or ["feed base publico"])
+
+    def tile(label: str, value: str, note: str) -> str:
+        return (
+            "<div class=\"summary-tile\">"
+            f"<span>{html.escape(label)}</span><strong>{html.escape(value)}</strong><small>{html.escape(note)}</small>"
+            "</div>"
+        )
+
+    agent_rows = "".join(
+        "<li>"
+        f"<strong>{html.escape(str(item['agent']))}</strong>"
+        f"<span>{html.escape(str(item['job']))}</span>"
+        f"<em>{html.escape(str(item['learns']))}</em>"
+        "</li>"
+        for item in agentic_learning_items()
+    )
+    source_rows = "".join(
+        "<li>"
+        f"<strong>{html.escape(str(item['source']))}</strong>"
+        f"<span>{html.escape(str(item['use']))}</span>"
+        "</li>"
+        for item in sports_news_source_policy_items()
+    )
+    return (
+        "<section class=\"panel agentic-panel\">"
+        "<div class=\"panel-head\"><div>"
+        "<p class=\"eyebrow\">IA operacional</p>"
+        "<h2>Agentes de aprendizaje, no solo texto generativo</h2>"
+        "<p class=\"lede-tight\">El modelo aprende de si mismo en sentido operativo: cada resultado real, baja confirmada, cambio de mercado o evento live se convierte en estado, calibracion y nuevas probabilidades. No inventa noticias; las exige como fuente trazable.</p>"
+        "</div></div>"
+        "<div class=\"confidence-tiles\">"
+        f"{tile('Monte Carlo activo', iterations_label + ' simulaciones', 'La auditoria exige al menos 15.000 por corrida.')}"
+        f"{tile('Eficiencia operativa', 'apto para 5 min', 'Cache, ensamble ligero y auditoria automatica para refrescar sin esperar horas.')}"
+        f"{tile('Datos ya incorporados', f'{final_count} final / {live_count} live', f'Ademas {projected_count} cruces de llave recalculables.')}"
+        f"{tile('Noticias multi-fuente', 'No solo ESPN', f'Fuente activa visible: {source_label}.')}"
+        "</div>"
+        "<div class=\"certainty-grid agentic-grid\">"
+        "<article><h3>Como aprende el sistema</h3><ul>"
+        f"{agent_rows}"
+        "</ul></article>"
+        "<article><h3>Fuentes deportivas aceptadas</h3><ul>"
+        f"{source_rows}"
+        "</ul></article>"
+        "<article><h3>Que tan eficiente es</h3><ul>"
+        f"<li><strong>15.000 simulaciones</strong><span>La llave se calcula con rutas completas de torneo, no solo favoritos sueltos.</span><em>Mas iteraciones reducen ruido Monte Carlo; no convierten un pick incierto en seguro.</em></li>"
+        f"<li><strong>Refresh cada 5 minutos</strong><span>GitHub Actions reconstruye la web y recalcula in-play cuando el feed trae cambios.</span><em>Si hay live profundo, cambian tiros, goles restantes, marcadores y probabilidades.</em></li>"
+        f"<li><strong>Calibracion acumulada</strong><span>{completed} partidos cerrados disponibles para backtesting en este corte.</span><em>Cuando crece la muestra, el agente de calibracion ajusta confianza y coberturas.</em></li>"
+        "</ul></article>"
         "</div>"
         "</section>"
     )
@@ -5319,6 +5681,10 @@ def build_dashboard_markdown(
     lines.extend(build_quiniela_strategy_markdown(entries))
     lines.extend(["", "## Calibracion avanzada y limites de confianza", ""])
     lines.extend(build_calibration_depth_markdown(entries, backtest))
+    lines.extend(["", "## Prediccion potenciada", ""])
+    lines.extend(build_prediction_power_markdown(entries))
+    lines.extend(["", "## Agentes de aprendizaje y fuentes", ""])
+    lines.extend(build_agentic_learning_markdown(entries, bracket_payload, backtest))
     lines.extend(["", "## Ajustes contra consenso externo", ""])
     lines.extend(build_consensus_guardrail_markdown(bracket_payload, entries))
     lines.extend(["", "## Que cambio desde la ultima actualizacion", ""])
@@ -6852,7 +7218,7 @@ def build_landing_proof_html(entries: Sequence[dict], bracket_payload: dict, bac
         ),
         (
             "Decision de quiniela",
-            "Separa picks firmes, partidos trampa, marcadores defendibles y coberturas. No fuerza una falsa certeza del 90%.",
+            "Separa picks base, partidos cerrados, marcadores defendibles y coberturas. No fuerza una falsa certeza del 90%.",
             "ok",
         ),
         (
@@ -7158,6 +7524,8 @@ def build_dashboard_html(
     runtime_status_html = build_runtime_status_html(entries, bracket_payload)
     methodology_html = build_methodology_html(bracket_payload, backtest, entries)
     calibration_depth_html = build_calibration_depth_html(entries, backtest)
+    prediction_power_html = build_prediction_power_html(entries)
+    agentic_learning_html = build_agentic_learning_html(entries, bracket_payload, backtest)
     global_confidence_html = build_global_confidence_html(entries)
     max_certainty_html = build_max_certainty_html(entries)
     strategy_html = build_quiniela_strategy_html(entries)
@@ -7179,6 +7547,8 @@ def build_dashboard_html(
             "runtime_status_html": runtime_status_html,
             "methodology_html": methodology_html,
             "calibration_depth_html": calibration_depth_html,
+            "prediction_power_html": prediction_power_html,
+            "agentic_learning_html": agentic_learning_html,
             "global_confidence_html": global_confidence_html,
             "max_certainty_html": max_certainty_html,
             "strategy_html": strategy_html,
@@ -7429,11 +7799,11 @@ def audit_dashboard_html(dashboard_html: str) -> List[str]:
         "Ventaja vs boleto popular",
         "Diferenciales positivos",
         "Cobertura recomendada",
-        "Marcadores exactos top-1 esperados",
+        "Marcador exacto principal",
         "certainty-panel",
         "Auditoria del boleto",
-        "Picks firmes o preferentes",
-        "Partidos trampa o alta varianza",
+        "Picks base o principales",
+        "Partidos cerrados o de riesgo alto",
         "Marcadores exactos defendibles",
         "Brecha minima contra la segunda opcion",
         "Checklist de auditoria",
@@ -7452,6 +7822,15 @@ def audit_dashboard_html(dashboard_html: str) -> List[str]:
         "Desacuerdo entre modelos",
         "Backtesting por buckets",
         "Limite de confianza operativa",
+        "Prediccion potenciada",
+        "Probabilidad pura vs conviccion",
+        "Conviccion reforzada media",
+        "Fuerza estructural media",
+        "Watchlist de riesgo",
+        "Agentes de aprendizaje",
+        "Noticias multi-fuente",
+        "No solo ESPN",
+        "Eficiencia operativa",
         "Semaforo metodologico",
         "Control de calidad del pronostico",
         "Pronóstico de goles",

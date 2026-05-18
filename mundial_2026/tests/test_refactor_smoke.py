@@ -174,9 +174,11 @@ class RefactorSmokeTest(unittest.TestCase):
                 "runtime_status_html": "",
                 "methodology_html": "",
                 "calibration_depth_html": "<section class=\"calibration-panel\"><h2>Como evitamos que el modelo se sobreconfie</h2></section>",
+                "prediction_power_html": "<section class=\"power-panel\"><h2>Probabilidad pura vs conviccion</h2></section>",
+                "agentic_learning_html": "<section class=\"agentic-panel\"><h2>Agentes de aprendizaje</h2><p>Noticias multi-fuente</p></section>",
                 "global_confidence_html": "",
                 "max_certainty_html": "<section class=\"certainty-panel\"><h2>Hoja de máxima certeza</h2></section>",
-                "strategy_html": "<section class=\"strategy-panel\"><h2>Estrategia para ganar la quiniela</h2><p>Ventaja vs boleto popular</p><p>Diferenciales positivos</p><p>Cobertura recomendada</p><p>Marcadores exactos top-1 esperados</p></section>",
+                "strategy_html": "<section class=\"strategy-panel\"><h2>Estrategia para ganar la quiniela</h2><p>Ventaja vs boleto popular</p><p>Diferenciales positivos</p><p>Cobertura recomendada</p><p>Marcador exacto principal</p></section>",
                 "recent_changes_html": "",
                 "backtesting_html": "",
                 "bracket_visual_html": "",
@@ -196,6 +198,8 @@ class RefactorSmokeTest(unittest.TestCase):
         self.assertNotIn("Partidos modelados: 72 de fase de grupos", html)
         self.assertIn('<section class="landing-proof">', html)
         self.assertIn('<section class="calibration-panel">', html)
+        self.assertIn('<section class="power-panel">', html)
+        self.assertIn('<section class="agentic-panel">', html)
         self.assertIn('<section class="certainty-panel">', html)
         self.assertIn('<section class="strategy-panel">', html)
         self.assertIn("Estrategia para ganar la quiniela", html)
