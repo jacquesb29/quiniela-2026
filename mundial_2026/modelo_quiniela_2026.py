@@ -4601,8 +4601,11 @@ def quiniela_strategy_profile(entry: dict) -> dict:
         strategy_tier = "Diferencial positivo"
         strategy_action = "Usarlo para sacar ventaja si otros siguen el favorito popular."
     elif second_edge >= 0.035 and second_prob >= 0.26 and float(base["gap"]) <= 0.12:
-        strategy_tier = "Cobertura inteligente"
-        strategy_action = f"Considerar cobertura con {base['second_label']} si el formato permite doble opcion."
+        strategy_tier = "Cubrir si puedes"
+        strategy_action = (
+            f"Pick base: {base['pick_label']}. Si tu quiniela permite marcar dos resultados, "
+            f"agrega tambien {base['second_label']}. Si solo permite uno, usa el pick base pero no lo trates como fijo."
+        )
     elif float(base["gap"]) < 0.08 or float(base["pick_prob"]) < 0.48:
         strategy_tier = "Alta varianza"
         strategy_action = "No gastar aqui un diferencial heroico; cubrir o aceptar riesgo."
@@ -4655,11 +4658,11 @@ def quiniela_strategy_metrics(strategy_profiles: Sequence[dict]) -> dict:
     )
     variance_sd = math.sqrt(sum(float(item["pick_prob"]) * (1.0 - float(item["pick_prob"])) for item in strategy_profiles))
     differentials = sum(1 for item in strategy_profiles if item["strategy_tier"] == "Diferencial positivo")
-    coverage_min = sum(1 for item in strategy_profiles if item["strategy_tier"] in {"Cobertura inteligente", "Alta varianza"})
+    coverage_min = sum(1 for item in strategy_profiles if item["strategy_tier"] in {"Cubrir si puedes", "Alta varianza"})
     coverage_recommended = sum(
         1
         for item in strategy_profiles
-        if item["strategy_tier"] in {"Cobertura inteligente", "Alta varianza"}
+        if item["strategy_tier"] in {"Cubrir si puedes", "Alta varianza"}
         or float(item["pick_prob"]) < 0.62
         or float(item["gap"]) < 0.14
         or (float(item["second_prob"]) >= 0.25 and float(item["second_edge"]) >= 0.005)
@@ -4667,7 +4670,7 @@ def quiniela_strategy_metrics(strategy_profiles: Sequence[dict]) -> dict:
     coverage_aggressive = sum(
         1
         for item in strategy_profiles
-        if item["strategy_tier"] in {"Cobertura inteligente", "Alta varianza"}
+        if item["strategy_tier"] in {"Cubrir si puedes", "Alta varianza"}
         or float(item["pick_prob"]) < 0.70
         or float(item["gap"]) < 0.20
         or float(item["second_prob"]) >= 0.22
@@ -4702,7 +4705,7 @@ def build_quiniela_strategy_markdown(entries: Sequence[dict]) -> List[str]:
         reverse=True,
     )[:10]
     coverage = sorted(
-        [item for item in profiles if item["strategy_tier"] in {"Cobertura inteligente", "Alta varianza"}],
+        [item for item in profiles if item["strategy_tier"] in {"Cubrir si puedes", "Alta varianza"}],
         key=lambda item: (item["gap"], -item["second_edge"]),
     )[:10]
     lines = [
@@ -4754,7 +4757,7 @@ def build_quiniela_strategy_html(entries: Sequence[dict]) -> str:
         [
             item
             for item in profiles
-            if item["strategy_tier"] in {"Cobertura inteligente", "Alta varianza"}
+            if item["strategy_tier"] in {"Cubrir si puedes", "Alta varianza"}
             or float(item["pick_prob"]) < 0.62
             or float(item["gap"]) < 0.14
             or (float(item["second_prob"]) >= 0.25 and float(item["second_edge"]) >= 0.005)
