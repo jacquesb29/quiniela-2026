@@ -13,6 +13,7 @@ from worldcup2026.cli import build_parser
 from worldcup2026.live.adjustment import live_game_state_adjustment
 from worldcup2026.live.patterns import detect_live_play_patterns
 from worldcup2026.data.loader import load_tournament_config, read_fixtures
+from worldcup2026.dashboard.comparison import compare_entry_predictions as compare_dashboard_entry_predictions
 from worldcup2026.dashboard.html_builder import render_dashboard_html
 import modelo_quiniela_2026 as app
 
@@ -194,6 +195,38 @@ class RefactorSmokeTest(unittest.TestCase):
         self.assertIn('<section class="landing-proof">', html)
         self.assertIn('<section class="certainty-panel">', html)
         self.assertNotIn("&lt;section class=&quot;certainty-panel&quot;&gt;", html)
+
+    def test_recent_change_comparison_does_not_mix_changed_matchups_as_pick_moves(self):
+        previous_entries = [
+            {
+                "match_id": "M96",
+                "title": "Dieciseisavos 16: Turkey vs Iran",
+                "team_a": "Turkey",
+                "team_b": "Iran",
+                "prediction": {"label": "Victoria Turkey", "prob": 0.615, "score": "2-0"},
+            }
+        ]
+        current_entries = [
+            {
+                "match_id": "M96",
+                "title": "Dieciseisavos 16: Paraguay vs Iran",
+                "team_a": "Paraguay",
+                "team_b": "Iran",
+                "prediction": {"label": "Victoria Paraguay", "prob": 0.459, "score": "1-1"},
+            }
+        ]
+        changes = compare_dashboard_entry_predictions(
+            current_entries,
+            previous_entries,
+            dashboard_entry_key=lambda entry: entry["match_id"],
+            pick_summary=lambda prediction: (prediction["label"], prediction["prob"]),
+            projected_score_value=lambda prediction: prediction["score"],
+        )
+        self.assertEqual(changes["movers"], [])
+        self.assertEqual(changes["score_changes"], [])
+        self.assertEqual(changes["label_changes"], [])
+        self.assertEqual(changes["matchup_changes"][0]["previous_matchup"], "Turkey vs Iran")
+        self.assertEqual(changes["matchup_changes"][0]["current_matchup"], "Paraguay vs Iran")
 
     def test_bracket_visual_keeps_branch_coherent(self):
         payload = {

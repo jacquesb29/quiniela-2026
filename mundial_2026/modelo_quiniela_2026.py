@@ -3833,18 +3833,27 @@ def build_recent_changes_markdown(
     if previous_updated_at:
         lines.append(f"- Comparado contra la publicacion anterior de: {previous_updated_at}")
     lines.append(
-        "- Esta seccion muestra solo movimientos reales frente a la version anterior ya publicada: picks que cambiaron, marcadores nuevos y cruces que entran o salen de la llave principal."
+        "- Esta seccion separa dos cosas distintas: cambios de cruce proyectado y cambios de probabilidad dentro del mismo partido. Solo compara picks cuando los dos equipos son los mismos; si cambia el cruce, aparece como cambio de llave, no como movimiento de probabilidad."
     )
+    combined_matchup_changes = []
+    seen_matchup_changes = set()
+    for item in list(bracket_changes["matchup_changes"]) + list(entry_changes.get("matchup_changes", [])):
+        key = (item.get("title"), item.get("previous_matchup"), item.get("current_matchup"))
+        if key in seen_matchup_changes:
+            continue
+        seen_matchup_changes.add(key)
+        combined_matchup_changes.append(item)
     if bracket_changes["new_teams"]:
         lines.append("- Equipos que entran en la ruta principal de la llave: " + "; ".join(bracket_changes["new_teams"]))
     if bracket_changes["dropped_teams"]:
         lines.append("- Equipos que salen de la ruta principal de la llave: " + "; ".join(bracket_changes["dropped_teams"]))
-    if bracket_changes["matchup_changes"]:
+    if combined_matchup_changes:
         lines.append(
             "- Cruces principales que cambiaron: "
             + "; ".join(
-                f"{item['title']}: {item['previous_matchup']} -> {item['current_matchup']} ({format_pct(item['current_prob'])})"
-                for item in bracket_changes["matchup_changes"]
+                f"{item['title']}: antes {item['previous_matchup']} -> ahora {item['current_matchup']}"
+                + (f" ({format_pct(item['current_prob'])})" if item.get("current_prob") is not None else "")
+                for item in combined_matchup_changes
             )
         )
     if bracket_changes["favorite_flips"]:
@@ -3857,7 +3866,7 @@ def build_recent_changes_markdown(
         )
     if entry_changes["movers"]:
         lines.append(
-            "- Partidos donde mas se movio el pick principal: "
+            "- Partidos comparables donde mas se movio el pick principal: "
             + "; ".join(
                 f"{item['title']}: {item['previous_label']} {format_pct(item['previous_prob'])} -> {item['current_label']} {format_pct(item['current_prob'])}"
                 for item in entry_changes["movers"]
@@ -3896,11 +3905,20 @@ def build_recent_changes_html(
             "<section class=\"panel changes-panel\">"
             "<div class=\"panel-head\"><div><p class=\"eyebrow\">Comparativo</p><h2>Que cambio desde la ultima actualizacion</h2>"
             "<p class=\"lede-tight\">Todavia no hay una publicacion anterior comparable para resumir movimientos del tablero.</p>"
+            "<p class=\"meta\">Regla de lectura: Solo compara partidos con los mismos dos equipos. Si cambia el cruce proyectado, se reporta como cambio de llave, no como movimiento de probabilidad.</p>"
             "</div></div></section>"
         )
 
     entry_changes = compare_entry_predictions(current_entries, previous_entries)
     bracket_changes = compare_bracket_payloads(current_bracket, previous_bracket)
+    combined_matchup_changes = []
+    seen_matchup_changes = set()
+    for item in list(bracket_changes["matchup_changes"]) + list(entry_changes.get("matchup_changes", [])):
+        key = (item.get("title"), item.get("previous_matchup"), item.get("current_matchup"))
+        if key in seen_matchup_changes:
+            continue
+        seen_matchup_changes.add(key)
+        combined_matchup_changes.append(item)
 
     def text_list(items: Sequence[str]) -> str:
         return "".join(f"<li><strong>{html.escape(item)}</strong></li>" for item in items)
@@ -3915,13 +3933,20 @@ def build_recent_changes_html(
         "<article><h3>Cruces principales que cambiaron</h3><ul>"
         + (
             detailed_rows(
-                bracket_changes["matchup_changes"],
+                combined_matchup_changes,
                 lambda row: (
                     row["title"],
-                    f"{row['previous_matchup']} -> {row['current_matchup']} | este cruce ahora aparece {format_pct(row['current_prob'])}",
+                    "Antes: "
+                    f"{row['previous_matchup']} | Ahora: {row['current_matchup']}"
+                    + (
+                        f" | El nuevo cruce aparece {format_pct(row['current_prob'])}"
+                        if row.get("current_prob") is not None
+                        else ""
+                    )
+                    + ". No se compara la probabilidad del pick porque cambiaron los equipos.",
                 ),
             )
-            if bracket_changes["matchup_changes"]
+            if combined_matchup_changes
             else "<li><strong>Sin cambios grandes</strong><span>La ruta principal del cuadro se mantiene respecto de la version anterior.</span></li>"
         )
         + "</ul></article>"
@@ -3937,7 +3962,7 @@ def build_recent_changes_html(
         + "</ul></article>"
     )
     movers_html = (
-        "<article><h3>Partidos donde mas se movio el pick</h3><ul>"
+        "<article><h3>Partidos comparables donde mas se movio el pick</h3><ul>"
         + (
             detailed_rows(
                 entry_changes["movers"],
@@ -3947,7 +3972,7 @@ def build_recent_changes_html(
                 ),
             )
             if entry_changes["movers"]
-            else "<li><strong>Sin cambios detectables</strong><span>Los picks principales siguen practicamente iguales que en la ultima publicacion.</span></li>"
+            else "<li><strong>Sin cambios detectables</strong><span>En los partidos con los mismos dos equipos, los picks principales siguen practicamente iguales que en la ultima publicacion.</span></li>"
         )
         + "</ul></article>"
     )
@@ -3995,11 +4020,11 @@ def build_recent_changes_html(
     changes_chart_html = render_chart_grid(
         [
             render_rank_chart(
-                "Mayores movimientos del pick principal",
+                "Mayores movimientos del pick principal comparable",
                 movers_chart_rows,
                 tone="rose",
-                description="Cuanto se movio el resultado principal frente a la publicacion anterior. El valor muestra el cambio absoluto de probabilidad, no la probabilidad final del partido.",
-                empty_body="Todavia no hubo un movimiento material del pick principal frente a la version anterior.",
+                description="Solo compara partidos con los mismos dos equipos. Si cambio el cruce proyectado, aparece en 'Cruces principales que cambiaron' y no aqui. El valor muestra el cambio absoluto de probabilidad, no la probabilidad final del partido.",
+                empty_body="Todavia no hubo un movimiento material del pick principal en partidos comparables frente a la version anterior.",
             )
         ]
     )
@@ -4007,7 +4032,8 @@ def build_recent_changes_html(
     return (
         "<section class=\"panel changes-panel\">"
         "<div class=\"panel-head\"><div><p class=\"eyebrow\">Comparativo</p><h2>Que cambio desde la ultima actualizacion</h2>"
-        "<p class=\"lede-tight\">Este bloque resume solo movimientos reales respecto de la version anterior ya publicada, para que se note rapido si el tablero se movio poco o mucho.</p>"
+        "<p class=\"lede-tight\">Este bloque separa cambios de llave y cambios de probabilidad. Si cambia el cruce proyectado, no se compara como si fuera el mismo partido.</p>"
+        "<p class=\"meta\">Regla de lectura: solo compara partidos con los mismos dos equipos. Si antes era Turkey vs Iran y ahora Paraguay vs Iran, eso es un cambio de cruce, no una caida/subida del pick de Paraguay.</p>"
         f"{compared_html}"
         "</div></div>"
         f"{changes_chart_html}"
@@ -6883,6 +6909,8 @@ def audit_dashboard_html(dashboard_html: str) -> List[str]:
         "actualiza llave, picks, goles y marcadores",
         "Partidos totales del Mundial 2026",
         "No son 72 en total",
+        "Solo compara partidos con los mismos dos equipos",
+        "Si cambia el cruce proyectado",
         "certainty-panel",
         "Auditoria del boleto",
         "Picks firmes o preferentes",

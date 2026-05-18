@@ -6,16 +6,35 @@ def compare_entry_predictions(current_entries, previous_entries, *, dashboard_en
     movers = []
     score_changes = []
     label_changes = []
+    matchup_changes = []
+
+    def matchup_text(entry):
+        return f"{entry.get('team_a', '?')} vs {entry.get('team_b', '?')}"
+
     for current in current_entries:
         previous = previous_map.get(dashboard_entry_key(current))
         if not previous:
+            continue
+        title = str(current.get("title", "Partido"))
+        same_matchup = current.get("team_a") == previous.get("team_a") and current.get("team_b") == previous.get("team_b")
+        if not same_matchup:
+            current_label, current_prob = pick_summary(current["prediction"])
+            matchup_changes.append(
+                {
+                    "title": title,
+                    "previous_title": str(previous.get("title", "Partido")),
+                    "previous_matchup": matchup_text(previous),
+                    "current_matchup": matchup_text(current),
+                    "current_label": current_label,
+                    "current_prob": float(current_prob),
+                }
+            )
             continue
         current_prediction = current["prediction"]
         previous_prediction = previous["prediction"]
         current_label, current_prob = pick_summary(current_prediction)
         previous_label, previous_prob = pick_summary(previous_prediction)
         delta = float(current_prob) - float(previous_prob)
-        title = str(current.get("title", "Partido"))
         abs_delta = abs(delta)
         if abs_delta >= 0.005 or previous_label != current_label:
             movers.append(
@@ -52,6 +71,7 @@ def compare_entry_predictions(current_entries, previous_entries, *, dashboard_en
         "movers": movers[:6],
         "score_changes": score_changes[:6],
         "label_changes": label_changes[:6],
+        "matchup_changes": matchup_changes[:8],
     }
 
 
