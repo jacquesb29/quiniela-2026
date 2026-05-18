@@ -5125,6 +5125,172 @@ def build_consensus_guardrail_html(bracket_payload: dict, entries: Optional[Sequ
     )
 
 
+def calibration_depth_metrics(entries: Sequence[dict], backtest: dict) -> dict:
+    fixture_entries = [entry for entry in entries if not entry.get("projection")]
+    agreements = [
+        float((entry.get("prediction").statistical_depth or {}).get("model_agreement"))
+        for entry in fixture_entries
+        if entry.get("prediction")
+        and (entry.get("prediction").statistical_depth or {}).get("model_agreement") is not None
+    ]
+    market_gaps = [
+        abs(float((entry.get("prediction").statistical_depth or {}).get("market_gap")))
+        for entry in fixture_entries
+        if entry.get("prediction")
+        and (entry.get("prediction").statistical_depth or {}).get("market_gap") is not None
+    ]
+    completed = int(backtest.get("completed_matches", 0) or 0)
+    reliability = backtest.get("brier_reliability")
+    temporal_accuracy = backtest.get("temporal_cv_accuracy")
+    buckets = backtest.get("calibration_buckets") or []
+    avg_agreement = sum(agreements) / len(agreements) if agreements else None
+    avg_market_gap = sum(market_gaps) / len(market_gaps) if market_gaps else None
+    if completed >= 20 and reliability is not None:
+        calibration_state = "Activa con muestra"
+        calibration_action = "Usar Brier, log-loss y buckets para ajustar confianza operativa."
+    elif completed > 0:
+        calibration_state = "Muestra chica"
+        calibration_action = "Leer resultados como senal temprana; no sobreajustar todavia."
+    else:
+        calibration_state = "Pretorneo"
+        calibration_action = "Usar shrinkage, consenso externo y desacuerdo de modelos hasta que haya resultados reales."
+    if reliability is not None and float(reliability) > 0.035:
+        confidence_rule = "Bajar agresividad: el modelo esta mostrando error de calibracion."
+    elif avg_agreement is not None and avg_agreement < 0.56:
+        confidence_rule = "Bajar picks heroicos: los modelos internos discrepan."
+    else:
+        confidence_rule = "Mantener picks base, pero cubrir partidos con brecha pequena."
+    return {
+        "completed": completed,
+        "regular_samples": int(backtest.get("regular_time_samples", 0) or 0),
+        "buckets": len(buckets),
+        "reliability": reliability,
+        "temporal_accuracy": temporal_accuracy,
+        "avg_agreement": avg_agreement,
+        "avg_market_gap": avg_market_gap,
+        "calibration_state": calibration_state,
+        "calibration_action": calibration_action,
+        "confidence_rule": confidence_rule,
+    }
+
+
+def calibration_depth_items(metrics: dict) -> List[dict]:
+    return [
+        {
+            "label": "Shrinkage bayesiano",
+            "status": "Activo",
+            "detail": "Reduce el peso de muestras pequenas: historia, forma y rendimiento por confederacion no dominan si hay poca evidencia.",
+        },
+        {
+            "label": "Desacuerdo entre modelos",
+            "status": "Activo" if metrics["avg_agreement"] is not None else "Preparado",
+            "detail": (
+                f"Coincidencia interna media {format_pct(float(metrics['avg_agreement']))}; si baja, se reduce la confianza del pick."
+                if metrics["avg_agreement"] is not None
+                else "Se activara cuando todos los partidos tengan stack de modelos comparable."
+            ),
+        },
+        {
+            "label": "Mercado y consenso",
+            "status": "Activo",
+            "detail": (
+                f"Brecha media vs mercado {format_pct(float(metrics['avg_market_gap']))}; se usa como ancla suave, no como reemplazo del modelo."
+                if metrics["avg_market_gap"] is not None
+                else "Consenso de campeon activo; lineas de goles entran cuando el feed las traiga."
+            ),
+        },
+        {
+            "label": "Backtesting por buckets",
+            "status": "Activo" if metrics["buckets"] else "Esperando partidos",
+            "detail": (
+                f"{metrics['buckets']} tramos de confianza medidos con {metrics['regular_samples']} partidos comparables."
+                if metrics["buckets"]
+                else "Cuando haya partidos cerrados, comparara confianza prometida contra acierto real."
+            ),
+        },
+        {
+            "label": "Limite de confianza operativa",
+            "status": "Activo",
+            "detail": metrics["confidence_rule"],
+        },
+    ]
+
+
+def build_calibration_depth_markdown(entries: Sequence[dict], backtest: dict) -> List[str]:
+    metrics = calibration_depth_metrics(entries, backtest)
+    lines = [
+        f"- Estado: {metrics['calibration_state']}. {metrics['calibration_action']}",
+        f"- Partidos cerrados para calibrar: {metrics['completed']} | muestra 90 minutos: {metrics['regular_samples']}.",
+    ]
+    if metrics["reliability"] is not None:
+        lines.append(f"- Brier calibracion/reliability: {float(metrics['reliability']):.3f}. Menor es mejor.")
+    if metrics["temporal_accuracy"] is not None:
+        lines.append(f"- Acierto temporal por ventanas: {format_pct(float(metrics['temporal_accuracy']))}.")
+    for item in calibration_depth_items(metrics):
+        lines.append(f"- {item['label']}: {item['status']} | {item['detail']}")
+    return lines
+
+
+def build_calibration_depth_html(entries: Sequence[dict], backtest: dict) -> str:
+    metrics = calibration_depth_metrics(entries, backtest)
+
+    def tile(label: str, value: str, note: str = "") -> str:
+        note_html = f"<small>{html.escape(note)}</small>" if note else ""
+        return (
+            "<div class=\"summary-tile\">"
+            f"<span>{html.escape(label)}</span><strong>{html.escape(value)}</strong>{note_html}"
+            "</div>"
+        )
+
+    items = calibration_depth_items(metrics)
+    rows = "".join(
+        "<article class=\"method-quality-card\">"
+        f"<span class=\"method-status {'ok' if item['status'] == 'Activo' else 'neutral'}\">{html.escape(str(item['status']))}</span>"
+        f"<h3>{html.escape(str(item['label']))}</h3>"
+        f"<p>{html.escape(str(item['detail']))}</p>"
+        "</article>"
+        for item in items
+    )
+    reliability_value = (
+        f"{float(metrics['reliability']):.3f}"
+        if metrics["reliability"] is not None
+        else "sin muestra"
+    )
+    agreement_value = (
+        format_pct(float(metrics["avg_agreement"]))
+        if metrics["avg_agreement"] is not None
+        else "pendiente"
+    )
+    temporal_value = (
+        format_pct(float(metrics["temporal_accuracy"]))
+        if metrics["temporal_accuracy"] is not None
+        else "pendiente"
+    )
+    return (
+        "<section class=\"panel calibration-panel\">"
+        "<div class=\"panel-head\"><div>"
+        "<p class=\"eyebrow\">Calibracion avanzada</p>"
+        "<h2>Como evitamos que el modelo se sobreconfie</h2>"
+        "<p class=\"lede-tight\">Profundizar la metodologia si vale la pena, pero solo si se traduce en mejores decisiones de quiniela. Esta capa muestra los frenos estadisticos que corrigen probabilidades extremas y separan pick fuerte de partido trampa.</p>"
+        "</div></div>"
+        "<div class=\"confidence-tiles\">"
+        f"{tile('Estado de calibracion', str(metrics['calibration_state']), str(metrics['calibration_action']))}"
+        f"{tile('Brier calibracion', reliability_value, 'Menor es mejor; mide si las probabilidades prometidas se cumplen.')}"
+        f"{tile('Coincidencia entre modelos', agreement_value, 'Si baja, el boleto debe cubrir mas partidos.')}"
+        f"{tile('Acierto por ventanas', temporal_value, 'Walk-forward temporal cuando haya resultados reales.')}"
+        "</div>"
+        "<div class=\"method-quality calibration-quality\">"
+        "<div class=\"method-quality-head\">"
+        "<p class=\"eyebrow\">Controles activos</p>"
+        "<h3>Calibraciones que si cambian la forma de decidir</h3>"
+        "<p>No fuerzan una confianza artificial de 90%: reducen sobreconfianza, activan cobertura y hacen que el modelo aprenda con resultados reales.</p>"
+        "</div>"
+        f"<div class=\"method-quality-grid\">{rows}</div>"
+        "</div>"
+        "</section>"
+    )
+
+
 def build_dashboard_markdown(
     entries: Sequence[dict],
     bracket_text: str,
@@ -5151,6 +5317,8 @@ def build_dashboard_markdown(
     lines.extend(build_max_certainty_markdown(entries))
     lines.extend(["", "## Estrategia para ganar la quiniela", ""])
     lines.extend(build_quiniela_strategy_markdown(entries))
+    lines.extend(["", "## Calibracion avanzada y limites de confianza", ""])
+    lines.extend(build_calibration_depth_markdown(entries, backtest))
     lines.extend(["", "## Ajustes contra consenso externo", ""])
     lines.extend(build_consensus_guardrail_markdown(bracket_payload, entries))
     lines.extend(["", "## Que cambio desde la ultima actualizacion", ""])
@@ -6989,6 +7157,7 @@ def build_dashboard_html(
     landing_proof_html = build_landing_proof_html(entries, bracket_payload, backtest)
     runtime_status_html = build_runtime_status_html(entries, bracket_payload)
     methodology_html = build_methodology_html(bracket_payload, backtest, entries)
+    calibration_depth_html = build_calibration_depth_html(entries, backtest)
     global_confidence_html = build_global_confidence_html(entries)
     max_certainty_html = build_max_certainty_html(entries)
     strategy_html = build_quiniela_strategy_html(entries)
@@ -7009,6 +7178,7 @@ def build_dashboard_html(
             "landing_proof_html": landing_proof_html,
             "runtime_status_html": runtime_status_html,
             "methodology_html": methodology_html,
+            "calibration_depth_html": calibration_depth_html,
             "global_confidence_html": global_confidence_html,
             "max_certainty_html": max_certainty_html,
             "strategy_html": strategy_html,
@@ -7276,6 +7446,12 @@ def audit_dashboard_html(dashboard_html: str) -> List[str]:
         "Ranking FIFA oficial",
         "SPI / modelos ofensivo-defensivos",
         "Mercado y consenso profesional",
+        "Calibracion avanzada",
+        "Como evitamos que el modelo se sobreconfie",
+        "Shrinkage bayesiano",
+        "Desacuerdo entre modelos",
+        "Backtesting por buckets",
+        "Limite de confianza operativa",
         "Semaforo metodologico",
         "Control de calidad del pronostico",
         "Pronóstico de goles",

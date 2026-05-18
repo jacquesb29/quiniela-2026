@@ -173,6 +173,7 @@ class RefactorSmokeTest(unittest.TestCase):
                 "landing_proof_html": "<section class=\"landing-proof\"><h2>Prueba operacional</h2></section>",
                 "runtime_status_html": "",
                 "methodology_html": "",
+                "calibration_depth_html": "<section class=\"calibration-panel\"><h2>Como evitamos que el modelo se sobreconfie</h2></section>",
                 "global_confidence_html": "",
                 "max_certainty_html": "<section class=\"certainty-panel\"><h2>Hoja de máxima certeza</h2></section>",
                 "strategy_html": "<section class=\"strategy-panel\"><h2>Estrategia para ganar la quiniela</h2><p>Ventaja vs boleto popular</p><p>Diferenciales positivos</p><p>Cobertura recomendada</p><p>Marcadores exactos top-1 esperados</p></section>",
@@ -194,6 +195,7 @@ class RefactorSmokeTest(unittest.TestCase):
         self.assertIn("No son 72 en total: 72 es solo la fase de grupos.", html)
         self.assertNotIn("Partidos modelados: 72 de fase de grupos", html)
         self.assertIn('<section class="landing-proof">', html)
+        self.assertIn('<section class="calibration-panel">', html)
         self.assertIn('<section class="certainty-panel">', html)
         self.assertIn('<section class="strategy-panel">', html)
         self.assertIn("Estrategia para ganar la quiniela", html)

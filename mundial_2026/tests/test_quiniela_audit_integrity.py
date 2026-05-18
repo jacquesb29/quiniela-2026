@@ -94,6 +94,9 @@ class QuinielaAuditIntegrityTest(unittest.TestCase):
             "<p>Solo compara partidos con los mismos dos equipos</p><p>Si cambia el cruce proyectado</p>"
             "<p>Estrategia para ganar la quiniela</p><p>Ventaja vs boleto popular</p><p>Diferenciales positivos</p>"
             "<p>Cobertura recomendada</p><p>Marcadores exactos top-1 esperados</p>"
+            "<p>Calibracion avanzada</p><p>Como evitamos que el modelo se sobreconfie</p>"
+            "<p>Shrinkage bayesiano</p><p>Desacuerdo entre modelos</p>"
+            "<p>Backtesting por buckets</p><p>Limite de confianza operativa</p>"
             "<p>Picks mas defendibles</p><p>Marcadores exactos mas defendibles</p><p>15000</p></section></html>"
         )
         errors = app.audit_dashboard_html(html)
@@ -240,6 +243,9 @@ class QuinielaAuditIntegrityTest(unittest.TestCase):
                 "<p>Metodologia de estimadores externos</p><p>Ratings tipo Elo / ClubElo</p>"
                 "<p>Ranking FIFA oficial</p><p>SPI / modelos ofensivo-defensivos</p>"
                 "<p>Mercado y consenso profesional</p>"
+                "<p>Calibracion avanzada</p><p>Como evitamos que el modelo se sobreconfie</p>"
+                "<p>Shrinkage bayesiano</p><p>Desacuerdo entre modelos</p>"
+                "<p>Backtesting por buckets</p><p>Limite de confianza operativa</p>"
                 "<p>Semaforo metodologico</p><p>Control de calidad del pronostico</p>"
                 "<p>Pronóstico de goles</p><p>15000</p></section></html>"
             )

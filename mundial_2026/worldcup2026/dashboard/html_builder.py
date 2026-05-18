@@ -20,6 +20,7 @@ def render_dashboard_html(context: Dict[str, Any]) -> str:
         "runtime_status_html",
         "landing_proof_html",
         "methodology_html",
+        "calibration_depth_html",
         "global_confidence_html",
         "max_certainty_html",
         "strategy_html",
