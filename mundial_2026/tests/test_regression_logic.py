@@ -173,6 +173,29 @@ class RegressionLogicTest(unittest.TestCase):
         self.assertIn("<strong>1</strong> finales", html)
         self.assertIn("<strong>1</strong> pendientes", html)
 
+    def test_provider_diagnostics_separate_prepared_from_configured(self):
+        entries = [{"projection": False, "source": "espn_scoreboard", "status_state": "pre"}]
+        with mock.patch.dict("os.environ", {}, clear=True):
+            diagnostics = app.provider_runtime_diagnostics(entries)
+            self.assertEqual(diagnostics["configured_wired"], [])
+            self.assertEqual(diagnostics["deep_sources"], [])
+            provider_html = app.build_provider_matrix_html(entries)
+            self.assertIn("sin adaptador profundo configurado", provider_html)
+            self.assertIn("0 fixtures con proveedor profundo", provider_html)
+            self.assertIn("API_FOOTBALL_KEY | falta key/variable", provider_html)
+            self.assertIn("sin key | no requiere key", provider_html)
+            stack = app.provider_stack_summary(entries)
+            self.assertEqual(stack["configured"], [])
+
+    def test_provider_diagnostics_detect_configured_api_football_key(self):
+        entries = [{"projection": False, "source": "espn_scoreboard", "status_state": "pre"}]
+        with mock.patch.dict("os.environ", {"API_FOOTBALL_KEY": "dummy"}, clear=True):
+            diagnostics = app.provider_runtime_diagnostics(entries)
+            self.assertIn("API-Football / API-SPORTS", diagnostics["configured_wired"])
+            provider_html = app.build_provider_matrix_html(entries)
+            self.assertIn("API_FOOTBALL_KEY | key configurada", provider_html)
+            self.assertIn("API-Football / API-SPORTS", app.provider_stack_summary(entries)["configured"])
+
     def test_consensus_champion_blend_decays_with_live_and_final_results(self):
         pending = [{"projection": False, "status_state": "pre"} for _ in range(4)]
         live = [{"projection": False, "status_state": "in"} for _ in range(4)]

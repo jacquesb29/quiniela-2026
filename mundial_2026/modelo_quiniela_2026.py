@@ -5,6 +5,7 @@ import argparse
 import html
 import json
 import math
+import os
 import random
 import re
 import shutil
@@ -5731,6 +5732,51 @@ def provider_catalog_metrics() -> dict:
     }
 
 
+def provider_env_names(env_label: str) -> List[str]:
+    if not env_label or env_label.lower() == "sin key":
+        return []
+    return [part.strip() for part in re.split(r"[/|,]", env_label) if part.strip()]
+
+
+def provider_env_configured(env_label: str) -> bool:
+    names = provider_env_names(env_label)
+    if not names:
+        return True
+    return any(bool(os.environ.get(name)) for name in names)
+
+
+def provider_runtime_diagnostics(entries: Optional[Sequence[dict]] = None) -> dict:
+    fixture_entries = [entry for entry in (entries or []) if not entry.get("projection")]
+    deep_sources = sorted({str(entry.get("live_feed_provider")) for entry in fixture_entries if entry.get("live_feed_provider")})
+    live_sources = sorted({str(entry.get("source")) for entry in fixture_entries if entry.get("source")})
+    catalog = live_provider_catalog()
+    configured = [
+        item["name"]
+        for item in catalog
+        if provider_env_names(str(item.get("env") or "")) and provider_env_configured(str(item.get("env") or ""))
+    ]
+    configured_wired = [
+        item["name"]
+        for item in catalog
+        if provider_env_names(str(item.get("env") or ""))
+        and provider_env_configured(str(item.get("env") or ""))
+        and "ya" in str(item.get("integration", "")).lower()
+    ]
+    missing_wired = [
+        item["name"]
+        for item in catalog
+        if not provider_env_configured(str(item.get("env") or "")) and "ya" in str(item.get("integration", "")).lower()
+    ]
+    return {
+        "configured": configured,
+        "configured_wired": configured_wired,
+        "missing_wired": missing_wired,
+        "deep_sources": deep_sources,
+        "live_sources": live_sources,
+        "fixture_count": len(fixture_entries),
+    }
+
+
 def build_provider_matrix_markdown() -> List[str]:
     metrics = provider_catalog_metrics()
     lines = [
@@ -5749,7 +5795,11 @@ def build_provider_matrix_html(entries: Sequence[dict]) -> str:
     fixture_entries = [entry for entry in entries if not entry.get("projection")]
     live_sources = sorted({str(entry.get("source")) for entry in fixture_entries if entry.get("source")})
     deep_sources = sorted({str(entry.get("live_feed_provider")) for entry in fixture_entries if entry.get("live_feed_provider")})
+    runtime = provider_runtime_diagnostics(entries)
     active_label = " + ".join(deep_sources or live_sources or ["feed base publico"])
+    configured_wired = runtime["configured_wired"]
+    configured_label = " + ".join(str(item) for item in configured_wired) if configured_wired else "sin adaptador profundo configurado"
+    deep_usage_label = " + ".join(deep_sources) if deep_sources else "0 fixtures con proveedor profundo"
     metrics = provider_catalog_metrics()
 
     def tile(label: str, value: str, note: str) -> str:
@@ -5777,20 +5827,31 @@ def build_provider_matrix_html(entries: Sequence[dict]) -> str:
         "Base publica": 10,
     }
     catalog = sorted(live_provider_catalog(), key=lambda item: (priority_order.get(item["category"], 99), item["name"]))
+    def provider_env_status(item: dict) -> str:
+        env_label = str(item.get("env") or "")
+        if not provider_env_names(env_label):
+            return "no requiere key"
+        return "key configurada" if provider_env_configured(env_label) else "falta key/variable"
+
     rows = "".join(
         "<li>"
         f"<strong>{html.escape(str(item['name']))}</strong>"
         f"<span>{html.escape(str(item['category']))} | {html.escape(str(item['coverage']))}</span>"
-        f"<em>{html.escape(str(item['priority']))}: {html.escape(str(item['integration']))} | {html.escape(str(item['env']))}</em>"
+        f"<em>{html.escape(str(item['priority']))}: {html.escape(str(item['integration']))} | {html.escape(str(item['env']))} | "
+        f"{html.escape(provider_env_status(item))}</em>"
         "</li>"
         for item in catalog
     )
-    best_next = [
-        "Activar API_FOOTBALL_KEY si aun no esta en GitHub Secrets.",
-        "Agregar SPORTMONKS_TOKEN como segundo proveedor live profundo.",
-        "Agregar THE_ODDS_API_KEY para consenso de mercado.",
-        "Agregar NEWSAPI_KEY o GDELT para lesiones/noticias multi-fuente.",
-    ]
+    best_next = []
+    if not provider_env_configured("API_FOOTBALL_KEY"):
+        best_next.append("Crear el secret API_FOOTBALL_KEY en GitHub para activar el adaptador profundo ya cableado.")
+    elif not deep_sources:
+        best_next.append("API-Football esta configurado, pero esta corrida no trajo partidos live profundos; cuando haya partido en vivo debe aparecer api_football en la llave.")
+    best_next.extend([
+        "Agregar adaptador Sportmonks si quieres segundo proveedor live profundo.",
+        "Agregar adaptador The Odds API para mover picks contra mercado real.",
+        "Agregar adaptador NewsAPI/GDELT para lesiones y noticias multi-fuente.",
+    ])
     next_rows = "".join(
         "<li>"
         f"<strong>{html.escape(item)}</strong>"
@@ -5807,9 +5868,9 @@ def build_provider_matrix_html(entries: Sequence[dict]) -> str:
         "</div></div>"
         "<div class=\"confidence-tiles\">"
         f"{tile('Fuente activa visible', active_label, 'Lo que esta entrando en este corte publicado.')}"
+        f"{tile('Adaptador configurado', configured_label, 'No muestra secretos; solo si existe key/variable en esta corrida.')}"
+        f"{tile('Datos profundos usados', deep_usage_label, 'Si queda en 0, la llave no cambia por proveedor profundo.')}"
         f"{tile('Proveedores catalogados', str(int(metrics['total'])), 'Live, odds, noticias, historico, oficial y video.')}"
-        f"{tile('Ya cableados', str(int(metrics['wired'])), 'ESPN base + API-Football si hay key.')}"
-        f"{tile('Adaptadores pendientes', str(int(metrics['adapters'])), 'Se pueden sumar con API keys y mapeo de campos.')}"
         "</div>"
         "<div class=\"certainty-grid provider-grid\">"
         "<article><h3>Proveedores posibles</h3><ul>"
@@ -5824,9 +5885,10 @@ def build_provider_matrix_html(entries: Sequence[dict]) -> str:
 
 
 def provider_stack_summary(entries: Optional[Sequence[dict]] = None) -> dict:
-    fixture_entries = [entry for entry in (entries or []) if not entry.get("projection")]
-    live_sources = sorted({str(entry.get("source")) for entry in fixture_entries if entry.get("source")})
-    deep_sources = sorted({str(entry.get("live_feed_provider")) for entry in fixture_entries if entry.get("live_feed_provider")})
+    runtime = provider_runtime_diagnostics(entries)
+    live_sources = runtime["live_sources"]
+    deep_sources = runtime["deep_sources"]
+    configured_wired = runtime["configured_wired"]
     active = " + ".join(deep_sources or live_sources or ["espn_scoreboard"])
     prepared = [
         "API-Football",
@@ -5839,9 +5901,10 @@ def provider_stack_summary(entries: Optional[Sequence[dict]] = None) -> dict:
     ]
     return {
         "active": active,
+        "configured": configured_wired,
         "prepared": prepared,
         "deep_active": bool(deep_sources),
-        "fixture_count": len(fixture_entries),
+        "fixture_count": runtime["fixture_count"],
     }
 
 
@@ -7028,6 +7091,7 @@ def build_bracket_visual_html(bracket_payload: dict, entries: Optional[Sequence[
         "<div class=\"bracket-provider-strip\">"
         f"<span>Stack de datos de la llave: {html.escape(provider_mode)}</span>"
         f"<strong>Activo: {html.escape(str(provider_stack['active']))}</strong>"
+        f"<span>Configurado: {html.escape(' + '.join(str(item) for item in provider_stack['configured']) or 'sin key profunda')}</span>"
         f"<em>Preparado: {html.escape(' + '.join(str(item) for item in provider_stack['prepared']))}</em>"
         "</div>"
     )
@@ -7411,8 +7475,10 @@ def build_runtime_status_html(entries: Sequence[dict], bracket_payload: dict) ->
     live_count = sum(1 for entry in fixture_entries if fixture_is_live(entry))
     final_count = sum(1 for entry in fixture_entries if fixture_is_final(entry))
     pending_count = max(len(fixture_entries) - live_count - final_count, 0)
-    deep_providers = sorted({str(entry.get("live_feed_provider")) for entry in fixture_entries if entry.get("live_feed_provider")})
-    live_sources = sorted({str(entry.get("source")) for entry in fixture_entries if entry.get("source")})
+    runtime = provider_runtime_diagnostics(entries)
+    deep_providers = runtime["deep_sources"]
+    live_sources = runtime["live_sources"]
+    configured_wired = runtime["configured_wired"]
     if deep_providers:
         provider_label = " + ".join(deep_providers)
         feed_depth_label = "Enriquecido"
@@ -7439,7 +7505,8 @@ def build_runtime_status_html(entries: Sequence[dict], bracket_payload: dict) ->
         (
             "Proveedor live activo",
             f"<strong>{html.escape(provider_label)}</strong> | {html.escape(feed_depth_label)}. "
-            "Si aparece un proveedor profundo, el in-play entra con mas señales del partido.",
+            f"Adaptador con key en esta corrida: <strong>{html.escape(' + '.join(configured_wired) or 'ninguno')}</strong>. "
+            "Si aparece un proveedor profundo en fixtures, el in-play entra con mas señales del partido.",
         ),
         (
             "Estado del tablero",
