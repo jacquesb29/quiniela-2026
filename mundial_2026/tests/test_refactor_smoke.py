@@ -180,6 +180,7 @@ class RefactorSmokeTest(unittest.TestCase):
                 "global_confidence_html": "",
                 "max_certainty_html": "<section class=\"certainty-panel\"><h2>Hoja de máxima certeza</h2></section>",
                 "strategy_html": "<section class=\"strategy-panel\"><h2>Estrategia para ganar la quiniela</h2><p>Ventaja vs boleto popular</p><p>Diferenciales positivos</p><p>Cobertura recomendada</p><p>Marcador exacto principal</p></section>",
+                "full_scorecard_html": "<section class=\"scorecard-panel\"><h2>Marcadores para cargar en Penca</h2></section>",
                 "recent_changes_html": "",
                 "backtesting_html": "",
                 "bracket_visual_html": "",

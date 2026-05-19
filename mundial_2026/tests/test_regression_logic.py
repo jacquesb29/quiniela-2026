@@ -237,6 +237,24 @@ class RegressionLogicTest(unittest.TestCase):
         self.assertEqual(profile["goal_options_a"][0]["goals"], 1)
         self.assertEqual(profile["goal_options_b"][0]["goals"], 1)
 
+    def test_full_scorecard_lists_match_score_to_enter(self):
+        teams = app.load_teams()
+        prediction = app.predict_match(teams, "Spain", "Saudi Arabia", app.MatchContext(neutral=True), top_scores=3)
+        html = app.build_full_scorecard_html(
+            [
+                {
+                    "title": "Spain vs Saudi Arabia",
+                    "stage_label": "Grupo H",
+                    "prediction": prediction,
+                    "status_state": "pre",
+                }
+            ]
+        )
+        self.assertIn("Marcadores para cargar en Penca", html)
+        self.assertIn("Marcador para cargar", html)
+        self.assertIn("Spain", html)
+        self.assertIn("Saudi Arabia", html)
+
     def test_consensus_champion_blend_decays_with_live_and_final_results(self):
         pending = [{"projection": False, "status_state": "pre"} for _ in range(4)]
         live = [{"projection": False, "status_state": "in"} for _ in range(4)]

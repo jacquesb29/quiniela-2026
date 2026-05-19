@@ -27,6 +27,7 @@ def render_dashboard_html(context: Dict[str, Any]) -> str:
         "global_confidence_html",
         "max_certainty_html",
         "strategy_html",
+        "full_scorecard_html",
         "consensus_guardrail_html",
         "recent_changes_html",
         "backtesting_html",

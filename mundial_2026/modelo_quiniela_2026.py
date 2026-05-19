@@ -5017,6 +5017,79 @@ def build_quiniela_strategy_html(entries: Sequence[dict]) -> str:
     )
 
 
+def build_full_scorecard_markdown(entries: Sequence[dict]) -> List[str]:
+    if not entries:
+        return ["### Marcadores para cargar en Penca", "_Sin partidos cargados._"]
+    lines = [
+        "### Marcadores para cargar en Penca",
+        "- Orden del marcador: equipo A - equipo B, exactamente como aparece en el partido.",
+        f"- Total modelado: {len(entries)} partidos/cruces.",
+    ]
+    for entry in entries:
+        prediction: MatchPrediction = entry["prediction"]
+        top_penca = penca_ovacion_top_score(prediction)
+        guidance = prediction.score_guidance or {}
+        pick_label, pick_prob = pick_summary(prediction)
+        projection_note = " | cruce proyectado" if entry.get("projection") else ""
+        lines.append(
+            f"- {entry['stage_label']} | {entry['title']}: {top_penca['score']} "
+            f"({prediction.team_a} - {prediction.team_b}) | pick {pick_label} {format_pct(pick_prob)} | "
+            f"exacto {format_pct(float(top_penca.get('exact_prob', 0.0)))} | "
+            f"puntos esp. {float(top_penca.get('expected_points', 0.0)):.2f}/8 | "
+            f"exacto mas probable {guidance.get('top_exact_score', prediction.exact_scores[0][0] if prediction.exact_scores else top_penca['score'])}"
+            f"{projection_note}"
+        )
+    return lines
+
+
+def build_full_scorecard_html(entries: Sequence[dict]) -> str:
+    if not entries:
+        return ""
+    fixture_entries = [entry for entry in entries if not entry.get("projection")]
+    projected_entries = [entry for entry in entries if entry.get("projection")]
+    rows = []
+    for index, entry in enumerate(entries, start=1):
+        prediction: MatchPrediction = entry["prediction"]
+        top_penca = penca_ovacion_top_score(prediction)
+        guidance = prediction.score_guidance or {}
+        pick_label, pick_prob = pick_summary(prediction)
+        status_class, status_text = dashboard_status(entry)
+        precision_label = str(guidance.get("precision_label", "sin clasificar"))
+        top_exact = str(guidance.get("top_exact_score", prediction.exact_scores[0][0] if prediction.exact_scores else top_penca["score"]))
+        row_classes = "scorecard-row"
+        if entry.get("projection"):
+            row_classes += " projected"
+        rows.append(
+            f"<tr class=\"{row_classes}\">"
+            f"<td>{index:03d}</td>"
+            f"<td><strong>{html.escape(str(entry['title']))}</strong><span>{html.escape(str(entry['stage_label']))} | {html.escape(status_text)}</span></td>"
+            f"<td><strong>{html.escape(prediction.team_a)} {html.escape(str(top_penca['score']).split('-')[0])} - {html.escape(str(top_penca['score']).split('-')[-1])} {html.escape(prediction.team_b)}</strong><span>Orden: {html.escape(prediction.team_a)} - {html.escape(prediction.team_b)}</span></td>"
+            f"<td>{html.escape(pick_label)} <span>{format_pct(pick_prob)}</span></td>"
+            f"<td>{html.escape(top_exact)} <span>exacto mas probable</span></td>"
+            f"<td>{format_pct(float(top_penca.get('exact_prob', 0.0)))} <span>exacto recomendado</span></td>"
+            f"<td>{float(top_penca.get('expected_points', 0.0)):.2f}/8 <span>{html.escape(precision_label)}</span></td>"
+            "</tr>"
+        )
+    return (
+        "<section class=\"panel scorecard-panel\" id=\"marcadores\">"
+        "<div class=\"panel-head\"><div>"
+        "<p class=\"eyebrow\">Boleto completo</p>"
+        "<h2>Marcadores para cargar en Penca</h2>"
+        "<p class=\"lede-tight\">Esta es la lista operativa: un marcador para cada partido modelado. El marcador siempre esta en el orden Equipo A - Equipo B, exactamente como aparece en la fila.</p>"
+        "</div></div>"
+        "<div class=\"confidence-tiles scorecard-tiles\">"
+        f"<div class=\"summary-tile\"><span>Total con marcador</span><strong>{len(entries)}/104</strong><small>{len(fixture_entries)} fixtures directos + {len(projected_entries)} cruces proyectados.</small></div>"
+        "<div class=\"summary-tile\"><span>Regla usada</span><strong>8 / 5 / 3</strong><small>Exacto, diferencia de goles, ganador.</small></div>"
+        "<div class=\"summary-tile\"><span>Como leerlo</span><strong>Equipo A - Equipo B</strong><small>No inviertas el orden al cargarlo en la app.</small></div>"
+        "</div>"
+        "<div class=\"scorecard-table-wrap\"><table class=\"scorecard-table\">"
+        "<thead><tr><th>#</th><th>Partido</th><th>Marcador para cargar</th><th>Pick</th><th>Exacto puro</th><th>Prob. exacto</th><th>Puntos esp.</th></tr></thead>"
+        f"<tbody>{''.join(rows)}</tbody>"
+        "</table></div>"
+        "</section>"
+    )
+
+
 def build_max_certainty_markdown(entries: Sequence[dict]) -> List[str]:
     if not entries:
         return ["_Sin partidos cargados para construir una hoja de picks._"]
@@ -6211,6 +6284,8 @@ def build_dashboard_markdown(
     lines.extend(build_max_certainty_markdown(entries))
     lines.extend(["", "## Estrategia para ganar la quiniela", ""])
     lines.extend(build_quiniela_strategy_markdown(entries))
+    lines.extend(["", "## Marcadores para cargar en Penca", ""])
+    lines.extend(build_full_scorecard_markdown(entries))
     lines.extend(["", "## Calibracion avanzada y limites de confianza", ""])
     lines.extend(build_calibration_depth_markdown(entries, backtest))
     lines.extend(["", "## Prediccion potenciada", ""])
@@ -8162,6 +8237,7 @@ def build_dashboard_html(
     global_confidence_html = build_global_confidence_html(entries)
     max_certainty_html = build_max_certainty_html(entries)
     strategy_html = build_quiniela_strategy_html(entries)
+    full_scorecard_html = build_full_scorecard_html(entries)
     consensus_guardrail_html = build_consensus_guardrail_html(bracket_payload, entries)
     recent_changes_html = build_recent_changes_html(
         entries,
@@ -8186,6 +8262,7 @@ def build_dashboard_html(
             "global_confidence_html": global_confidence_html,
             "max_certainty_html": max_certainty_html,
             "strategy_html": strategy_html,
+            "full_scorecard_html": full_scorecard_html,
             "consensus_guardrail_html": consensus_guardrail_html,
             "recent_changes_html": recent_changes_html,
             "backtesting_html": backtesting_html,
@@ -8430,6 +8507,8 @@ def audit_dashboard_html(dashboard_html: str) -> List[str]:
         "Solo compara partidos con los mismos dos equipos",
         "Si cambia el cruce proyectado",
         "Estrategia para ganar la quiniela",
+        "Marcadores para cargar en Penca",
+        "Boleto completo",
         "Ventaja vs boleto popular",
         "Diferenciales positivos",
         "Cobertura recomendada",
