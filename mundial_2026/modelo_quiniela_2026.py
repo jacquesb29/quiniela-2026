@@ -429,6 +429,7 @@ class MatchPrediction:
     statistical_depth: Optional[Dict[str, object]] = None
     live_patterns: Optional[Dict[str, object]] = None
     model_stack: Optional[Dict[str, object]] = None
+    penca_scores: Optional[List[Dict[str, float | str]]] = None
 
 
 def clamp(value: float, low: float, high: float) -> float:
@@ -1643,6 +1644,7 @@ def predict_match(
         draw=draw,
         win_b=win_b,
         exact_scores=exact[:top_scores],
+        penca_scores=penca_ovacion_score_options(dist, top_scores),
         advance_a=advance_a,
         advance_b=advance_b,
         knockout_detail=knockout_detail,
@@ -1725,6 +1727,7 @@ def predict_match_live(
             draw=1.0,
             win_b=0.0,
             exact_scores=[(f"{current_score_a}-{current_score_b}", 1.0)],
+            penca_scores=penca_ovacion_score_options(final_dist, top_scores),
             advance_a=penalties_a if include_advancement else None,
             advance_b=penalties_b if include_advancement else None,
             knockout_detail={
@@ -1823,6 +1826,7 @@ def predict_match_live(
             draw=draw,
             win_b=win_b,
             exact_scores=exact[:top_scores],
+            penca_scores=penca_ovacion_score_options(final_dist, top_scores),
             advance_a=advance_a,
             advance_b=advance_b,
             knockout_detail={
@@ -1931,6 +1935,7 @@ def predict_match_live(
         draw=draw,
         win_b=win_b,
         exact_scores=exact[:top_scores],
+        penca_scores=penca_ovacion_score_options(final_dist, top_scores),
         advance_a=advance_a,
         advance_b=advance_b,
         knockout_detail=knockout_detail,
@@ -4401,6 +4406,76 @@ def quiniela_outcome_options(prediction: MatchPrediction) -> List[Tuple[float, s
     ]
 
 
+PENCA_OVACION_POINTS = {
+    "exact": 8.0,
+    "goal_difference": 5.0,
+    "winner": 3.0,
+}
+
+
+def score_result_code(goals_a: int, goals_b: int) -> str:
+    if goals_a > goals_b:
+        return "1"
+    if goals_b > goals_a:
+        return "2"
+    return "X"
+
+
+def score_expected_points_for_penca(dist: Dict[Tuple[int, int], float], pick_a: int, pick_b: int) -> dict:
+    pick_diff = pick_a - pick_b
+    pick_result = score_result_code(pick_a, pick_b)
+    exact_prob = 0.0
+    difference_prob = 0.0
+    result_prob = 0.0
+    for (actual_a, actual_b), prob in dist.items():
+        actual_prob = float(prob)
+        if actual_a == pick_a and actual_b == pick_b:
+            exact_prob += actual_prob
+        if actual_a - actual_b == pick_diff:
+            difference_prob += actual_prob
+        if score_result_code(actual_a, actual_b) == pick_result:
+            result_prob += actual_prob
+    expected_points = (
+        PENCA_OVACION_POINTS["exact"] * exact_prob
+        + PENCA_OVACION_POINTS["goal_difference"] * max(0.0, difference_prob - exact_prob)
+        + PENCA_OVACION_POINTS["winner"] * max(0.0, result_prob - difference_prob)
+    )
+    return {
+        "score": f"{pick_a}-{pick_b}",
+        "expected_points": expected_points,
+        "exact_prob": exact_prob,
+        "difference_prob": difference_prob,
+        "result_prob": result_prob,
+    }
+
+
+def penca_ovacion_score_options(dist: Dict[Tuple[int, int], float], top_n: int = 5) -> List[Dict[str, float | str]]:
+    scored = [score_expected_points_for_penca(dist, goals_a, goals_b) for goals_a, goals_b in dist]
+    scored.sort(
+        key=lambda item: (
+            float(item["expected_points"]),
+            float(item["exact_prob"]),
+            float(item["difference_prob"]),
+            float(item["result_prob"]),
+        ),
+        reverse=True,
+    )
+    return scored[:top_n]
+
+
+def penca_ovacion_top_score(prediction: MatchPrediction) -> Dict[str, float | str]:
+    if prediction.penca_scores:
+        return prediction.penca_scores[0]
+    score, prob = prediction.exact_scores[0] if prediction.exact_scores else (projected_score_value(prediction), 0.0)
+    return {
+        "score": score,
+        "expected_points": 0.0,
+        "exact_prob": float(prob),
+        "difference_prob": float(prob),
+        "result_prob": max(float(prediction.win_a), float(prediction.draw), float(prediction.win_b)),
+    }
+
+
 def quiniela_certainty_profile(entry: dict) -> dict:
     prediction: MatchPrediction = entry["prediction"]
     outcomes = sorted(quiniela_outcome_options(prediction), key=lambda item: item[0], reverse=True)
@@ -4414,7 +4489,13 @@ def quiniela_certainty_profile(entry: dict) -> dict:
     agreement_value = float(agreement) if agreement is not None else 0.5
     market_gap_raw = depth.get("market_gap")
     market_gap = float(market_gap_raw) if market_gap_raw is not None else 0.0
-    score, score_prob = prediction.exact_scores[0] if prediction.exact_scores else (projected_score_value(prediction), 0.0)
+    top_exact_score, top_exact_prob = prediction.exact_scores[0] if prediction.exact_scores else (projected_score_value(prediction), 0.0)
+    penca_score = penca_ovacion_top_score(prediction)
+    score = str(penca_score["score"])
+    score_prob = float(penca_score["exact_prob"])
+    penca_expected_points = float(penca_score["expected_points"])
+    penca_difference_prob = float(penca_score["difference_prob"])
+    penca_result_prob = float(penca_score["result_prob"])
     certainty_score = clamp(
         0.42 * confidence
         + 0.34 * best_prob
@@ -4438,9 +4519,11 @@ def quiniela_certainty_profile(entry: dict) -> dict:
         tier = "Riesgo alto"
         action = "cubrir o evitar como fijo; marcador exacto solo si la quiniela lo exige"
     score_note = (
-        "marcador relativamente defendible"
-        if score_prob >= 0.16
-        else "marcador exacto fragil; usar solo si la quiniela lo exige"
+        "marcador optimizado para puntos de Penca Ovacion"
+        if penca_expected_points >= 3.60
+        else "marcador jugable, pero no venderlo como fijo"
+        if penca_expected_points >= 3.10
+        else "marcador exacto fragil; el valor viene mas por ganador/diferencia"
     )
     return {
         "title": entry["title"],
@@ -4459,6 +4542,11 @@ def quiniela_certainty_profile(entry: dict) -> dict:
         "market_gap": market_gap_raw,
         "score": score,
         "score_prob": float(score_prob),
+        "top_exact_score": top_exact_score,
+        "top_exact_score_prob": float(top_exact_prob),
+        "penca_expected_points": penca_expected_points,
+        "penca_difference_prob": penca_difference_prob,
+        "penca_result_prob": penca_result_prob,
         "tier": tier,
         "action": action,
         "score_note": score_note,
@@ -4639,6 +4727,10 @@ def quiniela_strategy_metrics(strategy_profiles: Sequence[dict]) -> dict:
             "expected_gain": 0.0,
             "expected_exact_scores": 0.0,
             "expected_top3_scores": 0.0,
+            "expected_penca_points": 0.0,
+            "expected_penca_points_per_match": 0.0,
+            "expected_penca_exact_scores": 0.0,
+            "expected_penca_difference_scores": 0.0,
             "exact_score_range_low": 0.0,
             "exact_score_range_high": 0.0,
             "variance_sd": 0.0,
@@ -4654,6 +4746,9 @@ def quiniela_strategy_metrics(strategy_profiles: Sequence[dict]) -> dict:
     expected_popular_hits = sum(float(item["popular_model_prob"]) for item in strategy_profiles)
     expected_exact_scores = sum(float(item["score_prob"]) for item in strategy_profiles)
     expected_top3_scores = sum(float(item["top3"]) for item in strategy_profiles)
+    expected_penca_points = sum(float(item["penca_expected_points"]) for item in strategy_profiles)
+    expected_penca_exact_scores = sum(float(item["score_prob"]) for item in strategy_profiles)
+    expected_penca_difference_scores = sum(float(item["penca_difference_prob"]) for item in strategy_profiles)
     exact_score_sd = math.sqrt(
         sum(float(item["score_prob"]) * (1.0 - float(item["score_prob"])) for item in strategy_profiles)
     )
@@ -4683,6 +4778,10 @@ def quiniela_strategy_metrics(strategy_profiles: Sequence[dict]) -> dict:
         "expected_gain": expected_model_hits - expected_popular_hits,
         "expected_exact_scores": expected_exact_scores,
         "expected_top3_scores": expected_top3_scores,
+        "expected_penca_points": expected_penca_points,
+        "expected_penca_points_per_match": expected_penca_points / float(total),
+        "expected_penca_exact_scores": expected_penca_exact_scores,
+        "expected_penca_difference_scores": expected_penca_difference_scores,
         "exact_score_range_low": max(0.0, expected_exact_scores - 1.64 * exact_score_sd),
         "exact_score_range_high": min(float(total), expected_exact_scores + 1.64 * exact_score_sd),
         "variance_sd": variance_sd,
@@ -4712,9 +4811,12 @@ def build_quiniela_strategy_markdown(entries: Sequence[dict]) -> List[str]:
     lines = [
         "### Estrategia para ganar la quiniela",
         "- Objetivo: aumentar expectativa y ventaja relativa frente a un boleto popular, no inflar porcentajes.",
+        "- Reglas Penca Ovacion usadas para optimizar marcador: 8 puntos por resultado exacto, 5 por diferencia de goles y 3 por ganador.",
         f"- Aciertos esperados del boleto modelo: {metrics['expected_model_hits']:.1f}/{int(metrics['total'])}.",
+        f"- Puntos esperados por marcadores recomendados para la app: {metrics['expected_penca_points']:.1f}/{int(metrics['total']) * 8} ({metrics['expected_penca_points_per_match']:.2f} por partido).",
         f"- Boleto popular por nombre estimado: {metrics['expected_popular_hits']:.1f}/{int(metrics['total'])}. Ventaja esperada del modelo: {metrics['expected_gain']:+.1f} picks.",
-        f"- Marcador exacto principal esperado: {metrics['expected_exact_scores']:.1f}/{int(metrics['total'])}. Esto NO mide acierto de ganador; mide cuantas veces esperarias acertar el marcador unico mas probable.",
+        f"- Marcador exacto recomendado esperado: {metrics['expected_penca_exact_scores']:.1f}/{int(metrics['total'])}. Esto NO mide acierto de ganador; mide cuantas veces esperarias acertar el marcador optimizado para puntos.",
+        f"- Diferencia de goles esperada con el marcador recomendado: {metrics['expected_penca_difference_scores']:.1f}/{int(metrics['total'])}.",
         f"- Rango realista 90% del marcador exacto principal: {metrics['exact_score_range_low']:.0f}-{metrics['exact_score_range_high']:.0f} aciertos.",
         f"- Si la quiniela permite poner 3 marcadores alternativos por partido, la cobertura esperada sube a {metrics['expected_top3_scores']:.1f}/{int(metrics['total'])}.",
         f"- Rango estadistico aproximado de resultados principales: {metrics['range_low']:.0f}-{metrics['range_high']:.0f} aciertos.",
@@ -4733,7 +4835,7 @@ def build_quiniela_strategy_markdown(entries: Sequence[dict]) -> List[str]:
     if coverage:
         for item in coverage:
             lines.append(
-                f"- {item['title']}: {item['pick_label']} {format_pct(item['pick_prob'])}; marcador sugerido {item['score']} {format_pct(item['score_prob'])}; segunda opcion {item['second_label']} {format_pct(item['second_prob'])}; {item['strategy_action']}"
+                f"- {item['title']}: {item['pick_label']} {format_pct(item['pick_prob'])}; marcador Penca {item['score']} | {item['penca_expected_points']:.2f} pts esp. | exacto {format_pct(item['score_prob'])} | diferencia {format_pct(item['penca_difference_prob'])}; segunda opcion {item['second_label']} {format_pct(item['second_prob'])}; {item['strategy_action']}"
             )
     else:
         lines.append("- No hay coberturas críticas en este corte.")
@@ -4774,6 +4876,8 @@ def build_quiniela_strategy_html(entries: Sequence[dict]) -> str:
         for item in items:
             detail = (
                 f"{item['pick_label']} {format_pct(float(item['pick_prob']))} | "
+                f"marcador Penca {item['score']} ({float(item['penca_expected_points']):.2f} pts esp.; "
+                f"exacto {format_pct(float(item['score_prob']))}; diferencia {format_pct(float(item['penca_difference_prob']))}) | "
                 f"boleto popular por nombre: {item['public_label']} {format_pct(float(item['public_prob']))} | "
                 f"edge de selección {item['edge_vs_public']:+.1%} | "
                 f"ganancia esperada {item['expected_gain_vs_popular']:+.1%}"
@@ -4790,9 +4894,11 @@ def build_quiniela_strategy_html(entries: Sequence[dict]) -> str:
     tiles = (
         "<div class=\"confidence-tiles strategy-tiles\">"
         f"<div class=\"summary-tile\"><span>Aciertos esperados 1X2</span><strong>{metrics['expected_model_hits']:.1f}/{int(metrics['total'])}</strong></div>"
+        f"<div class=\"summary-tile\"><span>Puntos esperados Penca</span><strong>{metrics['expected_penca_points']:.1f}/{int(metrics['total']) * 8}</strong><small>{metrics['expected_penca_points_per_match']:.2f} puntos por partido con marcador optimizado.</small></div>"
         f"<div class=\"summary-tile\"><span>Rango estadistico 90%</span><strong>{metrics['range_low']:.0f}-{metrics['range_high']:.0f}</strong></div>"
         f"<div class=\"summary-tile\"><span>Ventaja vs boleto popular</span><strong>{metrics['expected_gain']:+.1f} picks</strong></div>"
-        f"<div class=\"summary-tile\"><span>Marcador exacto principal</span><strong>{metrics['expected_exact_scores']:.1f}/{int(metrics['total'])}</strong><small>Es el marcador unico mas probable de cada partido, no el acierto 1X2. Rango 90%: {metrics['exact_score_range_low']:.0f}-{metrics['exact_score_range_high']:.0f}</small></div>"
+        f"<div class=\"summary-tile\"><span>Marcador exacto principal</span><strong>{metrics['expected_penca_exact_scores']:.1f}/{int(metrics['total'])}</strong><small>Marcador recomendado para cargar: maximiza puntos esperados de Penca, no solo probabilidad aislada. Rango 90%: {metrics['exact_score_range_low']:.0f}-{metrics['exact_score_range_high']:.0f}</small></div>"
+        f"<div class=\"summary-tile\"><span>Diferencia de goles esperada</span><strong>{metrics['expected_penca_difference_scores']:.1f}/{int(metrics['total'])}</strong><small>Incluye exactos; en Penca esto vale 5 puntos si no clavas el marcador.</small></div>"
         f"<div class=\"summary-tile\"><span>Si puedes poner 3 marcadores</span><strong>{metrics['expected_top3_scores']:.1f}/{int(metrics['total'])}</strong><small>Cobertura esperada usando los tres marcadores mas probables por partido.</small></div>"
         f"<div class=\"summary-tile\"><span>Diferenciales positivos</span><strong>{int(metrics['differentials'])}</strong></div>"
         f"<div class=\"summary-tile\"><span>Partidos a cubrir minimo</span><strong>{int(metrics['coverage_min'])}</strong><small>Solo partidos cerrados o de riesgo alto.</small></div>"
@@ -4806,6 +4912,7 @@ def build_quiniela_strategy_html(entries: Sequence[dict]) -> str:
         "<p class=\"eyebrow\">Optimización del boleto</p>"
         "<h2>Estrategia para ganar la quiniela</h2>"
         "<p class=\"lede-tight\">Esta capa busca subir tus probabilidades de ganar la quiniela: maximiza aciertos esperados, separa picks seguros de diferenciales y evita copiar ciegamente al favorito popular cuando el modelo ve otra cosa.</p>"
+        "<p class=\"meta\">Reglas publicas de Penca Ovacion usadas aqui: 8 puntos por marcador exacto, 5 por diferencia de goles y 3 por ganador. Por eso el marcador recomendado puede diferir del marcador exacto mas probable: se elige el que da mas puntos esperados.</p>"
         "<p class=\"meta\">No se inflan probabilidades: se mejora la estrategia. El proxy de boleto popular por nombre estima cómo llenaría alguien sobreponderando ranking, fama e historia; sirve para detectar dónde el modelo puede darte ventaja relativa.</p>"
         "</div></div>"
         f"{tiles}"
@@ -6416,6 +6523,34 @@ def model_comparison_html(prediction: MatchPrediction) -> str:
     )
 
 
+def penca_ovacion_score_html(prediction: MatchPrediction) -> str:
+    if not prediction.penca_scores:
+        return ""
+    top = penca_ovacion_top_score(prediction)
+    options = "".join(
+        "<li>"
+        f"<strong>{html.escape(str(item['score']))}</strong>"
+        f"<span>{float(item['expected_points']):.2f} pts esp. | exacto {format_pct(float(item['exact_prob']))} | "
+        f"diferencia {format_pct(float(item['difference_prob']))} | resultado {format_pct(float(item['result_prob']))}</span>"
+        "</li>"
+        for item in prediction.penca_scores[:5]
+    )
+    return (
+        "<div class=\"reason-block penca-block\">"
+        "<h4>Penca Ovacion: marcador que maximiza puntos</h4>"
+        "<p class=\"meta\">Regla aplicada: 8 puntos por marcador exacto, 5 por diferencia de goles y 3 por ganador. Esta lista esta ordenada por puntos esperados, no solo por probabilidad exacta.</p>"
+        "<div class=\"subgrid\">"
+        f"<div><span>Marcador recomendado para cargar</span><strong>{html.escape(str(top['score']))}</strong></div>"
+        f"<div><span>Puntos esperados del pick</span><strong>{float(top['expected_points']):.2f} / 8</strong></div>"
+        f"<div><span>Probabilidad de clavar exacto</span><strong>{format_pct(float(top['exact_prob']))}</strong></div>"
+        f"<div><span>Probabilidad de al menos diferencia correcta</span><strong>{format_pct(float(top['difference_prob']))}</strong></div>"
+        "</div>"
+        "<div class=\"scores\"><h4>Alternativas por puntos esperados</h4>"
+        f"<ul>{options}</ul></div>"
+        "</div>"
+    )
+
+
 def build_global_confidence_markdown(entries: Sequence[dict]) -> List[str]:
     if not entries:
         return ["_Sin partidos cargados para armar el resumen rapido del torneo._"]
@@ -7784,6 +7919,8 @@ def build_dashboard_html(
         depth_html = statistical_depth_html(prediction)
         goal_forecast_block_html = goal_forecast_html(entry, prediction)
         model_compare_html = model_comparison_html(prediction)
+        penca_score_block_html = penca_ovacion_score_html(prediction)
+        top_penca_score = penca_ovacion_top_score(prediction)
 
         knockout_html = ""
         if prediction.advance_a is not None and prediction.advance_b is not None:
@@ -7854,6 +7991,7 @@ def build_dashboard_html(
             f"{projection_html}"
             "<div class=\"hero-metrics\">"
             f"<div class=\"metric metric-score\"><span>{html.escape(projected_score_label(prediction))}</span><strong>{html.escape(projected_score_value(prediction))}</strong></div>"
+            f"<div class=\"metric metric-penca\"><span>Marcador recomendado Penca Ovacion</span><strong>{html.escape(str(top_penca_score['score']))}</strong></div>"
             f"<div class=\"metric metric-probs\"><span>{html.escape(top_result_label(prediction))}</span><strong>{html.escape(top_result_summary(prediction))}</strong></div>"
             "</div>"
             f"{average_goals_html}"
@@ -7861,6 +7999,7 @@ def build_dashboard_html(
             f"<div class=\"prob-block\">{probability_rows_html}</div>"
             f"{remaining_goals_html}"
             f"{depth_html}"
+            f"{penca_score_block_html}"
             f"{model_compare_html}"
             f"{knockout_html}"
             "<div class=\"scores\">"

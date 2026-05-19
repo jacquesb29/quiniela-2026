@@ -196,6 +196,28 @@ class RegressionLogicTest(unittest.TestCase):
             self.assertIn("API_FOOTBALL_KEY | key configurada", provider_html)
             self.assertIn("API-Football / API-SPORTS", app.provider_stack_summary(entries)["configured"])
 
+    def test_penca_ovacion_score_optimizer_uses_expected_points_not_only_exact_prob(self):
+        dist = {
+            (1, 0): 0.20,
+            (2, 0): 0.18,
+            (3, 1): 0.18,
+            (0, 0): 0.12,
+            (1, 1): 0.12,
+            (0, 1): 0.20,
+        }
+        options = app.penca_ovacion_score_options(dist, top_n=3)
+        self.assertEqual(options[0]["score"], "2-0")
+        self.assertGreater(options[0]["expected_points"], app.score_expected_points_for_penca(dist, 1, 0)["expected_points"])
+        self.assertAlmostEqual(float(options[0]["difference_prob"]), 0.36)
+
+    def test_predict_match_exposes_penca_ovacion_recommended_score(self):
+        teams = app.load_teams()
+        prediction = app.predict_match(teams, "Spain", "Saudi Arabia", app.MatchContext(neutral=True), top_scores=3)
+        self.assertTrue(prediction.penca_scores)
+        top = app.penca_ovacion_top_score(prediction)
+        self.assertIn("score", top)
+        self.assertGreaterEqual(float(top["expected_points"]), 0.0)
+
     def test_consensus_champion_blend_decays_with_live_and_final_results(self):
         pending = [{"projection": False, "status_state": "pre"} for _ in range(4)]
         live = [{"projection": False, "status_state": "in"} for _ in range(4)]
