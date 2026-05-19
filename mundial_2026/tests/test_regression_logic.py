@@ -217,6 +217,25 @@ class RegressionLogicTest(unittest.TestCase):
         top = app.penca_ovacion_top_score(prediction)
         self.assertIn("score", top)
         self.assertGreaterEqual(float(top["expected_points"]), 0.0)
+        self.assertTrue(prediction.score_guidance)
+        self.assertIn("goal_options_a", prediction.score_guidance)
+        self.assertIn("top5_coverage", prediction.score_guidance)
+
+    def test_score_precision_profile_exposes_goal_marginals_and_exact_pick(self):
+        dist = {
+            (1, 0): 0.20,
+            (2, 0): 0.18,
+            (2, 1): 0.12,
+            (0, 0): 0.10,
+            (1, 1): 0.15,
+            (0, 1): 0.12,
+            (3, 1): 0.13,
+        }
+        profile = app.score_precision_profile(dist, app.penca_ovacion_score_options(dist, top_n=5))
+        self.assertEqual(profile["top_exact_score"], "1-0")
+        self.assertGreater(profile["top5_coverage"], profile["top3_coverage"])
+        self.assertEqual(profile["goal_options_a"][0]["goals"], 1)
+        self.assertEqual(profile["goal_options_b"][0]["goals"], 1)
 
     def test_consensus_champion_blend_decays_with_live_and_final_results(self):
         pending = [{"projection": False, "status_state": "pre"} for _ in range(4)]

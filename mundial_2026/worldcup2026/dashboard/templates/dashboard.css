@@ -1490,6 +1490,19 @@ h3 { font-size: 1.05rem; }
   background: linear-gradient(135deg, rgba(181,131,47,0.14), rgba(15,109,102,0.08));
   border-color: rgba(181,131,47,0.22);
 }
+.score-guidance-grid {
+  margin-top: 12px;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+.score-marginals {
+  border-radius: 16px;
+  padding: 12px;
+  background: rgba(255,255,255,0.58);
+  border: 1px solid rgba(15,109,102,0.10);
+}
+.score-marginals h4 {
+  margin-top: 0;
+}
 span {
   display: block;
   color: var(--muted);

@@ -430,6 +430,7 @@ class MatchPrediction:
     live_patterns: Optional[Dict[str, object]] = None
     model_stack: Optional[Dict[str, object]] = None
     penca_scores: Optional[List[Dict[str, float | str]]] = None
+    score_guidance: Optional[Dict[str, object]] = None
 
 
 def clamp(value: float, low: float, high: float) -> float:
@@ -601,6 +602,7 @@ def compute_statistical_depth(
     under_3_5 = 1.0 - over_3_5
     top_scores = sorted(final_dist.items(), key=lambda item: item[1], reverse=True)
     top3_coverage = sum(prob for _, prob in top_scores[:3])
+    top5_coverage = sum(prob for _, prob in top_scores[:5])
     sorted_results = sorted(result_probs, reverse=True)
     top_outcome_prob = sorted_results[0]
     second_outcome_prob = sorted_results[1]
@@ -662,6 +664,7 @@ def compute_statistical_depth(
         "over_3_5": over_3_5,
         "under_3_5": under_3_5,
         "top3_coverage": top3_coverage,
+        "top5_coverage": top5_coverage,
         "modal_margin": modal_margin,
         "modal_margin_prob": modal_margin_prob,
         "market_gap": market_gap,
@@ -1609,6 +1612,8 @@ def predict_match(
             win_b += prob
 
     exact.sort(key=lambda item: item[1], reverse=True)
+    penca_scores = penca_ovacion_score_options(dist, top_scores)
+    score_guidance = score_precision_profile(dist, penca_scores)
     advance_a = None
     advance_b = None
     knockout_detail = None
@@ -1644,7 +1649,8 @@ def predict_match(
         draw=draw,
         win_b=win_b,
         exact_scores=exact[:top_scores],
-        penca_scores=penca_ovacion_score_options(dist, top_scores),
+        penca_scores=penca_scores,
+        score_guidance=score_guidance,
         advance_a=advance_a,
         advance_b=advance_b,
         knockout_detail=knockout_detail,
@@ -1718,6 +1724,7 @@ def predict_match_live(
         )
         factors = factor_breakdown(team_a, team_b, ctx, state_a=state_a, state_b=state_b) if show_factors else None
         final_dist = {(current_score_a, current_score_b): 1.0}
+        penca_scores = penca_ovacion_score_options(final_dist, top_scores)
         return MatchPrediction(
             team_a=team_a_name,
             team_b=team_b_name,
@@ -1727,7 +1734,8 @@ def predict_match_live(
             draw=1.0,
             win_b=0.0,
             exact_scores=[(f"{current_score_a}-{current_score_b}", 1.0)],
-            penca_scores=penca_ovacion_score_options(final_dist, top_scores),
+            penca_scores=penca_scores,
+            score_guidance=score_precision_profile(final_dist, penca_scores),
             advance_a=penalties_a if include_advancement else None,
             advance_b=penalties_b if include_advancement else None,
             knockout_detail={
@@ -1817,6 +1825,7 @@ def predict_match_live(
             iterations=1600,
         ) if include_advancement else None
         factors = factor_breakdown(team_a, team_b, ctx, state_a=state_a, state_b=state_b) if show_factors else None
+        penca_scores = penca_ovacion_score_options(final_dist, top_scores)
         return MatchPrediction(
             team_a=team_a_name,
             team_b=team_b_name,
@@ -1826,7 +1835,8 @@ def predict_match_live(
             draw=draw,
             win_b=win_b,
             exact_scores=exact[:top_scores],
-            penca_scores=penca_ovacion_score_options(final_dist, top_scores),
+            penca_scores=penca_scores,
+            score_guidance=score_precision_profile(final_dist, penca_scores),
             advance_a=advance_a,
             advance_b=advance_b,
             knockout_detail={
@@ -1925,6 +1935,7 @@ def predict_match_live(
             iterations=1600,
         )
     factors = factor_breakdown(team_a, team_b, ctx, state_a=state_a, state_b=state_b) if show_factors else None
+    penca_scores = penca_ovacion_score_options(final_dist, top_scores)
 
     return MatchPrediction(
         team_a=team_a_name,
@@ -1935,7 +1946,8 @@ def predict_match_live(
         draw=draw,
         win_b=win_b,
         exact_scores=exact[:top_scores],
-        penca_scores=penca_ovacion_score_options(final_dist, top_scores),
+        penca_scores=penca_scores,
+        score_guidance=score_precision_profile(final_dist, penca_scores),
         advance_a=advance_a,
         advance_b=advance_b,
         knockout_detail=knockout_detail,
@@ -4476,6 +4488,80 @@ def penca_ovacion_top_score(prediction: MatchPrediction) -> Dict[str, float | st
     }
 
 
+def goal_marginal_options(
+    dist: Dict[Tuple[int, int], float],
+    side: str,
+    *,
+    top_n: int = 4,
+) -> List[Dict[str, float | int]]:
+    counts: Dict[int, float] = {}
+    for (goals_a, goals_b), prob in dist.items():
+        goals = goals_a if side == "a" else goals_b
+        counts[goals] = counts.get(goals, 0.0) + float(prob)
+    ranked = sorted(counts.items(), key=lambda item: (item[1], -item[0]), reverse=True)
+    return [{"goals": goals, "prob": probability} for goals, probability in ranked[:top_n]]
+
+
+def score_precision_profile(
+    dist: Dict[Tuple[int, int], float],
+    penca_scores: Optional[List[Dict[str, float | str]]] = None,
+) -> Dict[str, object]:
+    exact_ranked = sorted(dist.items(), key=lambda item: item[1], reverse=True)
+    if exact_ranked:
+        top_exact_pair, top_exact_prob = exact_ranked[0]
+        second_exact_prob = float(exact_ranked[1][1]) if len(exact_ranked) > 1 else 0.0
+    else:
+        top_exact_pair, top_exact_prob, second_exact_prob = (0, 0), 0.0, 0.0
+
+    top_penca = (penca_scores or penca_ovacion_score_options(dist, 5) or [score_expected_points_for_penca(dist, *top_exact_pair)])[0]
+    top_exact_score = f"{top_exact_pair[0]}-{top_exact_pair[1]}"
+    recommended_score = str(top_penca["score"])
+    recommended_exact_prob = float(top_penca.get("exact_prob", 0.0))
+    top5_coverage = sum(prob for _, prob in exact_ranked[:5])
+    exact_gap = max(0.0, float(top_exact_prob) - second_exact_prob)
+    precision_score = clamp(
+        0.50 * (float(top_exact_prob) / 0.24)
+        + 0.25 * (exact_gap / 0.07)
+        + 0.25 * (top5_coverage / 0.62),
+        0.0,
+        1.0,
+    )
+    if precision_score >= 0.78:
+        precision_label = "Marcador defendible"
+    elif precision_score >= 0.55:
+        precision_label = "Marcador con precision media"
+    else:
+        precision_label = "Marcador fragil"
+
+    if recommended_score == top_exact_score:
+        recommendation_note = "El marcador que maximiza puntos tambien es el exacto mas probable."
+    else:
+        exact_loss = max(0.0, float(top_exact_prob) - recommended_exact_prob)
+        recommendation_note = (
+            f"Para Penca conviene {recommended_score}: puede sacrificar {format_pct(exact_loss)} de probabilidad exacta "
+            f"frente a {top_exact_score}, pero mejora la expectativa por ganador/diferencia."
+        )
+
+    return {
+        "recommended_score": recommended_score,
+        "recommended_exact_prob": recommended_exact_prob,
+        "recommended_expected_points": float(top_penca.get("expected_points", 0.0)),
+        "recommended_difference_prob": float(top_penca.get("difference_prob", 0.0)),
+        "recommended_result_prob": float(top_penca.get("result_prob", 0.0)),
+        "top_exact_score": top_exact_score,
+        "top_exact_prob": float(top_exact_prob),
+        "second_exact_prob": second_exact_prob,
+        "exact_gap": exact_gap,
+        "top3_coverage": sum(prob for _, prob in exact_ranked[:3]),
+        "top5_coverage": top5_coverage,
+        "goal_options_a": goal_marginal_options(dist, "a"),
+        "goal_options_b": goal_marginal_options(dist, "b"),
+        "precision_score": precision_score,
+        "precision_label": precision_label,
+        "recommendation_note": recommendation_note,
+    }
+
+
 def quiniela_certainty_profile(entry: dict) -> dict:
     prediction: MatchPrediction = entry["prediction"]
     outcomes = sorted(quiniela_outcome_options(prediction), key=lambda item: item[0], reverse=True)
@@ -6234,6 +6320,18 @@ def build_dashboard_markdown(
         else:
             pass
         lines.append(f"- {projected_score_label(prediction)}: {projected_score_value(prediction)}")
+        guidance = prediction.score_guidance or {}
+        top_penca = penca_ovacion_top_score(prediction)
+        lines.append(
+            f"- Marcador para cargar en Penca: {top_penca['score']} | "
+            f"{float(top_penca['expected_points']):.2f} pts esp. | exacto {format_pct(float(top_penca['exact_prob']))} | "
+            f"diferencia {format_pct(float(top_penca['difference_prob']))}"
+        )
+        if guidance:
+            lines.append(
+                f"- Precision de marcador: {guidance.get('precision_label')} | exacto mas probable {guidance.get('top_exact_score')} "
+                f"{format_pct(float(guidance.get('top_exact_prob', 0.0)))} | top-5 cubre {format_pct(float(guidance.get('top5_coverage', 0.0)))}"
+            )
         if prediction.live_phase != "penalties":
             lines.append(
                 f"- {average_goals_label(prediction)}: {prediction.team_a} {prediction.expected_goals_a:.2f} | "
@@ -6415,6 +6513,7 @@ def statistical_depth_html(prediction: MatchPrediction) -> str:
         f"<div><span>Mas de 1.5 goles</span><strong>{format_pct(float(depth.get('over_1_5', 0.0)))}</strong></div>"
         f"<div><span>Mas de 2.5 goles</span><strong>{format_pct(float(depth.get('over_2_5', 0.0)))}</strong></div>"
         f"<div><span>Probabilidad cubierta por los 3 marcadores mas probables</span><strong>{format_pct(float(depth.get('top3_coverage', 0.0)))}</strong></div>"
+        f"<div><span>Probabilidad cubierta por los 5 marcadores mas probables</span><strong>{format_pct(float(depth.get('top5_coverage', 0.0)))}</strong></div>"
         f"<div><span>Prob. de que {html.escape(prediction.team_a)} no reciba goles</span><strong>{format_pct(float(depth.get('clean_sheet_a', 0.0)))}</strong></div>"
         f"<div><span>Prob. de que {html.escape(prediction.team_b)} no reciba goles</span><strong>{format_pct(float(depth.get('clean_sheet_b', 0.0)))}</strong></div>"
         f"<div><span>Ventaja final mas probable</span><strong>{int(depth.get('modal_margin', 0)):+d}</strong></div>"
@@ -6431,9 +6530,19 @@ def statistical_depth_html(prediction: MatchPrediction) -> str:
 
 def goal_forecast_html(entry: dict, prediction: MatchPrediction) -> str:
     depth = prediction.statistical_depth or {}
+    guidance = prediction.score_guidance or {}
     expected_total = float(depth.get("expected_total_goals", prediction.expected_goals_a + prediction.expected_goals_b))
     consensus_line = depth.get("goal_consensus_line")
     source = entry.get("goal_consensus_source") or "consenso externo"
+    def goal_options_summary(options: object) -> str:
+        if not isinstance(options, list) or not options:
+            return "sin muestra"
+        return ", ".join(
+            f"{int(item.get('goals', 0))} ({format_pct(float(item.get('prob', 0.0)))})"
+            for item in options[:3]
+            if isinstance(item, dict)
+        )
+
     if consensus_line is not None:
         consensus_note = (
             f"Calibrado contra {html.escape(str(source))}: linea {float(consensus_line):.2f}, "
@@ -6446,13 +6555,20 @@ def goal_forecast_html(entry: dict, prediction: MatchPrediction) -> str:
         "<h4>Pronóstico de goles</h4>"
         "<div class=\"goal-forecast-grid\">"
         f"<div><span>Marcador entero principal</span><strong>{html.escape(projected_score_value(prediction))}</strong></div>"
+        f"<div><span>Marcador para cargar en Penca</span><strong>{html.escape(str(guidance.get('recommended_score', penca_ovacion_top_score(prediction)['score'])))}</strong></div>"
+        f"<div><span>Exacto mas probable</span><strong>{html.escape(str(guidance.get('top_exact_score', projected_score_value(prediction))))}</strong></div>"
+        f"<div><span>Precision del marcador</span><strong>{html.escape(str(guidance.get('precision_label', 'sin clasificar')))}</strong></div>"
+        f"<div><span>Goles mas probables de {html.escape(prediction.team_a)}</span><strong>{html.escape(goal_options_summary(guidance.get('goal_options_a')))}</strong></div>"
+        f"<div><span>Goles mas probables de {html.escape(prediction.team_b)}</span><strong>{html.escape(goal_options_summary(guidance.get('goal_options_b')))}</strong></div>"
         f"<div><span>Promedio total estimado</span><strong>{expected_total:.2f}</strong></div>"
         f"<div><span>Mas de 1.5 goles</span><strong>{format_pct(float(depth.get('over_1_5', 0.0)))}</strong></div>"
         f"<div><span>Mas de 2.5 goles</span><strong>{format_pct(float(depth.get('over_2_5', 0.0)))}</strong></div>"
         f"<div><span>Ambos equipos anotan</span><strong>{format_pct(float(depth.get('both_teams_score', 0.0)))}</strong></div>"
+        f"<div><span>Cobertura top-5 marcadores</span><strong>{format_pct(float(guidance.get('top5_coverage', depth.get('top5_coverage', 0.0))))}</strong></div>"
         f"<div><span>Estado vs consenso</span><strong>{html.escape(str(depth.get('goal_consensus_status', 'sin consenso externo')))}</strong></div>"
         "</div>"
         f"<p class=\"meta\">{consensus_note}</p>"
+        f"<p class=\"meta\">{html.escape(str(guidance.get('recommendation_note', 'El marcador recomendado se calcula con la distribucion completa de marcadores.')))}</p>"
         "</div>"
     )
 
@@ -6527,6 +6643,20 @@ def penca_ovacion_score_html(prediction: MatchPrediction) -> str:
     if not prediction.penca_scores:
         return ""
     top = penca_ovacion_top_score(prediction)
+    guidance = prediction.score_guidance or {}
+    def goal_options_list(options: object, team_name: str) -> str:
+        if not isinstance(options, list) or not options:
+            return ""
+        rows = "".join(
+            "<li>"
+            f"<strong>{int(item.get('goals', 0))} {'gol' if int(item.get('goals', 0)) == 1 else 'goles'}</strong>"
+            f"<span>{format_pct(float(item.get('prob', 0.0)))} para {html.escape(team_name)}</span>"
+            "</li>"
+            for item in options[:4]
+            if isinstance(item, dict)
+        )
+        return f"<div class=\"scores score-marginals\"><h4>{html.escape(team_name)}: goles más probables</h4><ul>{rows}</ul></div>"
+
     options = "".join(
         "<li>"
         f"<strong>{html.escape(str(item['score']))}</strong>"
@@ -6541,9 +6671,17 @@ def penca_ovacion_score_html(prediction: MatchPrediction) -> str:
         "<p class=\"meta\">Regla aplicada: 8 puntos por marcador exacto, 5 por diferencia de goles y 3 por ganador. Esta lista esta ordenada por puntos esperados, no solo por probabilidad exacta.</p>"
         "<div class=\"subgrid\">"
         f"<div><span>Marcador recomendado para cargar</span><strong>{html.escape(str(top['score']))}</strong></div>"
+        f"<div><span>Marcador exacto mas probable</span><strong>{html.escape(str(guidance.get('top_exact_score', prediction.exact_scores[0][0] if prediction.exact_scores else top['score'])))}</strong></div>"
+        f"<div><span>Calidad del marcador exacto</span><strong>{html.escape(str(guidance.get('precision_label', 'sin clasificar')))}</strong></div>"
         f"<div><span>Puntos esperados del pick</span><strong>{float(top['expected_points']):.2f} / 8</strong></div>"
         f"<div><span>Probabilidad de clavar exacto</span><strong>{format_pct(float(top['exact_prob']))}</strong></div>"
         f"<div><span>Probabilidad de al menos diferencia correcta</span><strong>{format_pct(float(top['difference_prob']))}</strong></div>"
+        f"<div><span>Cobertura top-5 marcadores</span><strong>{format_pct(float(guidance.get('top5_coverage', 0.0)))}</strong></div>"
+        "</div>"
+        f"<p class=\"meta\">{html.escape(str(guidance.get('recommendation_note', 'Usa este marcador como entrada principal y revisa las alternativas si quieres cubrir.')))}</p>"
+        "<div class=\"certainty-grid score-guidance-grid\">"
+        f"{goal_options_list(guidance.get('goal_options_a'), prediction.team_a)}"
+        f"{goal_options_list(guidance.get('goal_options_b'), prediction.team_b)}"
         "</div>"
         "<div class=\"scores\"><h4>Alternativas por puntos esperados</h4>"
         f"<ul>{options}</ul></div>"

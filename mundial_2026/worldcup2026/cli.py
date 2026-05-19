@@ -49,7 +49,7 @@ def build_parser(
     predict.add_argument("--group-matches-played-b", type=int, default=None)
     predict.add_argument("--weather-stress", type=float, default=None)
     predict.add_argument("--importance", type=float, default=None)
-    predict.add_argument("--top-scores", type=int, default=6)
+    predict.add_argument("--top-scores", type=int, default=8)
     predict.add_argument("--show-factors", action="store_true")
     predict.add_argument("--monte-carlo", type=int, default=0)
     predict.add_argument("--seed", type=int, default=None)
@@ -64,7 +64,7 @@ def build_parser(
 
     fixtures = subparsers.add_parser("fixtures", help="Lee un JSON de partidos y genera predicciones.")
     fixtures.add_argument("path")
-    fixtures.add_argument("--top-scores", type=int, default=5)
+    fixtures.add_argument("--top-scores", type=int, default=8)
     fixtures.add_argument("--show-factors", action="store_true")
     fixtures.add_argument("--state-file", default=state_file)
     fixtures.add_argument("--reset-state", action="store_true")
@@ -98,7 +98,7 @@ def build_parser(
     dashboard.add_argument("--bracket-json-file", default=bracket_json_file)
     dashboard.add_argument("--output-html", default=dashboard_html_file)
     dashboard.add_argument("--output-md", default=dashboard_md_file)
-    dashboard.add_argument("--top-scores", type=int, default=5)
+    dashboard.add_argument("--top-scores", type=int, default=8)
     dashboard.add_argument("--state-file", default=state_file)
 
     audit = subparsers.add_parser("audit-quiniela", help="Audita datos, llave, dashboard y workflow antes de publicar.")
