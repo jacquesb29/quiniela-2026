@@ -3701,6 +3701,8 @@ def dashboard_fixture_entries(
                 "news_headlines": fixture.get("news_headlines", []),
                 "news_notes_a": fixture.get("news_notes_a", []),
                 "news_notes_b": fixture.get("news_notes_b", []),
+                "open_news_provider": fixture.get("open_news_provider"),
+                "open_news_sources": fixture.get("open_news_sources", []),
                 "live_feed_provider": fixture.get("live_feed_provider"),
                 "live_feed_depth": fixture.get("live_feed_depth"),
                 "provider_fixture_id": fixture.get("provider_fixture_id"),
@@ -5075,11 +5077,12 @@ def build_full_scorecard_html(entries: Sequence[dict]) -> str:
         "<div class=\"panel-head\"><div>"
         "<p class=\"eyebrow\">Boleto completo</p>"
         "<h2>Marcadores para cargar en Penca</h2>"
-        "<p class=\"lede-tight\">Esta es la lista operativa: un marcador para cada partido modelado. El marcador siempre esta en el orden Equipo A - Equipo B, exactamente como aparece en la fila.</p>"
+        "<p class=\"lede-tight\">Esta es la lista operativa dinamica: un marcador para cada partido modelado, recalculado en cada refresh con el modelo, resultados reales, noticias, estado live y cruces proyectados. El marcador siempre esta en el orden Equipo A - Equipo B.</p>"
         "</div></div>"
         "<div class=\"confidence-tiles scorecard-tiles\">"
         f"<div class=\"summary-tile\"><span>Total con marcador</span><strong>{len(entries)}/104</strong><small>{len(fixture_entries)} fixtures directos + {len(projected_entries)} cruces proyectados.</small></div>"
         "<div class=\"summary-tile\"><span>Regla usada</span><strong>8 / 5 / 3</strong><small>Exacto, diferencia de goles, ganador.</small></div>"
+        "<div class=\"summary-tile\"><span>Actualizacion</span><strong>Dinamica</strong><small>Cambia durante el torneo si cambian partidos, llave, lesiones o live.</small></div>"
         "<div class=\"summary-tile\"><span>Como leerlo</span><strong>Equipo A - Equipo B</strong><small>No inviertas el orden al cargarlo en la app.</small></div>"
         "</div>"
         "<div class=\"scorecard-table-wrap\"><table class=\"scorecard-table\">"
@@ -5421,8 +5424,8 @@ def calibration_depth_metrics(entries: Sequence[dict], backtest: dict) -> dict:
         calibration_state = "Muestra chica"
         calibration_action = "Leer resultados como senal temprana; no sobreajustar todavia."
     else:
-        calibration_state = "Pretorneo"
-        calibration_action = "Usar shrinkage, consenso externo y desacuerdo de modelos hasta que haya resultados reales."
+        calibration_state = "Calibracion previa activa"
+        calibration_action = "Aun no hay partidos cerrados de 2026; se usa historico desde 1990, shrinkage, consenso externo y desacuerdo entre modelos."
     if reliability is not None and float(reliability) > 0.035:
         confidence_rule = "Bajar agresividad: el modelo esta mostrando error de calibracion."
     elif avg_agreement is not None and avg_agreement < 0.56:
@@ -5437,6 +5440,7 @@ def calibration_depth_metrics(entries: Sequence[dict], backtest: dict) -> dict:
         "temporal_accuracy": temporal_accuracy,
         "avg_agreement": avg_agreement,
         "avg_market_gap": avg_market_gap,
+        "historical_prior_active": completed == 0,
         "calibration_state": calibration_state,
         "calibration_action": calibration_action,
         "confidence_rule": confidence_rule,
@@ -5470,11 +5474,11 @@ def calibration_depth_items(metrics: dict) -> List[dict]:
         },
         {
             "label": "Backtesting por buckets",
-            "status": "Activo" if metrics["buckets"] else "Esperando partidos",
+            "status": "Activo" if metrics["buckets"] else "Listo para resultados 2026",
             "detail": (
                 f"{metrics['buckets']} tramos de confianza medidos con {metrics['regular_samples']} partidos comparables."
                 if metrics["buckets"]
-                else "Cuando haya partidos cerrados, comparara confianza prometida contra acierto real."
+                else "No existe Brier real del Mundial 2026 antes de que se jueguen partidos; el pipeline lo calcula automaticamente desde el primer resultado final."
             ),
         },
         {
@@ -5523,7 +5527,7 @@ def build_calibration_depth_html(entries: Sequence[dict], backtest: dict) -> str
     reliability_value = (
         f"{float(metrics['reliability']):.3f}"
         if metrics["reliability"] is not None
-        else "sin muestra"
+        else "sin Brier 2026"
     )
     agreement_value = (
         format_pct(float(metrics["avg_agreement"]))
@@ -5533,7 +5537,7 @@ def build_calibration_depth_html(entries: Sequence[dict], backtest: dict) -> str
     temporal_value = (
         format_pct(float(metrics["temporal_accuracy"]))
         if metrics["temporal_accuracy"] is not None
-        else "pendiente"
+        else "listo al 1er final"
     )
     return (
         "<section class=\"panel calibration-panel\">"
@@ -5544,9 +5548,9 @@ def build_calibration_depth_html(entries: Sequence[dict], backtest: dict) -> str
         "</div></div>"
         "<div class=\"confidence-tiles\">"
         f"{tile('Estado de calibracion', str(metrics['calibration_state']), str(metrics['calibration_action']))}"
-        f"{tile('Brier calibracion', reliability_value, 'Menor es mejor; mide si las probabilidades prometidas se cumplen.')}"
+        f"{tile('Brier calibracion', reliability_value, 'No se inventa: se calcula cuando existan partidos 2026 finalizados; antes opera la calibracion previa.')}"
         f"{tile('Coincidencia entre modelos', agreement_value, 'Si baja, el boleto debe cubrir mas partidos.')}"
-        f"{tile('Acierto por ventanas', temporal_value, 'Walk-forward temporal cuando haya resultados reales.')}"
+        f"{tile('Acierto por ventanas', temporal_value, 'Se recalcula automaticamente con los resultados reales del campeonato.')}"
         "</div>"
         "<div class=\"method-quality calibration-quality\">"
         "<div class=\"method-quality-head\">"
@@ -5843,27 +5847,45 @@ def live_provider_catalog() -> List[dict]:
         {
             "name": "ESPN scoreboard",
             "category": "Base publica",
-            "priority": "Fallback actual",
+            "priority": "Automatico sin key",
             "coverage": "Calendario, marcador, estado, resumen, odds y noticias si el endpoint lo expone.",
             "integration": "Ya integrado",
             "env": "sin key",
             "role": "Mantenerlo como piso: nunca debe ser el unico proveedor cuando haya partidos en vivo.",
         },
         {
+            "name": "Open-Meteo",
+            "category": "Clima/sedes",
+            "priority": "Automatico sin key",
+            "coverage": "Pronostico y baseline meteorologico por sede: temperatura, humedad, viento, lluvia y wet bulb.",
+            "integration": "Ya integrado sin key",
+            "env": "sin key",
+            "role": "Ajusta desgaste, ritmo y riesgo de partido sin pedirte ninguna cuenta externa.",
+        },
+        {
+            "name": "GDELT",
+            "category": "Noticias abiertas",
+            "priority": "Automatico sin key",
+            "coverage": "Monitoreo global de noticias y menciones; lesiones, sanciones, lineup probable y contexto de seleccion.",
+            "integration": "Ya integrado sin key",
+            "env": "sin key",
+            "role": "Fuente multi-prensa para no depender de una sola redaccion; el filtro solo mueve el modelo si detecta senal relevante.",
+        },
+        {
             "name": "API-Football / API-SPORTS",
             "category": "Live profundo",
-            "priority": "Prioridad 1",
+            "priority": "Opcional premium",
             "coverage": "Fixtures live, lineups, eventos, estadisticas, tiros, tarjetas, sustituciones y xG si viene en el feed.",
-            "integration": "Ya cableado",
+            "integration": "Ya cableado si hay credencial",
             "env": "API_FOOTBALL_KEY",
             "role": "Primer proveedor real para in-play: activa eventos minuto a minuto y estadisticas live.",
         },
         {
             "name": "Sportmonks Football API",
             "category": "Live profundo",
-            "priority": "Prioridad 2",
+            "priority": "Opcional premium",
             "coverage": "Livescores, eventos, World Cup 2026, odds, lineups, stats y endpoints de partidos en vivo.",
-            "integration": "Requiere adaptador",
+            "integration": "Adaptador preparado si hay credencial",
             "env": "SPORTMONKS_TOKEN",
             "role": "Mejor segundo proveedor practico: buena documentacion y cobertura directa para apps de Mundial.",
         },
@@ -5915,20 +5937,11 @@ def live_provider_catalog() -> List[dict]:
         {
             "name": "NewsAPI",
             "category": "Noticias",
-            "priority": "Prioridad noticias",
+            "priority": "Opcional noticias",
             "coverage": "Busqueda de articulos por palabra, fecha, dominio, idioma, relevancia y fuente.",
-            "integration": "Requiere adaptador",
+            "integration": "Adaptador preparado si hay credencial",
             "env": "NEWSAPI_KEY",
             "role": "Capa para lesiones, bajas, alineaciones probables y contexto de seleccion sin depender de ESPN.",
-        },
-        {
-            "name": "GDELT",
-            "category": "Noticias abiertas",
-            "priority": "Backup noticias",
-            "coverage": "Monitoreo global de noticias y menciones; util para alertas amplias y diversidad de fuentes.",
-            "integration": "Requiere adaptador",
-            "env": "GDELT_DOC_API",
-            "role": "Muy util para no depender de una sola prensa; requiere filtrado fuerte para ruido.",
         },
         {
             "name": "FIFA Match Centre / fuentes oficiales",
@@ -6048,7 +6061,7 @@ def build_provider_matrix_markdown() -> List[str]:
     lines = [
         "### Mapa de proveedores buscados",
         f"- Proveedores catalogados: {metrics['total']} | ya cableados: {metrics['wired']} | adaptadores pendientes: {metrics['adapters']} | enterprise/contrato: {metrics['enterprise']}.",
-        "- Regla: ESPN queda como fallback; el objetivo es activar API-Football y sumar Sportmonks/The Odds API/NewsAPI o equivalente si tienes keys.",
+        "- Regla: usar automaticamente fuentes sin key primero: ESPN publico, Open-Meteo, GDELT, FIFA rankings y datos historicos. Las fuentes premium quedan como mejora opcional, no como requisito para que el modelo funcione.",
     ]
     for item in live_provider_catalog():
         lines.append(
@@ -6061,11 +6074,15 @@ def build_provider_matrix_html(entries: Sequence[dict]) -> str:
     fixture_entries = [entry for entry in entries if not entry.get("projection")]
     live_sources = sorted({str(entry.get("source")) for entry in fixture_entries if entry.get("source")})
     deep_sources = sorted({str(entry.get("live_feed_provider")) for entry in fixture_entries if entry.get("live_feed_provider")})
+    open_news_sources = sorted({str(entry.get("open_news_provider")) for entry in fixture_entries if entry.get("open_news_provider")})
     runtime = provider_runtime_diagnostics(entries)
     active_label = " + ".join(deep_sources or live_sources or ["feed base publico"])
     configured_wired = runtime["configured_wired"]
-    configured_label = " + ".join(str(item) for item in configured_wired) if configured_wired else "sin adaptador profundo configurado"
-    deep_usage_label = " + ".join(deep_sources) if deep_sources else "0 fixtures con proveedor profundo"
+    automatic_label = "ESPN + Open-Meteo + GDELT"
+    if configured_wired:
+        automatic_label = f"{automatic_label} + {' + '.join(str(item) for item in configured_wired)}"
+    news_usage_label = " + ".join(open_news_sources) if open_news_sources else "GDELT listo; sin senal relevante en este corte"
+    deep_usage_label = " + ".join(deep_sources) if deep_sources else "sin eventos tiro-a-tiro en este corte"
     metrics = provider_catalog_metrics()
 
     def tile(label: str, value: str, note: str) -> str:
@@ -6085,6 +6102,7 @@ def build_provider_matrix_html(entries: Sequence[dict]) -> str:
         "Noticias abiertas": 3,
         "Oficial": 4,
         "Oficial/noticias": 4,
+        "Clima/sedes": 5,
         "Historico + xG": 5,
         "Fixture/resultados": 6,
         "Free/backup": 7,
@@ -6096,8 +6114,8 @@ def build_provider_matrix_html(entries: Sequence[dict]) -> str:
     def provider_env_status(item: dict) -> str:
         env_label = str(item.get("env") or "")
         if not provider_env_names(env_label):
-            return "no requiere key"
-        return "key configurada" if provider_env_configured(env_label) else "falta key/variable"
+            return "automatico sin key"
+        return "key configurada" if provider_env_configured(env_label) else "credencial opcional no configurada"
 
     rows = "".join(
         "<li>"
@@ -6108,16 +6126,15 @@ def build_provider_matrix_html(entries: Sequence[dict]) -> str:
         "</li>"
         for item in catalog
     )
-    best_next = []
-    if not provider_env_configured("API_FOOTBALL_KEY"):
-        best_next.append("Crear el secret API_FOOTBALL_KEY en GitHub para activar el adaptador profundo ya cableado.")
-    elif not deep_sources:
-        best_next.append("API-Football esta configurado, pero esta corrida no trajo partidos live profundos; cuando haya partido en vivo debe aparecer api_football en la llave.")
-    best_next.extend([
-        "Agregar adaptador Sportmonks si quieres segundo proveedor live profundo.",
-        "Agregar adaptador The Odds API para mover picks contra mercado real.",
-        "Agregar adaptador NewsAPI/GDELT para lesiones y noticias multi-fuente.",
-    ])
+    best_next = [
+        "Ya corre automatico: fixture/resultados ESPN, clima Open-Meteo, noticias abiertas GDELT, FIFA rankings e historico desde 1990.",
+        "Los marcadores Penca se recalculan en cada refresh: si cambia el resultado real, una baja, el cruce proyectado o la evidencia live, cambia el marcador recomendado.",
+        "Si aparece una fuente sin key con eventos tiro-a-tiro confiables para Mundial 2026, se puede sumar; por ahora no conviene scrapear SofaScore/FotMob/Flashscore sin licencia.",
+    ]
+    if deep_sources:
+        best_next.append("Evento profundo activo en esta corrida: el modelo ya esta usando tiros/eventos del proveedor live.")
+    else:
+        best_next.append("Sin credencial premium no hay feed universal de tiros minuto a minuto; usamos ESPN+GDELT+clima+historico y live profundo cuando el feed publico lo expone.")
     next_rows = "".join(
         "<li>"
         f"<strong>{html.escape(item)}</strong>"
@@ -6130,12 +6147,13 @@ def build_provider_matrix_html(entries: Sequence[dict]) -> str:
         "<div class=\"panel-head\"><div>"
         "<p class=\"eyebrow\">Mapa de proveedores</p>"
         "<h2>No depender solo de ESPN</h2>"
-        "<p class=\"lede-tight\">ESPN queda como base y fallback. Para in-play serio, el stack ideal combina un proveedor live profundo, una fuente de mercado, fuentes oficiales y noticias multi-fuente. Abajo queda el mapa de proveedores posibles y el estado de integracion.</p>"
+        "<p class=\"lede-tight\">El pipeline usa primero lo que si se puede extraer automaticamente sin que tengas que registrar cuentas: ESPN publico, Open-Meteo, GDELT, FIFA rankings e historico. Las fuentes premium aparecen separadas como opcionales, no como una tarea para ti.</p>"
         "</div></div>"
         "<div class=\"confidence-tiles\">"
         f"{tile('Fuente activa visible', active_label, 'Lo que esta entrando en este corte publicado.')}"
-        f"{tile('Adaptador configurado', configured_label, 'No muestra secretos; solo si existe key/variable en esta corrida.')}"
-        f"{tile('Datos profundos usados', deep_usage_label, 'Si queda en 0, la llave no cambia por proveedor profundo.')}"
+        f"{tile('Automatico sin cuentas', automatic_label, 'No requiere que pegues keys ni busques contratos.')}"
+        f"{tile('Noticias abiertas usadas', news_usage_label, 'GDELT puede mover lesiones, sanciones y contexto si detecta senal fuerte.')}"
+        f"{tile('Eventos live profundos', deep_usage_label, 'Tiros minuto a minuto solo si existe feed publico/premium valido.')}"
         f"{tile('Proveedores catalogados', str(int(metrics['total'])), 'Live, odds, noticias, historico, oficial y video.')}"
         "</div>"
         "<div class=\"certainty-grid provider-grid\">"
@@ -6157,6 +6175,9 @@ def provider_stack_summary(entries: Optional[Sequence[dict]] = None) -> dict:
     configured_wired = runtime["configured_wired"]
     active = " + ".join(deep_sources or live_sources or ["espn_scoreboard"])
     prepared = [
+        "ESPN publico",
+        "Open-Meteo",
+        "GDELT",
         "API-Football",
         "Sportmonks",
         "Sportradar",

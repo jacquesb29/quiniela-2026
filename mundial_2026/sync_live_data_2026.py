@@ -9,7 +9,7 @@ from collections import defaultdict, deque
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Dict, List, Optional, Sequence, Tuple
-from urllib.parse import urlencode
+from urllib.parse import urlencode, urlparse
 
 from modelo_quiniela_2026 import BRACKET_MATCH_TITLES, load_teams, profile_for, qualification_probabilities, resolve_team_name
 
@@ -25,6 +25,26 @@ SUMMARY_FETCH_WINDOW_DAYS = 10
 API_FOOTBALL_KEY = os.environ.get("API_FOOTBALL_KEY", "").strip()
 API_FOOTBALL_BASE_URL = (os.environ.get("API_FOOTBALL_BASE_URL") or "https://v3.football.api-sports.io").rstrip("/")
 API_FOOTBALL_HOST = os.environ.get("API_FOOTBALL_HOST", "v3.football.api-sports.io").strip()
+SPORTMONKS_TOKEN = os.environ.get("SPORTMONKS_TOKEN", "").strip()
+SPORTMONKS_BASE_URL = (os.environ.get("SPORTMONKS_BASE_URL") or "https://api.sportmonks.com/v3").rstrip("/")
+SPORTMONKS_LIVESCORES_PATH = os.environ.get("SPORTMONKS_LIVESCORES_PATH", "/football/livescores/inplay").strip()
+SPORTMONKS_INCLUDES = os.environ.get(
+    "SPORTMONKS_INCLUDES",
+    "scores;events.type;participants;statistics.type;lineups.details.type;sidelined;venue;referees",
+).strip()
+THE_ODDS_API_KEY = os.environ.get("THE_ODDS_API_KEY", "").strip()
+THE_ODDS_API_BASE_URL = (os.environ.get("THE_ODDS_API_BASE_URL") or "https://api.the-odds-api.com/v4").rstrip("/")
+THE_ODDS_API_SPORTS = [
+    item.strip()
+    for item in os.environ.get("THE_ODDS_API_SPORTS", "soccer_fifa_world_cup").split(",")
+    if item.strip()
+]
+THE_ODDS_API_REGIONS = os.environ.get("THE_ODDS_API_REGIONS", "us,eu,uk").strip()
+NEWSAPI_KEY = os.environ.get("NEWSAPI_KEY", "").strip()
+NEWSAPI_BASE_URL = (os.environ.get("NEWSAPI_BASE_URL") or "https://newsapi.org/v2/everything").strip()
+GDELT_DOC_API = (os.environ.get("GDELT_DOC_API") or "https://api.gdeltproject.org/api/v2/doc/doc").strip()
+NEWS_LOOKAHEAD_DAYS = int(os.environ.get("NEWS_LOOKAHEAD_DAYS", "30") or "30")
+NEWS_MAX_FIXTURES = int(os.environ.get("NEWS_MAX_FIXTURES", "8") or "8")
 
 COUNTRY_MAP = {
     "USA": "United States",
@@ -294,7 +314,7 @@ def run_curl_json(url: str, headers: Optional[Dict[str, str]] = None) -> dict:
 
 
 def provider_enabled() -> bool:
-    return bool(API_FOOTBALL_KEY)
+    return bool(API_FOOTBALL_KEY or SPORTMONKS_TOKEN)
 
 
 def api_football_headers() -> Dict[str, str]:
@@ -307,6 +327,61 @@ def api_football_headers() -> Dict[str, str]:
 def api_football_url(path: str, **params: object) -> str:
     query = {key: value for key, value in params.items() if value not in (None, "", [])}
     return f"{API_FOOTBALL_BASE_URL}{path}?{urlencode(query, doseq=True)}"
+
+
+def api_football_enabled() -> bool:
+    return bool(API_FOOTBALL_KEY)
+
+
+def sportmonks_enabled() -> bool:
+    return bool(SPORTMONKS_TOKEN)
+
+
+def sportmonks_url(path: str, **params: object) -> str:
+    query = {key: value for key, value in params.items() if value not in (None, "", [])}
+    query["api_token"] = SPORTMONKS_TOKEN
+    path_value = path if path.startswith("/") else f"/{path}"
+    return f"{SPORTMONKS_BASE_URL}{path_value}?{urlencode(query, doseq=True)}"
+
+
+def odds_api_enabled() -> bool:
+    return bool(THE_ODDS_API_KEY)
+
+
+def odds_api_url(sport_key: str, **params: object) -> str:
+    query = {key: value for key, value in params.items() if value not in (None, "", [])}
+    query["apiKey"] = THE_ODDS_API_KEY
+    return f"{THE_ODDS_API_BASE_URL}/sports/{sport_key}/odds?{urlencode(query, doseq=True)}"
+
+
+def newsapi_enabled() -> bool:
+    return bool(NEWSAPI_KEY)
+
+
+def newsapi_url(query: str) -> str:
+    params = {
+        "q": query,
+        "language": "en",
+        "sortBy": "publishedAt",
+        "pageSize": 12,
+        "apiKey": NEWSAPI_KEY,
+    }
+    return f"{NEWSAPI_BASE_URL}?{urlencode(params)}"
+
+
+def gdelt_enabled() -> bool:
+    return bool(GDELT_DOC_API)
+
+
+def gdelt_url(query: str) -> str:
+    params = {
+        "query": query,
+        "mode": "ArtList",
+        "format": "json",
+        "maxrecords": 12,
+        "sort": "hybridrel",
+    }
+    return f"{GDELT_DOC_API}?{urlencode(params)}"
 
 
 def normalize_key(value: str) -> str:
@@ -666,6 +741,205 @@ def extract_news_enrichment(summary_payload: dict, team_a: str, team_b: str) -> 
     return payload
 
 
+def article_source_name(article: dict) -> str:
+    source = article.get("source")
+    if isinstance(source, dict):
+        name = source.get("name")
+        if name:
+            return str(name)
+    for key in ("sourceCommonName", "domain", "url"):
+        value = article.get(key)
+        if not value:
+            continue
+        if key == "url":
+            parsed = urlparse(str(value))
+            return parsed.netloc or str(value)
+        return str(value)
+    return "fuente abierta"
+
+
+def article_title_text(article: dict) -> str:
+    return str(
+        article.get("title")
+        or article.get("headline")
+        or article.get("seendate")
+        or ""
+    ).strip()
+
+
+def article_body_text(article: dict) -> str:
+    return " ".join(
+        str(piece).strip()
+        for piece in (
+            article_title_text(article),
+            article.get("description"),
+            article.get("summary"),
+            article.get("sourceCommonName"),
+        )
+        if piece
+    )
+
+
+def classify_open_news_articles(articles: Sequence[dict], team_a: str, team_b: str, provider: str) -> dict:
+    aliases = {
+        "a": team_aliases(team_a),
+        "b": team_aliases(team_b),
+    }
+    headlines: List[str] = []
+    notes = {"a": [], "b": []}
+    morale = {"a": 0.0, "b": 0.0}
+    injury_bump = {"a": 0.0, "b": 0.0}
+    seen = set()
+    source_names = []
+
+    for article in articles:
+        if not isinstance(article, dict):
+            continue
+        text = article_body_text(article)
+        title = article_title_text(article)
+        if not text or not title:
+            continue
+        lowered = text.lower()
+        relevant_sides = [
+            side
+            for side, side_aliases in aliases.items()
+            if any(alias in lowered for alias in side_aliases)
+        ]
+        has_signal = any(token in lowered for token in NEWS_NEGATIVE_TOKENS + NEWS_POSITIVE_TOKENS + NEWS_LINEUP_TOKENS)
+        if not relevant_sides or not has_signal:
+            continue
+
+        source_name = article_source_name(article)
+        headline = f"{source_name}: {title}"
+        if headline in seen:
+            continue
+        seen.add(headline)
+        source_names.append(source_name)
+        headlines.append(headline)
+        for side in relevant_sides:
+            if any(token in lowered for token in NEWS_NEGATIVE_TOKENS):
+                morale[side] -= 0.04
+                injury_bump[side] += 0.05
+                notes[side].append(headline)
+            elif any(token in lowered for token in NEWS_POSITIVE_TOKENS):
+                morale[side] += 0.025
+                notes[side].append(headline)
+            elif any(token in lowered for token in NEWS_LINEUP_TOKENS):
+                morale[side] += 0.008
+                notes[side].append(headline)
+        if len(headlines) >= 5:
+            break
+
+    if not headlines:
+        return {}
+
+    payload: Dict[str, object] = {
+        "open_news_provider": provider,
+        "open_news_sources": sorted(set(source_names))[:6],
+        "news_headlines": headlines[:5],
+    }
+    for side, prefix in (("a", "a"), ("b", "b")):
+        if notes[side]:
+            payload[f"news_notes_{prefix}"] = notes[side][:4]
+        if abs(morale[side]) > 1e-9:
+            payload[f"morale_{prefix}"] = max(-0.14, min(0.14, round(morale[side], 3)))
+        if injury_bump[side] > 0.0:
+            payload[f"news_injury_bump_{prefix}"] = round(min(0.16, injury_bump[side]), 3)
+    return payload
+
+
+def open_news_query(team_a: str, team_b: str) -> str:
+    team_terms = f'"{team_a}" OR "{team_b}"'
+    signal_terms = "injury OR injured OR suspended OR doubtful OR lineup OR squad OR return OR ruled out"
+    return f"({team_terms}) (World Cup OR FIFA OR soccer OR football) ({signal_terms})"
+
+
+def fetch_gdelt_news_for_fixture(team_a: str, team_b: str) -> dict:
+    if not gdelt_enabled():
+        return {}
+    try:
+        payload = run_curl_json(gdelt_url(open_news_query(team_a, team_b)))
+    except Exception:
+        return {}
+    return classify_open_news_articles(payload.get("articles") or [], team_a, team_b, "gdelt")
+
+
+def fetch_newsapi_news_for_fixture(team_a: str, team_b: str) -> dict:
+    if not newsapi_enabled():
+        return {}
+    try:
+        payload = run_curl_json(newsapi_url(open_news_query(team_a, team_b)))
+    except Exception:
+        return {}
+    return classify_open_news_articles(payload.get("articles") or [], team_a, team_b, "newsapi")
+
+
+def merge_news_payload(base: dict, extra: dict) -> dict:
+    if not extra:
+        return base
+    merged = dict(base)
+    for key, value in extra.items():
+        if key in {"news_headlines", "open_news_sources", "news_notes_a", "news_notes_b"}:
+            current = list(merged.get(key, []) or [])
+            for item in value or []:
+                if item not in current:
+                    current.append(item)
+            merged[key] = current[:8]
+        elif key in {"morale_a", "morale_b", "news_injury_bump_a", "news_injury_bump_b"}:
+            merged[key] = round(float(merged.get(key, 0.0) or 0.0) + float(value or 0.0), 3)
+        elif key == "open_news_provider" and merged.get(key):
+            providers = [str(item) for item in (merged[key], value) if item]
+            merged[key] = "+".join(dict.fromkeys(providers))
+        else:
+            merged[key] = value
+    return merged
+
+
+def fixture_should_fetch_open_news(fixture: dict) -> bool:
+    status = str(fixture.get("status_state") or "").lower()
+    if status in {"in", "live", "in_progress", "post", "final", "finished"}:
+        return True
+    kickoff_text = fixture.get("kickoff_utc")
+    if not kickoff_text:
+        return False
+    try:
+        kickoff = parse_iso_utc(str(kickoff_text))
+    except Exception:
+        return False
+    now = datetime.now(timezone.utc)
+    return -2 <= (kickoff - now).days <= NEWS_LOOKAHEAD_DAYS
+
+
+def annotate_open_news(fixtures: List[dict]) -> None:
+    fetched = 0
+    for fixture in fixtures:
+        if fetched >= NEWS_MAX_FIXTURES:
+            break
+        if fixture.get("projection_only") or not fixture_should_fetch_open_news(fixture):
+            continue
+        team_a = str(fixture.get("team_a") or "")
+        team_b = str(fixture.get("team_b") or "")
+        if not team_a or not team_b:
+            continue
+        news_payload = {}
+        news_payload = merge_news_payload(news_payload, fetch_gdelt_news_for_fixture(team_a, team_b))
+        news_payload = merge_news_payload(news_payload, fetch_newsapi_news_for_fixture(team_a, team_b))
+        if not news_payload:
+            continue
+        for prefix in ("a", "b"):
+            injury_bump = float(news_payload.pop(f"news_injury_bump_{prefix}", 0.0) or 0.0)
+            if injury_bump > 0.0:
+                news_payload[f"injuries_{prefix}"] = round(
+                    min(0.9, float(fixture.get(f"injuries_{prefix}", 0.0) or 0.0) + injury_bump),
+                    3,
+                )
+        fixture.update(merge_news_payload(fixture, news_payload))
+        existing_source = str(fixture.get("source") or "espn_scoreboard")
+        if "open_news" not in existing_source:
+            fixture["source"] = f"{existing_source}+open_news"
+        fetched += 1
+
+
 def summarize_market(odds_entry: dict) -> dict:
     home_line = odds_entry.get("homeTeamOdds", {}).get("moneyLine")
     away_line = odds_entry.get("awayTeamOdds", {}).get("moneyLine")
@@ -1006,8 +1280,8 @@ def fetch_api_football_fixture_details(fixture_id: int, home_name: str, away_nam
     return enrichment
 
 
-def fetch_provider_live_index(teams: Dict[str, object]) -> Dict[Tuple[str, str], dict]:
-    if not provider_enabled():
+def fetch_api_football_live_index(teams: Dict[str, object]) -> Dict[Tuple[str, str], dict]:
+    if not api_football_enabled():
         return {}
     try:
         payload = run_curl_json(api_football_url("/fixtures", live="all"), headers=api_football_headers())
@@ -1036,6 +1310,291 @@ def fetch_provider_live_index(teams: Dict[str, object]) -> Dict[Tuple[str, str],
         enrichment.update(fetch_api_football_fixture_details(fixture_id, home_raw, away_raw, team_a, team_b))
         index[match_key] = enrichment
     return index
+
+
+def sportmonks_participant_side(row: dict, team_a: str, team_b: str) -> Tuple[Dict[int, str], Dict[str, str]]:
+    id_to_side: Dict[int, str] = {}
+    side_to_name: Dict[str, str] = {}
+    participants = row.get("participants") or row.get("teams") or []
+    if not isinstance(participants, list):
+        return id_to_side, side_to_name
+
+    for participant in participants:
+        if not isinstance(participant, dict):
+            continue
+        raw_name = str(participant.get("name") or participant.get("display_name") or participant.get("short_code") or "").strip()
+        participant_id = int(participant.get("id") or participant.get("team_id") or 0)
+        location = str((participant.get("meta") or {}).get("location") or participant.get("location") or "").lower()
+        canonical = provider_team_name(raw_name, {team_a: None, team_b: None}) if raw_name else ""
+        side = None
+        if canonical and normalize_key(canonical) == normalize_key(team_a):
+            side = "a"
+        elif canonical and normalize_key(canonical) == normalize_key(team_b):
+            side = "b"
+        elif location in {"home", "localteam"}:
+            side = "a"
+        elif location in {"away", "visitorteam"}:
+            side = "b"
+        if side:
+            if participant_id:
+                id_to_side[participant_id] = side
+            side_to_name[side] = canonical or raw_name
+    return id_to_side, side_to_name
+
+
+def sportmonks_side_from_payload(obj: dict, id_to_side: Dict[int, str], team_a: str, team_b: str) -> Optional[str]:
+    for key in ("participant_id", "team_id", "teamId"):
+        try:
+            raw_id = int(obj.get(key) or 0)
+        except (TypeError, ValueError):
+            raw_id = 0
+        if raw_id in id_to_side:
+            return id_to_side[raw_id]
+
+    for key in ("participant", "team"):
+        nested = obj.get(key)
+        if not isinstance(nested, dict):
+            continue
+        nested_id = int(nested.get("id") or nested.get("team_id") or 0)
+        if nested_id in id_to_side:
+            return id_to_side[nested_id]
+        raw_name = str(nested.get("name") or nested.get("display_name") or "").strip()
+        if raw_name:
+            canonical = provider_team_name(raw_name, {team_a: None, team_b: None})
+            if normalize_key(canonical) == normalize_key(team_a):
+                return "a"
+            if normalize_key(canonical) == normalize_key(team_b):
+                return "b"
+    return None
+
+
+def parse_sportmonks_statistics(row: dict, id_to_side: Dict[int, str], team_a: str, team_b: str) -> dict:
+    enrichment: Dict[str, object] = {}
+    by_side: Dict[str, Dict[str, float]] = {"a": {}, "b": {}}
+    statistics = row.get("statistics") or []
+    if not isinstance(statistics, list):
+        return enrichment
+
+    for stat in statistics:
+        if not isinstance(stat, dict):
+            continue
+        side = sportmonks_side_from_payload(stat, id_to_side, team_a, team_b)
+        if side not in {"a", "b"}:
+            continue
+        label = (
+            nested_text(stat.get("type"))
+            or str(stat.get("type_name") or "")
+            or str(stat.get("name") or "")
+            or str(stat.get("code") or "")
+        )
+        key = stat_key_from_label(label)
+        if not key:
+            continue
+        value = (
+            stat.get("value")
+            if stat.get("value") is not None
+            else (stat.get("data") or {}).get("value")
+            if isinstance(stat.get("data"), dict)
+            else None
+        )
+        parsed = parse_numeric_stat(value)
+        if parsed is None:
+            continue
+        by_side[side][key] = parsed
+
+    for side, stats in by_side.items():
+        for stat_key, value in stats.items():
+            enrichment[f"live_{stat_key}_{side}"] = value
+        proxy = live_xg_proxy(stats)
+        if proxy is not None and f"live_xg_{side}" not in enrichment:
+            enrichment[f"live_xg_proxy_{side}"] = proxy
+    return enrichment
+
+
+def parse_sportmonks_events(row: dict, id_to_side: Dict[int, str], team_a: str, team_b: str) -> dict:
+    enrichment: Dict[str, object] = {}
+    events = row.get("events") or []
+    if not isinstance(events, list):
+        return enrichment
+
+    shot_logs = {"a": [], "b": []}
+    shot_counts = {"a": 0, "b": 0}
+    shot_xg = {"a": 0.0, "b": 0.0}
+    big_chances = {"a": 0, "b": 0}
+    yellow_cards = {"a": 0, "b": 0}
+    red_cards = {"a": 0, "b": 0}
+    substitutions = {"a": 0, "b": 0}
+    max_minute = 0
+
+    for event in events:
+        if not isinstance(event, dict):
+            continue
+        side = sportmonks_side_from_payload(event, id_to_side, team_a, team_b)
+        if side not in {"a", "b"}:
+            continue
+        minute = int(event.get("minute") or event.get("sort_order") or 0)
+        max_minute = max(max_minute, minute)
+        label = " ".join(
+            text
+            for text in (
+                nested_text(event.get("type")),
+                str(event.get("type_name") or ""),
+                str(event.get("result") or ""),
+                str(event.get("info") or ""),
+                str(event.get("addition") or ""),
+            )
+            if text
+        )
+        normalized = label.lower()
+        if "yellow" in normalized:
+            yellow_cards[side] += 1
+        if "red" in normalized:
+            red_cards[side] += 1
+        if "substitution" in normalized or "substitution" in str(event.get("type") or "").lower():
+            substitutions[side] += 1
+        if not is_shot_event(normalized, normalized) and "attempt" not in normalized:
+            continue
+        shot_counts[side] += 1
+        xg_value = infer_shot_xg(normalized)
+        shot_xg[side] += xg_value
+        if "penalty" in normalized or "goal" in normalized:
+            big_chances[side] += 1
+        player = event.get("player") or event.get("player_name") or {}
+        player_name = nested_text(player) if not isinstance(player, str) else player
+        shot_logs[side].append(
+            {
+                "minute": minute,
+                "player": player_name or None,
+                "type": label or "event",
+                "detail": label or None,
+                "xg_proxy": round(xg_value, 3),
+            }
+        )
+
+    if max_minute:
+        enrichment["live_elapsed_minutes"] = max_minute
+    for side in ("a", "b"):
+        if shot_counts[side] > 0:
+            enrichment[f"live_shot_events_{side}"] = shot_counts[side]
+            enrichment[f"live_big_chances_{side}"] = big_chances[side]
+            enrichment[f"live_shot_log_{side}"] = shot_logs[side][-12:]
+            if enrichment.get(f"live_xg_{side}") is None:
+                enrichment[f"live_xg_proxy_{side}"] = round(shot_xg[side], 3)
+        if yellow_cards[side]:
+            enrichment[f"live_yellow_cards_{side}"] = yellow_cards[side]
+        if red_cards[side]:
+            enrichment[f"live_red_cards_{side}"] = red_cards[side]
+        if substitutions[side]:
+            enrichment[f"live_substitutions_{side}"] = substitutions[side]
+    return enrichment
+
+
+def parse_sportmonks_lineups(row: dict, id_to_side: Dict[int, str], team_a: str, team_b: str) -> dict:
+    enrichment: Dict[str, object] = {}
+    lineups = row.get("lineups") or []
+    if not isinstance(lineups, list):
+        return enrichment
+    starters = {"a": [], "b": []}
+    goalkeepers = {"a": None, "b": None}
+    for item in lineups:
+        if not isinstance(item, dict):
+            continue
+        side = sportmonks_side_from_payload(item, id_to_side, team_a, team_b)
+        if side not in {"a", "b"}:
+            continue
+        line_type = nested_text(item.get("type") or item.get("details") or item).lower()
+        if "bench" in line_type or "substitute" in line_type:
+            continue
+        player_payload = item.get("player") or item.get("participant") or {}
+        player_name = (
+            str(player_payload.get("display_name") or player_payload.get("name") or "").strip()
+            if isinstance(player_payload, dict)
+            else str(player_payload).strip()
+        )
+        if not player_name:
+            continue
+        starters[side].append(player_name)
+        position_blob = nested_text(item.get("position") or item.get("formation_position") or item.get("details")).lower()
+        if goalkeepers[side] is None and any(token in position_blob for token in ("gk", "goalkeeper", "keeper")):
+            goalkeepers[side] = player_name
+
+    for side in ("a", "b"):
+        if starters[side]:
+            enrichment[f"lineup_confirmed_{side}"] = len(starters[side]) >= 11
+            enrichment[f"starting_xi_{side}"] = starters[side][:11]
+            enrichment[f"lineup_status_{side}"] = "confirmada" if len(starters[side]) >= 11 else "parcial"
+            enrichment[f"starting_goalkeeper_{side}"] = goalkeepers[side] or starters[side][0]
+            enrichment[f"goalkeeper_confirmed_{side}"] = bool(goalkeepers[side])
+    return enrichment
+
+
+def parse_sportmonks_fixture(row: dict, team_a: str, team_b: str) -> dict:
+    id_to_side, _side_names = sportmonks_participant_side(row, team_a, team_b)
+    enrichment: Dict[str, object] = {
+        "live_feed_provider": "sportmonks",
+        "live_feed_depth": "eventos_estadisticas_lineups",
+        "provider_fixture_id": row.get("id"),
+    }
+    status_blob = nested_text(row.get("state") or row.get("status") or "").lower()
+    if status_blob:
+        enrichment["provider_status_detail"] = status_blob[:120]
+    enrichment.update(parse_sportmonks_statistics(row, id_to_side, team_a, team_b))
+    enrichment.update(parse_sportmonks_events(row, id_to_side, team_a, team_b))
+    enrichment.update(parse_sportmonks_lineups(row, id_to_side, team_a, team_b))
+    return enrichment
+
+
+def fetch_sportmonks_live_index(teams: Dict[str, object]) -> Dict[Tuple[str, str], dict]:
+    if not sportmonks_enabled():
+        return {}
+    try:
+        payload = run_curl_json(sportmonks_url(SPORTMONKS_LIVESCORES_PATH, include=SPORTMONKS_INCLUDES))
+    except Exception:
+        return {}
+
+    index: Dict[Tuple[str, str], dict] = {}
+    for row in payload.get("data") or payload.get("response") or []:
+        if not isinstance(row, dict):
+            continue
+        _id_to_side, side_names = sportmonks_participant_side(row, "", "")
+        raw_a = side_names.get("a", "")
+        raw_b = side_names.get("b", "")
+        if not raw_a or not raw_b:
+            participants = row.get("participants") or []
+            names = [str(item.get("name") or "").strip() for item in participants if isinstance(item, dict) and item.get("name")]
+            if len(names) >= 2:
+                raw_a, raw_b = names[0], names[1]
+        if not raw_a or not raw_b:
+            continue
+        team_a = provider_team_name(raw_a, teams)
+        team_b = provider_team_name(raw_b, teams)
+        index[match_lookup_key(team_a, team_b)] = parse_sportmonks_fixture(row, team_a, team_b)
+    return index
+
+
+def merge_provider_indexes(*indexes: Dict[Tuple[str, str], dict]) -> Dict[Tuple[str, str], dict]:
+    merged: Dict[Tuple[str, str], dict] = {}
+    for index in indexes:
+        for key, payload in index.items():
+            if not payload:
+                continue
+            if key not in merged:
+                merged[key] = dict(payload)
+                continue
+            previous_provider = str(merged[key].get("live_feed_provider") or "")
+            merged[key].update(payload)
+            current_provider = str(payload.get("live_feed_provider") or "")
+            providers = [item for item in (previous_provider, current_provider) if item]
+            if providers:
+                merged[key]["live_feed_provider"] = "+".join(dict.fromkeys(providers))
+    return merged
+
+
+def fetch_provider_live_index(teams: Dict[str, object]) -> Dict[Tuple[str, str], dict]:
+    return merge_provider_indexes(
+        fetch_api_football_live_index(teams),
+        fetch_sportmonks_live_index(teams),
+    )
 
 
 def summary_enrichment(event_id: str, kickoff: datetime, status_state: Optional[str], team_a: str, team_b: str) -> dict:
@@ -1622,6 +2181,7 @@ def build_live_fixtures(scoreboard_payload: dict) -> List[dict]:
 
     assign_group_letters(fixtures)
     attach_rest_and_travel(fixtures, teams)
+    annotate_open_news(fixtures)
     annotate_lineup_changes(fixtures, previous_by_id)
     annotate_market_moves(fixtures, previous_by_id)
     annotate_referee_profiles(fixtures, previous_by_id)

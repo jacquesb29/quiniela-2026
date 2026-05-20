@@ -180,12 +180,26 @@ class RegressionLogicTest(unittest.TestCase):
             self.assertEqual(diagnostics["configured_wired"], [])
             self.assertEqual(diagnostics["deep_sources"], [])
             provider_html = app.build_provider_matrix_html(entries)
-            self.assertIn("sin adaptador profundo configurado", provider_html)
-            self.assertIn("0 fixtures con proveedor profundo", provider_html)
-            self.assertIn("API_FOOTBALL_KEY | falta key/variable", provider_html)
-            self.assertIn("sin key | no requiere key", provider_html)
+            self.assertIn("Automatico sin cuentas", provider_html)
+            self.assertIn("sin eventos tiro-a-tiro en este corte", provider_html)
+            self.assertIn("API_FOOTBALL_KEY | credencial opcional no configurada", provider_html)
+            self.assertIn("sin key | automatico sin key", provider_html)
             stack = app.provider_stack_summary(entries)
             self.assertEqual(stack["configured"], [])
+
+    def test_provider_panel_surfaces_open_news_adapter_when_used(self):
+        entries = [
+            {
+                "projection": False,
+                "source": "espn_scoreboard+open_news",
+                "open_news_provider": "gdelt",
+                "status_state": "pre",
+            }
+        ]
+        provider_html = app.build_provider_matrix_html(entries)
+        self.assertIn("Noticias abiertas usadas", provider_html)
+        self.assertIn("gdelt", provider_html)
+        self.assertIn("espn_scoreboard+open_news", provider_html)
 
     def test_provider_diagnostics_detect_configured_api_football_key(self):
         entries = [{"projection": False, "source": "espn_scoreboard", "status_state": "pre"}]
