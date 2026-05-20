@@ -5412,20 +5412,30 @@ def calibration_depth_metrics(entries: Sequence[dict], backtest: dict) -> dict:
         and (entry.get("prediction").statistical_depth or {}).get("market_gap") is not None
     ]
     completed = int(backtest.get("completed_matches", 0) or 0)
+    regular_samples = int(backtest.get("regular_time_samples", 0) or 0)
     reliability = backtest.get("brier_reliability")
     temporal_accuracy = backtest.get("temporal_cv_accuracy")
     buckets = backtest.get("calibration_buckets") or []
     avg_agreement = sum(agreements) / len(agreements) if agreements else None
     avg_market_gap = sum(market_gaps) / len(market_gaps) if market_gaps else None
-    if completed >= 20 and reliability is not None:
-        calibration_state = "Activa con muestra"
-        calibration_action = "Usar Brier, log-loss y buckets para ajustar confianza operativa."
+    if regular_samples >= 20 and reliability is not None:
+        calibration_state = "Brier 2026 con muestra"
+        calibration_action = (
+            f"Ya recalcula Brier, log-loss y buckets con {regular_samples} partidos comparables; "
+            "usar esta lectura para ajustar confianza operativa."
+        )
+    elif regular_samples > 0 and reliability is not None:
+        calibration_state = "Brier 2026 activo"
+        calibration_action = (
+            f"Ya recalcula Brier, log-loss y acierto con {regular_samples} partido(s) finalizado(s); "
+            "la lectura es provisional hasta acumular muestra."
+        )
     elif completed > 0:
-        calibration_state = "Muestra chica"
-        calibration_action = "Leer resultados como senal temprana; no sobreajustar todavia."
+        calibration_state = "Resultado real detectado"
+        calibration_action = "Ya hay partidos cerrados; el Brier de 90 minutos se activa cuando el resultado sea comparable."
     else:
         calibration_state = "Calibracion previa activa"
-        calibration_action = "Aun no hay partidos cerrados de 2026; se usa historico desde 1990, shrinkage, consenso externo y desacuerdo entre modelos."
+        calibration_action = "Aun no hay partidos cerrados de 2026; el Brier arranca automaticamente con el primer resultado final."
     if reliability is not None and float(reliability) > 0.035:
         confidence_rule = "Bajar agresividad: el modelo esta mostrando error de calibracion."
     elif avg_agreement is not None and avg_agreement < 0.56:
@@ -5434,7 +5444,7 @@ def calibration_depth_metrics(entries: Sequence[dict], backtest: dict) -> dict:
         confidence_rule = "Mantener picks base, pero cubrir partidos con brecha pequena."
     return {
         "completed": completed,
-        "regular_samples": int(backtest.get("regular_time_samples", 0) or 0),
+        "regular_samples": regular_samples,
         "buckets": len(buckets),
         "reliability": reliability,
         "temporal_accuracy": temporal_accuracy,
@@ -5478,7 +5488,7 @@ def calibration_depth_items(metrics: dict) -> List[dict]:
             "detail": (
                 f"{metrics['buckets']} tramos de confianza medidos con {metrics['regular_samples']} partidos comparables."
                 if metrics["buckets"]
-                else "No existe Brier real del Mundial 2026 antes de que se jueguen partidos; el pipeline lo calcula automaticamente desde el primer resultado final."
+                else "No existe Brier real del Mundial 2026 antes de que se jueguen partidos; se activa automaticamente con el primer resultado final."
             ),
         },
         {
@@ -5548,9 +5558,9 @@ def build_calibration_depth_html(entries: Sequence[dict], backtest: dict) -> str
         "</div></div>"
         "<div class=\"confidence-tiles\">"
         f"{tile('Estado de calibracion', str(metrics['calibration_state']), str(metrics['calibration_action']))}"
-        f"{tile('Brier calibracion', reliability_value, 'No se inventa: se calcula cuando existan partidos 2026 finalizados; antes opera la calibracion previa.')}"
+        f"{tile('Brier calibracion', reliability_value, 'Arranca con el primer partido finalizado y se recalcula en cada refresh de 5 minutos.')}"
         f"{tile('Coincidencia entre modelos', agreement_value, 'Si baja, el boleto debe cubrir mas partidos.')}"
-        f"{tile('Acierto por ventanas', temporal_value, 'Se recalcula automaticamente con los resultados reales del campeonato.')}"
+        f"{tile('Acierto por ventanas', temporal_value, 'Empieza con la primera muestra y se estabiliza a medida que avanza el campeonato.')}"
         "</div>"
         "<div class=\"method-quality calibration-quality\">"
         "<div class=\"method-quality-head\">"
@@ -7489,7 +7499,7 @@ def build_bracket_visual_html(bracket_payload: dict, entries: Optional[Sequence[
 
 def build_backtesting_markdown(backtest: dict) -> List[str]:
     if not backtest or not backtest.get("completed_matches"):
-        return ["_Todavia no hay suficientes partidos terminados para medir como viene acertando el modelo._"]
+        return ["_El Brier 2026 se activa automaticamente con el primer partido terminado; antes no se inventa muestra._"]
 
     lines = [
         f"- Partidos cerrados analizados: {int(backtest.get('completed_matches', 0))}",
@@ -7535,7 +7545,7 @@ def build_backtesting_html(backtest: dict) -> str:
         return (
             "<section class=\"panel backtest-panel\">"
             "<div class=\"panel-head\"><div><p class=\"eyebrow\">Validacion</p><h2>Como viene acertando el modelo</h2>"
-            "<p class=\"lede-tight\">Todavia no hay suficientes partidos terminados en el torneo para medir con datos reales como viene rindiendo el modelo. Esta seccion se llenara sola cuando aparezcan resultados.</p>"
+            "<p class=\"lede-tight\">El Brier 2026 no se inventa antes del torneo: se activa solo y desde el primer partido terminado. En cuanto ESPN/proveedor marque un resultado final, esta seccion mostrara Brier, log-loss, acierto y buckets con la muestra disponible.</p>"
             "</div></div></section>"
         )
 
@@ -7738,12 +7748,12 @@ def build_methodology_quality_html(
         },
         {
             "label": "Backtesting y calibracion",
-            "status": "Activo" if completed_matches else "Sin muestra",
+            "status": "Activo" if completed_matches else "Listo al primer final",
             "tone": "ok" if completed_matches else "neutral",
             "detail": (
                 f"{completed_matches} partidos cerrados reconstruidos secuencialmente con log-loss, Brier y calibracion por tramos."
                 if completed_matches
-                else "Todavia no hay resultados reales suficientes; el modulo queda listo para medir en cuanto haya partidos cerrados."
+                else "No espera una muestra grande: empieza a medir Brier apenas haya un partido terminado."
             ),
         },
     ]

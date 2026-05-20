@@ -509,6 +509,39 @@ class RegressionLogicTest(unittest.TestCase):
         self.assertGreater(fixtures[0]["referee_yellow_bias"], 0.0)
         self.assertGreater(fixtures[0]["referee_red_bias"], 0.0)
 
+    def test_brier_activates_with_first_final_result(self):
+        teams = app.load_teams()
+        backtest = app.compute_backtest_summary(
+            [
+                {
+                    "id": "first-final",
+                    "team_a": "Spain",
+                    "team_b": "Uruguay",
+                    "stage": "group",
+                    "neutral": True,
+                    "kickoff_utc": "2026-06-15T00:00:00Z",
+                    "actual_score_a": 2,
+                    "actual_score_b": 1,
+                    "update_state": True,
+                }
+            ],
+            teams,
+            top_scores=3,
+        )
+        self.assertEqual(backtest["completed_matches"], 1)
+        self.assertEqual(backtest["regular_time_samples"], 1)
+        self.assertIsNotNone(backtest["brier_result"])
+        self.assertIsNotNone(backtest["brier_reliability"])
+        self.assertIsNotNone(backtest["temporal_cv_brier"])
+        html = app.build_calibration_depth_html([], backtest)
+        self.assertIn("Brier 2026 activo", html)
+        self.assertIn("Arranca con el primer partido finalizado", html)
+
+    def test_backtesting_empty_state_says_brier_starts_on_first_final(self):
+        html = app.build_backtesting_html({"completed_matches": 0})
+        self.assertIn("desde el primer partido terminado", html)
+        self.assertIn("Brier", html)
+
 
 if __name__ == "__main__":
     unittest.main()
