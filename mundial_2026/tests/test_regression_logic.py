@@ -31,6 +31,9 @@ class RegressionLogicTest(unittest.TestCase):
         self.assertLess(late_a, early_a)
         self.assertGreater(late_b, early_b)
 
+    def test_iso_timestamp_is_utc_aware_for_dashboard_consistency(self):
+        self.assertTrue(app.iso_timestamp().endswith("+00:00"))
+
     def test_live_stats_adjustment_rewards_team_with_stronger_live_signals(self):
         mu_a, mu_b = live_stats_adjustment(
             2.20,
@@ -173,6 +176,7 @@ class RegressionLogicTest(unittest.TestCase):
         self.assertIn("<strong>1</strong> en vivo", html)
         self.assertIn("<strong>1</strong> finales", html)
         self.assertIn("<strong>1</strong> pendientes", html)
+        self.assertIn("In-play limitado", html)
 
     def test_provider_diagnostics_separate_prepared_from_configured(self):
         entries = [{"projection": False, "source": "espn_scoreboard", "status_state": "pre"}]
@@ -212,9 +216,17 @@ class RegressionLogicTest(unittest.TestCase):
         ).read_text(encoding="utf-8")
         self.assertIn("Modo boleto", template)
         self.assertIn("Si vas a cargar la Penca Ovación, empieza aquí.", template)
+        self.assertIn("Lectura crítica", template)
+        self.assertIn("Track record 2026", template)
         self.assertIn("technical-accordion", template)
         self.assertIn("Uso educativo y entretenimiento", template)
         self.assertIn("no garantiza ganar", template)
+
+    def test_pages_build_records_dashboard_timestamp_in_latest_json(self):
+        script = (PACKAGE_ROOT / "build_pages_site.sh").read_text(encoding="utf-8")
+        self.assertIn("dashboard_updated_at_utc", script)
+        self.assertIn("timestamp_consistency_note", script)
+        self.assertIn('meta name="dashboard-updated-at"', script)
 
     def test_dashboard_renderer_does_not_escape_inline_css(self):
         html = render_dashboard_html({"updated_at": "test"})

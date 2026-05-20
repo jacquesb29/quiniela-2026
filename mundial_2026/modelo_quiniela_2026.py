@@ -12,7 +12,7 @@ import shutil
 import tempfile
 import unicodedata
 from dataclasses import asdict, dataclass
-from datetime import datetime
+from datetime import datetime, timezone
 from functools import lru_cache
 from pathlib import Path
 from typing import Dict, List, Optional, Sequence, Tuple
@@ -7872,6 +7872,13 @@ def build_runtime_status_html(entries: Sequence[dict], bracket_payload: dict) ->
     else:
         provider_label = "espn_scoreboard"
         feed_depth_label = "Base publica"
+    feed_limit_note = (
+        "In-play enriquecido: hay proveedor profundo en esta corrida; si trae eventos, el modelo puede usar tiros, "
+        "disciplina, sustituciones, xG/ocasiones y contexto minuto a minuto."
+        if deep_providers
+        else "In-play limitado: sin proveedor profundo activo, el modelo recalcula con marcador, estado, minuto, "
+        "fixture, noticias abiertas y clima disponibles; no finge xG tiro-a-tiro si el feed no lo trae."
+    )
     iterations = int(bracket_payload.get("iterations", 0) or 0)
     iterations_label = f"{iterations:,}".replace(",", ".") if iterations else "sin dato"
     in_play_label = "Activo" if live_count > 0 else "Listo para activarse"
@@ -7891,6 +7898,10 @@ def build_runtime_status_html(entries: Sequence[dict], bracket_payload: dict) ->
             f"<strong>{html.escape(provider_label)}</strong> | {html.escape(feed_depth_label)}. "
             f"Adaptador con key en esta corrida: <strong>{html.escape(' + '.join(configured_wired) or 'ninguno')}</strong>. "
             "Si aparece un proveedor profundo en fixtures, el in-play entra con mas señales del partido.",
+        ),
+        (
+            "Lectura prudente del feed",
+            html.escape(feed_limit_note),
         ),
         (
             "Estado del tablero",
@@ -8675,7 +8686,7 @@ def read_fixtures(path: Path) -> List[dict]:
 
 
 def iso_timestamp() -> str:
-    return datetime.now().isoformat(timespec="seconds")
+    return datetime.now(timezone.utc).isoformat(timespec="seconds")
 
 
 def default_team_state() -> dict:

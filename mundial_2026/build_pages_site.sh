@@ -18,6 +18,7 @@ cp "$SCRIPT_DIR/fixtures_live_2026.json" "$SITE_DIR/fixtures_live_2026.json"
 python3 - <<'PY'
 import json
 import os
+import re
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -25,16 +26,26 @@ script_dir = Path(os.environ["SCRIPT_DIR"])
 site_dir = script_dir / "site"
 fixtures_path = script_dir / "fixtures_live_2026.json"
 teams_path = script_dir / "teams_2026.json"
+dashboard_path = script_dir / "dashboard_actual_2026.html"
 fixtures_payload = []
 teams_payload = {}
+dashboard_updated_at = None
 if fixtures_path.exists():
     fixtures_payload = json.loads(fixtures_path.read_text())
 if teams_path.exists():
     teams_payload = json.loads(teams_path.read_text())
+if dashboard_path.exists():
+    match = re.search(r'<meta name="dashboard-updated-at" content="([^"]+)"', dashboard_path.read_text())
+    if match:
+        dashboard_updated_at = match.group(1)
 live_sources = sorted({item.get("source") for item in fixtures_payload if item.get("source")})
 live_providers = sorted({item.get("live_feed_provider") for item in fixtures_payload if item.get("live_feed_provider")})
+published_at = datetime.now(timezone.utc).isoformat(timespec="seconds")
 payload = {
-    "updated_at_utc": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+    "updated_at_utc": published_at,
+    "publication_updated_at_utc": published_at,
+    "dashboard_updated_at_utc": dashboard_updated_at,
+    "timestamp_consistency_note": "latest.json se escribe despues de copiar el HTML; compara dashboard_updated_at_utc contra publication_updated_at_utc para detectar desfases reales de publicacion o cache.",
     "refresh_interval_minutes": 5,
     "in_play_enabled": True,
     "delivery": "github_actions_pages",

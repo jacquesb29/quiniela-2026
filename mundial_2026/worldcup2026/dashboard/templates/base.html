@@ -3,6 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="dashboard-updated-at" content="{{ updated_at }}">
   <title>Quiniela Intelligence 2026</title>
   <style>{{ css }}</style>
 </head>
@@ -16,6 +17,7 @@
       <nav>
         <a href="#estado">Modo boleto</a>
         <a href="#modelo">Modelo</a>
+        <a href="#lectura-critica">Lectura crítica</a>
         <a href="#boleto">Boleto</a>
         <a href="#marcadores">Marcadores</a>
         <a href="#llave">Llave</a>
@@ -157,6 +159,35 @@
 
     {{ landing_proof_html }}
     {{ runtime_status_html }}
+    <section class="critical-reading-panel" id="lectura-critica" aria-label="Lectura critica del modelo">
+      <div class="critical-reading-copy">
+        <p class="eyebrow">Lectura crítica</p>
+        <h2>Qué es sustancia, qué depende del feed y qué todavía no puede prometer.</h2>
+        <p>La web no debe vender magia. Debe ayudarte a llenar mejor la quiniela, mostrar qué está realmente corriendo y reconocer cuándo una señal todavía es limitada.</p>
+      </div>
+      <div class="critical-grid">
+        <article>
+          <span>Verificable</span>
+          <strong>15.000 Monte Carlo + artefactos públicos</strong>
+          <p>La salida publica dashboard, reporte, llave, fixtures y <a href="latest.json">latest.json</a>. Ese archivo permite revisar timestamp, frecuencia de refresh y stack live usado.</p>
+        </article>
+        <article>
+          <span>Punto crítico</span>
+          <strong>El in-play depende del feed real</strong>
+          <p>Si la fuente activa es solo base pública, el modelo recalcula con marcador/estado/minuto y señales disponibles, pero no debe fingir xG tiro a tiro ni eventos profundos si el proveedor no los trae.</p>
+        </article>
+        <article>
+          <span>Track record 2026</span>
+          <strong>La calibración empírica arranca con el primer final</strong>
+          <p>Antes del primer partido terminado, Brier/log-loss son controles listos, no evidencia histórica del torneo. Por eso se usan priors, consenso y desacuerdo entre modelos como frenos.</p>
+        </article>
+        <article>
+          <span>Uso correcto</span>
+          <strong>Segunda opinión, no promesa de beneficio</strong>
+          <p>Úsalo para evitar errores tontos, ordenar coberturas y elegir marcadores defendibles. Si hay dinero de por medio, pon límites y no conviertas una probabilidad en garantía.</p>
+        </article>
+      </div>
+    </section>
     <details class="technical-accordion" id="modelo">
       <summary>
         <span class="accordion-kicker">Metodología y auditoría</span>

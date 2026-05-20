@@ -87,6 +87,7 @@ h3 { font-size: 1.05rem; }
 }
 #estado,
 #modelo,
+#lectura-critica,
 #boleto,
 #marcadores,
 #llave,
@@ -654,6 +655,72 @@ h3 { font-size: 1.05rem; }
 .technical-accordion-body > .panel {
   margin-left: 0;
   margin-right: 0;
+}
+.critical-reading-panel {
+  display: grid;
+  gap: 18px;
+  grid-template-columns: minmax(260px, 0.78fr) minmax(0, 1.22fr);
+  margin: 18px 0;
+  padding: clamp(18px, 3vw, 28px);
+  border-radius: 30px;
+  background:
+    radial-gradient(circle at 12% 16%, rgba(181,131,47,0.17), transparent 30%),
+    radial-gradient(circle at 90% 12%, rgba(15,109,102,0.14), transparent 32%),
+    linear-gradient(135deg, rgba(255,253,246,0.98), rgba(237,245,241,0.96));
+  border: 1px solid rgba(15,109,102,0.18);
+  box-shadow: var(--shadow);
+}
+.critical-reading-copy {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.critical-reading-copy h2 {
+  font-size: clamp(1.9rem, 4.5vw, 4rem);
+  line-height: 0.96;
+  letter-spacing: -0.045em;
+}
+.critical-reading-copy p:last-child {
+  color: var(--muted);
+  line-height: 1.46;
+  margin-bottom: 0;
+}
+.critical-grid {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.critical-grid article {
+  min-height: 180px;
+  border-radius: 22px;
+  padding: 16px;
+  background: rgba(255,255,255,0.78);
+  border: 1px solid rgba(15,109,102,0.14);
+  box-shadow: 0 14px 32px rgba(20, 42, 38, 0.06);
+}
+.critical-grid span {
+  color: var(--accent-dark);
+  font-weight: 900;
+  letter-spacing: 0.12em;
+}
+.critical-grid strong {
+  display: block;
+  margin: 10px 0 8px;
+  color: var(--ink);
+  font-size: 1.12rem;
+  line-height: 1.12;
+}
+.critical-grid p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.44;
+  font-size: 0.94rem;
+}
+.critical-grid a {
+  color: var(--accent-dark);
+  font-weight: 900;
+  text-decoration: none;
+  border-bottom: 1px dashed currentColor;
 }
 .landing-proof {
   background:
@@ -1950,12 +2017,14 @@ pre {
     min-height: auto;
   }
   .ticket-mode-panel,
+  .critical-reading-panel,
   .responsible-panel {
     grid-template-columns: 1fr;
   }
   .decision-flow,
   .landing-bento,
   .ticket-mode-grid,
+  .critical-grid,
   .responsible-grid {
     grid-template-columns: 1fr;
   }
