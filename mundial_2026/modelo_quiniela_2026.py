@@ -693,8 +693,8 @@ def top_factor_drivers(factors: Optional[Dict[str, float]], limit: int = 3) -> L
         "resource_diff": "Recursos/PIB proxy",
         "heritage_diff": "Historia mundialista",
         "historical_strength_diff": "Historia competitiva desde 1990",
-        "historical_attack_diff": "Ataque historico desde 1990",
-        "historical_defense_diff": "Defensa historica desde 1990",
+        "historical_attack_diff": "Ataque histórico desde 1990",
+        "historical_defense_diff": "Defensa histórica desde 1990",
         "competitive_history_diff": "Rendimiento competitivo desde 1990",
         "world_cup_history_diff": "Rendimiento en Mundiales desde 1990",
         "coach_diff": "Entrenador",
@@ -732,7 +732,7 @@ def top_factor_drivers(factors: Optional[Dict[str, float]], limit: int = 3) -> L
         "goalkeeper_context_diff": "Portero confirmado / cambio de portero",
         "substitution_diff": "Cambios en vivo y banco restante",
         "market_move_diff": "Movimiento reciente de cuotas",
-        "referee_profile_diff": "Perfil del arbitro",
+        "referee_profile_diff": "Perfil del árbitro",
         "rivalry": "Rivalidad",
     }
     ranked = sorted(
@@ -2822,7 +2822,7 @@ def ensure_minimum_monte_carlo_iterations(iterations: int, *, label: str, allow_
         return
     if iterations < MIN_MONTE_CARLO_ITERATIONS:
         raise SystemExit(
-            f"{label} requiere al menos {MIN_MONTE_CARLO_ITERATIONS} simulaciones Monte Carlo; recibio {iterations}."
+            f"{label} requiere al menos {MIN_MONTE_CARLO_ITERATIONS} simulaciones Monte Carlo; recibió {iterations}."
         )
 
 
@@ -3062,23 +3062,23 @@ def format_match_projection(match_id: str, aggregate: dict, iterations: int) -> 
     penalties_prob = projection["penalties_prob"]
     lines = [
         f"### {BRACKET_MATCH_TITLES.get(match_id, match_id)}",
-        f"- Cruce que aparece mas veces en la simulacion: {team_a} vs {team_b}",
+        f"- Cruce que aparece más veces en la simulación: {team_a} vs {team_b}",
         f"- Probabilidad de que este cruce ocurra: {outcome_prob:.1%}",
         f"- Favorito si ese cruce se juega: {winner} ({conditional_winner_prob:.1%})",
         f"- Probabilidad global de que {winner} salga de este casillero: {winner_prob:.1%}",
     ]
     alternatives = [
-        f"{scenario['team_a']} vs {scenario['team_b']} | gana mas probable {scenario['winner']} | este escenario aparece {scenario['prob']:.1%}"
+        f"{scenario['team_a']} vs {scenario['team_b']} | gana más probable {scenario['winner']} | este escenario aparece {scenario['prob']:.1%}"
         for scenario in projection.get("top_scenarios", [])[1:]
     ]
     if alternatives:
-        lines.append(f"- Otros cruces que tambien aparecen seguido: {'; '.join(alternatives)}")
+        lines.append(f"- Otros cruces que también aparecen seguido: {'; '.join(alternatives)}")
     if match_id != "M104":
         lines.append(f"- Va a proroga en {extra_time_prob:.1%} y a penales en {penalties_prob:.1%}")
         penalty_scores = projection.get("top_penalty_scores", [])
         if penalty_scores:
             lines.append(
-                "- Marcadores de penales mas probables en este cruce: "
+                "- Marcadores de penales más probables en este cruce: "
                 + "; ".join(f"{item['score']} ({item['prob']:.1%})" for item in penalty_scores)
             )
     return lines
@@ -3424,9 +3424,9 @@ def next_round_projection_note(
     if opponent_scenarios:
         top = opponent_scenarios[0]
         return (
-            f"Con este resultado, el siguiente cruce mas probable de {winner_name} es contra {top['opponent']}. "
+            f"Con este resultado, el siguiente cruce más probable de {winner_name} es contra {top['opponent']}. "
             f"Ese cruce aparece en {format_pct(float(top['matchup_prob']))} de las simulaciones; "
-            f"si {winner_name} llega a ese partido, su rival mas frecuente es {top['opponent']} en {format_pct(float(top['conditional_if_reaches']))}. "
+            f"si {winner_name} llega a ese partido, su rival más frecuente es {top['opponent']} en {format_pct(float(top['conditional_if_reaches']))}. "
             f"Probabilidad actual de que {winner_name} alcance ese cruce: {format_pct(appearance_prob)} | "
             f"probabilidad de avanzar desde esa llave: {format_pct(advance_prob)}."
         )
@@ -3539,7 +3539,7 @@ def dashboard_shot_timeline_lines(entry: dict, team_a: str, team_b: str) -> List
             if player:
                 label += f" ({player})"
             pieces.append(label)
-        lines.append(f"- Cronologia de disparos {team_name}: {'; '.join(pieces)}")
+        lines.append(f"- Cronología de disparos {team_name}: {'; '.join(pieces)}")
     return lines
 
 
@@ -3587,9 +3587,9 @@ def pattern_lines_from_payload(patterns: Optional[Dict[str, object]], team_a: st
     signals_a = side_a.get("signals") or []
     signals_b = side_b.get("signals") or []
     if signals_a:
-        lines.append(f"- Senales {team_a}: {'; '.join(str(signal) for signal in signals_a[:3])}")
+        lines.append(f"- Señales {team_a}: {'; '.join(str(signal) for signal in signals_a[:3])}")
     if signals_b:
-        lines.append(f"- Senales {team_b}: {'; '.join(str(signal) for signal in signals_b[:3])}")
+        lines.append(f"- Señales {team_b}: {'; '.join(str(signal) for signal in signals_b[:3])}")
     return lines
 
 
@@ -3600,7 +3600,7 @@ def dashboard_weather_summary(fixture: dict) -> Optional[str]:
         f"{fixture.get('weather_temperature_c', 0.0):.1f} C | "
         f"HR {fixture.get('weather_humidity_pct', 0.0):.0f}% | "
         f"viento {fixture.get('weather_wind_kmh', 0.0):.0f} km/h | "
-        f"estres {fixture.get('weather_stress', 0.0):.2f}"
+        f"estrés {fixture.get('weather_stress', 0.0):.2f}"
     )
 
 
@@ -3845,15 +3845,15 @@ def build_recent_changes_markdown(
     previous_updated_at: Optional[str],
 ) -> List[str]:
     if not previous_entries and not previous_bracket:
-        return ["_Todavia no hay una publicacion anterior comparable para mostrar cambios recientes._"]
+        return ["_Todavía no hay una publicación anterior comparable para mostrar cambios recientes._"]
 
     entry_changes = compare_entry_predictions(current_entries, previous_entries)
     bracket_changes = compare_bracket_payloads(current_bracket, previous_bracket)
     lines = []
     if previous_updated_at:
-        lines.append(f"- Comparado contra la publicacion anterior de: {previous_updated_at}")
+        lines.append(f"- Comparado contra la publicación anterior de: {previous_updated_at}")
     lines.append(
-        "- Esta seccion separa dos cosas distintas: cambios de cruce proyectado y cambios de probabilidad dentro del mismo partido. Solo compara picks cuando los dos equipos son los mismos; si cambia el cruce, aparece como cambio de llave, no como movimiento de probabilidad."
+        "- Esta sección separa dos cosas distintas: cambios de cruce proyectado y cambios de probabilidad dentro del mismo partido. Solo compara picks cuando los dos equipos son los mismos; si cambia el cruce, aparece como cambio de llave, no como movimiento de probabilidad."
     )
     combined_matchup_changes = []
     seen_matchup_changes = set()
@@ -3878,7 +3878,7 @@ def build_recent_changes_markdown(
         )
     if bracket_changes["favorite_flips"]:
         lines.append(
-            "- Cruces donde cambio el favorito de avance: "
+            "- Cruces donde cambió el favorito de avance: "
             + "; ".join(
                 f"{item['title']}: {item['matchup']} | antes {item['previous_winner']} -> ahora {item['current_winner']} ({format_pct(item['current_prob'])})"
                 for item in bracket_changes["favorite_flips"]
@@ -3886,7 +3886,7 @@ def build_recent_changes_markdown(
         )
     if entry_changes["movers"]:
         lines.append(
-            "- Partidos comparables donde mas se movio el pick principal: "
+            "- Partidos comparables donde más se movió el pick principal: "
             + "; ".join(
                 f"{item['title']}: {item['previous_label']} {format_pct(item['previous_prob'])} -> {item['current_label']} {format_pct(item['current_prob'])}"
                 for item in entry_changes["movers"]
@@ -3894,7 +3894,7 @@ def build_recent_changes_markdown(
         )
     if entry_changes["score_changes"]:
         lines.append(
-            "- Partidos cuyo marcador proyectado cambio: "
+            "- Partidos cuyo marcador proyectado cambió: "
             + "; ".join(
                 f"{item['title']}: {item['previous_score']} -> {item['current_score']}"
                 for item in entry_changes["score_changes"]
@@ -3902,14 +3902,14 @@ def build_recent_changes_markdown(
         )
     if entry_changes["label_changes"]:
         lines.append(
-            "- Partidos donde cambio el resultado mas probable: "
+            "- Partidos donde cambió el resultado más probable: "
             + "; ".join(
                 f"{item['title']}: {item['previous_label']} -> {item['current_label']}"
                 for item in entry_changes["label_changes"]
             )
         )
     if len(lines) <= 2:
-        lines.append("- Todavia no hay un cambio grande frente a la publicacion anterior.")
+        lines.append("- Todavía no hay un cambio grande frente a la publicación anterior.")
     return lines
 
 
@@ -3923,8 +3923,8 @@ def build_recent_changes_html(
     if not previous_entries and not previous_bracket:
         return (
             "<section class=\"panel changes-panel\">"
-            "<div class=\"panel-head\"><div><p class=\"eyebrow\">Comparativo</p><h2>Que cambio desde la ultima actualizacion</h2>"
-            "<p class=\"lede-tight\">Todavia no hay una publicacion anterior comparable para resumir movimientos del tablero.</p>"
+            "<div class=\"panel-head\"><div><p class=\"eyebrow\">Comparativo</p><h2>Qué cambió desde la última actualización</h2>"
+            "<p class=\"lede-tight\">Todavía no hay una publicación anterior comparable para resumir movimientos del tablero.</p>"
             "<p class=\"meta\">Regla de lectura: Solo compara partidos con los mismos dos equipos. Si cambia el cruce proyectado, se reporta como cambio de llave, no como movimiento de probabilidad.</p>"
             "</div></div></section>"
         )
@@ -3967,7 +3967,7 @@ def build_recent_changes_html(
                 ),
             )
             if combined_matchup_changes
-            else "<li><strong>Sin cambios grandes</strong><span>La ruta principal del cuadro se mantiene respecto de la version anterior.</span></li>"
+            else "<li><strong>Sin cambios grandes</strong><span>La ruta principal del cuadro se mantiene respecto de la versión anterior.</span></li>"
         )
         + "</ul></article>"
     )
@@ -3977,12 +3977,12 @@ def build_recent_changes_html(
             text_list([f"Entran: {', '.join(bracket_changes['new_teams'])}"] if bracket_changes["new_teams"] else [])
             + text_list([f"Salen: {', '.join(bracket_changes['dropped_teams'])}"] if bracket_changes["dropped_teams"] else [])
             if bracket_changes["new_teams"] or bracket_changes["dropped_teams"]
-            else "<li><strong>Sin entradas o salidas nuevas</strong><span>Los equipos visibles en la ruta principal no cambiaron frente a la publicacion anterior.</span></li>"
+            else "<li><strong>Sin entradas o salidas nuevas</strong><span>Los equipos visibles en la ruta principal no cambiaron frente a la publicación anterior.</span></li>"
         )
         + "</ul></article>"
     )
     movers_html = (
-        "<article><h3>Partidos comparables donde mas se movio el pick</h3><ul>"
+        "<article><h3>Partidos comparables donde más se movió el pick</h3><ul>"
         + (
             detailed_rows(
                 entry_changes["movers"],
@@ -3992,7 +3992,7 @@ def build_recent_changes_html(
                 ),
             )
             if entry_changes["movers"]
-            else "<li><strong>Sin cambios detectables</strong><span>En los partidos con los mismos dos equipos, los picks principales siguen practicamente iguales que en la ultima publicacion.</span></li>"
+            else "<li><strong>Sin cambios detectables</strong><span>En los partidos con los mismos dos equipos, los picks principales siguen prácticamente iguales que en la última publicación.</span></li>"
         )
         + "</ul></article>"
     )
@@ -4004,12 +4004,12 @@ def build_recent_changes_html(
                 lambda row: (row["title"], f"{row['previous_score']} -> {row['current_score']}"),
             )
             if entry_changes["score_changes"]
-            else "<li><strong>Sin cambio de marcador principal</strong><span>El resultado entero mas probable sigue igual en los partidos comparables.</span></li>"
+            else "<li><strong>Sin cambio de marcador principal</strong><span>El resultado entero más probable sigue igual en los partidos comparables.</span></li>"
         )
         + "</ul></article>"
     )
     flip_html = (
-        "<article><h3>Cruces donde cambio el favorito</h3><ul>"
+        "<article><h3>Cruces donde cambió el favorito</h3><ul>"
         + (
             detailed_rows(
                 bracket_changes["favorite_flips"],
@@ -4019,14 +4019,14 @@ def build_recent_changes_html(
                 ),
             )
             if bracket_changes["favorite_flips"]
-            else "<li><strong>Sin giro de favorito</strong><span>En los cruces principales comparables no cambio el equipo con mas probabilidad de avanzar.</span></li>"
+            else "<li><strong>Sin giro de favorito</strong><span>En los cruces principales comparables no cambió el equipo con más probabilidad de avanzar.</span></li>"
         )
         + "</ul></article>"
     )
 
     compared_html = ""
     if previous_updated_at:
-        compared_html = f"<p class=\"meta\">Comparado contra la publicacion anterior de {html.escape(previous_updated_at)}.</p>"
+        compared_html = f"<p class=\"meta\">Comparado contra la publicación anterior de {html.escape(previous_updated_at)}.</p>"
 
     movers_chart_rows = [
         {
@@ -4043,17 +4043,17 @@ def build_recent_changes_html(
                 "Mayores movimientos del pick principal comparable",
                 movers_chart_rows,
                 tone="rose",
-                description="Solo compara partidos con los mismos dos equipos. Si cambio el cruce proyectado, aparece en 'Cruces principales que cambiaron' y no aqui. El valor muestra el cambio absoluto de probabilidad, no la probabilidad final del partido.",
-                empty_body="Todavia no hubo un movimiento material del pick principal en partidos comparables frente a la version anterior.",
+                description="Solo compara partidos con los mismos dos equipos. Si cambió el cruce proyectado, aparece en 'Cruces principales que cambiaron' y no aquí. El valor muestra el cambio absoluto de probabilidad, no la probabilidad final del partido.",
+                empty_body="Todavía no hubo un movimiento material del pick principal en partidos comparables frente a la versión anterior.",
             )
         ]
     )
 
     return (
         "<section class=\"panel changes-panel\">"
-        "<div class=\"panel-head\"><div><p class=\"eyebrow\">Comparativo</p><h2>Que cambio desde la ultima actualizacion</h2>"
+        "<div class=\"panel-head\"><div><p class=\"eyebrow\">Comparativo</p><h2>Qué cambió desde la última actualización</h2>"
         "<p class=\"lede-tight\">Este bloque separa cambios de llave y cambios de probabilidad. Si cambia el cruce proyectado, no se compara como si fuera el mismo partido.</p>"
-        "<p class=\"meta\">Regla de lectura: solo compara partidos con los mismos dos equipos. Si antes era Turkey vs Iran y ahora Paraguay vs Iran, eso es un cambio de cruce, no una caida/subida del pick de Paraguay.</p>"
+        "<p class=\"meta\">Regla de lectura: solo compara partidos con los mismos dos equipos. Si antes era Turkey vs Iran y ahora Paraguay vs Iran, eso es un cambio de cruce, no una caída/subida del pick de Paraguay.</p>"
         f"{compared_html}"
         "</div></div>"
         f"{changes_chart_html}"
@@ -4144,8 +4144,8 @@ def projected_bracket_entries(
                 "goal_consensus_source": goal_consensus_source(base_fixture),
                 "projection": True,
                 "projection_note": (
-                    f"Cruce mas probable hoy: {team_a} vs {team_b} | "
-                    f"probabilidad de que se de {format_pct(match_projection['matchup_prob'])} | "
+                    f"Cruce más probable hoy: {team_a} vs {team_b} | "
+                    f"probabilidad de que se dé {format_pct(match_projection['matchup_prob'])} | "
                     f"favorito para avanzar si se juega hoy: {match_projection['winner']} "
                     f"{format_pct(float(match_projection.get('conditional_winner_prob', match_projection['winner_prob'])))} | "
                     f"probabilidad global de ese avance: {format_pct(match_projection['winner_prob'])}"
@@ -4180,7 +4180,7 @@ def dashboard_status(entry: dict) -> Tuple[str, str]:
         detail = entry.get("status_detail")
         return ("live", f"En vivo{f' | {detail}' if detail else ''}")
     if entry.get("projection"):
-        return ("projection", "Proyeccion")
+        return ("projection", "Proyección")
     detail = entry.get("status_detail")
     return ("pending", detail or "Pendiente")
 
@@ -4223,13 +4223,13 @@ def dashboard_news_lines(entry: dict, team_a: str, team_b: str) -> List[str]:
         )
     if entry.get("goalkeeper_change_a") or entry.get("goalkeeper_change_b"):
         lines.append(
-            f"- Cambio de portero respecto a la actualizacion anterior: {team_a} {'si' if entry.get('goalkeeper_change_a') else 'no'} | "
-            f"{team_b} {'si' if entry.get('goalkeeper_change_b') else 'no'}"
+            f"- Cambio de portero respecto a la actualización anterior: {team_a} {'sí' if entry.get('goalkeeper_change_a') else 'no'} | "
+            f"{team_b} {'sí' if entry.get('goalkeeper_change_b') else 'no'}"
         )
     if entry.get("referee"):
         sample_matches = int(entry.get("referee_sample_matches", 0) or 0)
         lines.append(
-            f"- Arbitro: {entry.get('referee')} | perfil {sample_matches} muestras, amarillas {float(entry.get('referee_yellow_bias', 0.0)):+.2f}, "
+            f"- Árbitro: {entry.get('referee')} | perfil {sample_matches} muestras, amarillas {float(entry.get('referee_yellow_bias', 0.0)):+.2f}, "
             f"rojas {float(entry.get('referee_red_bias', 0.0)):+.2f}, penales {float(entry.get('referee_penalty_bias', 0.0)):+.2f}"
         )
     market_move_a = float(entry.get("market_move_a", 0.0) or 0.0)
@@ -4285,13 +4285,13 @@ def adjustment_reason_lines(entry: dict, prediction: MatchPrediction) -> List[st
         )
     if entry.get("goalkeeper_change_a") or entry.get("goalkeeper_change_b"):
         lines.append(
-            f"- Cambio por portero distinto al de la actualizacion anterior: {prediction.team_a} {'si' if entry.get('goalkeeper_change_a') else 'no'} | "
-            f"{prediction.team_b} {'si' if entry.get('goalkeeper_change_b') else 'no'}."
+            f"- Cambio por portero distinto al de la actualización anterior: {prediction.team_a} {'sí' if entry.get('goalkeeper_change_a') else 'no'} | "
+            f"{prediction.team_b} {'sí' if entry.get('goalkeeper_change_b') else 'no'}."
         )
     if entry.get("weather_stress") is not None and float(entry.get("weather_stress", 0.0)) >= 0.18:
-        lines.append(f"- Cambio por clima exigente: estres climatico {float(entry.get('weather_stress', 0.0)):.2f}.")
+        lines.append(f"- Cambio por clima exigente: estrés climático {float(entry.get('weather_stress', 0.0)):.2f}.")
     if entry.get("market_prob_a") is not None:
-        lines.append("- Cambio por cuotas del mercado: se mezclan con la estimacion propia del modelo.")
+        lines.append("- Cambio por cuotas del mercado: se mezclan con la estimación propia del modelo.")
     if any(abs(float(entry.get(key, 0.0) or 0.0)) >= 0.005 for key in ("market_move_a", "market_move_draw", "market_move_b")):
         lines.append(
             f"- Cambio por movimiento reciente de cuotas: {prediction.team_a} {float(entry.get('market_move_a', 0.0)):+.1%} | "
@@ -4299,7 +4299,7 @@ def adjustment_reason_lines(entry: dict, prediction: MatchPrediction) -> List[st
         )
     if entry.get("referee_sample_matches"):
         lines.append(
-            f"- Cambio por perfil del arbitro: amarillas {float(entry.get('referee_yellow_bias', 0.0)):+.2f}, "
+            f"- Cambio por perfil del árbitro: amarillas {float(entry.get('referee_yellow_bias', 0.0)):+.2f}, "
             f"rojas {float(entry.get('referee_red_bias', 0.0)):+.2f}, penales {float(entry.get('referee_penalty_bias', 0.0)):+.2f}."
         )
     live_stats = extract_live_stats_payload(entry)
@@ -4340,7 +4340,7 @@ def adjustment_reason_lines(entry: dict, prediction: MatchPrediction) -> List[st
     drivers = top_factor_drivers(prediction.factors, limit=2)
     if drivers:
         lines.append(
-            "- Factores que mas pesan ahora: "
+            "- Factores que más pesan ahora: "
             + "; ".join(f"{label} {value:+.3f}" for label, value in drivers)
         )
     return lines
@@ -4350,7 +4350,7 @@ def goals_label(prediction: MatchPrediction) -> str:
     if prediction.live_phase == "regulation":
         return "Goles esperados al final del tiempo reglamentario"
     if prediction.live_phase == "extra_time":
-        return "Goles esperados al final de la prorroga"
+        return "Goles esperados al final de la prórroga"
     if prediction.live_phase == "penalties":
         return "Marcador actual"
     return "Goles esperados"
@@ -4360,7 +4360,7 @@ def projected_score_label(prediction: MatchPrediction) -> str:
     if prediction.live_phase == "regulation":
         return "Marcador proyectado al final del tiempo reglamentario"
     if prediction.live_phase == "extra_time":
-        return "Marcador proyectado al final de la prorroga"
+        return "Marcador proyectado al final de la prórroga"
     if prediction.live_phase == "penalties":
         return "Marcador actual"
     return "Marcador proyectado"
@@ -4376,7 +4376,7 @@ def average_goals_label(prediction: MatchPrediction) -> str:
     if prediction.live_phase == "regulation":
         return "Promedio estimado de goles al final del tiempo reglamentario"
     if prediction.live_phase == "extra_time":
-        return "Promedio estimado de goles al final de la prorroga"
+        return "Promedio estimado de goles al final de la prórroga"
     if prediction.live_phase == "penalties":
         return "Marcador actual"
     return "Promedio estimado de goles del modelo"
@@ -4386,7 +4386,7 @@ def result_prob_label(prediction: MatchPrediction) -> str:
     if prediction.live_phase == "regulation":
         return "Probabilidades de resultado al final del tiempo reglamentario"
     if prediction.live_phase == "extra_time":
-        return "Probabilidades de resultado al final de la prorroga"
+        return "Probabilidades de resultado al final de la prórroga"
     if prediction.live_phase == "penalties":
         return "Probabilidades de clasificar en penales"
     return "Probabilidades de resultado (90')"
@@ -4394,12 +4394,12 @@ def result_prob_label(prediction: MatchPrediction) -> str:
 
 def top_result_label(prediction: MatchPrediction) -> str:
     if prediction.live_phase == "regulation":
-        return "Desenlace mas probable al final del tiempo reglamentario"
+        return "Desenlace más probable al final del tiempo reglamentario"
     if prediction.live_phase == "extra_time":
-        return "Desenlace mas probable al final de la prorroga"
+        return "Desenlace más probable al final de la prórroga"
     if prediction.live_phase == "penalties":
         return "Equipo con mayor probabilidad de clasificar en penales"
-    return "Desenlace mas probable en 90 minutos"
+    return "Desenlace más probable en 90 minutos"
 
 
 def top_result_summary(prediction: MatchPrediction) -> str:
@@ -4531,12 +4531,12 @@ def score_precision_profile(
     if precision_score >= 0.78:
         precision_label = "Marcador defendible"
     elif precision_score >= 0.55:
-        precision_label = "Marcador con precision media"
+        precision_label = "Marcador con precisión media"
     else:
-        precision_label = "Marcador fragil"
+        precision_label = "Marcador frágil"
 
     if recommended_score == top_exact_score:
-        recommendation_note = "El marcador que maximiza puntos tambien es el exacto mas probable."
+        recommendation_note = "El marcador que maximiza puntos también es el exacto más probable."
     else:
         exact_loss = max(0.0, float(top_exact_prob) - recommended_exact_prob)
         recommendation_note = (
@@ -4596,22 +4596,22 @@ def quiniela_certainty_profile(entry: dict) -> dict:
     )
     if best_prob >= 0.66 and gap >= 0.18 and confidence >= 0.70:
         tier = "Pick base claro"
-        action = "jugar el resultado principal sin cubrir, salvo noticia fuerte de ultima hora"
+        action = "jugar el resultado principal sin cubrir, salvo noticia fuerte de última hora"
     elif best_prob >= 0.58 and gap >= 0.12:
         tier = "Pick principal"
         action = "jugar el resultado principal; cubrir solo si necesitas reducir riesgo"
     elif prediction.draw >= 0.27 and gap < 0.12:
         tier = "Partido cerrado"
-        action = "no venderlo como fijo: el empate esta cerca y conviene cubrir si las reglas lo permiten"
+        action = "no venderlo como fijo: el empate está cerca y conviene cubrir si las reglas lo permiten"
     else:
         tier = "Riesgo alto"
         action = "cubrir o evitar como fijo; marcador exacto solo si la quiniela lo exige"
     score_note = (
-        "marcador optimizado para puntos de Penca Ovacion"
+        "marcador optimizado para puntos de Penca Ovación"
         if penca_expected_points >= 3.60
         else "marcador jugable, pero no venderlo como fijo"
         if penca_expected_points >= 3.10
-        else "marcador exacto fragil; el valor viene mas por ganador/diferencia"
+        else "marcador exacto frágil; el valor viene más por ganador/diferencia"
     )
     return {
         "title": entry["title"],
@@ -4673,15 +4673,15 @@ def quiniela_audit_metrics(profiles: Sequence[dict]) -> dict:
     min_confidence = min(float(item["confidence"]) for item in profiles)
     warnings = []
     if low_gap:
-        warnings.append(f"{low_gap} partidos tienen brecha menor a 10 puntos porcentuales contra la segunda opcion.")
+        warnings.append(f"{low_gap} partidos tienen brecha menor a 10 puntos porcentuales contra la segunda opción.")
     if traps or high_variance:
         warnings.append(f"{traps + high_variance} partidos deben tratarse con cobertura o cautela.")
     if fragile_scores > defensible_scores:
-        warnings.append("La mayoria de marcadores exactos son fragiles; usarlos solo si la quiniela premia marcador.")
+        warnings.append("La mayoría de marcadores exactos son frágiles; usarlos solo si la quiniela premia marcador.")
     if avg_certainty < 0.68:
         warnings.append("La certeza operativa media no es alta; conviene priorizar picks base y evitar jugadas heroicas.")
     if not warnings:
-        warnings.append("El boleto no muestra alertas críticas en este corte, pero igual debe revisarse alineacion y noticias antes del cierre.")
+        warnings.append("El boleto no muestra alertas críticas en este corte, pero igual debe revisarse alineación y noticias antes del cierre.")
     if firm_or_preferent / total >= 0.70 and low_gap <= max(2, total // 8):
         ticket_status = "Boleto defendible"
     elif traps + high_variance >= max(4, total // 5):
@@ -4781,11 +4781,11 @@ def quiniela_strategy_profile(entry: dict) -> dict:
         strategy_tier = "Cubrir si puedes"
         strategy_action = (
             f"Pick base: {base['pick_label']}. Si tu quiniela permite marcar dos resultados, "
-            f"agrega tambien {base['second_label']}. Si solo permite uno, usa el pick base pero no lo trates como fijo."
+            f"agrega también {base['second_label']}. Si solo permite uno, usa el pick base pero no lo trates como fijo."
         )
     elif float(base["gap"]) < 0.08 or float(base["pick_prob"]) < 0.48:
         strategy_tier = "Riesgo alto"
-        strategy_action = "No gastes aqui un diferencial heroico: cubre o acepta el riesgo con marcador sugerido."
+        strategy_action = "No gastes aquí un diferencial heroico: cubre o acepta el riesgo con marcador sugerido."
     else:
         strategy_tier = "Base controlada"
         strategy_action = "Jugar el pick del modelo, sin sobreponderar marcador exacto."
@@ -4899,16 +4899,16 @@ def build_quiniela_strategy_markdown(entries: Sequence[dict]) -> List[str]:
     lines = [
         "### Estrategia para ganar la quiniela",
         "- Objetivo: aumentar expectativa y ventaja relativa frente a un boleto popular, no inflar porcentajes.",
-        "- Reglas Penca Ovacion usadas para optimizar marcador: 8 puntos por resultado exacto, 5 por diferencia de goles y 3 por ganador.",
+        "- Reglas Penca Ovación usadas para optimizar marcador: 8 puntos por resultado exacto, 5 por diferencia de goles y 3 por ganador.",
         f"- Aciertos esperados del boleto modelo: {metrics['expected_model_hits']:.1f}/{int(metrics['total'])}.",
         f"- Puntos esperados por marcadores recomendados para la app: {metrics['expected_penca_points']:.1f}/{int(metrics['total']) * 8} ({metrics['expected_penca_points_per_match']:.2f} por partido).",
         f"- Boleto popular por nombre estimado: {metrics['expected_popular_hits']:.1f}/{int(metrics['total'])}. Ventaja esperada del modelo: {metrics['expected_gain']:+.1f} picks.",
-        f"- Marcador exacto recomendado esperado: {metrics['expected_penca_exact_scores']:.1f}/{int(metrics['total'])}. Esto NO mide acierto de ganador; mide cuantas veces esperarias acertar el marcador optimizado para puntos.",
+        f"- Marcador exacto recomendado esperado: {metrics['expected_penca_exact_scores']:.1f}/{int(metrics['total'])}. Esto NO mide acierto de ganador; mide cuántas veces esperarías acertar el marcador optimizado para puntos.",
         f"- Diferencia de goles esperada con el marcador recomendado: {metrics['expected_penca_difference_scores']:.1f}/{int(metrics['total'])}.",
         f"- Rango realista 90% del marcador exacto principal: {metrics['exact_score_range_low']:.0f}-{metrics['exact_score_range_high']:.0f} aciertos.",
         f"- Si la quiniela permite poner 3 marcadores alternativos por partido, la cobertura esperada sube a {metrics['expected_top3_scores']:.1f}/{int(metrics['total'])}.",
-        f"- Rango estadistico aproximado de resultados principales: {metrics['range_low']:.0f}-{metrics['range_high']:.0f} aciertos.",
-        f"- Cobertura minima/recomendada/agresiva: {int(metrics['coverage_min'])}/{int(metrics['coverage_recommended'])}/{int(metrics['coverage_aggressive'])} partidos.",
+        f"- Rango estadístico aproximado de resultados principales: {metrics['range_low']:.0f}-{metrics['range_high']:.0f} aciertos.",
+        f"- Cobertura mínima/recomendada/agresiva: {int(metrics['coverage_min'])}/{int(metrics['coverage_recommended'])}/{int(metrics['coverage_aggressive'])} partidos.",
         "",
         "### Diferenciales positivos",
     ]
@@ -4923,7 +4923,7 @@ def build_quiniela_strategy_markdown(entries: Sequence[dict]) -> List[str]:
     if coverage:
         for item in coverage:
             lines.append(
-                f"- {item['title']}: {item['pick_label']} {format_pct(item['pick_prob'])}; marcador Penca {item['score']} | {item['penca_expected_points']:.2f} pts esp. | exacto {format_pct(item['score_prob'])} | diferencia {format_pct(item['penca_difference_prob'])}; segunda opcion {item['second_label']} {format_pct(item['second_prob'])}; {item['strategy_action']}"
+                f"- {item['title']}: {item['pick_label']} {format_pct(item['pick_prob'])}; marcador Penca {item['score']} | {item['penca_expected_points']:.2f} pts esp. | exacto {format_pct(item['score_prob'])} | diferencia {format_pct(item['penca_difference_prob'])}; segunda opción {item['second_label']} {format_pct(item['second_prob'])}; {item['strategy_action']}"
             )
     else:
         lines.append("- No hay coberturas críticas en este corte.")
@@ -4959,7 +4959,7 @@ def build_quiniela_strategy_html(entries: Sequence[dict]) -> str:
 
     def strategy_rows(items: Sequence[dict], empty: str) -> str:
         if not items:
-            return f"<li><strong>{html.escape(empty)}</strong><span>En este corte no hay suficientes casos para esta categoria.</span></li>"
+            return f"<li><strong>{html.escape(empty)}</strong><span>En este corte no hay suficientes casos para esta categoría.</span></li>"
         rows = []
         for item in items:
             detail = (
@@ -4983,14 +4983,14 @@ def build_quiniela_strategy_html(entries: Sequence[dict]) -> str:
         "<div class=\"confidence-tiles strategy-tiles\">"
         f"<div class=\"summary-tile\"><span>Aciertos esperados 1X2</span><strong>{metrics['expected_model_hits']:.1f}/{int(metrics['total'])}</strong></div>"
         f"<div class=\"summary-tile\"><span>Puntos esperados Penca</span><strong>{metrics['expected_penca_points']:.1f}/{int(metrics['total']) * 8}</strong><small>{metrics['expected_penca_points_per_match']:.2f} puntos por partido con marcador optimizado.</small></div>"
-        f"<div class=\"summary-tile\"><span>Rango estadistico 90%</span><strong>{metrics['range_low']:.0f}-{metrics['range_high']:.0f}</strong></div>"
+        f"<div class=\"summary-tile\"><span>Rango estadístico 90%</span><strong>{metrics['range_low']:.0f}-{metrics['range_high']:.0f}</strong></div>"
         f"<div class=\"summary-tile\"><span>Ventaja vs boleto popular</span><strong>{metrics['expected_gain']:+.1f} picks</strong></div>"
         f"<div class=\"summary-tile\"><span>Marcador exacto principal</span><strong>{metrics['expected_penca_exact_scores']:.1f}/{int(metrics['total'])}</strong><small>Marcador recomendado para cargar: maximiza puntos esperados de Penca, no solo probabilidad aislada. Rango 90%: {metrics['exact_score_range_low']:.0f}-{metrics['exact_score_range_high']:.0f}</small></div>"
         f"<div class=\"summary-tile\"><span>Diferencia de goles esperada</span><strong>{metrics['expected_penca_difference_scores']:.1f}/{int(metrics['total'])}</strong><small>Incluye exactos; en Penca esto vale 5 puntos si no clavas el marcador.</small></div>"
-        f"<div class=\"summary-tile\"><span>Si puedes poner 3 marcadores</span><strong>{metrics['expected_top3_scores']:.1f}/{int(metrics['total'])}</strong><small>Cobertura esperada usando los tres marcadores mas probables por partido.</small></div>"
+        f"<div class=\"summary-tile\"><span>Si puedes poner 3 marcadores</span><strong>{metrics['expected_top3_scores']:.1f}/{int(metrics['total'])}</strong><small>Cobertura esperada usando los tres marcadores más probables por partido.</small></div>"
         f"<div class=\"summary-tile\"><span>Diferenciales positivos</span><strong>{int(metrics['differentials'])}</strong></div>"
-        f"<div class=\"summary-tile\"><span>Partidos a cubrir minimo</span><strong>{int(metrics['coverage_min'])}</strong><small>Solo partidos cerrados o de riesgo alto.</small></div>"
-        f"<div class=\"summary-tile\"><span>Cobertura recomendada</span><strong>{int(metrics['coverage_recommended'])}</strong><small>Si tu formato permite dos resultados, agrega la segunda opcion indicada.</small></div>"
+        f"<div class=\"summary-tile\"><span>Partidos a cubrir mínimo</span><strong>{int(metrics['coverage_min'])}</strong><small>Solo partidos cerrados o de riesgo alto.</small></div>"
+        f"<div class=\"summary-tile\"><span>Cobertura recomendada</span><strong>{int(metrics['coverage_recommended'])}</strong><small>Si tu formato permite dos resultados, agrega la segunda opción indicada.</small></div>"
         f"<div class=\"summary-tile\"><span>Cobertura agresiva</span><strong>{int(metrics['coverage_aggressive'])}</strong><small>Si necesitas diferenciarte mucho.</small></div>"
         "</div>"
     )
@@ -5000,7 +5000,7 @@ def build_quiniela_strategy_html(entries: Sequence[dict]) -> str:
         "<p class=\"eyebrow\">Optimización del boleto</p>"
         "<h2>Estrategia para ganar la quiniela</h2>"
         "<p class=\"lede-tight\">Esta capa busca subir tus probabilidades de ganar la quiniela: maximiza aciertos esperados, separa picks seguros de diferenciales y evita copiar ciegamente al favorito popular cuando el modelo ve otra cosa.</p>"
-        "<p class=\"meta\">Reglas publicas de Penca Ovacion usadas aqui: 8 puntos por marcador exacto, 5 por diferencia de goles y 3 por ganador. Por eso el marcador recomendado puede diferir del marcador exacto mas probable: se elige el que da mas puntos esperados.</p>"
+        "<p class=\"meta\">Reglas públicas de Penca Ovación usadas aquí: 8 puntos por marcador exacto, 5 por diferencia de goles y 3 por ganador. Por eso el marcador recomendado puede diferir del marcador exacto más probable: se elige el que da más puntos esperados.</p>"
         "<p class=\"meta\">No se inflan probabilidades: se mejora la estrategia. El proxy de boleto popular por nombre estima cómo llenaría alguien sobreponderando ranking, fama e historia; sirve para detectar dónde el modelo puede darte ventaja relativa.</p>"
         "</div></div>"
         f"{tiles}"
@@ -5038,7 +5038,7 @@ def build_full_scorecard_markdown(entries: Sequence[dict]) -> List[str]:
             f"({prediction.team_a} - {prediction.team_b}) | pick {pick_label} {format_pct(pick_prob)} | "
             f"exacto {format_pct(float(top_penca.get('exact_prob', 0.0)))} | "
             f"puntos esp. {float(top_penca.get('expected_points', 0.0)):.2f}/8 | "
-            f"exacto mas probable {guidance.get('top_exact_score', prediction.exact_scores[0][0] if prediction.exact_scores else top_penca['score'])}"
+            f"exacto más probable {guidance.get('top_exact_score', prediction.exact_scores[0][0] if prediction.exact_scores else top_penca['score'])}"
             f"{projection_note}"
         )
     return lines
@@ -5067,26 +5067,26 @@ def build_full_scorecard_html(entries: Sequence[dict]) -> str:
             f"<td><strong>{html.escape(str(entry['title']))}</strong><span>{html.escape(str(entry['stage_label']))} | {html.escape(status_text)}</span></td>"
             f"<td><strong>{html.escape(prediction.team_a)} {html.escape(str(top_penca['score']).split('-')[0])} - {html.escape(str(top_penca['score']).split('-')[-1])} {html.escape(prediction.team_b)}</strong><span>Orden: {html.escape(prediction.team_a)} - {html.escape(prediction.team_b)}</span></td>"
             f"<td>{html.escape(pick_label)} <span>{format_pct(pick_prob)}</span></td>"
-            f"<td>{html.escape(top_exact)} <span>exacto mas probable</span></td>"
+            f"<td>{html.escape(top_exact)} <span>marcador más probable del modelo</span></td>"
             f"<td>{format_pct(float(top_penca.get('exact_prob', 0.0)))} <span>exacto recomendado</span></td>"
             f"<td>{float(top_penca.get('expected_points', 0.0)):.2f}/8 <span>{html.escape(precision_label)}</span></td>"
             "</tr>"
         )
     return (
-        "<section class=\"panel scorecard-panel\" id=\"marcadores\">"
+        "<section class=\"panel scorecard-panel\">"
         "<div class=\"panel-head\"><div>"
         "<p class=\"eyebrow\">Boleto completo</p>"
         "<h2>Marcadores para cargar en Penca</h2>"
-        "<p class=\"lede-tight\">Esta es la lista operativa dinamica: un marcador para cada partido modelado, recalculado en cada refresh con el modelo, resultados reales, noticias, estado live y cruces proyectados. El marcador siempre esta en el orden Equipo A - Equipo B.</p>"
+        "<p class=\"lede-tight\">Esta es la lista operativa dinámica: un marcador para cada partido modelado, recalculado en cada refresh con el modelo, resultados reales, noticias, estado live y cruces proyectados. El marcador siempre está en el orden Equipo A - Equipo B.</p>"
         "</div></div>"
         "<div class=\"confidence-tiles scorecard-tiles\">"
-        f"<div class=\"summary-tile\"><span>Total con marcador</span><strong>{len(entries)}/104</strong><small>{len(fixture_entries)} fixtures directos + {len(projected_entries)} cruces proyectados.</small></div>"
+        f"<div class=\"summary-tile\"><span>Total con marcador</span><strong>{len(entries)}/104</strong><small>{len(fixture_entries)} partidos de fase de grupos auditados + {len(projected_entries)} cruces eliminatorios proyectados.</small></div>"
         "<div class=\"summary-tile\"><span>Regla usada</span><strong>8 / 5 / 3</strong><small>Exacto, diferencia de goles, ganador.</small></div>"
-        "<div class=\"summary-tile\"><span>Actualizacion</span><strong>Dinamica</strong><small>Cambia durante el torneo si cambian partidos, llave, lesiones o live.</small></div>"
-        "<div class=\"summary-tile\"><span>Como leerlo</span><strong>Equipo A - Equipo B</strong><small>No inviertas el orden al cargarlo en la app.</small></div>"
+        "<div class=\"summary-tile\"><span>Actualización</span><strong>Dinámica</strong><small>Cambia durante el torneo si cambian partidos, llave, lesiones o live.</small></div>"
+        "<div class=\"summary-tile\"><span>Cómo leerlo</span><strong>Equipo A - Equipo B</strong><small>No inviertas el orden al cargarlo en la app.</small></div>"
         "</div>"
         "<div class=\"scorecard-table-wrap\"><table class=\"scorecard-table\">"
-        "<thead><tr><th>#</th><th>Partido</th><th>Marcador para cargar</th><th>Pick</th><th>Exacto puro</th><th>Prob. exacto</th><th>Puntos esp.</th></tr></thead>"
+        "<thead><tr><th>#</th><th>Partido</th><th>Marcador para cargar en Penca</th><th>Pick</th><th>Más probable del modelo</th><th>Prob. exacto</th><th>Puntos esperados</th></tr></thead>"
         f"<tbody>{''.join(rows)}</tbody>"
         "</table></div>"
         "</section>"
@@ -5097,6 +5097,7 @@ def build_max_certainty_markdown(entries: Sequence[dict]) -> List[str]:
     if not entries:
         return ["_Sin partidos cargados para construir una hoja de picks._"]
     profiles = [quiniela_certainty_profile(entry) for entry in entries if not entry.get("projection")]
+    projected_count = sum(1 for entry in entries if entry.get("projection"))
     if not profiles:
         return ["_Sin partidos reales cargados para construir una hoja de picks._"]
     audit = quiniela_audit_metrics(profiles)
@@ -5107,21 +5108,21 @@ def build_max_certainty_markdown(entries: Sequence[dict]) -> List[str]:
     )[:8]
     score_picks = sorted(profiles, key=lambda item: (item["score_prob"], item["top3"]), reverse=True)[:8]
     lines = [
-        "- Lectura: la certeza operativa no es probabilidad garantizada de acierto; es un ranking conservador que mezcla probabilidad del resultado, diferencia contra la segunda opcion, cobertura de marcadores y acuerdo entre modelos.",
+        "- Lectura: la certeza operativa no es probabilidad garantizada de acierto; es un ranking conservador que mezcla probabilidad del resultado, diferencia contra la segunda opción, cobertura de marcadores y acuerdo entre modelos.",
         "- Regla base sin conocer tu quiniela exacta: en picks base juega resultado; en partidos cerrados cubre empate/upset si el formato lo permite; para marcador exacto usa el marcador principal solo si la quiniela lo premia mucho.",
         "",
-        "### Auditoria del boleto",
+        "### Auditoría del boleto",
         f"- Estado: {audit['ticket_status']}",
-        f"- Partidos auditados: {audit['total']}",
+        f"- Partidos auditados: {audit['total']} de fase de grupos + {projected_count} cruces eliminatorios proyectados = {audit['total'] + projected_count} partidos con marcador.",
         f"- Picks base o principales: {audit['firm_or_preferent']}",
         f"- Partidos cerrados o de riesgo alto: {audit['traps'] + audit['high_variance']}",
-        f"- Marcadores exactos defendibles: {audit['defensible_scores']} | fragiles: {audit['fragile_scores']}",
-        f"- Brecha minima contra la segunda opcion: {format_pct(float(audit['min_gap']))}",
+        f"- Marcadores exactos defendibles: {audit['defensible_scores']} | frágiles: {audit['fragile_scores']}",
+        f"- Brecha mínima contra la segunda opción: {format_pct(float(audit['min_gap']))}",
         f"- Certeza operativa media: {format_pct(float(audit['avg_certainty']))}",
-        "- Checklist de auditoria: revisar bajas confirmadas, once inicial, mercado de ultima hora, clima y estado live antes de cerrar el boleto.",
+        "- Checklist de auditoría: revisar bajas confirmadas, once inicial, mercado de última hora, clima y estado live antes de cerrar el boleto.",
         "- Alertas: " + " ".join(str(item) for item in audit["warnings"]),
         "",
-        "### Picks mas defendibles",
+        "### Picks más defendibles",
     ]
     for item in safest:
         lines.append(
@@ -5131,11 +5132,11 @@ def build_max_certainty_markdown(entries: Sequence[dict]) -> List[str]:
     if traps:
         for item in traps:
             lines.append(
-                f"- {item['title']}: pick principal {item['pick_label']} {format_pct(item['pick_prob'])}, marcador sugerido {item['score']} {format_pct(item['score_prob'])}, segunda opcion {item['second_label']} {format_pct(item['second_prob'])} | brecha {format_pct(item['gap'])} | {item['action']}"
+                f"- {item['title']}: pick principal {item['pick_label']} {format_pct(item['pick_prob'])}, marcador sugerido {item['score']} {format_pct(item['score_prob'])}, segunda opción {item['second_label']} {format_pct(item['second_prob'])} | brecha {format_pct(item['gap'])} | {item['action']}"
             )
     else:
         lines.append("- No hay partidos cerrados críticos en este corte.")
-    lines.extend(["", "### Marcadores exactos mas defendibles"])
+    lines.extend(["", "### Marcadores exactos más defendibles"])
     for item in score_picks:
         lines.append(
             f"- {item['title']}: {item['score']} ({format_pct(item['score_prob'])}) | cobertura con tres marcadores {format_pct(item['top3'])} | {item['score_note']}"
@@ -5149,6 +5150,7 @@ def build_max_certainty_html(entries: Sequence[dict]) -> str:
     profiles = [quiniela_certainty_profile(entry) for entry in entries if not entry.get("projection")]
     if not profiles:
         return ""
+    projected_count = sum(1 for entry in entries if entry.get("projection"))
     audit = quiniela_audit_metrics(profiles)
     safest = sorted(profiles, key=lambda item: (item["certainty_score"], item["pick_prob"], item["gap"]), reverse=True)[:10]
     traps = sorted(
@@ -5170,7 +5172,7 @@ def build_max_certainty_html(entries: Sequence[dict]) -> str:
                 detail = (
                     f"Pick principal {item['pick_label']} {format_pct(item['pick_prob'])}; "
                     f"marcador sugerido {item['score']} {format_pct(item['score_prob'])}; "
-                    f"segunda opcion {item['second_label']} {format_pct(item['second_prob'])}; "
+                    f"segunda opción {item['second_label']} {format_pct(item['second_prob'])}; "
                     f"brecha {format_pct(item['gap'])}"
                 )
             else:
@@ -5190,29 +5192,29 @@ def build_max_certainty_html(entries: Sequence[dict]) -> str:
     audit_tiles = (
         "<div class=\"confidence-tiles quiniela-audit-tiles\">"
         f"<div class=\"summary-tile\"><span>Estado del boleto</span><strong>{html.escape(str(audit['ticket_status']))}</strong></div>"
-        f"<div class=\"summary-tile\"><span>Partidos auditados</span><strong>{int(audit['total'])}</strong></div>"
+        f"<div class=\"summary-tile\"><span>Fase de grupos auditada</span><strong>{int(audit['total'])}</strong><small>{int(audit['total'])} partidos de fase de grupos auditados + {projected_count} cruces eliminatorios proyectados = {int(audit['total']) + projected_count} con marcador.</small></div>"
         f"<div class=\"summary-tile\"><span>Picks base o principales</span><strong>{int(audit['firm_or_preferent'])}</strong></div>"
         f"<div class=\"summary-tile\"><span>Partidos cerrados o de riesgo alto</span><strong>{int(audit['traps']) + int(audit['high_variance'])}</strong></div>"
         f"<div class=\"summary-tile\"><span>Marcadores exactos defendibles</span><strong>{int(audit['defensible_scores'])}</strong></div>"
-        f"<div class=\"summary-tile\"><span>Brecha minima contra la segunda opcion</span><strong>{format_pct(float(audit['min_gap']))}</strong></div>"
+        f"<div class=\"summary-tile\"><span>Brecha mínima contra la segunda opción</span><strong>{format_pct(float(audit['min_gap']))}</strong></div>"
         f"<div class=\"summary-tile\"><span>Certeza operativa media</span><strong>{format_pct(float(audit['avg_certainty']))}</strong></div>"
         "</div>"
     )
     warning_rows = "".join(
         "<li>"
         f"<strong>{html.escape(str(warning))}</strong>"
-        "<span>Accion: revisar antes de cerrar la quiniela y no sobreapostar marcadores exactos fragiles.</span>"
+        "<span>Acción: revisar antes de cerrar la quiniela y no sobreapostar marcadores exactos frágiles.</span>"
         "</li>"
         for warning in audit["warnings"]
     )
     audit_panel = (
         "<article class=\"ticket-audit-card\">"
-        "<h3>Auditoria del boleto</h3>"
-        "<p class=\"meta\">Esta capa revisa si el boleto esta defendible como estrategia de quiniela: no promete certeza artificial, separa picks base de coberturas y detecta donde el modelo esta mas fragil.</p>"
+        "<h3>Auditoría del boleto</h3>"
+        "<p class=\"meta\">Esta capa revisa si el boleto está defendible como estrategia de quiniela: no promete certeza artificial, separa picks base de coberturas y detecta dónde el modelo está más frágil.</p>"
         f"{audit_tiles}"
-        "<h4>Checklist de auditoria</h4>"
+        "<h4>Checklist de auditoría</h4>"
         "<ul>"
-        "<li><strong>Antes de cerrar</strong><span>Confirmar bajas, once inicial, portero, cuotas de ultima hora, clima y noticias.</span></li>"
+        "<li><strong>Antes de cerrar</strong><span>Confirmar bajas, once inicial, portero, cuotas de última hora, clima y noticias.</span></li>"
         "<li><strong>Durante partido en vivo</strong><span>Si la quiniela permite cambios, priorizar minuto, marcador, tiros, xG live, rojas y momentum.</span></li>"
         f"{warning_rows}"
         "</ul>"
@@ -5225,18 +5227,18 @@ def build_max_certainty_html(entries: Sequence[dict]) -> str:
         "<div>"
         "<p class=\"eyebrow\">Modo quiniela</p>"
         "<h2>Hoja de máxima certeza</h2>"
-        "<p class=\"lede-tight\">Esta seccion traduce el modelo a decisiones de quiniela. No infla probabilidades: ordena los picks por solidez operativa, separa partidos cerrados y avisa cuando el marcador exacto es fragil.</p>"
+        "<p class=\"lede-tight\">Esta sección traduce el modelo a decisiones de quiniela. No infla probabilidades: ordena los picks por solidez operativa, separa partidos cerrados y avisa cuando el marcador exacto es frágil.</p>"
         "</div>"
         "</div>"
         f"{audit_panel}"
         "<div class=\"certainty-grid\">"
-        "<article><h3>Picks mas defendibles</h3><ul>"
+        "<article><h3>Picks más defendibles</h3><ul>"
         f"{rows(safest, 'safe')}"
         "</ul></article>"
         "<article><h3>Partidos para cubrir o tratar con cuidado</h3><ul>"
         f"{trap_rows}"
         "</ul></article>"
-        "<article><h3>Marcadores exactos mas defendibles</h3><ul>"
+        "<article><h3>Marcadores exactos más defendibles</h3><ul>"
         f"{rows(score_picks, 'score')}"
         "</ul></article>"
         "</div>"
@@ -5252,9 +5254,9 @@ def build_consensus_guardrail_markdown(bracket_payload: dict, entries: Optional[
         return ["_Sin llave generada para comparar contra consenso externo._"]
     lines = [
         "- Lectura: esta capa no reemplaza el modelo. Lo calibra contra consenso externo definido para evitar dos errores típicos de quiniela: sobreconcentrarse en un favorito y dejar vivo muy poco a contendientes fuertes.",
-        f"- Mezcla dinamica usada para campeon recomendado: {format_pct(float(context['model_blend']))} modelo propio/live + {format_pct(float(context['consensus_blend']))} consenso externo.",
-        f"- Actualizacion live de esa mezcla: {int(context['final_count'])} partidos finales, {int(context['live_count'])} en vivo y {int(context['pending_count'])} pendientes. A medida que entran resultados reales, el consenso externo pesa menos y la simulacion Monte Carlo vigente pesa mas.",
-        "- Transparencia: el consenso externo no es una caja negra; combina priors declarados de campeon, ratings tipo Elo/FIFA, fuerza ofensiva-defensiva tipo SPI, mercado cuando existe y simulacion Monte Carlo para dependencias de llave.",
+        f"- Mezcla dinámica usada para campeón recomendado: {format_pct(float(context['model_blend']))} modelo propio/live + {format_pct(float(context['consensus_blend']))} consenso externo.",
+        f"- Actualización live de esa mezcla: {int(context['final_count'])} partidos finales, {int(context['live_count'])} en vivo y {int(context['pending_count'])} pendientes. A medida que entran resultados reales, el consenso externo pesa menos y la simulación Monte Carlo vigente pesa más.",
+        "- Transparencia: el consenso externo no es una caja negra; combina priors declarados de campeón, ratings tipo Elo/FIFA, fuerza ofensiva-defensiva tipo SPI, mercado cuando existe y simulación Monte Carlo para dependencias de llave.",
     ]
     if rows:
         leader = rows[0]
@@ -5292,11 +5294,11 @@ def external_estimator_methodology_items() -> List[dict]:
         {
             "name": "SPI / modelos ofensivo-defensivos",
             "signal": "Ataque y defensa convertidos a goles esperados y probabilidades de marcador.",
-            "usage": "El modelo replica esa logica con goles esperados, distribucion de marcadores y ensamble Poisson/Dixon-Coles.",
+            "usage": "El modelo replica esa lógica con goles esperados, distribución de marcadores y ensamble Poisson/Dixon-Coles.",
         },
         {
             "name": "Mercado y consenso profesional",
-            "signal": "Probabilidades implicitas, lineas de goles y consenso pretorneo de campeon.",
+            "signal": "Probabilidades implícitas, líneas de goles y consenso pretorneo de campeón.",
             "usage": "Funciona como guardrail: corrige extremos, pero pierde peso cuando aparecen datos reales del Mundial.",
         },
         {
@@ -5378,7 +5380,7 @@ def build_consensus_guardrail_html(bracket_payload: dict, entries: Optional[Sequ
         "<div>"
         "<p class=\"eyebrow\">Guardrail de consenso</p>"
         "<h2>Ajustes para boleto de quiniela</h2>"
-        "<p class=\"lede-tight\">Esta capa compara la llave contra consenso externo definido: priors declarados de campeon, ratings tipo Elo/FIFA, fuerza ofensiva-defensiva tipo SPI, mercado cuando existe y señales live/finales. No es una caja negra ni reemplaza el Monte Carlo; solo evita extremos hasta que haya evidencia real del Mundial.</p>"
+        "<p class=\"lede-tight\">Esta capa compara la llave contra consenso externo definido: priors declarados de campeón, ratings tipo Elo/FIFA, fuerza ofensiva-defensiva tipo SPI, mercado cuando existe y señales live/finales. No es una caja negra ni reemplaza el Monte Carlo; solo evita extremos hasta que haya evidencia real del Mundial.</p>"
         "</div>"
         "</div>"
         "<div class=\"confidence-tiles\">"
@@ -5394,7 +5396,7 @@ def build_consensus_guardrail_html(bracket_payload: dict, entries: Optional[Sequ
         "<article><h3>Ajustes de llave recomendados</h3><ul>"
         f"{alert_rows()}"
         "</ul></article>"
-        "<article><h3>Metodologia de estimadores externos</h3><ul>"
+        "<article><h3>Metodología de estimadores externos</h3><ul>"
         f"{methodology_rows()}"
         "</ul></article>"
         "</div>"
@@ -5439,14 +5441,14 @@ def calibration_depth_metrics(entries: Sequence[dict], backtest: dict) -> dict:
         calibration_state = "Resultado real detectado"
         calibration_action = "Ya hay partidos cerrados; el Brier de 90 minutos se activa cuando el resultado sea comparable."
     else:
-        calibration_state = "Calibracion previa activa"
-        calibration_action = "Aun no hay partidos cerrados de 2026; el Brier arranca automaticamente con el primer resultado final."
+        calibration_state = "Calibración previa activa"
+        calibration_action = "Aún no hay partidos cerrados de 2026; el Brier arranca automáticamente con el primer resultado final."
     if reliability is not None and float(reliability) > 0.035:
-        confidence_rule = "Bajar agresividad: el modelo esta mostrando error de calibracion."
+        confidence_rule = "Bajar agresividad: el modelo está mostrando error de calibración."
     elif avg_agreement is not None and avg_agreement < 0.56:
         confidence_rule = "Bajar picks heroicos: los modelos internos discrepan."
     else:
-        confidence_rule = "Mantener picks base, pero cubrir partidos con brecha pequena."
+        confidence_rule = "Mantener picks base, pero cubrir partidos con brecha pequeña."
     return {
         "completed": completed,
         "regular_samples": regular_samples,
@@ -5467,7 +5469,7 @@ def calibration_depth_items(metrics: dict) -> List[dict]:
         {
             "label": "Shrinkage bayesiano",
             "status": "Activo",
-            "detail": "Reduce el peso de muestras pequenas: historia, forma y rendimiento por confederacion no dominan si hay poca evidencia.",
+            "detail": "Reduce el peso de muestras pequeñas: historia, forma y rendimiento por confederación no dominan si hay poca evidencia.",
         },
         {
             "label": "Desacuerdo entre modelos",
@@ -5475,7 +5477,7 @@ def calibration_depth_items(metrics: dict) -> List[dict]:
             "detail": (
                 f"Coincidencia interna media {format_pct(float(metrics['avg_agreement']))}; si baja, se reduce la confianza del pick."
                 if metrics["avg_agreement"] is not None
-                else "Se activara cuando todos los partidos tengan stack de modelos comparable."
+                else "Se activará cuando todos los partidos tengan stack de modelos comparable."
             ),
         },
         {
@@ -5484,7 +5486,7 @@ def calibration_depth_items(metrics: dict) -> List[dict]:
             "detail": (
                 f"Brecha media vs mercado {format_pct(float(metrics['avg_market_gap']))}; se usa como ancla suave, no como reemplazo del modelo."
                 if metrics["avg_market_gap"] is not None
-                else "Consenso de campeon activo; lineas de goles entran cuando el feed las traiga."
+                else "Consenso de campeón activo; líneas de goles entran cuando el feed las traiga."
             ),
         },
         {
@@ -5493,11 +5495,11 @@ def calibration_depth_items(metrics: dict) -> List[dict]:
             "detail": (
                 f"{metrics['buckets']} tramos de confianza medidos con {metrics['regular_samples']} partidos comparables."
                 if metrics["buckets"]
-                else "No existe Brier real del Mundial 2026 antes de que se jueguen partidos; se activa automaticamente con el primer resultado final."
+                else "No existe Brier real del Mundial 2026 antes de que se jueguen partidos; se activa automáticamente con el primer resultado final."
             ),
         },
         {
-            "label": "Limite de confianza operativa",
+            "label": "Límite de confianza operativa",
             "status": "Activo",
             "detail": metrics["confidence_rule"],
         },
@@ -5511,7 +5513,7 @@ def build_calibration_depth_markdown(entries: Sequence[dict], backtest: dict) ->
         f"- Partidos cerrados para calibrar: {metrics['completed']} | muestra 90 minutos: {metrics['regular_samples']}.",
     ]
     if metrics["reliability"] is not None:
-        lines.append(f"- Brier calibracion/reliability: {float(metrics['reliability']):.3f}. Menor es mejor.")
+        lines.append(f"- Brier calibración/reliability: {float(metrics['reliability']):.3f}. Menor es mejor.")
     if metrics["temporal_accuracy"] is not None:
         lines.append(f"- Acierto temporal por ventanas: {format_pct(float(metrics['temporal_accuracy']))}.")
     for item in calibration_depth_items(metrics):
@@ -5557,20 +5559,20 @@ def build_calibration_depth_html(entries: Sequence[dict], backtest: dict) -> str
     return (
         "<section class=\"panel calibration-panel\">"
         "<div class=\"panel-head\"><div>"
-        "<p class=\"eyebrow\">Calibracion avanzada</p>"
-        "<h2>Como evitamos que el modelo se sobreconfie</h2>"
-        "<p class=\"lede-tight\">Profundizar la metodologia si vale la pena, pero solo si se traduce en mejores decisiones de quiniela. Esta capa muestra los frenos estadisticos que corrigen probabilidades extremas y separan pick fuerte de partido cerrado.</p>"
+        "<p class=\"eyebrow\">Calibración avanzada</p>"
+        "<h2>Cómo evitamos que el modelo se sobreconfíe</h2>"
+        "<p class=\"lede-tight\">Profundizar la metodología sí vale la pena, pero solo si se traduce en mejores decisiones de quiniela. Esta capa muestra los frenos estadísticos que corrigen probabilidades extremas y separan pick fuerte de partido cerrado.</p>"
         "</div></div>"
         "<div class=\"confidence-tiles\">"
-        f"{tile('Estado de calibracion', str(metrics['calibration_state']), str(metrics['calibration_action']))}"
-        f"{tile('Brier calibracion', reliability_value, 'Arranca con el primer partido finalizado y se recalcula en cada refresh de 5 minutos.')}"
-        f"{tile('Coincidencia entre modelos', agreement_value, 'Si baja, el boleto debe cubrir mas partidos.')}"
+        f"{tile('Estado de calibración', str(metrics['calibration_state']), str(metrics['calibration_action']))}"
+        f"{tile('Brier calibración', reliability_value, 'Arranca con el primer partido finalizado y se recalcula en cada refresh de 5 minutos.')}"
+        f"{tile('Coincidencia entre modelos', agreement_value, 'Si baja, el boleto debe cubrir más partidos.')}"
         f"{tile('Acierto por ventanas', temporal_value, 'Empieza con la primera muestra y se estabiliza a medida que avanza el campeonato.')}"
         "</div>"
         "<div class=\"method-quality calibration-quality\">"
         "<div class=\"method-quality-head\">"
         "<p class=\"eyebrow\">Controles activos</p>"
-        "<h3>Calibraciones que si cambian la forma de decidir</h3>"
+        "<h3>Calibraciones que sí cambian la forma de decidir</h3>"
         "<p>No fuerzan una confianza artificial de 90%: reducen sobreconfianza, activan cobertura y hacen que el modelo aprenda con resultados reales.</p>"
         "</div>"
         f"<div class=\"method-quality-grid\">{rows}</div>"
@@ -5678,7 +5680,7 @@ def prediction_power_profile(entry: dict) -> dict:
     if market_alignment >= 0.70:
         drivers.append("sin choque fuerte con mercado")
     if not drivers:
-        drivers.append("senal moderada")
+        drivers.append("señal moderada")
     return {
         **base,
         "structural_support": structural_support,
@@ -5774,19 +5776,19 @@ def build_prediction_power_html(entries: Sequence[dict]) -> str:
     return (
         "<section class=\"panel power-panel\">"
         "<div class=\"panel-head\"><div>"
-        "<p class=\"eyebrow\">Prediccion potenciada</p>"
-        "<h2>Probabilidad pura vs conviccion para jugar la quiniela</h2>"
-        "<p class=\"lede-tight\">Aqui potenciamos la decision sin maquillar la probabilidad: cruzamos la prediccion base con fuerza estructural FIFA/Elo/squad/historia, acuerdo entre modelos, mercado y riesgo de empate.</p>"
-        "<p class=\"meta\">La conviccion reforzada no es una probabilidad de que ocurra el resultado; es un indice de decision para ordenar el boleto y saber donde puedes jugar mas firme.</p>"
+        "<p class=\"eyebrow\">Predicción potenciada</p>"
+        "<h2>Probabilidad pura vs convicción para jugar la quiniela</h2>"
+        "<p class=\"lede-tight\">Aquí potenciamos la decisión sin maquillar la probabilidad: cruzamos la predicción base con fuerza estructural FIFA/Elo/squad/historia, acuerdo entre modelos, mercado y riesgo de empate.</p>"
+        "<p class=\"meta\">La convicción reforzada no es una probabilidad de que ocurra el resultado; es un índice de decisión para ordenar el boleto y saber dónde puedes jugar más firme.</p>"
         "</div></div>"
         "<div class=\"confidence-tiles\">"
-        f"{tile('Conviccion reforzada media', format_pct(float(metrics['avg_conviction'])), 'Indice de decision, no probabilidad pura.')}"
+        f"{tile('Convicción reforzada media', format_pct(float(metrics['avg_conviction'])), 'Índice de decisión, no probabilidad pura.')}"
         f"{tile('Picks de potencia alta', str(int(metrics['high_power'])) + '/' + str(int(metrics['total'])), 'Candidatos a columna vertebral del boleto.')}"
         f"{tile('Fuerza estructural media', format_pct(float(metrics['avg_structural'])), 'FIFA, Elo, squad, historia y recursos.')}"
         f"{tile('Watchlist de riesgo', str(int(metrics['watchlist'])), 'Partidos que no conviene vender como fijos.')}"
         "</div>"
         "<div class=\"certainty-grid power-grid\">"
-        "<article><h3>Picks mas potenciados</h3><ul>"
+        "<article><h3>Picks más potenciados</h3><ul>"
         f"{rows(strongest, 'Sin picks potenciados')}"
         "</ul></article>"
         "<article><h3>No forzar como fijo</h3><ul>"
@@ -5802,32 +5804,32 @@ def agentic_learning_items() -> List[dict]:
         {
             "agent": "Agente de ingesta",
             "job": "Lee fixtures, estado del partido, mercado, noticias, bajas, alineaciones y proveedor live cuando exista.",
-            "learns": "No inventa datos: solo convierte fuentes disponibles en senales trazables.",
+            "learns": "No inventa datos: solo convierte fuentes disponibles en señales trazables.",
         },
         {
-            "agent": "Agente de senales",
-            "job": "Traduce cada dato a variables futbolisticas: disponibilidad, forma, fatiga, tarjetas, momentum, tiros, ocasiones y riesgo de empate.",
+            "agent": "Agente de señales",
+            "job": "Traduce cada dato a variables futbolísticas: disponibilidad, forma, fatiga, tarjetas, momentum, tiros, ocasiones y riesgo de empate.",
             "learns": "Si un evento cambia el partido, ajusta goles restantes, probabilidad de resultado y marcador exacto.",
         },
         {
             "agent": "Agente predictivo",
             "job": "Combina Poisson/Dixon-Coles, Elo/FIFA, ensamble ligero, consenso externo y Monte Carlo de torneo.",
-            "learns": "Cuando cambia un resultado, recalcula grupos, cruces, llave, campeon y boletos recomendados.",
+            "learns": "Cuando cambia un resultado, recalcula grupos, cruces, llave, campeón y boletos recomendados.",
         },
         {
-            "agent": "Agente de calibracion",
+            "agent": "Agente de calibración",
             "job": "Mide Brier, log-loss, buckets de confianza y backtesting temporal.",
-            "learns": "Baja la agresividad si el modelo esta sobreconfiado y sube cobertura si los modelos discrepan.",
+            "learns": "Baja la agresividad si el modelo está sobreconfiado y sube cobertura si los modelos discrepan.",
         },
         {
             "agent": "Agente de quiniela",
-            "job": "Convierte probabilidades en decisiones: pick base, marcador principal, segunda opcion y cobertura.",
+            "job": "Convierte probabilidades en decisiones: pick base, marcador principal, segunda opción y cobertura.",
             "learns": "Optimiza contra un boleto popular estimado para buscar ventaja relativa, no solo acierto bruto.",
         },
         {
             "agent": "Agente auditor",
-            "job": "Bloquea publicacion si faltan 15.000 simulaciones, llave coherente, consenso, goles, auditoria o refresh de 5 minutos.",
-            "learns": "Cada falla deja una regla verificable para que el pipeline no publique una version incompleta.",
+            "job": "Bloquea publicación si faltan 15.000 simulaciones, llave coherente, consenso, goles, auditoría o refresh de 5 minutos.",
+            "learns": "Cada falla deja una regla verificable para que el pipeline no publique una versión incompleta.",
         },
     ]
 
@@ -5835,24 +5837,24 @@ def agentic_learning_items() -> List[dict]:
 def sports_news_source_policy_items() -> List[dict]:
     return [
         {
-            "source": "ESPN / scoreboard publico",
-            "use": "Base de calendario, estado y resultado cuando no hay feed mas profundo.",
+            "source": "ESPN / scoreboard público",
+            "use": "Base de calendario, estado y resultado cuando no hay feed más profundo.",
         },
         {
             "source": "FIFA Match Centre / datos oficiales",
-            "use": "Confirmacion de partido, sedes, plantillas, sanciones, XI y eventos oficiales si el feed esta disponible.",
+            "use": "Confirmación de partido, sedes, plantillas, sanciones, XI y eventos oficiales si el feed está disponible.",
         },
         {
             "source": "Reuters / AP / BBC / Sky / The Athletic / Guardian",
-            "use": "Noticias confirmadas, bajas, lesiones, decisiones tecnicas y contexto prepartido.",
+            "use": "Noticias confirmadas, bajas, lesiones, decisiones técnicas y contexto prepartido.",
         },
         {
             "source": "Federaciones, clubes y cuentas oficiales",
-            "use": "Validacion de lesionados, convocatorias, suspensiones y cambios de portero o once.",
+            "use": "Validación de lesionados, convocatorias, suspensiones y cambios de portero o once.",
         },
         {
             "source": "Proveedor live profundo",
-            "use": "Tiros, tiros al arco, calidad de ocasion, corners, rojas, sustituciones, xG live y secuencia minuto a minuto.",
+            "use": "Tiros, tiros al arco, calidad de ocasión, corners, rojas, sustituciones, xG live y secuencia minuto a minuto.",
         },
     ]
 
@@ -5861,18 +5863,18 @@ def live_provider_catalog() -> List[dict]:
     return [
         {
             "name": "ESPN scoreboard",
-            "category": "Base publica",
-            "priority": "Automatico sin key",
+            "category": "Base pública",
+            "priority": "Automático sin key",
             "coverage": "Calendario, marcador, estado, resumen, odds y noticias si el endpoint lo expone.",
             "integration": "Ya integrado",
             "env": "sin key",
-            "role": "Mantenerlo como piso: nunca debe ser el unico proveedor cuando haya partidos en vivo.",
+            "role": "Mantenerlo como piso: nunca debe ser el único proveedor cuando haya partidos en vivo.",
         },
         {
             "name": "Open-Meteo",
             "category": "Clima/sedes",
-            "priority": "Automatico sin key",
-            "coverage": "Pronostico y baseline meteorologico por sede: temperatura, humedad, viento, lluvia y wet bulb.",
+            "priority": "Automático sin key",
+            "coverage": "Pronóstico y baseline meteorológico por sede: temperatura, humedad, viento, lluvia y wet bulb.",
             "integration": "Ya integrado sin key",
             "env": "sin key",
             "role": "Ajusta desgaste, ritmo y riesgo de partido sin pedirte ninguna cuenta externa.",
@@ -5880,20 +5882,20 @@ def live_provider_catalog() -> List[dict]:
         {
             "name": "GDELT",
             "category": "Noticias abiertas",
-            "priority": "Automatico sin key",
-            "coverage": "Monitoreo global de noticias y menciones; lesiones, sanciones, lineup probable y contexto de seleccion.",
+            "priority": "Automático sin key",
+            "coverage": "Monitoreo global de noticias y menciones; lesiones, sanciones, lineup probable y contexto de selección.",
             "integration": "Ya integrado sin key",
             "env": "sin key",
-            "role": "Fuente multi-prensa para no depender de una sola redaccion; el filtro solo mueve el modelo si detecta senal relevante.",
+            "role": "Fuente multi-prensa para no depender de una sola redacción; el filtro solo mueve el modelo si detecta señal relevante.",
         },
         {
             "name": "API-Football / API-SPORTS",
             "category": "Live profundo",
             "priority": "Opcional premium",
-            "coverage": "Fixtures live, lineups, eventos, estadisticas, tiros, tarjetas, sustituciones y xG si viene en el feed.",
+            "coverage": "Fixtures live, lineups, eventos, estadísticas, tiros, tarjetas, sustituciones y xG si viene en el feed.",
             "integration": "Ya cableado si hay credencial",
             "env": "API_FOOTBALL_KEY",
-            "role": "Primer proveedor real para in-play: activa eventos minuto a minuto y estadisticas live.",
+            "role": "Primer proveedor real para in-play: activa eventos minuto a minuto y estadísticas live.",
         },
         {
             "name": "Sportmonks Football API",
@@ -5902,75 +5904,75 @@ def live_provider_catalog() -> List[dict]:
             "coverage": "Livescores, eventos, World Cup 2026, odds, lineups, stats y endpoints de partidos en vivo.",
             "integration": "Adaptador preparado si hay credencial",
             "env": "SPORTMONKS_TOKEN",
-            "role": "Mejor segundo proveedor practico: buena documentacion y cobertura directa para apps de Mundial.",
+            "role": "Mejor segundo proveedor práctico: buena documentación y cobertura directa para apps de Mundial.",
         },
         {
             "name": "Sportradar Soccer API",
             "category": "Enterprise live",
             "priority": "Prioridad 3",
-            "coverage": "Soccer API, timelines, cobertura por competicion, feeds oficiales, odds y datos editoriales segun contrato.",
+            "coverage": "Soccer API, timelines, cobertura por competición, feeds oficiales, odds y datos editoriales según contrato.",
             "integration": "Requiere contrato",
             "env": "SPORTRADAR_KEY",
-            "role": "Proveedor premium para robustez y SLA; ideal si quieres maxima fiabilidad.",
+            "role": "Proveedor premium para robustez y SLA; ideal si quieres máxima fiabilidad.",
         },
         {
             "name": "Opta / Stats Perform",
             "category": "Enterprise xG/eventos",
             "priority": "Prioridad 4",
-            "coverage": "Opta live, data feeds, play-by-play, xG, player/team stats, historico, predicciones y FIFA packages.",
+            "coverage": "Opta live, data feeds, play-by-play, xG, player/team stats, histórico, predicciones y FIFA packages.",
             "integration": "Requiere contrato",
             "env": "OPTA_KEY",
             "role": "La mejor capa profesional si se consigue acceso; no es normalmente gratis.",
         },
         {
             "name": "StatsBomb",
-            "category": "Historico + xG",
-            "priority": "Referencia metodologica",
-            "coverage": "Open data historica con eventos, lineups y 360 en competiciones seleccionadas; live/pro depende de contrato.",
+            "category": "Histórico + xG",
+            "priority": "Referencia metodológica",
+            "coverage": "Open data histórica con eventos, lineups y 360 en competiciones seleccionadas; live/pro depende de contrato.",
             "integration": "Referencia/open data",
             "env": "STATSBOMB_TOKEN",
-            "role": "Excelente para calibrar xG, eventos y backtesting, no como feed live gratuito del Mundial.",
+            "role": "Excelente para calibrar xG, eventos y backtesting; no como feed live gratuito del Mundial.",
         },
         {
             "name": "The Odds API",
             "category": "Mercado/odds",
             "priority": "Prioridad mercado",
-            "coverage": "Odds por deporte, eventos, scores, h2h, totales, historico y event odds segun plan.",
+            "coverage": "Odds por deporte, eventos, scores, h2h, totales, histórico y event odds según plan.",
             "integration": "Requiere adaptador",
             "env": "THE_ODDS_API_KEY",
-            "role": "Ancla externa para detectar si el modelo se esta alejando demasiado del mercado.",
+            "role": "Ancla externa para detectar si el modelo se está alejando demasiado del mercado.",
         },
         {
             "name": "OddsJam / Pinnacle / Betfair Exchange",
             "category": "Mercado avanzado",
             "priority": "Referencia mercado",
-            "coverage": "Movimiento de lineas, liquidez, cuotas sharp y consenso de apuestas segun acceso.",
+            "coverage": "Movimiento de líneas, liquidez, cuotas sharp y consenso de apuestas según acceso.",
             "integration": "Requiere contrato/API",
             "env": "ODDS_PROVIDER_KEY",
-            "role": "Sirve para calibrar picks cerrados y detectar steam moves de ultima hora.",
+            "role": "Sirve para calibrar picks cerrados y detectar steam moves de última hora.",
         },
         {
             "name": "NewsAPI",
             "category": "Noticias",
             "priority": "Opcional noticias",
-            "coverage": "Busqueda de articulos por palabra, fecha, dominio, idioma, relevancia y fuente.",
+            "coverage": "Búsqueda de artículos por palabra, fecha, dominio, idioma, relevancia y fuente.",
             "integration": "Adaptador preparado si hay credencial",
             "env": "NEWSAPI_KEY",
-            "role": "Capa para lesiones, bajas, alineaciones probables y contexto de seleccion sin depender de ESPN.",
+            "role": "Capa para lesiones, bajas, alineaciones probables y contexto de selección sin depender de ESPN.",
         },
         {
             "name": "FIFA Match Centre / fuentes oficiales",
             "category": "Oficial",
-            "priority": "Validacion oficial",
+            "priority": "Validación oficial",
             "coverage": "Partidos, Match Centre, plantillas, sanciones, sedes, comunicados y estado oficial.",
             "integration": "Best-effort/manual/API si existe",
             "env": "FIFA_SOURCE_URLS",
-            "role": "Fuente de verdad para confirmar datos criticos antes de mover probabilidades.",
+            "role": "Fuente de verdad para confirmar datos críticos antes de mover probabilidades.",
         },
         {
             "name": "Federaciones y clubes",
             "category": "Oficial/noticias",
-            "priority": "Validacion lesiones",
+            "priority": "Validación lesiones",
             "coverage": "Convocatorias, lesionados, suspensiones, entrenamiento, ruedas de prensa y XI.",
             "integration": "RSS/web/manual",
             "env": "OFFICIAL_FEED_URLS",
@@ -5980,7 +5982,7 @@ def live_provider_catalog() -> List[dict]:
             "name": "football-data.org",
             "category": "Fixture/resultados",
             "priority": "Backup abierto",
-            "coverage": "Competiciones, equipos, partidos y resultados via API v4.",
+            "coverage": "Competiciones, equipos, partidos y resultados vía API v4.",
             "integration": "Requiere adaptador",
             "env": "FOOTBALL_DATA_KEY",
             "role": "Buen backup de calendario/resultados; no reemplaza eventos live profundos.",
@@ -5992,22 +5994,22 @@ def live_provider_catalog() -> List[dict]:
             "coverage": "JSON API, datos, arte, eventos, highlights y livescores premium cada 2 minutos.",
             "integration": "Requiere adaptador",
             "env": "THESPORTSDB_KEY",
-            "role": "Backup economico para datos publicos, arte y highlights; menor profundidad analitica.",
+            "role": "Backup económico para datos públicos, arte y highlights; menor profundidad analítica.",
         },
         {
             "name": "ScoreBat",
             "category": "Video/highlights",
             "priority": "Contexto visual",
-            "coverage": "Highlights, clips de goles, streams publicos disponibles y embeds oficiales.",
+            "coverage": "Highlights, clips de goles, streams públicos disponibles y embeds oficiales.",
             "integration": "Requiere adaptador",
             "env": "SCOREBAT_KEY",
-            "role": "No mejora el modelo numerico directamente, pero ayuda a revisar jugadas y narrativa.",
+            "role": "No mejora el modelo numérico directamente, pero ayuda a revisar jugadas y narrativa.",
         },
         {
             "name": "SofaScore / FotMob / Flashscore / 365Scores",
             "category": "Referencia no oficial",
             "priority": "Solo con licencia",
-            "coverage": "Eventos, ratings, momentum y estadisticas en vivo segun plataforma.",
+            "coverage": "Eventos, ratings, momentum y estadísticas en vivo según plataforma.",
             "integration": "No scrapear sin permiso",
             "env": "LICENSED_LIVESCORE_KEY",
             "role": "Buenos para contrastar visualmente; no conviene automatizar sin API/licencia clara.",
@@ -6022,7 +6024,7 @@ def provider_catalog_metrics() -> dict:
         "wired": sum(1 for item in catalog if "Ya" in item["integration"]),
         "adapters": sum(1 for item in catalog if "adaptador" in item["integration"].lower()),
         "enterprise": sum(1 for item in catalog if "contrato" in item["integration"].lower()),
-        "reference": sum(1 for item in catalog if "Referencia" in item["priority"] or "Validacion" in item["priority"]),
+        "reference": sum(1 for item in catalog if "Referencia" in item["priority"] or "Validación" in item["priority"]),
     }
 
 
@@ -6076,7 +6078,7 @@ def build_provider_matrix_markdown() -> List[str]:
     lines = [
         "### Mapa de proveedores buscados",
         f"- Proveedores catalogados: {metrics['total']} | ya cableados: {metrics['wired']} | adaptadores pendientes: {metrics['adapters']} | enterprise/contrato: {metrics['enterprise']}.",
-        "- Regla: usar automaticamente fuentes sin key primero: ESPN publico, Open-Meteo, GDELT, FIFA rankings y datos historicos. Las fuentes premium quedan como mejora opcional, no como requisito para que el modelo funcione.",
+        "- Regla: usar automáticamente fuentes sin key primero: ESPN público, Open-Meteo, GDELT, FIFA rankings y datos históricos. Las fuentes premium quedan como mejora opcional, no como requisito para que el modelo funcione.",
     ]
     for item in live_provider_catalog():
         lines.append(
@@ -6091,12 +6093,12 @@ def build_provider_matrix_html(entries: Sequence[dict]) -> str:
     deep_sources = sorted({str(entry.get("live_feed_provider")) for entry in fixture_entries if entry.get("live_feed_provider")})
     open_news_sources = sorted({str(entry.get("open_news_provider")) for entry in fixture_entries if entry.get("open_news_provider")})
     runtime = provider_runtime_diagnostics(entries)
-    active_label = " + ".join(deep_sources or live_sources or ["feed base publico"])
+    active_label = " + ".join(deep_sources or live_sources or ["feed base público"])
     configured_wired = runtime["configured_wired"]
     automatic_label = "ESPN + Open-Meteo + GDELT"
     if configured_wired:
         automatic_label = f"{automatic_label} + {' + '.join(str(item) for item in configured_wired)}"
-    news_usage_label = " + ".join(open_news_sources) if open_news_sources else "GDELT listo; sin senal relevante en este corte"
+    news_usage_label = " + ".join(open_news_sources) if open_news_sources else "GDELT listo; sin señal relevante en este corte"
     deep_usage_label = " + ".join(deep_sources) if deep_sources else "sin eventos tiro-a-tiro en este corte"
     metrics = provider_catalog_metrics()
 
@@ -6123,13 +6125,13 @@ def build_provider_matrix_html(entries: Sequence[dict]) -> str:
         "Free/backup": 7,
         "Video/highlights": 8,
         "Referencia no oficial": 9,
-        "Base publica": 10,
+        "Base pública": 10,
     }
     catalog = sorted(live_provider_catalog(), key=lambda item: (priority_order.get(item["category"], 99), item["name"]))
     def provider_env_status(item: dict) -> str:
         env_label = str(item.get("env") or "")
         if not provider_env_names(env_label):
-            return "automatico sin key"
+            return "automático sin key"
         return "key configurada" if provider_env_configured(env_label) else "credencial opcional no configurada"
 
     rows = "".join(
@@ -6142,18 +6144,18 @@ def build_provider_matrix_html(entries: Sequence[dict]) -> str:
         for item in catalog
     )
     best_next = [
-        "Ya corre automatico: fixture/resultados ESPN, clima Open-Meteo, noticias abiertas GDELT, FIFA rankings e historico desde 1990.",
+        "Ya corre automático: fixture/resultados ESPN, clima Open-Meteo, noticias abiertas GDELT, FIFA rankings e histórico desde 1990.",
         "Los marcadores Penca se recalculan en cada refresh: si cambia el resultado real, una baja, el cruce proyectado o la evidencia live, cambia el marcador recomendado.",
         "Si aparece una fuente sin key con eventos tiro-a-tiro confiables para Mundial 2026, se puede sumar; por ahora no conviene scrapear SofaScore/FotMob/Flashscore sin licencia.",
     ]
     if deep_sources:
-        best_next.append("Evento profundo activo en esta corrida: el modelo ya esta usando tiros/eventos del proveedor live.")
+        best_next.append("Evento profundo activo en esta corrida: el modelo ya está usando tiros/eventos del proveedor live.")
     else:
-        best_next.append("Sin credencial premium no hay feed universal de tiros minuto a minuto; usamos ESPN+GDELT+clima+historico y live profundo cuando el feed publico lo expone.")
+        best_next.append("Sin credencial premium no hay feed universal de tiros minuto a minuto; usamos ESPN+GDELT+clima+histórico y live profundo cuando el feed público lo expone.")
     next_rows = "".join(
         "<li>"
         f"<strong>{html.escape(item)}</strong>"
-        "<span>Esto aumenta robustez; no garantiza acertar mas si el proveedor no cubre Mundial 2026 o no trae datos live profundos.</span>"
+        "<span>Esto aumenta robustez; no garantiza acertar más si el proveedor no cubre Mundial 2026 o no trae datos live profundos.</span>"
         "</li>"
         for item in best_next
     )
@@ -6162,14 +6164,14 @@ def build_provider_matrix_html(entries: Sequence[dict]) -> str:
         "<div class=\"panel-head\"><div>"
         "<p class=\"eyebrow\">Mapa de proveedores</p>"
         "<h2>No depender solo de ESPN</h2>"
-        "<p class=\"lede-tight\">El pipeline usa primero lo que si se puede extraer automaticamente sin que tengas que registrar cuentas: ESPN publico, Open-Meteo, GDELT, FIFA rankings e historico. Las fuentes premium aparecen separadas como opcionales, no como una tarea para ti.</p>"
+        "<p class=\"lede-tight\">El pipeline usa primero lo que sí se puede extraer automáticamente sin que tengas que registrar cuentas: ESPN público, Open-Meteo, GDELT, FIFA rankings e histórico. Las fuentes premium aparecen separadas como opcionales, no como una tarea para ti.</p>"
         "</div></div>"
         "<div class=\"confidence-tiles\">"
-        f"{tile('Fuente activa visible', active_label, 'Lo que esta entrando en este corte publicado.')}"
-        f"{tile('Automatico sin cuentas', automatic_label, 'No requiere que pegues keys ni busques contratos.')}"
-        f"{tile('Noticias abiertas usadas', news_usage_label, 'GDELT puede mover lesiones, sanciones y contexto si detecta senal fuerte.')}"
-        f"{tile('Eventos live profundos', deep_usage_label, 'Tiros minuto a minuto solo si existe feed publico/premium valido.')}"
-        f"{tile('Proveedores catalogados', str(int(metrics['total'])), 'Live, odds, noticias, historico, oficial y video.')}"
+        f"{tile('Fuente activa visible', active_label, 'Lo que está entrando en este corte publicado.')}"
+        f"{tile('Automático sin cuentas', automatic_label, 'No requiere que pegues keys ni busques contratos.')}"
+        f"{tile('Noticias abiertas usadas', news_usage_label, 'GDELT puede mover lesiones, sanciones y contexto si detecta señal fuerte.')}"
+        f"{tile('Eventos live profundos', deep_usage_label, 'Tiros minuto a minuto solo si existe feed público/premium válido.')}"
+        f"{tile('Proveedores catalogados', str(int(metrics['total'])), 'Live, odds, noticias, histórico, oficial y video.')}"
         "</div>"
         "<div class=\"certainty-grid provider-grid\">"
         "<article><h3>Proveedores posibles</h3><ul>"
@@ -6190,7 +6192,7 @@ def provider_stack_summary(entries: Optional[Sequence[dict]] = None) -> dict:
     configured_wired = runtime["configured_wired"]
     active = " + ".join(deep_sources or live_sources or ["espn_scoreboard"])
     prepared = [
-        "ESPN publico",
+        "ESPN público",
         "Open-Meteo",
         "GDELT",
         "API-Football",
@@ -6217,10 +6219,10 @@ def build_agentic_learning_markdown(entries: Sequence[dict], bracket_payload: di
     iterations = int(bracket_payload.get("iterations", 0) or 0)
     lines = [
         "### Agentes de aprendizaje",
-        "- Lectura: esto no es un chatbot generando opiniones. Es un pipeline de agentes que ingiere datos, los transforma en senales, predice, calibra, decide y audita.",
+        "- Lectura: esto no es un chatbot generando opiniones. Es un pipeline de agentes que ingiere datos, los transforma en señales, predice, calibra, decide y audita.",
         f"- Monte Carlo vigente: {iterations:,} simulaciones por corrida.".replace(",", "."),
         f"- Aprendizaje real disponible hoy: {final_count} partidos finalizados y {live_count} en vivo dentro del fixture cargado.",
-        f"- Backtesting/calibracion: {int(backtest.get('completed_matches', 0) or 0)} partidos cerrados reconstruidos.",
+        f"- Backtesting/calibración: {int(backtest.get('completed_matches', 0) or 0)} partidos cerrados reconstruidos.",
         "- Noticias multi-fuente: no depende solo de ESPN; ESPN puede ser fuente base, pero el modelo acepta fuentes oficiales, prensa internacional, mercado y proveedor live profundo.",
     ]
     for item in agentic_learning_items():
@@ -6239,7 +6241,7 @@ def build_agentic_learning_html(entries: Sequence[dict], bracket_payload: dict, 
     completed = int(backtest.get("completed_matches", 0) or 0)
     live_sources = sorted({str(entry.get("source")) for entry in fixture_entries if entry.get("source")})
     deep_sources = sorted({str(entry.get("live_feed_provider")) for entry in fixture_entries if entry.get("live_feed_provider")})
-    source_label = " + ".join(deep_sources or live_sources or ["feed base publico"])
+    source_label = " + ".join(deep_sources or live_sources or ["feed base público"])
     prepared_stack = "API-Football + Sportmonks + Sportradar + Opta + Odds + News"
 
     def tile(label: str, value: str, note: str) -> str:
@@ -6269,25 +6271,25 @@ def build_agentic_learning_html(entries: Sequence[dict], bracket_payload: dict, 
         "<div class=\"panel-head\"><div>"
         "<p class=\"eyebrow\">IA operacional</p>"
         "<h2>Agentes de aprendizaje, no solo texto generativo</h2>"
-        "<p class=\"lede-tight\">El modelo aprende de si mismo en sentido operativo: cada resultado real, baja confirmada, cambio de mercado o evento live se convierte en estado, calibracion y nuevas probabilidades. No inventa noticias; las exige como fuente trazable.</p>"
+        "<p class=\"lede-tight\">El modelo aprende de sí mismo en sentido operativo: cada resultado real, baja confirmada, cambio de mercado o evento live se convierte en estado, calibración y nuevas probabilidades. No inventa noticias; las exige como fuente trazable.</p>"
         "</div></div>"
         "<div class=\"confidence-tiles\">"
-        f"{tile('Monte Carlo activo', iterations_label + ' simulaciones', 'La auditoria exige al menos 15.000 por corrida.')}"
-        f"{tile('Eficiencia operativa', 'apto para 5 min', 'Cache, ensamble ligero y auditoria automatica para refrescar sin esperar horas.')}"
-        f"{tile('Datos ya incorporados', f'{final_count} final / {live_count} live', f'Ademas {projected_count} cruces de llave recalculables.')}"
+        f"{tile('Monte Carlo activo', iterations_label + ' simulaciones', 'La auditoría exige al menos 15.000 por corrida.')}"
+        f"{tile('Eficiencia operativa', 'apto para 5 min', 'Cache, ensamble ligero y auditoría automática para refrescar sin esperar horas.')}"
+        f"{tile('Datos ya incorporados', f'{final_count} final / {live_count} live', f'Además {projected_count} cruces de llave recalculables.')}"
         f"{tile('Noticias multi-fuente', 'No solo ESPN', f'Fuente activa visible: {source_label}; stack preparado: {prepared_stack}.')}"
         "</div>"
         "<div class=\"certainty-grid agentic-grid\">"
-        "<article><h3>Como aprende el sistema</h3><ul>"
+        "<article><h3>Cómo aprende el sistema</h3><ul>"
         f"{agent_rows}"
         "</ul></article>"
         "<article><h3>Fuentes deportivas aceptadas</h3><ul>"
         f"{source_rows}"
         "</ul></article>"
-        "<article><h3>Que tan eficiente es</h3><ul>"
-        f"<li><strong>15.000 simulaciones</strong><span>La llave se calcula con rutas completas de torneo, no solo favoritos sueltos.</span><em>Mas iteraciones reducen ruido Monte Carlo; no convierten un pick incierto en seguro.</em></li>"
+        "<article><h3>Qué tan eficiente es</h3><ul>"
+        f"<li><strong>15.000 simulaciones</strong><span>La llave se calcula con rutas completas de torneo, no solo favoritos sueltos.</span><em>Más iteraciones reducen ruido Monte Carlo; no convierten un pick incierto en seguro.</em></li>"
         f"<li><strong>Refresh cada 5 minutos</strong><span>GitHub Actions reconstruye la web y recalcula in-play cuando el feed trae cambios.</span><em>Si hay live profundo, cambian tiros, goles restantes, marcadores y probabilidades.</em></li>"
-        f"<li><strong>Calibracion acumulada</strong><span>{completed} partidos cerrados disponibles para backtesting en este corte.</span><em>Cuando crece la muestra, el agente de calibracion ajusta confianza y coberturas.</em></li>"
+        f"<li><strong>Calibración acumulada</strong><span>{completed} partidos cerrados disponibles para backtesting en este corte.</span><em>Cuando crece la muestra, el agente de calibración ajusta confianza y coberturas.</em></li>"
         "</ul></article>"
         "</div>"
         "</section>"
@@ -6312,25 +6314,25 @@ def build_dashboard_markdown(
         f"Estado usado: {state_path}",
         f"Fixtures leidos: {fixtures_path}",
         "",
-        "## Resumen rapido del torneo",
+        "## Resumen rápido del torneo",
         "",
     ]
     lines.extend(build_global_confidence_markdown(entries))
-    lines.extend(["", "## Hoja de maxima certeza para quiniela", ""])
+    lines.extend(["", "## Hoja de máxima certeza para quiniela", ""])
     lines.extend(build_max_certainty_markdown(entries))
     lines.extend(["", "## Estrategia para ganar la quiniela", ""])
     lines.extend(build_quiniela_strategy_markdown(entries))
     lines.extend(["", "## Marcadores para cargar en Penca", ""])
     lines.extend(build_full_scorecard_markdown(entries))
-    lines.extend(["", "## Calibracion avanzada y limites de confianza", ""])
+    lines.extend(["", "## Calibración avanzada y límites de confianza", ""])
     lines.extend(build_calibration_depth_markdown(entries, backtest))
-    lines.extend(["", "## Prediccion potenciada", ""])
+    lines.extend(["", "## Predicción potenciada", ""])
     lines.extend(build_prediction_power_markdown(entries))
     lines.extend(["", "## Agentes de aprendizaje y fuentes", ""])
     lines.extend(build_agentic_learning_markdown(entries, bracket_payload, backtest))
     lines.extend(["", "## Ajustes contra consenso externo", ""])
     lines.extend(build_consensus_guardrail_markdown(bracket_payload, entries))
-    lines.extend(["", "## Que cambio desde la ultima actualizacion", ""])
+    lines.extend(["", "## Qué cambió desde la última actualización", ""])
     lines.extend(
         build_recent_changes_markdown(
             entries,
@@ -6340,7 +6342,7 @@ def build_dashboard_markdown(
             previous_updated_at,
         )
     )
-    lines.extend(["", "## Como viene acertando el modelo", ""])
+    lines.extend(["", "## Cómo viene acertando el modelo", ""])
     lines.extend(build_backtesting_markdown(backtest))
     lines.extend([
         "",
@@ -6373,7 +6375,7 @@ def build_dashboard_markdown(
         if entry.get("weather_summary"):
             lines.append(f"- Clima estimado: {entry['weather_summary']}")
         if entry.get("referee"):
-            lines.append(f"- Arbitro: {entry['referee']}")
+            lines.append(f"- Árbitro: {entry['referee']}")
         if entry.get("market_summary"):
             provider = entry.get("market_provider") or "mercado"
             lines.append(f"- Odds {provider}: {entry['market_summary']}")
@@ -6393,7 +6395,7 @@ def build_dashboard_markdown(
             )
         if entry.get("lineup_change_count_a") or entry.get("lineup_change_count_b"):
             lines.append(
-                f"- Cambios de alineacion: {prediction.team_a} {entry.get('lineup_change_count_a', 0)} | "
+                f"- Cambios de alineación: {prediction.team_a} {entry.get('lineup_change_count_a', 0)} | "
                 f"{prediction.team_b} {entry.get('lineup_change_count_b', 0)}"
             )
         lines.extend(dashboard_absence_lines(entry, prediction.team_a, prediction.team_b))
@@ -6407,7 +6409,7 @@ def build_dashboard_markdown(
         if next_round_note:
             lines.append(f"- Siguiente cruce del ganador real: {next_round_note}")
         if entry.get("projection"):
-            lines.append(f"- Proyeccion automatica: {entry.get('projection_note', '')}")
+            lines.append(f"- Proyección automática: {entry.get('projection_note', '')}")
             alternatives = entry.get("projection_alternatives") or []
             if alternatives:
                 lines.append(
@@ -6422,7 +6424,7 @@ def build_dashboard_markdown(
             if entry["went_penalties"]:
                 result_line += f" | penales: {entry['penalties_winner']}"
             elif entry["went_extra_time"]:
-                result_line += " | con proroga"
+                result_line += " | con prórroga"
             lines.append(result_line)
         elif entry.get("live_score_a") is not None and entry.get("live_score_b") is not None:
             lines.append(
@@ -6440,7 +6442,7 @@ def build_dashboard_markdown(
         )
         if guidance:
             lines.append(
-                f"- Precision de marcador: {guidance.get('precision_label')} | exacto mas probable {guidance.get('top_exact_score')} "
+                f"- Precisión de marcador: {guidance.get('precision_label')} | exacto más probable {guidance.get('top_exact_score')} "
                 f"{format_pct(float(guidance.get('top_exact_prob', 0.0)))} | top-5 cubre {format_pct(float(guidance.get('top5_coverage', 0.0)))}"
             )
         if prediction.live_phase != "penalties":
@@ -6461,10 +6463,10 @@ def build_dashboard_markdown(
         if prediction.advance_a is not None and prediction.advance_b is not None:
             detail = prediction.knockout_detail or {}
             lines.append(
-                f"- Quien tiene mas probabilidad de avanzar: {prediction.team_a} {format_pct(prediction.advance_a)} | {prediction.team_b} {format_pct(prediction.advance_b)}"
+                f"- Quién tiene más probabilidad de avanzar: {prediction.team_a} {format_pct(prediction.advance_a)} | {prediction.team_b} {format_pct(prediction.advance_b)}"
             )
             lines.append(
-                f"- Si empatan tras 90': gana en prorroga {prediction.team_a} {format_pct(detail.get('et_win_a', 0.0))} | "
+                f"- Si empatan tras 90': gana en prórroga {prediction.team_a} {format_pct(detail.get('et_win_a', 0.0))} | "
                 f"siguen empatados {format_pct(detail.get('et_draw', 0.0))} | {prediction.team_b} {format_pct(detail.get('et_win_b', 0.0))}"
             )
             lines.append(
@@ -6475,20 +6477,20 @@ def build_dashboard_markdown(
                 shootout = prediction.penalty_shootout
                 projected_shootout = (shootout.get("top_scores") or [("5-4", 0.0)])[0][0]
                 lines.append(
-                    f"- Marcador mas probable de la tanda: {projected_shootout}"
+                    f"- Marcador más probable de la tanda: {projected_shootout}"
                 )
                 lines.append(
                     f"- Marcador medio esperado en la tanda: {prediction.team_a} {shootout.get('avg_score_a', 0.0):.2f} | "
                     f"{prediction.team_b} {shootout.get('avg_score_b', 0.0):.2f}"
                 )
                 lines.append(
-                    "- Marcadores de tanda mas probables: "
+                    "- Marcadores de tanda más probables: "
                     + ", ".join(
                         f"{score} {format_pct(prob)}" for score, prob in shootout.get("top_scores", [])
                     )
                 )
         score_line = ", ".join(f"{score} {format_pct(prob)}" for score, prob in prediction.exact_scores)
-        lines.append(f"- Marcadores mas probables: {score_line}")
+        lines.append(f"- Marcadores más probables: {score_line}")
         lines.append("")
 
     return "\n".join(lines)
@@ -6543,29 +6545,29 @@ def statistical_depth_lines(prediction: MatchPrediction) -> List[str]:
         f"- Lectura estadistica: {confidence_tier(confidence)} | pick actual {pick_label} {format_pct(pick_prob)} | confianza {format_pct(confidence)}"
     )
     lines.append(
-        f"- Escenario de goles: ambos marcan {format_pct(both_score)} | mas de 2.5 goles {format_pct(over_2_5)}"
+        f"- Escenario de goles: ambos marcan {format_pct(both_score)} | más de 2.5 goles {format_pct(over_2_5)}"
     )
     if depth.get("goal_consensus_line") is not None:
         lines.append(
-            f"- Calibracion de goles vs consenso externo: modelo {expected_total_goals:.2f} goles totales | consenso {float(depth['goal_consensus_line']):.2f} | brecha {float(depth.get('goal_consensus_gap', 0.0)):+.2f} ({depth.get('goal_consensus_status')})."
+            f"- Calibración de goles vs consenso externo: modelo {expected_total_goals:.2f} goles totales | consenso {float(depth['goal_consensus_line']):.2f} | brecha {float(depth.get('goal_consensus_gap', 0.0)):+.2f} ({depth.get('goal_consensus_status')})."
         )
     else:
         lines.append(
-            f"- Goles totales esperados por el modelo: {expected_total_goals:.2f}. Sin linea externa de goles cargada para ese partido."
+            f"- Goles totales esperados por el modelo: {expected_total_goals:.2f}. Sin línea externa de goles cargada para ese partido."
         )
     lines.append(
         f"- Probabilidad de que no reciba goles: {prediction.team_a} {format_pct(clean_sheet_a)} | {prediction.team_b} {format_pct(clean_sheet_b)}"
     )
     lines.append(
-        f"- Cuanta probabilidad cubren los 3 marcadores mas probables: {format_pct(top3_coverage)} | ventaja final mas probable {modal_margin:+d} ({format_pct(modal_margin_prob)})"
+        f"- Cuánta probabilidad cubren los 3 marcadores más probables: {format_pct(top3_coverage)} | ventaja final más probable {modal_margin:+d} ({format_pct(modal_margin_prob)})"
     )
     if model_agreement is not None:
-        lines.append(f"- Que tanto coinciden los modelos entre si: {format_pct(float(model_agreement))}")
+        lines.append(f"- Qué tanto coinciden los modelos entre sí: {format_pct(float(model_agreement))}")
     if market_gap is not None:
         lines.append(f"- Diferencia frente a las cuotas de mercado: {format_pct(float(market_gap))}")
     stack_names = [name for name in depth.get("model_stack_names", []) if name]
     if stack_names:
-        lines.append(f"- Stack estadistico usado: {' + '.join(stack_names)}")
+        lines.append(f"- Stack estadístico usado: {' + '.join(stack_names)}")
     drivers = top_factor_drivers(prediction.factors, limit=3)
     if drivers:
         lines.append(
@@ -6609,7 +6611,7 @@ def statistical_depth_html(prediction: MatchPrediction) -> str:
     stack_html = ""
     if stack_names:
         stack_html = (
-            "<p class=\"meta\"><strong>Stack estadistico:</strong> "
+            "<p class=\"meta\"><strong>Stack estadístico:</strong> "
             + html.escape(" + ".join(stack_names))
             + "</p>"
         )
@@ -6621,13 +6623,13 @@ def statistical_depth_html(prediction: MatchPrediction) -> str:
         f"<div><span>Confianza del pronóstico</span><strong>{format_pct(confidence)}</strong></div>"
         f"<div><span>Goles totales esperados</span><strong>{float(depth.get('expected_total_goals', prediction.expected_goals_a + prediction.expected_goals_b)):.2f}</strong></div>"
         f"<div><span>Ambos marcan</span><strong>{format_pct(float(depth.get('both_teams_score', 0.0)))}</strong></div>"
-        f"<div><span>Mas de 1.5 goles</span><strong>{format_pct(float(depth.get('over_1_5', 0.0)))}</strong></div>"
-        f"<div><span>Mas de 2.5 goles</span><strong>{format_pct(float(depth.get('over_2_5', 0.0)))}</strong></div>"
-        f"<div><span>Probabilidad cubierta por los 3 marcadores mas probables</span><strong>{format_pct(float(depth.get('top3_coverage', 0.0)))}</strong></div>"
-        f"<div><span>Probabilidad cubierta por los 5 marcadores mas probables</span><strong>{format_pct(float(depth.get('top5_coverage', 0.0)))}</strong></div>"
+        f"<div><span>Más de 1.5 goles</span><strong>{format_pct(float(depth.get('over_1_5', 0.0)))}</strong></div>"
+        f"<div><span>Más de 2.5 goles</span><strong>{format_pct(float(depth.get('over_2_5', 0.0)))}</strong></div>"
+        f"<div><span>Probabilidad cubierta por los 3 marcadores más probables</span><strong>{format_pct(float(depth.get('top3_coverage', 0.0)))}</strong></div>"
+        f"<div><span>Probabilidad cubierta por los 5 marcadores más probables</span><strong>{format_pct(float(depth.get('top5_coverage', 0.0)))}</strong></div>"
         f"<div><span>Prob. de que {html.escape(prediction.team_a)} no reciba goles</span><strong>{format_pct(float(depth.get('clean_sheet_a', 0.0)))}</strong></div>"
         f"<div><span>Prob. de que {html.escape(prediction.team_b)} no reciba goles</span><strong>{format_pct(float(depth.get('clean_sheet_b', 0.0)))}</strong></div>"
-        f"<div><span>Ventaja final mas probable</span><strong>{int(depth.get('modal_margin', 0)):+d}</strong></div>"
+        f"<div><span>Ventaja final más probable</span><strong>{int(depth.get('modal_margin', 0)):+d}</strong></div>"
         f"<div><span>Probabilidad de esa ventaja</span><strong>{format_pct(float(depth.get('modal_margin_prob', 0.0)))}</strong></div>"
         f"{agreement_html}"
         f"{market_html}"
@@ -6660,20 +6662,20 @@ def goal_forecast_html(entry: dict, prediction: MatchPrediction) -> str:
             f"brecha final {float(depth.get('goal_consensus_gap', 0.0)):+.2f} ({html.escape(str(depth.get('goal_consensus_status', 'alineado')))})."
         )
     else:
-        consensus_note = "Sin linea externa de goles cargada; usa el modelo propio y se ajustara automaticamente si el feed trae mercado/consenso de goles."
+        consensus_note = "Sin línea externa de goles cargada; usa el modelo propio y se ajustará automáticamente si el feed trae mercado/consenso de goles."
     return (
         "<div class=\"goal-forecast-block\">"
         "<h4>Pronóstico de goles</h4>"
         "<div class=\"goal-forecast-grid\">"
-        f"<div><span>Marcador entero principal</span><strong>{html.escape(projected_score_value(prediction))}</strong></div>"
-        f"<div><span>Marcador para cargar en Penca</span><strong>{html.escape(str(guidance.get('recommended_score', penca_ovacion_top_score(prediction)['score'])))}</strong></div>"
-        f"<div><span>Exacto mas probable</span><strong>{html.escape(str(guidance.get('top_exact_score', projected_score_value(prediction))))}</strong></div>"
-        f"<div><span>Precision del marcador</span><strong>{html.escape(str(guidance.get('precision_label', 'sin clasificar')))}</strong></div>"
-        f"<div><span>Goles mas probables de {html.escape(prediction.team_a)}</span><strong>{html.escape(goal_options_summary(guidance.get('goal_options_a')))}</strong></div>"
-        f"<div><span>Goles mas probables de {html.escape(prediction.team_b)}</span><strong>{html.escape(goal_options_summary(guidance.get('goal_options_b')))}</strong></div>"
+        f"<div><span>Marcador más probable del modelo</span><strong>{html.escape(projected_score_value(prediction))}</strong></div>"
+        f"<div><span>Marcador para cargar en Penca Ovación</span><strong>{html.escape(str(guidance.get('recommended_score', penca_ovacion_top_score(prediction)['score'])))}</strong></div>"
+        f"<div><span>Exacto puro más probable</span><strong>{html.escape(str(guidance.get('top_exact_score', projected_score_value(prediction))))}</strong></div>"
+        f"<div><span>Precisión del marcador</span><strong>{html.escape(str(guidance.get('precision_label', 'sin clasificar')))}</strong></div>"
+        f"<div><span>Goles más probables de {html.escape(prediction.team_a)}</span><strong>{html.escape(goal_options_summary(guidance.get('goal_options_a')))}</strong></div>"
+        f"<div><span>Goles más probables de {html.escape(prediction.team_b)}</span><strong>{html.escape(goal_options_summary(guidance.get('goal_options_b')))}</strong></div>"
         f"<div><span>Promedio total estimado</span><strong>{expected_total:.2f}</strong></div>"
-        f"<div><span>Mas de 1.5 goles</span><strong>{format_pct(float(depth.get('over_1_5', 0.0)))}</strong></div>"
-        f"<div><span>Mas de 2.5 goles</span><strong>{format_pct(float(depth.get('over_2_5', 0.0)))}</strong></div>"
+        f"<div><span>Más de 1.5 goles</span><strong>{format_pct(float(depth.get('over_1_5', 0.0)))}</strong></div>"
+        f"<div><span>Más de 2.5 goles</span><strong>{format_pct(float(depth.get('over_2_5', 0.0)))}</strong></div>"
         f"<div><span>Ambos equipos anotan</span><strong>{format_pct(float(depth.get('both_teams_score', 0.0)))}</strong></div>"
         f"<div><span>Cobertura top-5 marcadores</span><strong>{format_pct(float(guidance.get('top5_coverage', depth.get('top5_coverage', 0.0))))}</strong></div>"
         f"<div><span>Estado vs consenso</span><strong>{html.escape(str(depth.get('goal_consensus_status', 'sin consenso externo')))}</strong></div>"
@@ -6701,7 +6703,7 @@ def model_comparison_lines(prediction: MatchPrediction) -> List[str]:
             f"- {name}: victoria {prediction.team_a} {format_pct(float(probs.get('a', 0.0)))} | "
             f"empate {format_pct(float(probs.get('draw', 0.0)))} | "
             f"victoria {prediction.team_b} {format_pct(float(probs.get('b', 0.0)))} | "
-            f"marcador mas probable {top_score} ({format_pct(float(top_score_prob))}){weight_label}"
+            f"marcador más probable {top_score} ({format_pct(float(top_score_prob))}){weight_label}"
         )
 
     lines = ["- Comparativa entre modelos:"]
@@ -6731,15 +6733,14 @@ def model_comparison_html(prediction: MatchPrediction) -> str:
             f"<p>Victoria {html.escape(prediction.team_a)} {format_pct(float(probs.get('a', 0.0)))}</p>"
             f"<p>Empate {format_pct(float(probs.get('draw', 0.0)))}</p>"
             f"<p>Victoria {html.escape(prediction.team_b)} {format_pct(float(probs.get('b', 0.0)))}</p>"
-            f"<p><strong>Marcador mas probable:</strong> {html.escape(str(top_score))} ({format_pct(float(top_score_prob))})</p>"
+            f"<p><strong>Marcador más probable:</strong> {html.escape(str(top_score))} ({format_pct(float(top_score_prob))})</p>"
             f"{weight_html}"
             "</article>"
         )
 
-    return (
+    inner = (
         "<div class=\"reason-block model-compare-block\">"
-        "<h4>Que dice cada modelo</h4>"
-        "<p class=\"meta\">Aqui se ven por separado el modelo principal, el contraste y el ajuste de baja anotacion. El ensamble final repondera esos modelos segun consenso y cercania al mercado cuando hay cuotas confiables.</p>"
+        "<p class=\"meta\">Aquí se ven por separado el modelo principal, el contraste y el ajuste de baja anotación. El ensamble final repondera esos modelos según consenso y cercanía al mercado cuando hay cuotas confiables.</p>"
         "<div class=\"model-compare-grid\">"
         f"{card('primary_name', 'primary_probs', 'primary_top_score', 'primary')}"
         f"{card('contrast_name', 'contrast_probs', 'contrast_top_score', 'contrast')}"
@@ -6747,6 +6748,12 @@ def model_comparison_html(prediction: MatchPrediction) -> str:
         f"{card('final_name', 'ensemble_probs', 'ensemble_top_score', 'ensemble')}"
         "</div>"
         "</div>"
+    )
+    return (
+        "<details class=\"inline-collapse model-compare-collapse\">"
+        "<summary>Qué dice cada modelo</summary>"
+        f"<div class=\"inline-collapse-body\">{inner}</div>"
+        "</details>"
     )
 
 
@@ -6778,11 +6785,11 @@ def penca_ovacion_score_html(prediction: MatchPrediction) -> str:
     )
     return (
         "<div class=\"reason-block penca-block\">"
-        "<h4>Penca Ovacion: marcador que maximiza puntos</h4>"
-        "<p class=\"meta\">Regla aplicada: 8 puntos por marcador exacto, 5 por diferencia de goles y 3 por ganador. Esta lista esta ordenada por puntos esperados, no solo por probabilidad exacta.</p>"
+        "<h4>Penca Ovación: marcador que maximiza puntos</h4>"
+        "<p class=\"meta\">Regla aplicada: 8 puntos por marcador exacto, 5 por diferencia de goles y 3 por ganador. Esta lista está ordenada por puntos esperados, no solo por probabilidad exacta.</p>"
         "<div class=\"subgrid\">"
         f"<div><span>Marcador recomendado para cargar</span><strong>{html.escape(str(top['score']))}</strong></div>"
-        f"<div><span>Marcador exacto mas probable</span><strong>{html.escape(str(guidance.get('top_exact_score', prediction.exact_scores[0][0] if prediction.exact_scores else top['score'])))}</strong></div>"
+        f"<div><span>Marcador exacto más probable</span><strong>{html.escape(str(guidance.get('top_exact_score', prediction.exact_scores[0][0] if prediction.exact_scores else top['score'])))}</strong></div>"
         f"<div><span>Calidad del marcador exacto</span><strong>{html.escape(str(guidance.get('precision_label', 'sin clasificar')))}</strong></div>"
         f"<div><span>Puntos esperados del pick</span><strong>{float(top['expected_points']):.2f} / 8</strong></div>"
         f"<div><span>Probabilidad de clavar exacto</span><strong>{format_pct(float(top['exact_prob']))}</strong></div>"
@@ -6802,7 +6809,7 @@ def penca_ovacion_score_html(prediction: MatchPrediction) -> str:
 
 def build_global_confidence_markdown(entries: Sequence[dict]) -> List[str]:
     if not entries:
-        return ["_Sin partidos cargados para armar el resumen rapido del torneo._"]
+        return ["_Sin partidos cargados para armar el resumen rápido del torneo._"]
 
     ranked = []
     ranked_market = []
@@ -6826,20 +6833,20 @@ def build_global_confidence_markdown(entries: Sequence[dict]) -> List[str]:
     market_edges = sorted(ranked_market, key=lambda item: item[0], reverse=True)[:3]
 
     lines = [
-        "- Que significa esta seccion: resume si hoy el torneo se ve mas claro o mas incierto. No es una nota del modelo; es una foto de que tan firmes o parejos salen los partidos publicados.",
-        f"- Que tan claro sale, en promedio, el pick principal: {format_pct(avg_confidence)}",
-        f"- Cuanta probabilidad concentran, en promedio, los 3 marcadores mas probables: {format_pct(avg_top3)}",
+        "- Qué significa esta sección: resume si hoy el torneo se ve más claro o más incierto. No es una nota del modelo; es una foto de qué tan firmes o parejos salen los partidos publicados.",
+        f"- Qué tan claro sale, en promedio, el pick principal: {format_pct(avg_confidence)}",
+        f"- Cuánta probabilidad concentran, en promedio, los 3 marcadores más probables: {format_pct(avg_top3)}",
         f"- Partidos en vivo ahora mismo: {live_matches}",
-        "- Como validar la actualizacion en vivo: revisa la hora de publicacion de la portada, el badge 'En vivo', el minuto modelado y el archivo latest.json del sitio.",
+        "- Cómo validar la actualización en vivo: revisa la hora de publicación de la portada, el badge 'En vivo', el minuto modelado y el archivo latest.json del sitio.",
     ]
     if strongest:
         lines.append(
-            "- Partidos con favorito mas claro: "
+            "- Partidos con favorito más claro: "
             + "; ".join(f"{item[2]['title']} {format_pct(item[0])}" for item in strongest)
         )
     if most_open:
         lines.append(
-            "- Partidos mas cerrados o parejos: "
+            "- Partidos más cerrados o parejos: "
             + "; ".join(f"{item[2]['title']} {format_pct(item[0])}" for item in most_open)
         )
     group_metrics = {}
@@ -6865,14 +6872,14 @@ def build_global_confidence_markdown(entries: Sequence[dict]) -> List[str]:
         balanced_groups = sorted(group_rows, key=lambda row: (row[3], row[2]), reverse=True)
         favorite_groups = sorted(group_rows, key=lambda row: (row[1], -row[2]), reverse=True)
         lines.append(
-            "- Grupos mas parejos hasta ahora: "
+            "- Grupos más parejos hasta ahora: "
             + "; ".join(
                 f"{label} | equilibrio {format_pct(balance)} | empate medio {format_pct(avg_draw)} | partidos {matches}"
                 for label, avg_conf, avg_draw, balance, matches in balanced_groups
             )
         )
         lines.append(
-            "- Grupos con favoritos mas claros hasta ahora: "
+            "- Grupos con favoritos más claros hasta ahora: "
             + "; ".join(
                 f"{label} | certeza media {format_pct(avg_conf)} | empate medio {format_pct(avg_draw)} | partidos {matches}"
                 for label, avg_conf, avg_draw, balance, matches in favorite_groups
@@ -6880,7 +6887,7 @@ def build_global_confidence_markdown(entries: Sequence[dict]) -> List[str]:
         )
     if market_edges:
         lines.append(
-            "- Partidos donde mas se separan modelo y cuotas: "
+            "- Partidos donde más se separan modelo y cuotas: "
             + "; ".join(f"{item[1]['title']} {format_pct(item[0])}" for item in market_edges)
         )
     return lines
@@ -6942,7 +6949,7 @@ def build_global_confidence_html(entries: Sequence[dict]) -> str:
             prediction: MatchPrediction = entry["prediction"]
             favorite_label, favorite_prob = favorite_summary(entry)
             tail = (
-                f"Certeza del pick {format_pct(confidence)} | resultado mas probable {favorite_label} {format_pct(favorite_prob)}"
+                f"Certeza del pick {format_pct(confidence)} | resultado más probable {favorite_label} {format_pct(favorite_prob)}"
                 if mode == "firm"
                 else f"Certeza del pick {format_pct(confidence)} | empate {format_pct(prediction.draw)}"
             )
@@ -6992,12 +6999,12 @@ def build_global_confidence_html(entries: Sequence[dict]) -> str:
         balanced_groups = sorted(group_rows, key=lambda row: (row[3], row[2]), reverse=True)
         favorite_groups = sorted(group_rows, key=lambda row: (row[1], -row[2]), reverse=True)
         group_closed_html = (
-            "<article><h3>Grupos mas parejos</h3><ul>"
+            "<article><h3>Grupos más parejos</h3><ul>"
             f"{group_list(balanced_groups, 'balanced')}"
             "</ul></article>"
         )
         group_open_html = (
-            "<article><h3>Grupos con favoritos mas claros</h3><ul>"
+            "<article><h3>Grupos con favoritos más claros</h3><ul>"
             f"{group_list(favorite_groups, 'favorite')}"
             "</ul></article>"
         )
@@ -7024,7 +7031,7 @@ def build_global_confidence_html(entries: Sequence[dict]) -> str:
                 "label": entry["title"],
                 "value": parity,
                 "value_text": format_pct(parity),
-                "detail": f"Pick mas fuerte {favorite_label} {format_pct(favorite_prob)} | empate {format_pct(prediction.draw)}",
+                "detail": f"Pick más fuerte {favorite_label} {format_pct(favorite_prob)} | empate {format_pct(prediction.draw)}",
             }
         )
 
@@ -7055,32 +7062,32 @@ def build_global_confidence_html(entries: Sequence[dict]) -> str:
     charts_html = render_chart_grid(
         [
             render_rank_chart(
-                "Donde el favorito se ve mas fuerte",
+                "Dónde el favorito se ve más fuerte",
                 strongest_chart_rows,
                 tone="accent",
-                description="Lectura rapida de los cruces donde hoy el modelo ve mas diferencia entre el pick principal y el resto.",
-                empty_body="Todavia no hay partidos comparables con ventaja clara.",
+                description="Lectura rápida de los cruces donde hoy el modelo ve más diferencia entre el pick principal y el resto.",
+                empty_body="Todavía no hay partidos comparables con ventaja clara.",
             ),
             render_rank_chart(
-                "Donde el partido se ve mas parejo",
+                "Dónde el partido se ve más parejo",
                 most_open_chart_rows,
                 tone="slate",
-                description="No es lo mismo que empate seguro. Aqui sube cuando el duelo se ve abierto y ningun desenlace domina con claridad.",
-                empty_body="Todavia no hay partidos comparables lo bastante parejos para dibujar esta lectura.",
+                description="No es lo mismo que empate seguro. Aquí sube cuando el duelo se ve abierto y ningún desenlace domina con claridad.",
+                empty_body="Todavía no hay partidos comparables lo bastante parejos para dibujar esta lectura.",
             ),
             render_rank_chart(
-                "Grupos mas parejos",
+                "Grupos más parejos",
                 balanced_chart_rows,
                 tone="gold",
-                description="Resumen por grupo usando equilibrio medio, probabilidad de empate y los partidos que ya estan cargados.",
-                empty_body="Todavia no hay suficientes partidos de grupos para construir este grafico.",
+                description="Resumen por grupo usando equilibrio medio, probabilidad de empate y los partidos que ya están cargados.",
+                empty_body="Todavía no hay suficientes partidos de grupos para construir este gráfico.",
             ),
             render_rank_chart(
-                "Grupos con favoritos mas claros",
+                "Grupos con favoritos más claros",
                 favorite_group_chart_rows,
                 tone="rose",
                 description="Estos grupos muestran la mayor ventaja media del pick principal en los partidos publicados hasta ahora.",
-                empty_body="Todavia no hay suficiente informacion de grupos para dibujar esta lectura.",
+                empty_body="Todavía no hay suficiente información de grupos para dibujar esta lectura.",
             ),
         ]
     )
@@ -7090,26 +7097,26 @@ def build_global_confidence_html(entries: Sequence[dict]) -> str:
         "<div class=\"panel-head\">"
         "<div>"
         "<p class=\"eyebrow\">Lectura global</p>"
-        "<h2>Resumen rapido del torneo</h2>"
-        "<p class=\"lede-tight\">Este bloque te deja ver rapido donde hay favoritos mas claros, donde los cruces se ven mas parejos y en que partidos el modelo se aleja mas de las cuotas. No es una nota del modelo; es una foto del tablero de hoy.</p>"
+        "<h2>Resumen rápido del torneo</h2>"
+        "<p class=\"lede-tight\">Este bloque te deja ver rápido dónde hay favoritos más claros, dónde los cruces se ven más parejos y en qué partidos el modelo se aleja más de las cuotas. No es una nota del modelo; es una foto del tablero de hoy.</p>"
         "</div>"
         "</div>"
         "<div class=\"confidence-tiles\">"
         f"<div class=\"summary-tile\"><span>Claridad media del pick principal</span><strong>{format_pct(avg_confidence)}</strong></div>"
-        f"<div class=\"summary-tile\"><span>Probabilidad media cubierta por los 3 marcadores mas probables</span><strong>{format_pct(avg_top3)}</strong></div>"
+        f"<div class=\"summary-tile\"><span>Probabilidad media cubierta por los 3 marcadores más probables</span><strong>{format_pct(avg_top3)}</strong></div>"
         f"<div class=\"summary-tile\"><span>Partidos en vivo detectados</span><strong>{live_matches}</strong></div>"
-        "<div class=\"summary-tile\"><span>Como comprobar actualizacion</span><strong><a href=\"latest.json\">latest.json</a> + badge En vivo + minuto</strong></div>"
+        "<div class=\"summary-tile\"><span>Cómo comprobar actualización</span><strong><a href=\"latest.json\">latest.json</a> + badge En vivo + minuto</strong></div>"
         "</div>"
         f"{charts_html}"
         "<div class=\"confidence-grid\">"
-        "<article><h3>Partidos con favorito mas claro</h3><ul>"
+        "<article><h3>Partidos con favorito más claro</h3><ul>"
         f"{bullet_list(strongest, 'firm')}"
         "</ul></article>"
-        "<article><h3>Partidos mas cerrados o parejos</h3><ul>"
+        "<article><h3>Partidos más cerrados o parejos</h3><ul>"
         f"{bullet_list(most_open, 'open')}"
         "</ul></article>"
         "<article><h3>Modelo vs cuotas</h3><ul>"
-        f"{market_list(market_edges) if market_edges else '<li><strong>Sin odds comparables</strong><span>Aun no llegaron cuotas utilizables del feed.</span></li>'}"
+        f"{market_list(market_edges) if market_edges else '<li><strong>Sin odds comparables</strong><span>Aún no llegaron cuotas utilizables del feed.</span></li>'}"
         "</ul></article>"
         f"{group_closed_html}"
         f"{group_open_html}"
@@ -7504,39 +7511,39 @@ def build_bracket_visual_html(bracket_payload: dict, entries: Optional[Sequence[
 
 def build_backtesting_markdown(backtest: dict) -> List[str]:
     if not backtest or not backtest.get("completed_matches"):
-        return ["_El Brier 2026 se activa automaticamente con el primer partido terminado; antes no se inventa muestra._"]
+        return ["_El Brier 2026 se activa automáticamente con el primer partido terminado; antes no se inventa muestra._"]
 
     lines = [
         f"- Partidos cerrados analizados: {int(backtest.get('completed_matches', 0))}",
         f"- Partidos comparables en 90 minutos: {int(backtest.get('regular_time_samples', 0))}",
     ]
     if backtest.get("favorite_hit_rate") is not None:
-        lines.append(f"- Cuantas veces acertamos el resultado mas probable: {format_pct(float(backtest['favorite_hit_rate']))}")
+        lines.append(f"- Cuántas veces acertamos el resultado más probable: {format_pct(float(backtest['favorite_hit_rate']))}")
     if backtest.get("top1_score_hit_rate") is not None:
-        lines.append(f"- Cuantas veces acertamos exactamente el marcador principal: {format_pct(float(backtest['top1_score_hit_rate']))}")
+        lines.append(f"- Cuántas veces acertamos exactamente el marcador principal: {format_pct(float(backtest['top1_score_hit_rate']))}")
     if backtest.get("top3_score_hit_rate") is not None:
-        lines.append(f"- Cuantas veces el marcador real estuvo dentro de nuestros 3 resultados principales: {format_pct(float(backtest['top3_score_hit_rate']))}")
+        lines.append(f"- Cuántas veces el marcador real estuvo dentro de nuestros 3 resultados principales: {format_pct(float(backtest['top3_score_hit_rate']))}")
     if backtest.get("logloss_result") is not None:
         lines.append(f"- Error log-loss en resultado: {float(backtest['logloss_result']):.3f}")
     if backtest.get("brier_result") is not None:
         lines.append(f"- Error Brier en resultado: {float(backtest['brier_result']):.3f}")
     if backtest.get("brier_reliability") is not None:
-        lines.append(f"- Brier descompuesto | calibracion {float(backtest['brier_reliability']):.3f} | separacion {float(backtest['brier_resolution']):.3f} | incertidumbre base {float(backtest['brier_uncertainty']):.3f}")
+        lines.append(f"- Brier descompuesto | calibración {float(backtest['brier_reliability']):.3f} | separación {float(backtest['brier_resolution']):.3f} | incertidumbre base {float(backtest['brier_uncertainty']):.3f}")
     if backtest.get("logloss_advance") is not None:
-        lines.append(f"- Error log-loss en clasificacion knockout: {float(backtest['logloss_advance']):.3f}")
+        lines.append(f"- Error log-loss en clasificación knockout: {float(backtest['logloss_advance']):.3f}")
     if backtest.get("brier_advance") is not None:
-        lines.append(f"- Error Brier en clasificacion knockout: {float(backtest['brier_advance']):.3f}")
+        lines.append(f"- Error Brier en clasificación knockout: {float(backtest['brier_advance']):.3f}")
     if backtest.get("market_logloss_result") is not None:
         lines.append(f"- Error log-loss de las cuotas en esos mismos partidos: {float(backtest['market_logloss_result']):.3f}")
     if backtest.get("temporal_cv_logloss") is not None:
         lines.append(
-            f"- Validacion temporal por ventanas | log-loss {float(backtest['temporal_cv_logloss']):.3f} | "
+            f"- Validación temporal por ventanas | log-loss {float(backtest['temporal_cv_logloss']):.3f} | "
             f"Brier {float(backtest['temporal_cv_brier']):.3f} | acierto {format_pct(float(backtest['temporal_cv_accuracy']))}"
         )
     buckets = backtest.get("calibration_buckets") or []
     if buckets:
         lines.append(
-            "- Si el modelo dice una probabilidad parecida, esto es lo que paso en la realidad: "
+            "- Si el modelo dice una probabilidad parecida, esto es lo que pasó en la realidad: "
             + "; ".join(
                 f"{bucket['bucket']} -> confianza media {format_pct(float(bucket['avg_confidence']))}, acierto real {format_pct(float(bucket['hit_rate']))}, n={int(bucket['matches'])}"
                 for bucket in buckets
@@ -7549,8 +7556,8 @@ def build_backtesting_html(backtest: dict) -> str:
     if not backtest or not backtest.get("completed_matches"):
         return (
             "<section class=\"panel backtest-panel\">"
-            "<div class=\"panel-head\"><div><p class=\"eyebrow\">Validacion</p><h2>Como viene acertando el modelo</h2>"
-            "<p class=\"lede-tight\">El Brier 2026 no se inventa antes del torneo: se activa solo y desde el primer partido terminado. En cuanto ESPN/proveedor marque un resultado final, esta seccion mostrara Brier, log-loss, acierto y buckets con la muestra disponible.</p>"
+            "<div class=\"panel-head\"><div><p class=\"eyebrow\">Validación</p><h2>Cómo viene acertando el modelo</h2>"
+            "<p class=\"lede-tight\">El Brier 2026 no se inventa antes del torneo: se activa solo y desde el primer partido terminado. En cuanto ESPN/proveedor marque un resultado final, esta sección mostrará Brier, log-loss, acierto y buckets con la muestra disponible.</p>"
             "</div></div></section>"
         )
 
@@ -7571,13 +7578,13 @@ def build_backtesting_html(backtest: dict) -> str:
     if backtest.get("brier_result") is not None:
         quality_rows.append(f"<li><strong>Brier resultado</strong><span>{float(backtest['brier_result']):.3f}</span></li>")
     if backtest.get("brier_reliability") is not None:
-        quality_rows.append(f"<li><strong>Brier calibracion</strong><span>{float(backtest['brier_reliability']):.3f}</span></li>")
-        quality_rows.append(f"<li><strong>Brier separacion</strong><span>{float(backtest['brier_resolution']):.3f}</span></li>")
+        quality_rows.append(f"<li><strong>Brier calibración</strong><span>{float(backtest['brier_reliability']):.3f}</span></li>")
+        quality_rows.append(f"<li><strong>Brier separación</strong><span>{float(backtest['brier_resolution']):.3f}</span></li>")
         quality_rows.append(f"<li><strong>Incertidumbre base</strong><span>{float(backtest['brier_uncertainty']):.3f}</span></li>")
     if backtest.get("logloss_advance") is not None:
-        quality_rows.append(f"<li><strong>Log-loss clasificacion</strong><span>{float(backtest['logloss_advance']):.3f}</span></li>")
+        quality_rows.append(f"<li><strong>Log-loss clasificación</strong><span>{float(backtest['logloss_advance']):.3f}</span></li>")
     if backtest.get("brier_advance") is not None:
-        quality_rows.append(f"<li><strong>Brier clasificacion</strong><span>{float(backtest['brier_advance']):.3f}</span></li>")
+        quality_rows.append(f"<li><strong>Brier clasificación</strong><span>{float(backtest['brier_advance']):.3f}</span></li>")
     if backtest.get("market_logloss_result") is not None:
         quality_rows.append(f"<li><strong>Log-loss mercado</strong><span>{float(backtest['market_logloss_result']):.3f}</span></li>")
     if backtest.get("temporal_cv_logloss") is not None:
@@ -7601,7 +7608,7 @@ def build_backtesting_html(backtest: dict) -> str:
                 "label": "Pick principal",
                 "value": float(backtest["favorite_hit_rate"]),
                 "value_text": format_pct(float(backtest["favorite_hit_rate"])),
-                "detail": "Cuantas veces acierta el resultado principal que publicamos.",
+                "detail": "Cuántas veces acierta el resultado principal que publicamos.",
             }
         )
     if backtest.get("top1_score_hit_rate") is not None:
@@ -7610,7 +7617,7 @@ def build_backtesting_html(backtest: dict) -> str:
                 "label": "Marcador principal exacto",
                 "value": float(backtest["top1_score_hit_rate"]),
                 "value_text": format_pct(float(backtest["top1_score_hit_rate"])),
-                "detail": "Cuantas veces el marcador exacto numero uno coincide con el resultado real.",
+                "detail": "Cuántas veces el marcador exacto número uno coincide con el resultado real.",
             }
         )
     if backtest.get("top3_score_hit_rate") is not None:
@@ -7619,7 +7626,7 @@ def build_backtesting_html(backtest: dict) -> str:
                 "label": "Marcador dentro del top-3",
                 "value": float(backtest["top3_score_hit_rate"]),
                 "value_text": format_pct(float(backtest["top3_score_hit_rate"])),
-                "detail": "Cuantas veces el marcador real cae dentro de nuestros tres marcadores principales.",
+                "detail": "Cuántas veces el marcador real cae dentro de nuestros tres marcadores principales.",
             }
         )
     if backtest.get("temporal_cv_accuracy") is not None:
@@ -7648,38 +7655,38 @@ def build_backtesting_html(backtest: dict) -> str:
     charts_html = render_chart_grid(
         [
             render_rank_chart(
-                "Que tan seguido pega lo visible",
+                "Qué tan seguido pega lo visible",
                 performance_chart_rows,
                 tone="accent",
-                description="Este grafico se enfoca en lo que mas se ve en la web: pick principal, marcador exacto y aciertos por ventanas temporales.",
-                empty_body="Todavia no hay suficientes partidos cerrados para medir rendimiento visible.",
+                description="Este gráfico se enfoca en lo que más se ve en la web: pick principal, marcador exacto y aciertos por ventanas temporales.",
+                empty_body="Todavía no hay suficientes partidos cerrados para medir rendimiento visible.",
             ),
             render_dual_bar_chart(
-                "Calibracion por tramos",
+                "Calibración por tramos",
                 calibration_chart_rows,
-                description="Compara lo que el modelo prometia en cada tramo de confianza contra lo que termino pasando de verdad.",
+                description="Compara lo que el modelo prometía en cada tramo de confianza contra lo que terminó pasando de verdad.",
                 primary_label="Confianza media",
                 secondary_label="Acierto real",
                 primary_tone="accent",
                 secondary_tone="gold",
-                empty_body="Todavia no hay suficientes buckets de confianza para comparar modelo y realidad.",
+                empty_body="Todavía no hay suficientes buckets de confianza para comparar modelo y realidad.",
             ),
         ]
     )
 
     return (
         "<section class=\"panel backtest-panel\">"
-        "<div class=\"panel-head\"><div><p class=\"eyebrow\">Validacion</p><h2>Como viene acertando el modelo</h2>"
-        "<p class=\"lede-tight\">Aqui reconstruimos el torneo partido por partido, siempre pronosticando antes de cargar el resultado real. Asi medimos con justicia si el modelo esta bien calibrado y cuanto se acerca a lo que termino pasando.</p>"
+        "<div class=\"panel-head\"><div><p class=\"eyebrow\">Validación</p><h2>Cómo viene acertando el modelo</h2>"
+        "<p class=\"lede-tight\">Aquí reconstruimos el torneo partido por partido, siempre pronosticando antes de cargar el resultado real. Así medimos con justicia si el modelo está bien calibrado y cuánto se acerca a lo que terminó pasando.</p>"
         "</div></div>"
         f"<div class=\"confidence-tiles\">{''.join(metrics)}</div>"
         f"{charts_html}"
         "<div class=\"confidence-grid\">"
         "<article><h3>Errores del modelo</h3><ul>"
-        f"{''.join(quality_rows) if quality_rows else '<li><strong>Sin muestra suficiente</strong><span>Aun no hay datos comparables.</span></li>'}"
+        f"{''.join(quality_rows) if quality_rows else '<li><strong>Sin muestra suficiente</strong><span>Aún no hay datos comparables.</span></li>'}"
         "</ul></article>"
-        "<article><h3>Cuando el modelo dice X, que tanto se cumple</h3><ul>"
-        f"{''.join(calibration_rows) if calibration_rows else '<li><strong>Sin buckets</strong><span>Aun no hay suficientes partidos.</span></li>'}"
+        "<article><h3>Cuando el modelo dice X, qué tanto se cumple</h3><ul>"
+        f"{''.join(calibration_rows) if calibration_rows else '<li><strong>Sin buckets</strong><span>Aún no hay suficientes partidos.</span></li>'}"
         "</ul></article>"
         "</div>"
         "</section>"
@@ -7708,17 +7715,17 @@ def build_methodology_quality_html(
             "tone": "ok" if iterations >= 15000 else "warn",
             "detail": (
                 f"{iterations:,}".replace(",", ".")
-                + " simulaciones por corrida; minimo operativo exigido: 15.000."
+                + " simulaciones por corrida; mínimo operativo exigido: 15.000."
                 if iterations
-                else "La llave no reporta numero de simulaciones."
+                else "La llave no reporta número de simulaciones."
             ),
         },
         {
-            "label": "Consenso externo campeon",
+            "label": "Consenso externo campeón",
             "status": "Activo" if champion_rows else "Pendiente",
             "tone": "ok" if champion_rows else "warn",
             "detail": (
-                "Probabilidades de campeon mezcladas dinamicamente: "
+                "Probabilidades de campeón mezcladas dinámicamente: "
                 f"{format_pct(float(consensus_context.get('model_blend', 0.0)))} modelo/live y "
                 f"{format_pct(float(consensus_context.get('consensus_blend', 0.0)))} consenso externo."
                 if champion_rows
@@ -7726,19 +7733,19 @@ def build_methodology_quality_html(
             ),
         },
         {
-            "label": "Pronostico de goles",
+            "label": "Pronóstico de goles",
             "status": "Activo" if goal_consensus_count else "Listo",
             "tone": "ok" if goal_consensus_count else "neutral",
             "detail": (
-                f"{goal_consensus_count}/{total_fixtures} partidos tienen linea externa seria de goles para ajustar el total esperado."
+                f"{goal_consensus_count}/{total_fixtures} partidos tienen línea externa seria de goles para ajustar el total esperado."
                 if total_fixtures
-                else "Sin fixtures cargados todavia."
+                else "Sin fixtures cargados todavía."
             )
             if goal_consensus_count
             else (
-                "El modelo publica goles esperados, marcador entero principal y over/under; cuando entre una linea externa, ajusta la brecha automaticamente."
+                "El modelo publica goles esperados, marcador entero principal y over/under; cuando entre una línea externa, ajusta la brecha automáticamente."
                 if total_fixtures
-                else "Sin fixtures cargados todavia."
+                else "Sin fixtures cargados todavía."
             ),
         },
         {
@@ -7748,15 +7755,15 @@ def build_methodology_quality_html(
             "detail": (
                 f"{live_count} partidos en vivo y {final_count} cerrados. El workflow recalcula cada 5 minutos y en cada push."
                 if total_fixtures
-                else "El workflow esta listo, pero no hay partidos para monitorear."
+                else "El workflow está listo, pero no hay partidos para monitorear."
             ),
         },
         {
-            "label": "Backtesting y calibracion",
+            "label": "Backtesting y calibración",
             "status": "Activo" if completed_matches else "Listo al primer final",
             "tone": "ok" if completed_matches else "neutral",
             "detail": (
-                f"{completed_matches} partidos cerrados reconstruidos secuencialmente con log-loss, Brier y calibracion por tramos."
+                f"{completed_matches} partidos cerrados reconstruidos secuencialmente con log-loss, Brier y calibración por tramos."
                 if completed_matches
                 else "No espera una muestra grande: empieza a medir Brier apenas haya un partido terminado."
             ),
@@ -7774,9 +7781,9 @@ def build_methodology_quality_html(
     return (
         "<div class=\"method-quality\">"
         "<div class=\"method-quality-head\">"
-        "<p class=\"eyebrow\">Semaforo metodologico</p>"
-        "<h3>Control de calidad del pronostico</h3>"
-        "<p>Este bloque separa lo que ya esta activo de lo que esta preparado para activarse cuando entren partidos, goles, noticias y feed live reales.</p>"
+        "<p class=\"eyebrow\">Semáforo metodológico</p>"
+        "<h3>Control de calidad del pronóstico</h3>"
+        "<p>Este bloque separa lo que ya está activo de lo que está preparado para activarse cuando entren partidos, goles, noticias y feed live reales.</p>"
         "</div>"
         f"<div class=\"method-quality-grid\">{''.join(rows)}</div>"
         "</div>"
@@ -7796,55 +7803,55 @@ def build_methodology_html(
         "<div class=\"panel-head\">"
         "<div>"
         "<p class=\"eyebrow\">Cómo Leer Esto</p>"
-        "<h2>Como esta armado el modelo</h2>"
-        "<p class=\"lede-tight\">La idea aqui no es complicar por complicar. El modelo ya es fuerte para quiniela; lo que mas valor agrega ahora es que explique bien por que cambia y que luego podamos medir con datos reales si viene acertando.</p>"
+        "<h2>Cómo está armado el modelo</h2>"
+        "<p class=\"lede-tight\">La idea aquí no es complicar por complicar. El modelo ya es fuerte para quiniela; lo que más valor agrega ahora es que explique bien por qué cambia y que luego podamos medir con datos reales si viene acertando.</p>"
         "</div>"
         "</div>"
         f"{quality_html}"
         "<div class=\"method-grid\">"
         "<article>"
         "<h3>Partido a partido</h3>"
-        "<p>Combina fuerza de cada seleccion, contexto del partido y un stack de modelos para estimar marcador final y probabilidades de victoria, empate y derrota.</p>"
+        "<p>Combina fuerza de cada selección, contexto del partido y un stack de modelos para estimar marcador final y probabilidades de victoria, empate y derrota.</p>"
         "</article>"
         "<article>"
-        "<h3>Capa historica desde 1990</h3>"
-        "<p>Ademas del Elo y la forma actual, el modelo incorpora resultados de selecciones desde 1990: rendimiento total, competitivo, mundialista, ataque, defensa y tandas de penales. Esa memoria historica ahora usa shrinkage bayesiano empirico para no sobrepremiar muestras chicas y para sumar contexto sin tapar lo que esta pasando hoy.</p>"
+        "<h3>Capa histórica desde 1990</h3>"
+        "<p>Además del Elo y la forma actual, el modelo incorpora resultados de selecciones desde 1990: rendimiento total, competitivo, mundialista, ataque, defensa y tandas de penales. Esa memoria histórica ahora usa shrinkage bayesiano empírico para no sobrepremiar muestras chicas y para sumar contexto sin tapar lo que está pasando hoy.</p>"
         "</article>"
         "<article>"
         "<h3>Cuadro completo</h3>"
-        f"<p>La llave publicada se construye con Monte Carlo dinamico de {html.escape(montecarlo_line)} por corrida para que el cuadro no cambie solo por ruido de simulacion. El muestreo de goles ya usa un RNG rapido con NumPy y semillas deterministas para sostener mas simulaciones sin volver lento el procesamiento.</p>"
+        f"<p>La llave publicada se construye con Monte Carlo dinámico de {html.escape(montecarlo_line)} por corrida para que el cuadro no cambie solo por ruido de simulación. El muestreo de goles ya usa un RNG rápido con NumPy y semillas deterministas para sostener más simulaciones sin volver lento el procesamiento.</p>"
         "</article>"
         "<article>"
-        "<h3>Stack estadistico</h3>"
-        "<p>La capa prepartido mezcla el modelo principal Bivariante Poisson, un modelo de contraste Poisson independiente, un ajuste de baja anotacion y un ensamble ligero final. Ese ensamble ahora repondera los modelos segun consenso y cercania al mercado cuando hay cuotas confiables.</p>"
+        "<h3>Stack estadístico</h3>"
+        "<p>La capa prepartido mezcla el modelo principal Bivariante Poisson, un modelo de contraste Poisson independiente, un ajuste de baja anotación y un ensamble ligero final. Ese ensamble ahora repondera los modelos según consenso y cercanía al mercado cuando hay cuotas confiables.</p>"
         "</article>"
         "<article>"
         "<h3>Estrategia de datos</h3>"
-        "<p>El modelo prioriza fuentes solidas y trazables antes que volumen bruto. Aqui la meta no es meter cientos de terabytes por marketing, sino usar capas de alta señal: datos oficiales, historia desde 1990, feed en vivo y mercado como referencia suave.</p>"
+        "<p>El modelo prioriza fuentes sólidas y trazables antes que volumen bruto. Aquí la meta no es meter cientos de terabytes por marketing, sino usar capas de alta señal: datos oficiales, historia desde 1990, feed en vivo y mercado como referencia suave.</p>"
         "</article>"
         "<article>"
         "<h3>Modelos visibles en la web</h3>"
-        "<p>En cada tarjeta de partido veras por separado que dice Bivariante Poisson, que dice Poisson independiente, que dice el ajuste de baja anotacion y cual es el ensamble final publicado. Asi puedes comparar si coinciden o si hay dispersion entre modelos.</p>"
+        "<p>En cada tarjeta de partido verás por separado qué dice Bivariante Poisson, qué dice Poisson independiente, qué dice el ajuste de baja anotación y cuál es el ensamble final publicado. Así puedes comparar si coinciden o si hay dispersión entre modelos.</p>"
         "</article>"
         "<article>"
         "<h3>Estado dinámico</h3>"
-        "<p>Actualiza Elo, forma, fatiga, disponibilidad, disciplina, clima, alineaciones, bajas, mercado y ahora tambien xG/xGA reciente ajustado por rival. Ademas, acumula el estilo reciente de cada seleccion para no arrancar cada cruce desde cero.</p>"
+        "<p>Actualiza Elo, forma, fatiga, disponibilidad, disciplina, clima, alineaciones, bajas, mercado y ahora también xG/xGA reciente ajustado por rival. Además, acumula el estilo reciente de cada selección para no arrancar cada cruce desde cero.</p>"
         "</article>"
         "<article>"
-        "<h3>Validacion y calibracion</h3>"
-        "<p>El seguimiento del rendimiento no se queda en acierto bruto. La web ahora muestra log-loss, Brier, descomposicion de calibracion y una lectura temporal por ventanas para ver si el modelo se mantiene estable cuando el torneo avanza.</p>"
+        "<h3>Validación y calibración</h3>"
+        "<p>El seguimiento del rendimiento no se queda en acierto bruto. La web ahora muestra log-loss, Brier, descomposición de calibración y una lectura temporal por ventanas para ver si el modelo se mantiene estable cuando el torneo avanza.</p>"
         "</article>"
         "<article>"
         "<h3>Modo in-play</h3>"
-        "<p>Durante un partido, condiciona las probabilidades por minuto, marcador actual y fase del juego. Si el feed trae datos mas ricos, tambien usa tiros, tiros al arco, posesion, calidad de ocasiones, corners, disciplina, sustituciones, banco restante y el portero confirmado para recalcular todo.</p>"
+        "<p>Durante un partido, condiciona las probabilidades por minuto, marcador actual y fase del juego. Si el feed trae datos más ricos, también usa tiros, tiros al arco, posesión, calidad de ocasiones, corners, disciplina, sustituciones, banco restante y el portero confirmado para recalcular todo.</p>"
         "</article>"
         "<article>"
         "<h3>Noticias y bajas</h3>"
-        "<p>Si el feed publica ausencias, cambios de XI, movimiento de cuotas, arbitro o noticias relevantes del partido, esas señales entran como disponibilidad, moral o contexto adicional.</p>"
+        "<p>Si el feed publica ausencias, cambios de XI, movimiento de cuotas, árbitro o noticias relevantes del partido, esas señales entran como disponibilidad, moral o contexto adicional.</p>"
         "</article>"
         "<article>"
-        "<h3>Como validar el refresh</h3>"
-        "<p>La portada publica hora de actualizacion, badge En vivo, minuto modelado y un latest.json. Si esos campos cambian, el in-play se esta recalculando bien.</p>"
+        "<h3>Cómo validar el refresh</h3>"
+        "<p>La portada publica hora de actualización, badge En vivo, minuto modelado y un latest.json. Si esos campos cambian, el in-play se está recalculando bien.</p>"
         "</article>"
         "</div>"
         f"<p class=\"lede-tight\">Backtesting actual: {html.escape(str(int(backtest.get('completed_matches', 0))))} partidos cerrados reconstruidos secuencialmente.</p>"
@@ -7868,10 +7875,10 @@ def build_runtime_status_html(entries: Sequence[dict], bracket_payload: dict) ->
         feed_depth_label = "Enriquecido"
     elif live_sources:
         provider_label = " + ".join(live_sources)
-        feed_depth_label = "Base publica"
+        feed_depth_label = "Base pública"
     else:
         provider_label = "espn_scoreboard"
-        feed_depth_label = "Base publica"
+        feed_depth_label = "Base pública"
     feed_limit_note = (
         "In-play enriquecido: hay proveedor profundo en esta corrida; si trae eventos, el modelo puede usar tiros, "
         "disciplina, sustituciones, xG/ocasiones y contexto minuto a minuto."
@@ -7885,19 +7892,19 @@ def build_runtime_status_html(entries: Sequence[dict], bracket_payload: dict) ->
     cards = [
         (
             "Estado operativo",
-            "Publicacion automatica en <strong>GitHub Actions + Pages</strong>. "
-            "Se reconstruye cada <strong>5 minutos</strong> y tambien en cada push a <strong>main</strong>.",
+            "Publicación automática en <strong>GitHub Actions + Pages</strong>. "
+            "Se reconstruye cada <strong>5 minutos</strong> y también en cada push a <strong>main</strong>.",
         ),
         (
             "Monte Carlo publicado",
             f"La llave visible usa <strong>{iterations_label} simulaciones</strong> por corrida. "
-            "Ese numero ya no deberia verse como 1.200.",
+            "Ese número ya no debería verse como 1.200.",
         ),
         (
             "Proveedor live activo",
             f"<strong>{html.escape(provider_label)}</strong> | {html.escape(feed_depth_label)}. "
             f"Adaptador con key en esta corrida: <strong>{html.escape(' + '.join(configured_wired) or 'ninguno')}</strong>. "
-            "Si aparece un proveedor profundo en fixtures, el in-play entra con mas señales del partido.",
+            "Si aparece un proveedor profundo en fixtures, el in-play entra con más señales del partido.",
         ),
         (
             "Lectura prudente del feed",
@@ -7924,7 +7931,7 @@ def build_runtime_status_html(entries: Sequence[dict], bracket_payload: dict) ->
     chip_html = (
         "<div class=\"runtime-chip-row\">"
         f"<span class=\"runtime-chip\">In-play <strong>{html.escape(in_play_label)}</strong></span>"
-        f"<span class=\"runtime-chip\">Validacion <strong>{html.escape('latest.json + badge En vivo + minuto')}</strong></span>"
+        f"<span class=\"runtime-chip\">Validación <strong>{html.escape('latest.json + badge En vivo + minuto')}</strong></span>"
         f"<span class=\"runtime-chip\">Frecuencia <strong>{html.escape('cada 5 minutos')}</strong></span>"
         "</div>"
     )
@@ -7932,8 +7939,8 @@ def build_runtime_status_html(entries: Sequence[dict], bracket_payload: dict) ->
         "<section class=\"panel runtime-panel\">"
         "<div class=\"panel-head\"><div>"
         "<p class=\"eyebrow\">Estado Del Modelo</p>"
-        "<h2>Que esta corriendo ahora mismo</h2>"
-        "<p class=\"lede-tight\">Esta caja resume lo que de verdad esta publicado: cuantas simulaciones usa la llave, que feed live esta activo y cuantas tarjetas del tablero estan en vivo, cerradas o pendientes.</p>"
+        "<h2>Qué está corriendo ahora mismo</h2>"
+        "<p class=\"lede-tight\">Esta caja resume lo que de verdad está publicado: cuántas simulaciones usa la llave, qué feed live está activo y cuántas tarjetas del tablero están en vivo, cerradas o pendientes.</p>"
         "</div></div>"
         f"<div class=\"runtime-grid\">{card_html}</div>"
         f"{chip_html}"
@@ -7953,31 +7960,31 @@ def build_landing_proof_html(entries: Sequence[dict], bracket_payload: dict, bac
     champion_rows = consensus_adjusted_champion_probabilities(bracket_payload, entries)
     completed_matches = int(backtest.get("completed_matches", 0) or 0)
     goal_consensus_count = sum(1 for entry in fixture_entries if entry.get("market_total_line") is not None)
-    model_status = "Activo" if iterations >= 15000 and champion_rows else "En preparacion"
+    model_status = "Activo" if iterations >= 15000 and champion_rows else "En preparación"
     live_status = "En vivo" if live_count else "Listo"
     evidence_cards = [
         (
             "Motor probado",
-            f"{iterations_label} simulaciones Monte Carlo, ensamble de modelos y auditoria bloqueante antes de publicar.",
+            f"{iterations_label} simulaciones Monte Carlo, ensamble de modelos y auditoría bloqueante antes de publicar.",
             "ok" if iterations >= 15000 else "warn",
         ),
         (
-            "Actualizacion real",
+            "Actualización real",
             f"GitHub Actions regenera cada 5 minutos. Modela {modeled_total} partidos: {len(fixture_entries)} fixtures directos y {len(projected_entries)} cruces de llave proyectados. Estado directo: {live_count} live, {final_count} final, {pending_count} pendientes.",
             "ok",
         ),
         (
-            "Decision de quiniela",
+            "Decisión de quiniela",
             "Separa picks base, partidos cerrados, marcadores defendibles y coberturas. No fuerza una falsa certeza del 90%.",
             "ok",
         ),
         (
             "Contraste externo",
-            "Mezcla consenso de campeon y lineas serias de goles cuando existen, sin dejar que tapen el modelo propio.",
+            "Mezcla consenso de campeón y líneas serias de goles cuando existen, sin dejar que tapen el modelo propio.",
             "ok" if champion_rows or goal_consensus_count else "neutral",
         ),
         (
-            "Calibracion",
+            "Calibración",
             f"{completed_matches} partidos cerrados reconstruidos con log-loss, Brier y tramos de confianza.",
             "ok" if completed_matches else "neutral",
         ),
@@ -8001,8 +8008,8 @@ def build_landing_proof_html(entries: Sequence[dict], bracket_payload: dict, bac
         "<div class=\"proof-layout\">"
         "<div class=\"proof-copy\">"
         "<p class=\"eyebrow\">Prueba operacional</p>"
-        "<h2>Como sabes que no es una pagina bonita pegada encima de numeros muertos</h2>"
-        "<p class=\"lede-tight\">El sitio publica evidencia de funcionamiento: simulaciones, frecuencia de refresco, auditoria, calibracion, consenso externo y estado in-play. Para ganar la quiniela, esta capa importa tanto como el pronostico: te dice cuando confiar, cuando cubrir y cuando no sobreapostar un partido abierto.</p>"
+        "<h2>Cómo sabes que no es una página bonita pegada encima de números muertos</h2>"
+        "<p class=\"lede-tight\">El sitio publica evidencia de funcionamiento: simulaciones, frecuencia de refresco, auditoría, calibración, consenso externo y estado in-play. Para ganar la quiniela, esta capa importa tanto como el pronóstico: te dice cuándo confiar, cuándo cubrir y cuándo no sobreapostar un partido abierto.</p>"
         "<div class=\"proof-status-row\">"
         f"<span>Modelo <strong>{html.escape(model_status)}</strong></span>"
         f"<span>In-play <strong>{html.escape(live_status)}</strong></span>"
@@ -8047,7 +8054,7 @@ def build_dashboard_html(
             if entry["went_penalties"]:
                 result_text += f" | penales: {entry['penalties_winner']}"
             elif entry["went_extra_time"]:
-                result_text += " | con proroga"
+                result_text += " | con prórroga"
             result_html = f"<p class=\"meta\">{html.escape(result_text)}</p>"
         elif entry.get("live_score_a") is not None and entry.get("live_score_b") is not None:
             result_html = (
@@ -8056,6 +8063,12 @@ def build_dashboard_html(
             )
         else:
             result_html = ""
+        timezone_html = ""
+        if "EDT" in str(status_text):
+            timezone_html = (
+                "<p class=\"meta timezone-note\">Horario del feed en EDT; confirma la hora local "
+                "en Uruguay/Venezuela/tu calendario antes de cargar el boleto.</p>"
+            )
 
         venue_html = ""
         if entry.get("kickoff_utc") or entry.get("venue_name"):
@@ -8122,7 +8135,7 @@ def build_dashboard_html(
         shot_timeline_lines = dashboard_shot_timeline_lines(entry, prediction.team_a, prediction.team_b)
         if shot_timeline_lines:
             shot_timeline_html = (
-                "<div class=\"reason-block\"><h4>Cronologia de disparos y eventos</h4>"
+                "<div class=\"reason-block\"><h4>Cronología de disparos y eventos</h4>"
                 + "".join(
                     f"<p class=\"meta\">{html.escape(line[2:] if line.startswith('- ') else line)}</p>"
                     for line in shot_timeline_lines
@@ -8145,7 +8158,7 @@ def build_dashboard_html(
         reason_lines = adjustment_reason_lines(entry, prediction)
         if reason_lines:
             reason_html = (
-                "<div class=\"reason-block\"><h4>Por que cambia el pronostico</h4>"
+                "<div class=\"reason-block\"><h4>Por qué cambia el pronóstico</h4>"
                 + "".join(
                     f"<p class=\"meta\">{html.escape(line[2:] if line.startswith('- ') else line)}</p>"
                     for line in reason_lines
@@ -8193,15 +8206,18 @@ def build_dashboard_html(
                     for score, prob in prediction.penalty_shootout.get("top_scores", [])
                 )
                 shootout_html = (
-                    f"<div><span>Marcador mas probable de la tanda</span><strong>{html.escape(projected_shootout)}</strong></div>"
+                    f"<div><span>Marcador más probable de la tanda</span><strong>{html.escape(projected_shootout)}</strong></div>"
                     f"<div><span>Marcador medio esperado en la tanda</span><strong>{prediction.team_a} {prediction.penalty_shootout.get('avg_score_a', 0.0):.2f} | "
                     f"{prediction.team_b} {prediction.penalty_shootout.get('avg_score_b', 0.0):.2f}</strong></div>"
-                    "<div class=\"scores\"><h4>Marcadores de tanda mas probables</h4>"
+                    "<details class=\"inline-collapse shootout-collapse\">"
+                    "<summary>Marcadores de tanda más probables</summary>"
+                    "<div class=\"inline-collapse-body scores\">"
                     f"<ul>{shootout_scores}</ul></div>"
+                    "</details>"
                 )
             knockout_html = (
                 "<div class=\"subgrid\">"
-                f"<div><span>Quien tiene mas probabilidad de avanzar</span><strong>{html.escape(prediction.team_a)} {format_pct(prediction.advance_a)} | "
+                f"<div><span>Quién tiene más probabilidad de avanzar</span><strong>{html.escape(prediction.team_a)} {format_pct(prediction.advance_a)} | "
                 f"{html.escape(prediction.team_b)} {format_pct(prediction.advance_b)}</strong></div>"
                 f"<div><span>Si empatan tras 90'</span><strong>{html.escape(prediction.team_a)} {format_pct(detail.get('et_win_a', 0.0))} | "
                 f"siguen empatados {format_pct(detail.get('et_draw', 0.0))} | {html.escape(prediction.team_b)} {format_pct(detail.get('et_win_b', 0.0))}</strong></div>"
@@ -8234,6 +8250,7 @@ def build_dashboard_html(
             f"<h3>{html.escape(entry['title'])}</h3>"
             f"<p class=\"meta\">{html.escape(entry['stage_label'])}</p>"
             f"{result_html}"
+            f"{timezone_html}"
             f"{venue_html}"
             f"{minute_html}"
             f"{weather_html}"
@@ -8250,8 +8267,8 @@ def build_dashboard_html(
             f"{next_round_html}"
             f"{projection_html}"
             "<div class=\"hero-metrics\">"
-            f"<div class=\"metric metric-score\"><span>{html.escape(projected_score_label(prediction))}</span><strong>{html.escape(projected_score_value(prediction))}</strong></div>"
-            f"<div class=\"metric metric-penca\"><span>Marcador recomendado Penca Ovacion</span><strong>{html.escape(str(top_penca_score['score']))}</strong></div>"
+            f"<div class=\"metric metric-score\"><span>Marcador más probable del modelo</span><strong>{html.escape(projected_score_value(prediction))}</strong></div>"
+            f"<div class=\"metric metric-penca\"><span>Marcador recomendado Penca Ovación</span><strong>{html.escape(str(top_penca_score['score']))}</strong></div>"
             f"<div class=\"metric metric-probs\"><span>{html.escape(top_result_label(prediction))}</span><strong>{html.escape(top_result_summary(prediction))}</strong></div>"
             "</div>"
             f"{average_goals_html}"
@@ -8263,7 +8280,7 @@ def build_dashboard_html(
             f"{model_compare_html}"
             f"{knockout_html}"
             "<div class=\"scores\">"
-            "<h4>Marcadores finales mas probables</h4>"
+            "<h4>Marcadores finales más probables</h4>"
             f"<ul>{top_scores_html}</ul>"
             "</div>"
             "</section>"
@@ -8561,30 +8578,30 @@ def audit_dashboard_html(dashboard_html: str) -> List[str]:
         "Cobertura recomendada",
         "Marcador exacto principal",
         "certainty-panel",
-        "Auditoria del boleto",
+        "Auditoría del boleto",
         "Picks base o principales",
         "Partidos cerrados o de riesgo alto",
         "Marcadores exactos defendibles",
-        "Brecha minima contra la segunda opcion",
-        "Checklist de auditoria",
-        "Picks mas defendibles",
-        "Marcadores exactos mas defendibles",
+        "Brecha mínima contra la segunda opción",
+        "Checklist de auditoría",
+        "Picks más defendibles",
+        "Marcadores exactos más defendibles",
         "Ajustes para boleto de quiniela",
         "Guardrail de consenso",
-        "Metodologia de estimadores externos",
+        "Metodología de estimadores externos",
         "Ratings tipo Elo / ClubElo",
         "Ranking FIFA oficial",
         "SPI / modelos ofensivo-defensivos",
         "Mercado y consenso profesional",
-        "Calibracion avanzada",
-        "Como evitamos que el modelo se sobreconfie",
+        "Calibración avanzada",
+        "Cómo evitamos que el modelo se sobreconfíe",
         "Shrinkage bayesiano",
         "Desacuerdo entre modelos",
         "Backtesting por buckets",
-        "Limite de confianza operativa",
-        "Prediccion potenciada",
-        "Probabilidad pura vs conviccion",
-        "Conviccion reforzada media",
+        "Límite de confianza operativa",
+        "Predicción potenciada",
+        "Probabilidad pura vs convicción",
+        "Convicción reforzada media",
         "Fuerza estructural media",
         "Watchlist de riesgo",
         "Agentes de aprendizaje",
@@ -8601,8 +8618,8 @@ def audit_dashboard_html(dashboard_html: str) -> List[str]:
         "GDELT",
         "StatsBomb",
         "ScoreBat",
-        "Semaforo metodologico",
-        "Control de calidad del pronostico",
+        "Semáforo metodológico",
+        "Control de calidad del pronóstico",
         "Pronóstico de goles",
         "15000",
     ]
@@ -9130,7 +9147,7 @@ def print_prediction(prediction: MatchPrediction, show_factors: bool = False) ->
                 f"    Marcador esperado en penales: {prediction.team_a} {shootout.get('avg_score_a', 0.0):.2f} | "
                 f"{prediction.team_b} {shootout.get('avg_score_b', 0.0):.2f}"
             )
-            print("    Marcadores de penales mas probables:")
+            print("    Marcadores de penales más probables:")
             for score, prob in shootout.get("top_scores", []):
                 print(f"      {score}: {prob:.1%}")
         print(
@@ -9149,7 +9166,7 @@ def print_prediction(prediction: MatchPrediction, show_factors: bool = False) ->
             f"{prediction.model_stack.get('low_score_name')} + {prediction.model_stack.get('final_name')} "
             f"| coincidencia entre modelos {agreement:.1%}"
         )
-    print("  Marcadores finales mas probables:" if prediction.advance_a is not None else "  Marcadores mas probables:")
+    print("  Marcadores finales más probables:" if prediction.advance_a is not None else "  Marcadores más probables:")
     for score, prob in prediction.exact_scores:
         print(f"    {score}: {prob:.1%}")
     if show_factors and prediction.factors:
@@ -9402,7 +9419,7 @@ def command_score_prob(args: argparse.Namespace, teams: Dict[str, Team]) -> None
             f"    Marcador esperado en penales: {team_a_name} {shootout['avg_score_a']:.2f} | "
             f"{team_b_name} {shootout['avg_score_b']:.2f}"
         )
-        print("    Marcadores de penales mas probables:")
+        print("    Marcadores de penales más probables:")
         for score, shootout_prob in shootout["top_scores"]:
             print(f"      {score}: {shootout_prob:.1%}")
 

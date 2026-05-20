@@ -107,8 +107,8 @@ class RefactorSmokeTest(unittest.TestCase):
     def test_methodology_mentions_15000_iterations(self):
         html = app.build_methodology_html({"iterations": 15000}, {"completed_matches": 0})
         self.assertIn("15.000 iteraciones", html)
-        self.assertIn("Semaforo metodologico", html)
-        self.assertIn("Control de calidad del pronostico", html)
+        self.assertIn("Semáforo metodológico", html)
+        self.assertIn("Control de calidad del pronóstico", html)
         self.assertIn("15.000 simulaciones", html)
 
     def test_runtime_status_panel_mentions_provider_and_simulations(self):
@@ -173,8 +173,8 @@ class RefactorSmokeTest(unittest.TestCase):
                 "landing_proof_html": "<section class=\"landing-proof\"><h2>Prueba operacional</h2></section>",
                 "runtime_status_html": "",
                 "methodology_html": "",
-                "calibration_depth_html": "<section class=\"calibration-panel\"><h2>Como evitamos que el modelo se sobreconfie</h2></section>",
-                "prediction_power_html": "<section class=\"power-panel\"><h2>Probabilidad pura vs conviccion</h2></section>",
+                "calibration_depth_html": "<section class=\"calibration-panel\"><h2>Cómo evitamos que el modelo se sobreconfíe</h2></section>",
+                "prediction_power_html": "<section class=\"power-panel\"><h2>Probabilidad pura vs convicción</h2></section>",
                 "agentic_learning_html": "<section class=\"agentic-panel\"><h2>Agentes de aprendizaje</h2><p>Noticias multi-fuente</p></section>",
                 "provider_matrix_html": "<section class=\"provider-panel\"><h2>No depender solo de ESPN</h2><p>Sportmonks</p></section>",
                 "global_confidence_html": "",

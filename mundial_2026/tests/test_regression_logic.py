@@ -185,10 +185,10 @@ class RegressionLogicTest(unittest.TestCase):
             self.assertEqual(diagnostics["configured_wired"], [])
             self.assertEqual(diagnostics["deep_sources"], [])
             provider_html = app.build_provider_matrix_html(entries)
-            self.assertIn("Automatico sin cuentas", provider_html)
+            self.assertIn("Automático sin cuentas", provider_html)
             self.assertIn("sin eventos tiro-a-tiro en este corte", provider_html)
             self.assertIn("API_FOOTBALL_KEY | credencial opcional no configurada", provider_html)
-            self.assertIn("sin key | automatico sin key", provider_html)
+            self.assertIn("sin key | automático sin key", provider_html)
             stack = app.provider_stack_summary(entries)
             self.assertEqual(stack["configured"], [])
 
@@ -219,6 +219,10 @@ class RegressionLogicTest(unittest.TestCase):
         self.assertIn("Lectura crítica", template)
         self.assertIn("Track record 2026", template)
         self.assertIn("technical-accordion", template)
+        self.assertIn('id="marcadores"', template)
+        self.assertIn('id="partidos"', template)
+        self.assertIn("Modelo de apoyo para quiniela; no garantiza resultados.", template)
+        self.assertIn("section-collapse", template)
         self.assertIn("Uso educativo y entretenimiento", template)
         self.assertIn("no garantiza ganar", template)
 
@@ -306,9 +310,35 @@ class RegressionLogicTest(unittest.TestCase):
             ]
         )
         self.assertIn("Marcadores para cargar en Penca", html)
-        self.assertIn("Marcador para cargar", html)
+        self.assertIn("Marcador para cargar en Penca", html)
+        self.assertIn("Más probable del modelo", html)
+        self.assertIn("partidos de fase de grupos auditados", html)
         self.assertIn("Spain", html)
         self.assertIn("Saudi Arabia", html)
+
+    def test_cards_make_model_score_and_penca_score_explicit(self):
+        teams = app.load_teams()
+        states = app.initial_team_states(teams)
+        entries = app.dashboard_fixture_entries(
+            [
+                {
+                    "team_a": "Spain",
+                    "team_b": "Saudi Arabia",
+                    "status_detail": "Thu, June 11th at 3:00 PM EDT",
+                    "neutral": True,
+                    "stage": "group",
+                }
+            ],
+            teams,
+            states,
+            top_scores=3,
+        )
+        html = app.build_dashboard_html(entries, "", {}, {"completed_matches": 0}, Path("state.json"), Path("fixtures.json"))
+        self.assertIn("Marcador más probable del modelo", html)
+        self.assertIn("Marcador recomendado Penca Ovación", html)
+        self.assertIn("Horario del feed en EDT", html)
+        self.assertIn("Qué dice cada modelo", html)
+        self.assertIn("model-compare-collapse", html)
 
     def test_consensus_champion_blend_decays_with_live_and_final_results(self):
         pending = [{"projection": False, "status_state": "pre"} for _ in range(4)]
@@ -391,10 +421,10 @@ class RegressionLogicTest(unittest.TestCase):
             ]
         )
         self.assertIn("Hoja de máxima certeza", html)
-        self.assertIn("Auditoria del boleto", html)
-        self.assertIn("Brecha minima contra la segunda opcion", html)
-        self.assertIn("Checklist de auditoria", html)
-        self.assertIn("Picks mas defendibles", html)
+        self.assertIn("Auditoría del boleto", html)
+        self.assertIn("Brecha mínima contra la segunda opción", html)
+        self.assertIn("Checklist de auditoría", html)
+        self.assertIn("Picks más defendibles", html)
         self.assertIn("Spain vs Uruguay", html)
 
     def test_quiniela_audit_metrics_flags_traps_and_fragile_scores(self):

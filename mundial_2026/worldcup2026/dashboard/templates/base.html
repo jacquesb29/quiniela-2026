@@ -37,6 +37,7 @@
             <em>actualiza llave, picks, goles y marcadores</em>
           </div>
           <p class="lede">Pronósticos, goles, llave, picks defendibles, partidos cerrados y actualización in-play en una sola web, sostenidos por un motor Monte Carlo de 15.000 simulaciones por corrida. El objetivo no es vender certeza falsa: es reducir errores, detectar valor y elegir cuándo cubrir.</p>
+          <p class="mini-disclaimer">Modelo de apoyo para quiniela; no garantiza resultados. Los horarios que vienen del feed pueden aparecer en EDT; confirma la hora local en tu app/calendario antes de cargar el boleto.</p>
           <div class="hero-actions">
             <a class="primary-action" href="#boleto">Ver hoja de máxima certeza</a>
             <a class="secondary-action" href="#modelo">Auditar el modelo</a>
@@ -212,26 +213,34 @@
     <div id="boleto"></div>
     {{ max_certainty_html }}
     {{ strategy_html }}
+    <div id="marcadores" class="section-anchor"></div>
     {{ full_scorecard_html }}
     {{ consensus_guardrail_html }}
     {{ recent_changes_html }}
     {{ backtesting_html }}
     <div id="llave"></div>
     {{ bracket_visual_html }}
-    <section class="panel">
-      <div class="panel-head">
-        <div>
-          <p class="eyebrow">Texto técnico</p>
-          <h2>Resumen completo de la llave</h2>
-          <p class="lede-tight">Además del bracket visual, aquí se conserva el detalle textual completo para revisar todos los cruces y porcentajes publicados.</p>
-        </div>
-      </div>
-      <h2>Llave actual</h2>
-      <pre>{{ bracket_html }}</pre>
-    </section>
-    <section id="partidos" class="cards">
-      {{ cards_html }}
-    </section>
+    <details class="section-collapse">
+      <summary>
+        <span>Texto técnico</span>
+        <strong>Resumen completo de la llave</strong>
+        <em>Abre este bloque solo si quieres revisar el detalle textual de todos los cruces y porcentajes.</em>
+      </summary>
+      <section class="panel">
+        <h2>Llave actual</h2>
+        <pre>{{ bracket_html }}</pre>
+      </section>
+    </details>
+    <details class="section-collapse" id="partidos">
+      <summary>
+        <span>Partido a partido</span>
+        <strong>Tarjetas detalladas de todos los partidos</strong>
+        <em>Primero usa el boleto y la tabla de marcadores. Abre esto para ver modelos, factores, noticias, probabilidades y tandas.</em>
+      </summary>
+      <section class="cards">
+        {{ cards_html }}
+      </section>
+    </details>
     <section class="responsible-panel" id="riesgos" aria-label="Riesgos y uso responsable">
       <div>
         <p class="eyebrow">Riesgos / uso responsable</p>

@@ -309,7 +309,7 @@ def build_model_stack(
     models = [
         ModelOutput("Bivariante Poisson", primary, primary_probs, base_weights["primary"], top_score_from_distribution(primary)),
         ModelOutput("Poisson independiente", contrast, contrast_probs, base_weights["contrast"], top_score_from_distribution(contrast)),
-        ModelOutput("Ajuste de baja anotacion", low_score, low_score_probs, base_weights["low_score"], top_score_from_distribution(low_score)),
+        ModelOutput("Ajuste de baja anotación", low_score, low_score_probs, base_weights["low_score"], top_score_from_distribution(low_score)),
     ]
     adaptive_weights = adaptive_ensemble_weights(models, market_probs=market_probs)
     ensemble = blend_distributions([(weight, model.dist) for weight, model in zip(adaptive_weights, models)])

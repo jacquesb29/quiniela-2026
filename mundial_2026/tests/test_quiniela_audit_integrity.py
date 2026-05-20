@@ -95,18 +95,18 @@ class QuinielaAuditIntegrityTest(unittest.TestCase):
             "<p>Estrategia para ganar la quiniela</p><p>Ventaja vs boleto popular</p><p>Diferenciales positivos</p>"
             "<p>Cobertura recomendada</p><p>Marcador exacto principal</p>"
             "<p>Marcadores para cargar en Penca</p><p>Boleto completo</p>"
-            "<p>Calibracion avanzada</p><p>Como evitamos que el modelo se sobreconfie</p>"
+            "<p>Calibración avanzada</p><p>Cómo evitamos que el modelo se sobreconfíe</p>"
             "<p>Shrinkage bayesiano</p><p>Desacuerdo entre modelos</p>"
-            "<p>Backtesting por buckets</p><p>Limite de confianza operativa</p>"
-            "<p>Prediccion potenciada</p><p>Probabilidad pura vs conviccion</p>"
-            "<p>Conviccion reforzada media</p><p>Fuerza estructural media</p><p>Watchlist de riesgo</p>"
+            "<p>Backtesting por buckets</p><p>Límite de confianza operativa</p>"
+            "<p>Predicción potenciada</p><p>Probabilidad pura vs convicción</p>"
+            "<p>Convicción reforzada media</p><p>Fuerza estructural media</p><p>Watchlist de riesgo</p>"
             "<p>Agentes de aprendizaje</p><p>Noticias multi-fuente</p><p>No solo ESPN</p><p>Eficiencia operativa</p>"
             "<p>Mapa de proveedores</p><p>API-Football</p><p>Sportmonks</p><p>Sportradar</p><p>Opta</p>"
             "<p>The Odds API</p><p>NewsAPI</p><p>GDELT</p><p>StatsBomb</p><p>ScoreBat</p>"
-            "<p>Picks mas defendibles</p><p>Marcadores exactos mas defendibles</p><p>15000</p></section></html>"
+            "<p>Picks más defendibles</p><p>Marcadores exactos más defendibles</p><p>15000</p></section></html>"
         )
         errors = app.audit_dashboard_html(html)
-        self.assertTrue(any("Auditoria del boleto" in error for error in errors))
+        self.assertTrue(any("Auditoría del boleto" in error for error in errors))
 
     def build_valid_bracket_matches(self):
         team_pool = [team for members in self.draw_payload["groups"].values() for team in members]
@@ -230,7 +230,7 @@ class QuinielaAuditIntegrityTest(unittest.TestCase):
             bracket_path.write_text(json.dumps({"iterations": 15000, "matches": bracket_matches}))
             dashboard_path.write_text(
                 "<html><section class=\"certainty-panel\"><h2>Hoja de máxima certeza</h2>"
-                "<p>Auditoria del boleto</p>"
+                "<p>Auditoría del boleto</p>"
                 "<p>Quiniela Intelligence 2026</p><p>Prueba operacional</p><p>Una sala de decisión</p>"
                 "<p>De datos a boleto</p><p>Primero decide como una mesa profesional</p>"
                 "<p>Monte Carlo vigente</p><p>15.000 simulaciones por corrida</p>"
@@ -243,22 +243,22 @@ class QuinielaAuditIntegrityTest(unittest.TestCase):
                 "<p>Picks base o principales</p>"
                 "<p>Partidos cerrados o de riesgo alto</p>"
                 "<p>Marcadores exactos defendibles</p>"
-                "<p>Brecha minima contra la segunda opcion</p>"
-                "<p>Checklist de auditoria</p>"
-                "<p>Picks mas defendibles</p><p>Marcadores exactos mas defendibles</p>"
+                "<p>Brecha mínima contra la segunda opción</p>"
+                "<p>Checklist de auditoría</p>"
+                "<p>Picks más defendibles</p><p>Marcadores exactos más defendibles</p>"
                 "<p>Guardrail de consenso</p><p>Ajustes para boleto de quiniela</p>"
-                "<p>Metodologia de estimadores externos</p><p>Ratings tipo Elo / ClubElo</p>"
+                "<p>Metodología de estimadores externos</p><p>Ratings tipo Elo / ClubElo</p>"
                 "<p>Ranking FIFA oficial</p><p>SPI / modelos ofensivo-defensivos</p>"
                 "<p>Mercado y consenso profesional</p>"
-                "<p>Calibracion avanzada</p><p>Como evitamos que el modelo se sobreconfie</p>"
+                "<p>Calibración avanzada</p><p>Cómo evitamos que el modelo se sobreconfíe</p>"
                 "<p>Shrinkage bayesiano</p><p>Desacuerdo entre modelos</p>"
-                "<p>Backtesting por buckets</p><p>Limite de confianza operativa</p>"
-                "<p>Prediccion potenciada</p><p>Probabilidad pura vs conviccion</p>"
-                "<p>Conviccion reforzada media</p><p>Fuerza estructural media</p><p>Watchlist de riesgo</p>"
+                "<p>Backtesting por buckets</p><p>Límite de confianza operativa</p>"
+                "<p>Predicción potenciada</p><p>Probabilidad pura vs convicción</p>"
+                "<p>Convicción reforzada media</p><p>Fuerza estructural media</p><p>Watchlist de riesgo</p>"
                 "<p>Agentes de aprendizaje</p><p>Noticias multi-fuente</p><p>No solo ESPN</p><p>Eficiencia operativa</p>"
                 "<p>Mapa de proveedores</p><p>API-Football</p><p>Sportmonks</p><p>Sportradar</p><p>Opta</p>"
                 "<p>The Odds API</p><p>NewsAPI</p><p>GDELT</p><p>StatsBomb</p><p>ScoreBat</p>"
-                "<p>Semaforo metodologico</p><p>Control de calidad del pronostico</p>"
+                "<p>Semáforo metodológico</p><p>Control de calidad del pronóstico</p>"
                 "<p>Pronóstico de goles</p><p>15000</p></section></html>"
             )
             workflow_path.write_text(
