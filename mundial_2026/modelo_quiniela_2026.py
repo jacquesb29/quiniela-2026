@@ -5251,10 +5251,10 @@ def build_consensus_guardrail_markdown(bracket_payload: dict, entries: Optional[
     if not rows and not alerts:
         return ["_Sin llave generada para comparar contra consenso externo._"]
     lines = [
-        "- Lectura: esta capa no reemplaza el modelo. Lo calibra contra consenso externo para evitar dos errores típicos de quiniela: sobreconcentrarse en un favorito y dejar vivo muy poco a contendientes fuertes.",
+        "- Lectura: esta capa no reemplaza el modelo. Lo calibra contra consenso externo definido para evitar dos errores típicos de quiniela: sobreconcentrarse en un favorito y dejar vivo muy poco a contendientes fuertes.",
         f"- Mezcla dinamica usada para campeon recomendado: {format_pct(float(context['model_blend']))} modelo propio/live + {format_pct(float(context['consensus_blend']))} consenso externo.",
         f"- Actualizacion live de esa mezcla: {int(context['final_count'])} partidos finales, {int(context['live_count'])} en vivo y {int(context['pending_count'])} pendientes. A medida que entran resultados reales, el consenso externo pesa menos y la simulacion Monte Carlo vigente pesa mas.",
-        "- Metodologia externa incorporada como guardrail: ratings tipo Elo/FIFA, fuerza ofensiva-defensiva tipo SPI, consenso de mercado y simulacion Monte Carlo para dependencias de llave.",
+        "- Transparencia: el consenso externo no es una caja negra; combina priors declarados de campeon, ratings tipo Elo/FIFA, fuerza ofensiva-defensiva tipo SPI, mercado cuando existe y simulacion Monte Carlo para dependencias de llave.",
     ]
     if rows:
         leader = rows[0]
@@ -5298,6 +5298,11 @@ def external_estimator_methodology_items() -> List[dict]:
             "name": "Mercado y consenso profesional",
             "signal": "Probabilidades implicitas, lineas de goles y consenso pretorneo de campeon.",
             "usage": "Funciona como guardrail: corrige extremos, pero pierde peso cuando aparecen datos reales del Mundial.",
+        },
+        {
+            "name": "Transparencia de fuentes",
+            "signal": "Priors declarados, feeds live, noticias abiertas, mercado si existe y resultados finales.",
+            "usage": "Cada corrida muestra que peso tuvo el modelo y que peso tuvo el consenso; si no hay feed profundo, no se finge que existe.",
         },
         {
             "name": "Monte Carlo de torneo",
@@ -5373,7 +5378,7 @@ def build_consensus_guardrail_html(bracket_payload: dict, entries: Optional[Sequ
         "<div>"
         "<p class=\"eyebrow\">Guardrail de consenso</p>"
         "<h2>Ajustes para boleto de quiniela</h2>"
-        "<p class=\"lede-tight\">Esta capa compara la llave contra consenso externo, pero ya no es fija: cada corrida reduce el peso del consenso cuando hay partidos en vivo o finalizados. Asi las probabilidades de campeon pasan de consenso pretorneo a evidencia real del Mundial.</p>"
+        "<p class=\"lede-tight\">Esta capa compara la llave contra consenso externo definido: priors declarados de campeon, ratings tipo Elo/FIFA, fuerza ofensiva-defensiva tipo SPI, mercado cuando existe y señales live/finales. No es una caja negra ni reemplaza el Monte Carlo; solo evita extremos hasta que haya evidencia real del Mundial.</p>"
         "</div>"
         "</div>"
         "<div class=\"confidence-tiles\">"

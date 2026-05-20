@@ -14,11 +14,13 @@
         <span>Quiniela Intelligence 2026</span>
       </a>
       <nav>
+        <a href="#estado">Modo boleto</a>
         <a href="#modelo">Modelo</a>
         <a href="#boleto">Boleto</a>
         <a href="#marcadores">Marcadores</a>
         <a href="#llave">Llave</a>
         <a href="#partidos">Partidos</a>
+        <a href="#riesgos">Riesgos</a>
       </nav>
     </header>
 
@@ -83,6 +85,31 @@
       </div>
     </section>
 
+    <section class="ticket-mode-panel" id="estado" aria-label="Modo boleto en tres pasos">
+      <div class="ticket-mode-copy">
+        <p class="eyebrow">Modo boleto</p>
+        <h2>Si vas a cargar la Penca Ovación, empieza aquí.</h2>
+        <p>La página separa decisión de explicación: primero mira qué partido jugar, qué marcador cargar y dónde conviene cubrir. La metodología queda plegada para auditarla sin que estorbe el boleto.</p>
+      </div>
+      <div class="ticket-mode-grid">
+        <a class="ticket-step" href="#partidos">
+          <span>1</span>
+          <strong>Revisar fixtures y estado</strong>
+          <p>Confirma si el partido está pendiente, en vivo o finalizado. Si está live, el modelo debe mover probabilidades y marcadores con la nueva evidencia.</p>
+        </a>
+        <a class="ticket-step ticket-step-primary" href="#boleto">
+          <span>2</span>
+          <strong>Elegir picks defendibles</strong>
+          <p>Usa la hoja de máxima certeza para distinguir pick base, partido cerrado y cobertura. No todo favorito merece el mismo peso.</p>
+        </a>
+        <a class="ticket-step" href="#marcadores">
+          <span>3</span>
+          <strong>Cargar marcador Penca</strong>
+          <p>El marcador sugerido no es solo el más probable: se optimiza para sumar más puntos bajo reglas tipo Penca Ovación.</p>
+        </a>
+      </div>
+    </section>
+
     <section class="landing-showcase">
       <div class="showcase-copy">
         <p class="eyebrow">De datos a boleto</p>
@@ -130,17 +157,27 @@
 
     {{ landing_proof_html }}
     {{ runtime_status_html }}
-    <section class="dashboard-gateway" id="modelo">
+    <details class="technical-accordion" id="modelo">
+      <summary>
+        <span class="accordion-kicker">Metodología y auditoría</span>
+        <strong class="accordion-title">Abrir cómo está armado el modelo</strong>
+        <span class="accordion-subtitle">Monte Carlo, calibración, proveedores, aprendizaje, consenso externo y controles contra sobreconfianza.</span>
+      </summary>
+      <div class="technical-accordion-body">
+        {{ methodology_html }}
+        {{ calibration_depth_html }}
+        {{ prediction_power_html }}
+        {{ agentic_learning_html }}
+        {{ provider_matrix_html }}
+        {{ global_confidence_html }}
+      </div>
+    </details>
+
+    <section class="dashboard-gateway">
       <p class="eyebrow">Centro de control</p>
-      <h2>Ahora sí: la parte técnica que sostiene la decisión</h2>
-      <p>Debajo está el tablero completo: metodología, confianza global, hoja de máxima certeza, consenso externo, backtesting, llave y tarjetas partido a partido.</p>
+      <h2>El boleto queda separado del manual técnico.</h2>
+      <p>Debajo están las piezas accionables para cargar la quiniela: hoja de máxima certeza, marcadores sugeridos, consenso externo, cambios recientes, backtesting, llave y tarjetas partido a partido.</p>
     </section>
-    {{ methodology_html }}
-    {{ calibration_depth_html }}
-    {{ prediction_power_html }}
-    {{ agentic_learning_html }}
-    {{ provider_matrix_html }}
-    {{ global_confidence_html }}
     <div id="boleto"></div>
     {{ max_certainty_html }}
     {{ strategy_html }}
@@ -163,6 +200,27 @@
     </section>
     <section id="partidos" class="cards">
       {{ cards_html }}
+    </section>
+    <section class="responsible-panel" id="riesgos" aria-label="Riesgos y uso responsable">
+      <div>
+        <p class="eyebrow">Riesgos / uso responsable</p>
+        <h2>Esto mejora decisiones, no promete aciertos.</h2>
+        <p>Uso educativo y entretenimiento. La quiniela sigue siendo un juego con incertidumbre. El modelo sirve para análisis y toma de decisiones; no garantiza ganar, no elimina la varianza y no debe leerse como consejo financiero, de inversión o de apuestas.</p>
+      </div>
+      <div class="responsible-grid">
+        <article>
+          <strong>Dependencia de datos</strong>
+          <p>La calidad del in-play depende de la cobertura real del feed: marcador, minuto, tiros, tarjetas, alineaciones, bajas y noticias disponibles.</p>
+        </article>
+        <article>
+          <strong>Calibración viva</strong>
+          <p>El Brier 2026 empieza apenas haya un partido finalizado. Antes de eso, se usan priors, consenso, auditoría y desacuerdo entre modelos para evitar sobreconfianza.</p>
+        </article>
+        <article>
+          <strong>Lectura correcta</strong>
+          <p>Una probabilidad alta no es promesa; es una prioridad para ordenar el boleto. Si el partido es cerrado, el sistema debe decirlo y sugerir cobertura.</p>
+        </article>
+      </div>
     </section>
   </main>
 </body>

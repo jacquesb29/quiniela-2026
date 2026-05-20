@@ -37,7 +37,7 @@ def render_dashboard_html(context: Dict[str, Any]) -> str:
         "css",
     }
     payload: Dict[str, Any] = {
-        "css": (TEMPLATE_DIR / "dashboard.css").read_text(),
+        "css": Markup((TEMPLATE_DIR / "dashboard.css").read_text()),
     }
     for key, value in context.items():
         payload[key] = Markup(value) if key in safe_keys else value

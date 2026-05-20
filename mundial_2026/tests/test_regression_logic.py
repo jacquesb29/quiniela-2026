@@ -14,6 +14,7 @@ if str(PACKAGE_ROOT) not in sys.path:
 
 import modelo_quiniela_2026 as app
 import sync_live_data_2026 as sync
+from worldcup2026.dashboard.html_builder import render_dashboard_html
 from worldcup2026.live.adjustment import live_game_state_adjustment, live_stats_adjustment
 from worldcup2026.simulation.match import sample_knockout_resolution, simulate_match_sample
 from worldcup2026.types import KnockoutResolution
@@ -200,6 +201,34 @@ class RegressionLogicTest(unittest.TestCase):
         self.assertIn("Noticias abiertas usadas", provider_html)
         self.assertIn("gdelt", provider_html)
         self.assertIn("espn_scoreboard+open_news", provider_html)
+
+    def test_dashboard_template_separates_ticket_mode_from_technical_manual(self):
+        template = (
+            PACKAGE_ROOT
+            / "worldcup2026"
+            / "dashboard"
+            / "templates"
+            / "base.html"
+        ).read_text(encoding="utf-8")
+        self.assertIn("Modo boleto", template)
+        self.assertIn("Si vas a cargar la Penca Ovación, empieza aquí.", template)
+        self.assertIn("technical-accordion", template)
+        self.assertIn("Uso educativo y entretenimiento", template)
+        self.assertIn("no garantiza ganar", template)
+
+    def test_dashboard_renderer_does_not_escape_inline_css(self):
+        html = render_dashboard_html({"updated_at": "test"})
+        self.assertIn(".technical-accordion > summary", html)
+        self.assertIn('content: "Abrir"', html)
+        self.assertNotIn(".technical-accordion &gt; summary", html)
+
+    def test_consensus_guardrail_explains_external_consensus_is_defined(self):
+        bracket_payload = {"matches": {"M103": {"advance_probabilities": {"Spain": 0.60, "France": 0.40}}}}
+        entries = [{"projection": False, "status_state": "pre"} for _ in range(4)]
+        html = app.build_consensus_guardrail_html(bracket_payload, entries)
+        self.assertIn("consenso externo definido", html)
+        self.assertIn("No es una caja negra", html)
+        self.assertIn("Transparencia de fuentes", html)
 
     def test_provider_diagnostics_detect_configured_api_football_key(self):
         entries = [{"projection": False, "source": "espn_scoreboard", "status_state": "pre"}]
