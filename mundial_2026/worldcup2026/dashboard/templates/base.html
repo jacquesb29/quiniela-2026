@@ -16,13 +16,13 @@
       </a>
       <nav>
         <a href="#estado">Modo boleto</a>
-        <a href="#modelo">Modelo</a>
-        <a href="#lectura-critica">Lectura crítica</a>
         <a href="#boleto">Boleto</a>
         <a href="#marcadores">Marcadores</a>
         <a href="#llave">Llave</a>
         <a href="#partidos">Partidos</a>
         <a href="#riesgos">Riesgos</a>
+        <a href="#modelo">Modelo</a>
+        <a href="#metodologia">Metodología</a>
       </nav>
     </header>
 
@@ -38,52 +38,31 @@
           </div>
           <p class="lede">Pronósticos, goles, llave, picks defendibles, partidos cerrados y actualización in-play en una sola web, sostenidos por un motor Monte Carlo de 15.000 simulaciones por corrida. El objetivo no es vender certeza falsa: es reducir errores, detectar valor y elegir cuándo cubrir.</p>
           <p class="mini-disclaimer">Modelo de apoyo para quiniela; no garantiza resultados. Los horarios que vienen del feed pueden aparecer en EDT; confirma la hora local en tu app/calendario antes de cargar el boleto.</p>
-          <div class="hero-actions">
-            <a class="primary-action" href="#boleto">Ver hoja de máxima certeza</a>
-            <a class="secondary-action" href="#modelo">Auditar el modelo</a>
-          </div>
-          <div class="summary-grid">
-            <div class="summary-tile">
-              <span>Última actualización</span>
-              <strong>{{ updated_at }}</strong>
-            </div>
-            <div class="summary-tile">
-              <span>Monte Carlo publicado</span>
-              <strong>15.000 simulaciones</strong>
-            </div>
-            <div class="summary-tile">
-              <span>Frecuencia cloud</span>
-              <strong>Cada 5 minutos</strong>
-            </div>
-            <div class="summary-tile">
-              <span>Publicación</span>
-              <strong>GitHub Actions + Pages</strong>
-            </div>
-          </div>
+          {{ ticket_snapshot_html }}
         </div>
         <aside class="hero-command-center" aria-label="Resumen del sistema">
           <div class="command-topline">
             <span class="live-dot"></span>
-            <span>Sistema operativo</span>
+            <span>Uso rápido</span>
           </div>
-          <h2>Modelo vivo, no una tabla estática</h2>
+          <h2>Cómo usarlo en 30 segundos</h2>
           <div class="command-metric command-metric-highlight">
-            <span>Monte Carlo</span>
-            <strong>15.000 simulaciones por corrida para estimar llave, picks, goles y marcadores exactos.</strong>
+            <span>1. Carga</span>
+            <strong>Entra a Marcadores y usa la columna “Marcador para cargar en Penca”.</strong>
           </div>
           <div class="command-metric">
-            <span>Stack</span>
-            <strong>Poisson bivariante + contraste + ajuste baja anotación + ensamble</strong>
+            <span>2. Diferencia clave</span>
+            <strong>“Más probable del modelo” explica el pronóstico; “Penca” optimiza puntos bajo regla 8/5/3.</strong>
           </div>
           <div class="command-metric">
-            <span>In-play</span>
-            <strong>Minuto, marcador, eventos, tiros, disciplina y disponibilidad cuando el feed los trae</strong>
+            <span>3. Riesgo</span>
+            <strong>Si el partido está abierto, mira Riesgos antes de tratarlo como fijo.</strong>
           </div>
           <div class="command-metric">
-            <span>Salida para quiniela</span>
-            <strong>Pick, marcador entero, goles, riesgo, cobertura y explicación</strong>
+            <span>4. Auditoría</span>
+            <strong>El modelo sigue usando 15.000 simulaciones Monte Carlo por corrida y se publica cada 5 minutos en live.</strong>
           </div>
-          <p class="command-note">La ventaja aparece cuando el modelo separa picks base de partidos abiertos y evita convertir intuiciones ruidosas en apuestas de alta confianza.</p>
+          <p class="command-note">Menos explicación arriba, más decisión arriba. La metodología completa queda más abajo para auditar sin estorbar el boleto.</p>
         </aside>
       </div>
     </section>
@@ -103,7 +82,7 @@
         <a class="ticket-step ticket-step-primary" href="#boleto">
           <span>2</span>
           <strong>Elegir picks defendibles</strong>
-          <p>Usa la hoja de máxima certeza para distinguir pick base, partido cerrado y cobertura. No todo favorito merece el mismo peso.</p>
+          <p>Usa la hoja de máxima firmeza para distinguir pick base, partido cerrado y cobertura. No todo favorito merece el mismo peso.</p>
         </a>
         <a class="ticket-step" href="#marcadores">
           <span>3</span>
@@ -153,7 +132,7 @@
         </article>
         <article class="bento-card">
           <span class="bento-stat">Auditado</span>
-          <p>Si falta Monte Carlo, auditoría, goles, consenso o la hoja de certeza, la pipeline debe fallar.</p>
+          <p>Si falta Monte Carlo, auditoría, goles, consenso o la hoja de firmeza, la pipeline debe fallar.</p>
         </article>
       </div>
     </section>
@@ -189,6 +168,7 @@
         </article>
       </div>
     </section>
+    <span class="section-anchor" id="metodologia"></span>
     <details class="technical-accordion" id="modelo">
       <summary>
         <span class="accordion-kicker">Metodología y auditoría</span>
@@ -208,7 +188,7 @@
     <section class="dashboard-gateway">
       <p class="eyebrow">Centro de control</p>
       <h2>El boleto queda separado del manual técnico.</h2>
-      <p>Debajo están las piezas accionables para cargar la quiniela: hoja de máxima certeza, marcadores sugeridos, consenso externo, cambios recientes, backtesting, llave y tarjetas partido a partido.</p>
+      <p>Debajo están las piezas accionables para cargar la quiniela: hoja de máxima firmeza, marcadores sugeridos, consenso externo, cambios recientes, backtesting, llave y tarjetas partido a partido.</p>
     </section>
     <div id="boleto"></div>
     {{ max_certainty_html }}

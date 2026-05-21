@@ -17,6 +17,7 @@ _ENV = Environment(
 def render_dashboard_html(context: Dict[str, Any]) -> str:
     template = _ENV.get_template("base.html")
     safe_keys = {
+        "ticket_snapshot_html",
         "runtime_status_html",
         "landing_proof_html",
         "methodology_html",

@@ -5109,7 +5109,7 @@ def quiniela_audit_metrics(profiles: Sequence[dict]) -> dict:
     if fragile_scores > defensible_scores:
         warnings.append("La mayoría de marcadores exactos son frágiles; usarlos solo si la quiniela premia marcador.")
     if avg_certainty < 0.68:
-        warnings.append("La certeza operativa media no es alta; conviene priorizar picks base y evitar jugadas heroicas.")
+        warnings.append("La firmeza operativa media no es alta; conviene priorizar picks base y evitar jugadas heroicas.")
     if not warnings:
         warnings.append("El boleto no muestra alertas críticas en este corte, pero igual debe revisarse alineación y noticias antes del cierre.")
     if firm_or_preferent / total >= 0.70 and low_gap <= max(2, total // 8):
@@ -5133,6 +5133,105 @@ def quiniela_audit_metrics(profiles: Sequence[dict]) -> dict:
         "ticket_status": ticket_status,
         "warnings": warnings,
     }
+
+
+def build_ticket_snapshot_html(entries: Sequence[dict], updated_at: str) -> str:
+    """Render the first-screen decision module for Penca users."""
+
+    if not entries:
+        return ""
+    strategy_profiles = [quiniela_strategy_profile(entry) for entry in entries]
+    fixture_entries = [entry for entry in entries if not entry.get("projection")]
+    projected_entries = [entry for entry in entries if entry.get("projection")]
+    fixture_profiles = [
+        quiniela_certainty_profile(entry)
+        for entry in fixture_entries
+    ]
+    metrics = quiniela_strategy_metrics(strategy_profiles)
+    audit = quiniela_audit_metrics(fixture_profiles)
+    base_count = sum(
+        1
+        for item in strategy_profiles
+        if item["strategy_tier"] in {"Base fuerte", "Base controlada"}
+        or item["tier"] in {"Pick base claro", "Pick principal"}
+    )
+    risk_count = int(metrics["coverage_recommended"])
+    defensible_scores = sum(1 for item in strategy_profiles if float(item["score_prob"]) >= 0.16)
+    top_rows = sorted(
+        strategy_profiles,
+        key=lambda item: (
+            item["strategy_tier"] == "Base fuerte",
+            item["pick_prob"],
+            item["penca_expected_points"],
+            item["certainty_score"],
+        ),
+        reverse=True,
+    )[:4]
+
+    def tile(label: str, value: str, note: str = "") -> str:
+        note_html = f"<small>{html.escape(note)}</small>" if note else ""
+        return (
+            "<div class=\"snapshot-tile\">"
+            f"<span>{html.escape(label)}</span>"
+            f"<strong>{html.escape(value)}</strong>"
+            f"{note_html}"
+            "</div>"
+        )
+
+    row_html = []
+    for item in top_rows:
+        model_score = str(item.get("top_exact_score", item["score"]))
+        penca_score = str(item["score"])
+        row_html.append(
+            "<li>"
+            f"<strong>{html.escape(str(item['title']))}</strong>"
+            "<span>"
+            f"Pick: {html.escape(str(item['pick_label']))} {format_pct(float(item['pick_prob']))} · "
+            f"Modelo: {html.escape(model_score)} · "
+            f"Penca: {html.escape(penca_score)}"
+            "</span>"
+            f"<em>{html.escape(str(item['strategy_tier']))}</em>"
+            "</li>"
+        )
+
+    modeled_note = (
+        f"{len(fixture_entries)} partidos de fase de grupos auditados + "
+        f"{len(projected_entries)} cruces eliminatorios proyectados = "
+        f"{len(entries)} partidos con marcador."
+    )
+    expected_hits_label = f"{metrics['expected_model_hits']:.1f}/{int(metrics['total'])}"
+    modeled_total_label = f"{len(entries)}/104"
+    return (
+        "<section class=\"ticket-snapshot\" aria-label=\"Boleto recomendado hoy\">"
+        "<div class=\"ticket-snapshot-head\">"
+        "<p class=\"eyebrow\">Boleto recomendado hoy</p>"
+        "<h2>Qué cargar primero en Penca</h2>"
+        "<p>Arriba va la decisión, no el paper: pick, marcador del modelo y marcador optimizado para Penca. "
+        "Si difieren, carga el marcador Penca porque maximiza puntos esperados bajo regla 8/5/3.</p>"
+        "</div>"
+        "<div class=\"ticket-snapshot-grid\">"
+        f"{tile('Picks base', str(base_count), 'Candidatos para jugar sin inventar.')}"
+        f"{tile('Partidos a cubrir', str(risk_count), 'Revisar segunda opción si el formato lo permite.')}"
+        f"{tile('Marcadores defendibles', str(defensible_scores), 'Exactos con señal suficiente para cargar.')}"
+        f"{tile('Aciertos esperados', expected_hits_label, 'Esperanza del resultado principal, no garantía.')}"
+        f"{tile('Partidos cubiertos', modeled_total_label, modeled_note)}"
+        f"{tile('Última actualización', updated_at, 'GitHub Actions publica cada 5 minutos durante live.')}"
+        "</div>"
+        "<div class=\"ticket-snapshot-actions\">"
+        "<a class=\"primary-action\" href=\"#marcadores\">Ver marcadores para cargar</a>"
+        "<a class=\"secondary-action\" href=\"#riesgos\">Ver partidos de riesgo</a>"
+        "<a class=\"secondary-action\" href=\"#llave\">Ver llave proyectada</a>"
+        "<a class=\"secondary-action\" href=\"#modelo\">Auditar modelo</a>"
+        "</div>"
+        "<div class=\"ticket-snapshot-list\">"
+        "<h3>Atajo de carga: primeros picks defendibles</h3>"
+        f"<ul>{''.join(row_html)}</ul>"
+        "</div>"
+        "<p class=\"ticket-snapshot-note\">Modelo de apoyo para quiniela; no garantiza resultados. "
+        f"Estado de auditoría: {html.escape(str(audit['ticket_status']))}. "
+        "Confirma hora local, alineaciones y reglas exactas de tu grupo antes de cerrar.</p>"
+        "</section>"
+    )
 
 
 def team_public_popularity_index(team_name: str) -> float:
@@ -5416,7 +5515,7 @@ def build_quiniela_strategy_html(entries: Sequence[dict]) -> str:
         "<div class=\"confidence-tiles strategy-tiles\">"
         f"<div class=\"summary-tile\"><span>Aciertos esperados 1X2</span><strong>{metrics['expected_model_hits']:.1f}/{int(metrics['total'])}</strong></div>"
         f"<div class=\"summary-tile\"><span>Puntos esperados Penca</span><strong>{metrics['expected_penca_points']:.1f}/{int(metrics['total']) * 8}</strong><small>{metrics['expected_penca_points_per_match']:.2f} puntos por partido con marcador optimizado.</small></div>"
-        f"<div class=\"summary-tile\"><span>Certeza media Penca</span><strong>{format_pct(float(metrics['avg_penca_certainty']))}</strong><small>Combina ganador, diferencia, exacto, varianza del marcador y puntos esperados.</small></div>"
+        f"<div class=\"summary-tile\"><span>Firmeza media Penca</span><strong>{format_pct(float(metrics['avg_penca_certainty']))}</strong><small>Índice de decisión: combina ganador, diferencia, exacto, varianza del marcador y puntos esperados.</small></div>"
         f"<div class=\"summary-tile\"><span>Rango estadístico 90%</span><strong>{metrics['range_low']:.0f}-{metrics['range_high']:.0f}</strong></div>"
         f"<div class=\"summary-tile\"><span>Ventaja vs boleto popular</span><strong>{metrics['expected_gain']:+.1f} picks</strong></div>"
         f"<div class=\"summary-tile\"><span>Marcador exacto principal</span><strong>{metrics['expected_penca_exact_scores']:.1f}/{int(metrics['total'])}</strong><small>Marcador recomendado para cargar: maximiza puntos esperados de Penca, no solo probabilidad aislada. Rango 90%: {metrics['exact_score_range_low']:.0f}-{metrics['exact_score_range_high']:.0f}</small></div>"
@@ -5446,7 +5545,7 @@ def build_quiniela_strategy_html(entries: Sequence[dict]) -> str:
         f"{strategy_rows(differentials, 'Sin diferenciales positivos fuertes')}"
         "</ul></article>"
         "<article><h3>Coberturas y partidos peligrosos</h3><ul>"
-        f"{strategy_rows(coverage, 'Sin coberturas criticas')}"
+        f"{strategy_rows(coverage, 'Sin coberturas críticas')}"
         "</ul></article>"
         "</div>"
         "</section>"
@@ -5542,7 +5641,7 @@ def build_max_certainty_markdown(entries: Sequence[dict]) -> List[str]:
     )[:8]
     score_picks = sorted(profiles, key=lambda item: (item["score_prob"], item["top3"]), reverse=True)[:8]
     lines = [
-        "- Lectura: la certeza operativa no es probabilidad garantizada de acierto; es un ranking conservador que mezcla probabilidad del resultado, diferencia contra la segunda opción, cobertura de marcadores y acuerdo entre modelos.",
+        "- Lectura: la firmeza operativa no es probabilidad garantizada de acierto; es un ranking conservador que mezcla probabilidad del resultado, diferencia contra la segunda opción, cobertura de marcadores y acuerdo entre modelos.",
         "- Regla base sin conocer tu quiniela exacta: en picks base juega resultado; en partidos cerrados cubre empate/upset si el formato lo permite; para marcador exacto usa el marcador principal solo si la quiniela lo premia mucho.",
         "",
         "### Auditoría del boleto",
@@ -5552,7 +5651,7 @@ def build_max_certainty_markdown(entries: Sequence[dict]) -> List[str]:
         f"- Partidos cerrados o de riesgo alto: {audit['traps'] + audit['high_variance']}",
         f"- Marcadores exactos defendibles: {audit['defensible_scores']} | frágiles: {audit['fragile_scores']}",
         f"- Brecha mínima contra la segunda opción: {format_pct(float(audit['min_gap']))}",
-        f"- Certeza operativa media: {format_pct(float(audit['avg_certainty']))}",
+        f"- Firmeza operativa media: {format_pct(float(audit['avg_certainty']))}",
         "- Checklist de auditoría: revisar bajas confirmadas, once inicial, mercado de última hora, clima y estado live antes de cerrar el boleto.",
         "- Alertas: " + " ".join(str(item) for item in audit["warnings"]),
         "",
@@ -5560,7 +5659,7 @@ def build_max_certainty_markdown(entries: Sequence[dict]) -> List[str]:
     ]
     for item in safest:
         lines.append(
-            f"- {item['title']}: {item['pick_label']} ({format_pct(item['pick_prob'])}) | certeza operativa {format_pct(item['certainty_score'])} | marcador {item['score']} ({format_pct(item['score_prob'])}) | {item['tier']}: {item['action']}"
+            f"- {item['title']}: {item['pick_label']} ({format_pct(item['pick_prob'])}) | índice de firmeza {format_pct(item['certainty_score'])} | marcador {item['score']} ({format_pct(item['score_prob'])}) | {item['tier']}: {item['action']}"
         )
     lines.extend(["", "### Partidos que no conviene jugar con exceso de confianza"])
     if traps:
@@ -5599,8 +5698,8 @@ def build_max_certainty_html(entries: Sequence[dict]) -> str:
             if mode == "safe":
                 detail = (
                     f"{item['pick_label']} {format_pct(item['pick_prob'])} | "
-                    f"certeza operativa {format_pct(item['certainty_score'])} | "
-                    f"marcador {item['score']} {format_pct(item['score_prob'])}"
+                    f"índice de firmeza {format_pct(item['certainty_score'])} | "
+                    f"marcador Penca {item['score']} {format_pct(item['score_prob'])}"
                 )
             elif mode == "trap":
                 detail = (
@@ -5631,7 +5730,7 @@ def build_max_certainty_html(entries: Sequence[dict]) -> str:
         f"<div class=\"summary-tile\"><span>Partidos cerrados o de riesgo alto</span><strong>{int(audit['traps']) + int(audit['high_variance'])}</strong></div>"
         f"<div class=\"summary-tile\"><span>Marcadores exactos defendibles</span><strong>{int(audit['defensible_scores'])}</strong></div>"
         f"<div class=\"summary-tile\"><span>Brecha mínima contra la segunda opción</span><strong>{format_pct(float(audit['min_gap']))}</strong></div>"
-        f"<div class=\"summary-tile\"><span>Certeza operativa media</span><strong>{format_pct(float(audit['avg_certainty']))}</strong></div>"
+        f"<div class=\"summary-tile\"><span>Firmeza operativa media</span><strong>{format_pct(float(audit['avg_certainty']))}</strong><small>Índice de decisión; no es probabilidad garantizada.</small></div>"
         "</div>"
     )
     warning_rows = "".join(
@@ -5644,7 +5743,7 @@ def build_max_certainty_html(entries: Sequence[dict]) -> str:
     audit_panel = (
         "<article class=\"ticket-audit-card\">"
         "<h3>Auditoría del boleto</h3>"
-        "<p class=\"meta\">Esta capa revisa si el boleto está defendible como estrategia de quiniela: no promete certeza artificial, separa picks base de coberturas y detecta dónde el modelo está más frágil.</p>"
+        "<p class=\"meta\">Esta capa revisa si el boleto está defendible como estrategia de quiniela: no promete certeza artificial, separa picks base de coberturas y detecta dónde el modelo está más frágil. Cuando veas 90+ aquí, léelo como índice de firmeza, no como probabilidad pura.</p>"
         f"{audit_tiles}"
         "<h4>Checklist de auditoría</h4>"
         "<ul>"
@@ -5660,8 +5759,8 @@ def build_max_certainty_html(entries: Sequence[dict]) -> str:
         "<div class=\"panel-head\">"
         "<div>"
         "<p class=\"eyebrow\">Modo quiniela</p>"
-        "<h2>Hoja de máxima certeza</h2>"
-        "<p class=\"lede-tight\">Esta sección traduce el modelo a decisiones de quiniela. No infla probabilidades: ordena los picks por solidez operativa, separa partidos cerrados y avisa cuando el marcador exacto es frágil.</p>"
+        "<h2>Hoja de máxima firmeza</h2>"
+        "<p class=\"lede-tight\">Esta sección traduce el modelo a decisiones de quiniela. No infla probabilidades: ordena los picks por firmeza operativa, separa partidos cerrados y avisa cuando el marcador exacto es frágil.</p>"
         "</div>"
         "</div>"
         f"{audit_panel}"
@@ -6095,7 +6194,7 @@ def prediction_power_profile(entry: dict) -> dict:
         power_action = "Puede ser pick central del boleto."
     elif conviction >= 0.78:
         power_tier = "Potenciado jugable"
-        power_action = "Usar como pick, pero revisar cobertura si el margen es pequeno."
+        power_action = "Usar como pick, pero revisar cobertura si el margen es pequeño."
     elif conviction >= 0.66:
         power_tier = "Potenciado con cautela"
         power_action = "No subirlo demasiado: jugar solo si necesitas cubrir ese tramo."
@@ -6158,14 +6257,14 @@ def build_prediction_power_markdown(entries: Sequence[dict]) -> List[str]:
         reverse=True,
     )[:10]
     lines = [
-        "### Prediccion potenciada",
-        "- Lectura: no es una probabilidad nueva; es una conviccion reforzada para decidir boleto.",
-        f"- Conviccion reforzada media: {format_pct(float(metrics['avg_conviction']))}.",
+        "### Predicción potenciada",
+        "- Lectura: no es una probabilidad nueva; es un índice de firmeza para decidir boleto.",
+        f"- Índice de firmeza medio: {format_pct(float(metrics['avg_conviction']))}.",
         f"- Picks de potencia alta: {int(metrics['high_power'])}/{int(metrics['total'])}; watchlist: {int(metrics['watchlist'])}.",
     ]
     for item in strongest:
         lines.append(
-            f"- {item['title']}: {item['pick_label']} | probabilidad pura {format_pct(float(item['pick_prob']))} | conviccion reforzada {format_pct(float(item['power_conviction']))} | drivers: {', '.join(item['power_drivers'])}."
+            f"- {item['title']}: {item['pick_label']} | probabilidad pura {format_pct(float(item['pick_prob']))} | índice de firmeza {format_pct(float(item['power_conviction']))} | drivers: {', '.join(item['power_drivers'])}."
         )
     return lines
 
@@ -6201,7 +6300,7 @@ def build_prediction_power_html(entries: Sequence[dict]) -> str:
             rendered.append(
                 "<li>"
                 f"<strong>{html.escape(str(item['title']))}</strong>"
-                f"<span>{html.escape(str(item['pick_label']))}: probabilidad pura {format_pct(float(item['pick_prob']))} | conviccion reforzada {format_pct(float(item['power_conviction']))} | fuerza estructural {format_pct(float(item['structural_support']))}</span>"
+                f"<span>{html.escape(str(item['pick_label']))}: probabilidad pura {format_pct(float(item['pick_prob']))} | índice de firmeza {format_pct(float(item['power_conviction']))} | fuerza estructural {format_pct(float(item['structural_support']))}</span>"
                 f"<em>{html.escape(str(item['power_tier']))}: {html.escape(str(item['power_action']))} Drivers: {html.escape(', '.join(item['power_drivers']))}</em>"
                 "</li>"
             )
@@ -6211,12 +6310,12 @@ def build_prediction_power_html(entries: Sequence[dict]) -> str:
         "<section class=\"panel power-panel\">"
         "<div class=\"panel-head\"><div>"
         "<p class=\"eyebrow\">Predicción potenciada</p>"
-        "<h2>Probabilidad pura vs convicción para jugar la quiniela</h2>"
+        "<h2>Probabilidad pura vs índice de firmeza para jugar la quiniela</h2>"
         "<p class=\"lede-tight\">Aquí potenciamos la decisión sin maquillar la probabilidad: cruzamos la predicción base con fuerza estructural FIFA/Elo/squad/historia, acuerdo entre modelos, mercado y riesgo de empate.</p>"
-        "<p class=\"meta\">La convicción reforzada no es una probabilidad de que ocurra el resultado; es un índice de decisión para ordenar el boleto y saber dónde puedes jugar más firme.</p>"
+        "<p class=\"meta\">El índice de firmeza no es una probabilidad de que ocurra el resultado; es un índice de decisión para ordenar el boleto y saber dónde puedes jugar más firme.</p>"
         "</div></div>"
         "<div class=\"confidence-tiles\">"
-        f"{tile('Convicción reforzada media', format_pct(float(metrics['avg_conviction'])), 'Índice de decisión, no probabilidad pura.')}"
+        f"{tile('Índice de firmeza medio', format_pct(float(metrics['avg_conviction'])), '0-100 para ordenar el boleto; no probabilidad pura.')}"
         f"{tile('Picks de potencia alta', str(int(metrics['high_power'])) + '/' + str(int(metrics['total'])), 'Candidatos a columna vertebral del boleto.')}"
         f"{tile('Fuerza estructural media', format_pct(float(metrics['avg_structural'])), 'FIFA, Elo, squad, historia y recursos.')}"
         f"{tile('Watchlist de riesgo', str(int(metrics['watchlist'])), 'Partidos que no conviene vender como fijos.')}"
@@ -6752,7 +6851,7 @@ def build_dashboard_markdown(
         "",
     ]
     lines.extend(build_global_confidence_markdown(entries))
-    lines.extend(["", "## Hoja de máxima certeza para quiniela", ""])
+    lines.extend(["", "## Hoja de máxima firmeza para quiniela", ""])
     lines.extend(build_max_certainty_markdown(entries))
     lines.extend(["", "## Estrategia para ganar la quiniela", ""])
     lines.extend(build_quiniela_strategy_markdown(entries))
@@ -6786,7 +6885,7 @@ def build_dashboard_markdown(
     if bracket_text.strip():
         lines.append(bracket_text.strip())
     else:
-        lines.append("_No hay llave generada todavia._")
+        lines.append("_No hay llave generada todavía._")
     lines.extend(["", "## Partidos cargados", ""])
 
     if not entries:
@@ -7133,7 +7232,7 @@ def goal_forecast_html(entry: dict, prediction: MatchPrediction) -> str:
         f"<div><span>Cobertura top-5 marcadores</span><strong>{format_pct(float(guidance.get('top5_coverage', depth.get('top5_coverage', 0.0))))}</strong></div>"
         f"<div><span>Estado vs consenso</span><strong>{html.escape(str(depth.get('goal_consensus_status', 'sin consenso externo')))}</strong></div>"
         f"<div><span>Ajuste histórico del marcador</span><strong>{html.escape(shape_label)}</strong></div>"
-        f"<div><span>Certeza para puntuar en Penca</span><strong>{html.escape(str(guidance.get('penca_certainty_label', 'sin clasificar')))} | {format_pct(float(guidance.get('penca_certainty_index', 0.0)))}</strong></div>"
+        f"<div><span>Firmeza para puntuar en Penca</span><strong>{html.escape(str(guidance.get('penca_certainty_label', 'sin clasificar')))} | {format_pct(float(guidance.get('penca_certainty_index', 0.0)))}</strong></div>"
         "</div>"
         f"<p class=\"meta\">{consensus_note}</p>"
         f"<p class=\"meta\">{html.escape(str(guidance.get('recommendation_note', 'El marcador recomendado se calcula con la distribución completa de marcadores.')))}</p>"
@@ -7284,7 +7383,7 @@ def penca_ovacion_score_html(prediction: MatchPrediction) -> str:
         f"<div><span>Probabilidad de al menos diferencia correcta</span><strong>{format_pct(float(top['difference_prob']))}</strong></div>"
         f"<div><span>Cobertura top-5 marcadores</span><strong>{format_pct(float(guidance.get('top5_coverage', 0.0)))}</strong></div>"
         f"<div><span>Ajuste histórico del marcador</span><strong>{html.escape(str(guidance.get('score_shape_label', 'sin ajuste histórico específico')))}</strong></div>"
-        f"<div><span>Certeza del marcador Penca</span><strong>{html.escape(str(guidance.get('penca_certainty_label', 'sin clasificar')))} | {format_pct(float(guidance.get('penca_certainty_index', 0.0)))}</strong></div>"
+        f"<div><span>Firmeza del marcador Penca</span><strong>{html.escape(str(guidance.get('penca_certainty_label', 'sin clasificar')))} | {format_pct(float(guidance.get('penca_certainty_index', 0.0)))}</strong></div>"
         "</div>"
         f"<p class=\"meta\">{html.escape(str(guidance.get('recommendation_note', 'Usa este marcador como entrada principal y revisa las alternativas si quieres cubrir.')))}</p>"
         f"<p class=\"meta\">Marcador del modelo: {html.escape(str(guidance.get('top_exact_score', projected_score_value(prediction))))}. Marcador para Penca: {html.escape(str(top['score']))}. Si difieren, Penca prioriza puntos esperados según exacto, diferencia y ganador.</p>"
@@ -7378,7 +7477,7 @@ def build_global_confidence_markdown(entries: Sequence[dict]) -> List[str]:
         lines.append(
             "- Grupos con favoritos más claros hasta ahora: "
             + "; ".join(
-                f"{label} | certeza media {format_pct(avg_conf)} | empate medio {format_pct(avg_draw)} | partidos {matches}"
+                f"{label} | firmeza media {format_pct(avg_conf)} | empate medio {format_pct(avg_draw)} | partidos {matches}"
                 for label, avg_conf, avg_draw, balance, matches in favorite_groups
             )
         )
@@ -7446,9 +7545,9 @@ def build_global_confidence_html(entries: Sequence[dict]) -> str:
             prediction: MatchPrediction = entry["prediction"]
             favorite_label, favorite_prob = favorite_summary(entry)
             tail = (
-                f"Certeza del pick {format_pct(confidence)} | resultado más probable {favorite_label} {format_pct(favorite_prob)}"
+                f"Firmeza del pick {format_pct(confidence)} | resultado más probable {favorite_label} {format_pct(favorite_prob)}"
                 if mode == "firm"
-                else f"Certeza del pick {format_pct(confidence)} | empate {format_pct(prediction.draw)}"
+                else f"Firmeza del pick {format_pct(confidence)} | empate {format_pct(prediction.draw)}"
             )
             rows.append(
                 "<li>"
@@ -7475,7 +7574,7 @@ def build_global_confidence_html(entries: Sequence[dict]) -> str:
             if mode == "balanced":
                 tail = f"Equilibrio {format_pct(balance)} | empate medio {format_pct(avg_draw)} | partidos {matches}"
             else:
-                tail = f"Certeza media {format_pct(avg_conf)} | empate medio {format_pct(avg_draw)} | partidos {matches}"
+                tail = f"Firmeza media {format_pct(avg_conf)} | empate medio {format_pct(avg_draw)} | partidos {matches}"
             rows.append(
                 "<li>"
                 f"<strong>{html.escape(group_label)}</strong>"
@@ -8784,10 +8883,12 @@ def build_dashboard_html(
         )
 
     if not cards:
-        cards.append("<section class=\"card\"><h3>Sin partidos cargados</h3><p class=\"meta\">Agrega partidos a fixtures_template.json para ver probabilidades aqui.</p></section>")
+        cards.append("<section class=\"card\"><h3>Sin partidos cargados</h3><p class=\"meta\">Agrega partidos a fixtures_template.json para ver probabilidades aquí.</p></section>")
 
-    bracket_html = html.escape(bracket_text.strip() or "No hay llave generada todavia.")
+    bracket_html = html.escape(bracket_text.strip() or "No hay llave generada todavía.")
     bracket_visual_html = build_bracket_visual_html(bracket_payload, entries)
+    updated_at = iso_timestamp()
+    ticket_snapshot_html = build_ticket_snapshot_html(entries, updated_at)
     landing_proof_html = build_landing_proof_html(entries, bracket_payload, backtest)
     runtime_status_html = build_runtime_status_html(entries, bracket_payload)
     methodology_html = build_methodology_html(bracket_payload, backtest, entries)
@@ -8810,9 +8911,10 @@ def build_dashboard_html(
     backtesting_html = build_backtesting_html(backtest)
     return render_dashboard_html(
         {
-            "updated_at": html.escape(iso_timestamp()),
+            "updated_at": html.escape(updated_at),
             "state_path": html.escape(str(state_path)),
             "fixtures_path": html.escape(str(fixtures_path)),
+            "ticket_snapshot_html": ticket_snapshot_html,
             "landing_proof_html": landing_proof_html,
             "runtime_status_html": runtime_status_html,
             "methodology_html": methodology_html,
@@ -9054,7 +9156,10 @@ def audit_bracket_payload(bracket_payload: dict, teams: Dict[str, Team], min_ite
 def audit_dashboard_html(dashboard_html: str) -> List[str]:
     errors = []
     required_snippets = [
-        "Hoja de máxima certeza",
+        "Boleto recomendado hoy",
+        "Qué cargar primero en Penca",
+        "Marcador para cargar en Penca",
+        "Hoja de máxima firmeza",
         "Quiniela Intelligence 2026",
         "Prueba operacional",
         "Una sala de decisión",
@@ -9080,6 +9185,7 @@ def audit_dashboard_html(dashboard_html: str) -> List[str]:
         "Partidos cerrados o de riesgo alto",
         "Marcadores exactos defendibles",
         "Brecha mínima contra la segunda opción",
+        "Firmeza operativa media",
         "Checklist de auditoría",
         "Picks más defendibles",
         "Marcadores exactos más defendibles",
@@ -9097,8 +9203,8 @@ def audit_dashboard_html(dashboard_html: str) -> List[str]:
         "Backtesting por buckets",
         "Límite de confianza operativa",
         "Predicción potenciada",
-        "Probabilidad pura vs convicción",
-        "Convicción reforzada media",
+        "Probabilidad pura vs índice de firmeza",
+        "Índice de firmeza medio",
         "Fuerza estructural media",
         "Watchlist de riesgo",
         "Agentes de aprendizaje",
@@ -9124,7 +9230,7 @@ def audit_dashboard_html(dashboard_html: str) -> List[str]:
         if snippet not in dashboard_html:
             errors.append(f"Dashboard no contiene bloque requerido: {snippet}.")
     if "&lt;section class=&quot;certainty-panel&quot;&gt;" in dashboard_html:
-        errors.append("Dashboard escapo el HTML del modulo de maxima certeza.")
+        errors.append("Dashboard escapó el HTML del módulo de máxima firmeza.")
     return errors
 
 
@@ -9702,7 +9808,7 @@ def print_monte_carlo_summary(team_a: str, team_b: str, summary: dict) -> None:
             f"    Clasificar simulado: {team_a} {summary['advance_a']:.1%} | "
             f"{team_b} {summary['advance_b']:.1%}"
         )
-    print("    Marcadores mas frecuentes:")
+    print("    Marcadores más frecuentes:")
     for score, prob in summary["top_scores"]:
         print(f"      {score}: {prob:.1%}")
 

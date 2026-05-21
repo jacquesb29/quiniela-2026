@@ -229,7 +229,9 @@ class QuinielaAuditIntegrityTest(unittest.TestCase):
             fixtures_path.write_text(json.dumps([{"id": "1", "team_a": first_group[0], "team_b": first_group[1], "status_state": "pre"}]))
             bracket_path.write_text(json.dumps({"iterations": 15000, "matches": bracket_matches}))
             dashboard_path.write_text(
-                "<html><section class=\"certainty-panel\"><h2>Hoja de máxima certeza</h2>"
+                "<html><section class=\"certainty-panel\"><h2>Hoja de máxima firmeza</h2>"
+                "<p>Boleto recomendado hoy</p><p>Qué cargar primero en Penca</p>"
+                "<p>Marcador para cargar en Penca</p>"
                 "<p>Auditoría del boleto</p>"
                 "<p>Quiniela Intelligence 2026</p><p>Prueba operacional</p><p>Una sala de decisión</p>"
                 "<p>De datos a boleto</p><p>Primero decide como una mesa profesional</p>"
@@ -244,6 +246,7 @@ class QuinielaAuditIntegrityTest(unittest.TestCase):
                 "<p>Partidos cerrados o de riesgo alto</p>"
                 "<p>Marcadores exactos defendibles</p>"
                 "<p>Brecha mínima contra la segunda opción</p>"
+                "<p>Firmeza operativa media</p>"
                 "<p>Checklist de auditoría</p>"
                 "<p>Picks más defendibles</p><p>Marcadores exactos más defendibles</p>"
                 "<p>Guardrail de consenso</p><p>Ajustes para boleto de quiniela</p>"
@@ -253,8 +256,8 @@ class QuinielaAuditIntegrityTest(unittest.TestCase):
                 "<p>Calibración avanzada</p><p>Cómo evitamos que el modelo se sobreconfíe</p>"
                 "<p>Shrinkage bayesiano</p><p>Desacuerdo entre modelos</p>"
                 "<p>Backtesting por buckets</p><p>Límite de confianza operativa</p>"
-                "<p>Predicción potenciada</p><p>Probabilidad pura vs convicción</p>"
-                "<p>Convicción reforzada media</p><p>Fuerza estructural media</p><p>Watchlist de riesgo</p>"
+                "<p>Predicción potenciada</p><p>Probabilidad pura vs índice de firmeza</p>"
+                "<p>Índice de firmeza medio</p><p>Fuerza estructural media</p><p>Watchlist de riesgo</p>"
                 "<p>Agentes de aprendizaje</p><p>Noticias multi-fuente</p><p>No solo ESPN</p><p>Eficiencia operativa</p>"
                 "<p>Mapa de proveedores</p><p>API-Football</p><p>Sportmonks</p><p>Sportradar</p><p>Opta</p>"
                 "<p>The Odds API</p><p>NewsAPI</p><p>GDELT</p><p>StatsBomb</p><p>ScoreBat</p>"

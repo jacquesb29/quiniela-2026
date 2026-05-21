@@ -217,6 +217,8 @@ class RegressionLogicTest(unittest.TestCase):
         self.assertIn("Modo boleto", template)
         self.assertIn("Si vas a cargar la Penca Ovación, empieza aquí.", template)
         self.assertIn("Lectura crítica", template)
+        self.assertIn("ticket_snapshot_html", template)
+        self.assertIn("Metodología", template)
         self.assertIn("Track record 2026", template)
         self.assertIn("technical-accordion", template)
         self.assertIn('id="marcadores"', template)
@@ -410,6 +412,9 @@ class RegressionLogicTest(unittest.TestCase):
         self.assertIn("Marcadores amplios o menos centrados a vigilar", html)
         self.assertIn("Modo seguro", html)
         self.assertIn("Modo agresivo", html)
+        self.assertIn("Qué cargar primero en Penca", html)
+        self.assertIn("Modelo:", html)
+        self.assertIn("Penca:", html)
 
     def test_consensus_champion_blend_decays_with_live_and_final_results(self):
         pending = [{"projection": False, "status_state": "pre"} for _ in range(4)]
@@ -491,9 +496,10 @@ class RegressionLogicTest(unittest.TestCase):
                 }
             ]
         )
-        self.assertIn("Hoja de máxima certeza", html)
+        self.assertIn("Hoja de máxima firmeza", html)
         self.assertIn("Auditoría del boleto", html)
         self.assertIn("Brecha mínima contra la segunda opción", html)
+        self.assertIn("Firmeza operativa media", html)
         self.assertIn("Checklist de auditoría", html)
         self.assertIn("Picks más defendibles", html)
         self.assertIn("Spain vs Uruguay", html)
