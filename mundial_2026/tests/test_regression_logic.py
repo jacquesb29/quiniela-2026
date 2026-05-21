@@ -169,6 +169,102 @@ class RegressionLogicTest(unittest.TestCase):
         self.assertEqual(prediction.current_score_a, 1)
         self.assertEqual(prediction.current_score_b, 0)
 
+    def test_live_score_recalculates_model_and_penca_markers(self):
+        teams = app.load_teams()
+        states = app.initial_team_states(teams)
+        ctx = app.MatchContext(neutral=True)
+        pre_match = app.predict_match(
+            teams,
+            "Spain",
+            "Uruguay",
+            ctx,
+            top_scores=5,
+            state_a=states["Spain"],
+            state_b=states["Uruguay"],
+        )
+        live_match = app.predict_match_live(
+            teams,
+            "Spain",
+            "Uruguay",
+            ctx,
+            0,
+            1,
+            "70'",
+            top_scores=5,
+            state_a=states["Spain"],
+            state_b=states["Uruguay"],
+            live_stats={
+                "shots_a": 14,
+                "shots_b": 6,
+                "shots_on_target_a": 5,
+                "shots_on_target_b": 2,
+                "xg_a": 1.4,
+                "xg_b": 0.7,
+            },
+        )
+
+        self.assertNotEqual(app.projected_score_value(pre_match), app.projected_score_value(live_match))
+        self.assertNotEqual(
+            app.penca_ovacion_top_score(pre_match)["score"],
+            app.penca_ovacion_top_score(live_match)["score"],
+        )
+        self.assertEqual(live_match.current_score_a, 0)
+        self.assertEqual(live_match.current_score_b, 1)
+        self.assertIsNotNone(live_match.expected_remaining_goals_a)
+
+    def test_final_result_state_changes_future_score_probabilities(self):
+        teams = app.load_teams()
+        states = app.initial_team_states(teams)
+        next_fixture = {"team_a": "Spain", "team_b": "Cape Verde", "stage": "group", "neutral": True, "group": "H"}
+        next_ctx = app.context_from_fixture(next_fixture, teams, states)
+        before = app.predict_match(
+            teams,
+            "Spain",
+            "Cape Verde",
+            next_ctx,
+            top_scores=5,
+            state_a=states["Spain"],
+            state_b=states["Cape Verde"],
+        )
+        result_fixture = {
+            "team_a": "Spain",
+            "team_b": "Saudi Arabia",
+            "stage": "group",
+            "neutral": True,
+            "group": "H",
+            "actual_score_a": 6,
+            "actual_score_b": 0,
+            "actual_yellows_a": 0,
+            "actual_yellows_b": 2,
+            "live_xg_a": 3.4,
+            "live_xg_b": 0.2,
+        }
+        result_ctx = app.context_from_fixture(result_fixture, teams, states)
+        result_prediction = app.predict_match(
+            teams,
+            "Spain",
+            "Saudi Arabia",
+            result_ctx,
+            top_scores=5,
+            state_a=states["Spain"],
+            state_b=states["Saudi Arabia"],
+        )
+        app.apply_state_updates(teams, states, result_fixture, result_ctx, result_prediction)
+        after_ctx = app.context_from_fixture(next_fixture, teams, states)
+        after = app.predict_match(
+            teams,
+            "Spain",
+            "Cape Verde",
+            after_ctx,
+            top_scores=5,
+            state_a=states["Spain"],
+            state_b=states["Cape Verde"],
+        )
+
+        self.assertNotEqual(before.expected_goals_a, after.expected_goals_a)
+        self.assertNotEqual(before.exact_scores[0][1], after.exact_scores[0][1])
+        self.assertGreater(states["Spain"]["group_points"], 0)
+
     def test_runtime_status_counts_provider_status_variants(self):
         html = app.build_runtime_status_html(
             [
@@ -232,6 +328,7 @@ class RegressionLogicTest(unittest.TestCase):
         self.assertIn("section-collapse", template)
         self.assertIn("Uso educativo y entretenimiento", template)
         self.assertIn("no garantiza ganar", template)
+        self.assertIn("score_dynamics_html", template)
 
     def test_pages_build_records_dashboard_timestamp_in_latest_json(self):
         script = (PACKAGE_ROOT / "build_pages_site.sh").read_text(encoding="utf-8")
@@ -421,6 +518,8 @@ class RegressionLogicTest(unittest.TestCase):
         self.assertIn("Qué cargar primero en Penca", html)
         self.assertIn("Modelo:", html)
         self.assertIn("Penca:", html)
+        self.assertIn("Marcadores dinámicos", html)
+        self.assertIn("Los marcadores cambian a medida que avanza el campeonato", html)
 
     def test_consensus_champion_blend_decays_with_live_and_final_results(self):
         pending = [{"projection": False, "status_state": "pre"} for _ in range(4)]

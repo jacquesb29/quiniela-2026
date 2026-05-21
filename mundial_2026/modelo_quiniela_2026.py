@@ -8633,6 +8633,66 @@ def build_landing_proof_html(entries: Sequence[dict], bracket_payload: dict, bac
     )
 
 
+def build_score_dynamics_html(entries: Sequence[dict]) -> str:
+    """Explain and expose why score recommendations are not static."""
+
+    fixture_entries = [entry for entry in entries if not entry.get("projection")]
+    projected_entries = [entry for entry in entries if entry.get("projection")]
+    live_count = sum(1 for entry in fixture_entries if fixture_is_live(entry))
+    final_count = sum(1 for entry in fixture_entries if fixture_is_final(entry))
+    pending_count = max(len(fixture_entries) - live_count - final_count, 0)
+    live_tone = "ok" if live_count else "neutral"
+    final_tone = "ok" if final_count else "neutral"
+    cards = [
+        (
+            "Durante el partido",
+            "Si el fixture entra en vivo, el marcador recomendado deja de ser prepartido: usa marcador actual, minuto, goles restantes, eventos, tiros, tarjetas y patrones disponibles.",
+            live_tone,
+        ),
+        (
+            "Después de cada final",
+            "Cada resultado real actualiza forma, Elo dinámico, goles a favor/en contra, tabla, fatiga, disciplina y señales recientes; eso puede mover los marcadores de los próximos partidos.",
+            final_tone,
+        ),
+        (
+            "En la llave",
+            f"Los {len(projected_entries)} cruces eliminatorios proyectados se reconstruyen por Monte Carlo. Si cambia un clasificado o un ganador real, cambian rival, probabilidades y marcador recomendado.",
+            "ok" if projected_entries else "neutral",
+        ),
+        (
+            "En Penca Ovación",
+            "El marcador Penca no se copia ciegamente del exacto más probable: se reordena en cada corrida para maximizar puntos esperados bajo regla 8/5/3.",
+            "ok",
+        ),
+    ]
+    card_html = "".join(
+        (
+            f"<article class=\"score-dynamics-card {html.escape(tone)}\">"
+            f"<h3>{html.escape(title)}</h3>"
+            f"<p>{html.escape(body)}</p>"
+            "</article>"
+        )
+        for title, body, tone in cards
+    )
+    return (
+        "<section class=\"panel score-dynamics-panel\" id=\"marcadores-dinamicos\">"
+        "<div class=\"panel-head\"><div>"
+        "<p class=\"eyebrow\">Marcadores dinámicos</p>"
+        "<h2>Los marcadores cambian a medida que avanza el campeonato.</h2>"
+        "<p class=\"lede-tight\">No son picks congelados. En cada refresh se recalculan el marcador más probable del modelo, el marcador para cargar en Penca y las alternativas por puntos esperados.</p>"
+        "</div></div>"
+        "<div class=\"score-dynamics-status\">"
+        f"<span>Fixtures directos <strong>{len(fixture_entries)}</strong></span>"
+        f"<span>En vivo <strong>{live_count}</strong></span>"
+        f"<span>Finales aplicados <strong>{final_count}</strong></span>"
+        f"<span>Pendientes <strong>{pending_count}</strong></span>"
+        "</div>"
+        f"<div class=\"score-dynamics-grid\">{card_html}</div>"
+        "<p class=\"score-dynamics-note\"><strong>Regla práctica:</strong> antes del torneo verás cambios menores; durante partidos y después de resultados reales, el marcador puede cambiar más porque el estado del equipo y la llave ya no son supuestos.</p>"
+        "</section>"
+    )
+
+
 def build_dashboard_html(
     entries: Sequence[dict],
     bracket_text: str,
@@ -8906,6 +8966,7 @@ def build_dashboard_html(
     ticket_snapshot_html = build_ticket_snapshot_html(entries, updated_at)
     landing_proof_html = build_landing_proof_html(entries, bracket_payload, backtest)
     runtime_status_html = build_runtime_status_html(entries, bracket_payload)
+    score_dynamics_html = build_score_dynamics_html(entries)
     methodology_html = build_methodology_html(bracket_payload, backtest, entries)
     calibration_depth_html = build_calibration_depth_html(entries, backtest)
     prediction_power_html = build_prediction_power_html(entries)
@@ -8932,6 +8993,7 @@ def build_dashboard_html(
             "ticket_snapshot_html": ticket_snapshot_html,
             "landing_proof_html": landing_proof_html,
             "runtime_status_html": runtime_status_html,
+            "score_dynamics_html": score_dynamics_html,
             "methodology_html": methodology_html,
             "calibration_depth_html": calibration_depth_html,
             "prediction_power_html": prediction_power_html,
@@ -9183,6 +9245,11 @@ def audit_dashboard_html(dashboard_html: str) -> List[str]:
         "Monte Carlo vigente",
         "15.000 simulaciones por corrida",
         "actualiza llave, picks, goles y marcadores",
+        "Marcadores dinámicos",
+        "Los marcadores cambian a medida que avanza el campeonato",
+        "Durante el partido",
+        "Después de cada final",
+        "marcador para cargar en Penca",
         "Partidos totales del Mundial 2026",
         "No son 72 en total",
         "Solo compara partidos con los mismos dos equipos",

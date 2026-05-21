@@ -2199,6 +2199,62 @@ strong {
 .model-card.ensemble {
   background: linear-gradient(180deg, rgba(176,71,60,0.10), rgba(255,255,255,0.75));
 }
+.score-dynamics-panel {
+  background:
+    radial-gradient(circle at 12% 18%, rgba(15,109,102,0.14), transparent 32%),
+    linear-gradient(135deg, rgba(255,255,255,0.94), rgba(244,239,226,0.76));
+}
+.score-dynamics-status,
+.score-dynamics-grid {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+.score-dynamics-status {
+  margin: 18px 0;
+}
+.score-dynamics-status span,
+.score-dynamics-card {
+  border: 1px solid rgba(15,109,102,0.14);
+  border-radius: 20px;
+  background: rgba(255,255,255,0.66);
+  padding: 14px 16px;
+  box-shadow: var(--shadow-soft);
+}
+.score-dynamics-status span {
+  color: var(--muted);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.78rem;
+}
+.score-dynamics-status strong {
+  display: block;
+  margin-top: 6px;
+  color: var(--accent-dark);
+  font-size: 1.45rem;
+}
+.score-dynamics-card h3 {
+  margin: 0 0 8px;
+  color: var(--accent-dark);
+}
+.score-dynamics-card p,
+.score-dynamics-note {
+  margin: 0;
+  color: var(--muted);
+}
+.score-dynamics-card.ok {
+  border-color: rgba(15,109,102,0.25);
+  background: linear-gradient(180deg, rgba(15,109,102,0.11), rgba(255,255,255,0.74));
+}
+.score-dynamics-card.neutral {
+  background: linear-gradient(180deg, rgba(181,131,47,0.08), rgba(255,255,255,0.74));
+}
+.score-dynamics-note {
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px dashed rgba(15,109,102,0.20);
+}
 .scores h4 {
   margin: 14px 0 8px;
   color: var(--accent);
@@ -2260,6 +2316,10 @@ pre {
   .runtime-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
+  .score-dynamics-status,
+  .score-dynamics-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
   .ticket-snapshot-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -2289,6 +2349,8 @@ pre {
   .runtime-grid,
   .summary-grid,
   .ticket-snapshot-grid,
+  .score-dynamics-status,
+  .score-dynamics-grid,
   .confidence-tiles,
   .proof-grid {
     grid-template-columns: 1fr;
