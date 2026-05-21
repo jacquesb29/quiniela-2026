@@ -1328,6 +1328,222 @@ def expected_goals(
     )
 
 
+def score_shape_team_signal(profile: TeamProfile, state: Optional[dict] = None) -> Dict[str, float]:
+    """Historical scoring profile used to choose better exact-score shapes.
+
+    The expected-goals model already decides the broad strength of each side.
+    This layer only changes the shape inside each W/D/L bucket: teams with a
+    long-run tendency to score/concede asymmetrically get more 2-1, 3-0, 3-1
+    mass when the data supports it, without changing the winner probability.
+    """
+    history = profile.history
+    gf_signal = clamp((history.weighted_goals_for_per_match - 1.25) / 0.75, -1.0, 1.0)
+    ga_signal = clamp((history.weighted_goals_against_per_match - 1.15) / 0.75, -1.0, 1.0)
+    scoring_rate_signal = clamp((history.scoring_rate - 0.62) / 0.24, -1.0, 1.0)
+    clean_sheet_signal = clamp((history.clean_sheet_rate - 0.26) / 0.22, -1.0, 1.0)
+    attack = clamp(
+        0.24 * centered(history.attack_index)
+        + 0.18 * centered(profile.squad.finishing)
+        + 0.16 * centered(profile.squad.shot_creation)
+        + 0.14 * gf_signal
+        + 0.12 * scoring_rate_signal
+        + 0.10 * attack_form_signal(state)
+        + 0.06 * tactical_attack_signal(state),
+        -1.0,
+        1.0,
+    )
+    defense = clamp(
+        0.24 * centered(history.defense_index)
+        + 0.18 * centered(profile.squad.defense_unit)
+        + 0.14 * centered(profile.squad.goalkeeper_unit)
+        + 0.14 * clean_sheet_signal
+        - 0.10 * ga_signal
+        + 0.08 * defense_form_signal(state)
+        + 0.06 * tactical_defense_signal(state),
+        -1.0,
+        1.0,
+    )
+    concede = clamp(
+        0.26 * ga_signal
+        - 0.16 * centered(history.defense_index)
+        - 0.14 * centered(profile.squad.goalkeeper_unit)
+        - 0.12 * clean_sheet_signal
+        + 0.10 * recent_xga_signal(state),
+        -1.0,
+        1.0,
+    )
+    high_goal = clamp(
+        0.46 * attack
+        + 0.22 * gf_signal
+        + 0.18 * centered(profile.tempo)
+        + 0.14 * tactical_tempo_signal(state),
+        -1.0,
+        1.0,
+    )
+    return {
+        "attack": attack,
+        "defense": defense,
+        "concede": concede,
+        "clean_sheet": clean_sheet_signal,
+        "scoring_rate": scoring_rate_signal,
+        "high_goal": high_goal,
+        "strength": clamp(
+            0.42 * centered(profile.fifa_strength_index)
+            + 0.24 * centered(history.strength_index)
+            + 0.18 * centered(profile.squad.attack_unit)
+            + 0.16 * centered(profile.squad.defense_unit),
+            -1.0,
+            1.0,
+        ),
+    }
+
+
+def score_shape_outcome(goals_a: int, goals_b: int) -> str:
+    if goals_a > goals_b:
+        return "a"
+    if goals_b > goals_a:
+        return "b"
+    return "draw"
+
+
+def score_shape_weight(
+    goals_a: int,
+    goals_b: int,
+    mu_a: float,
+    mu_b: float,
+    signal_a: Dict[str, float],
+    signal_b: Dict[str, float],
+    ctx: MatchContext,
+) -> float:
+    def side_exponent(goals_for: int, goals_against: int, mu_for: float, own: Dict[str, float], opp: Dict[str, float]) -> float:
+        exponent = 0.0
+        if goals_for == 0:
+            exponent += -0.11 * own["attack"] - 0.07 * own["scoring_rate"] + 0.08 * opp["defense"]
+        elif goals_for == 1:
+            exponent += -0.02 * own["high_goal"] + 0.02 * opp["defense"]
+        elif goals_for == 2:
+            exponent += 0.055 * own["attack"] + 0.045 * opp["concede"] + 0.025 * max(mu_for - 1.35, 0.0)
+        else:
+            exponent += 0.15 * own["attack"] + 0.11 * opp["concede"] + 0.07 * own["high_goal"] + 0.04 * max(mu_for - 1.45, 0.0)
+
+        if goals_against == 0:
+            exponent += 0.10 * own["defense"] + 0.08 * own["clean_sheet"] - 0.09 * opp["attack"] - 0.05 * opp["scoring_rate"]
+        elif goals_against >= 2:
+            exponent += 0.09 * own["concede"] + 0.08 * opp["attack"] - 0.05 * own["defense"]
+        return exponent
+
+    exponent = side_exponent(goals_a, goals_b, mu_a, signal_a, signal_b)
+    exponent += side_exponent(goals_b, goals_a, mu_b, signal_b, signal_a)
+
+    total_goals = goals_a + goals_b
+    margin = abs(goals_a - goals_b)
+    expected_total = mu_a + mu_b
+    strength_gap = signal_a["strength"] - signal_b["strength"]
+    both_score_signal = 0.5 * (
+        signal_a["attack"] + signal_b["attack"] + signal_a["concede"] + signal_b["concede"]
+    )
+
+    if goals_a > goals_b and margin >= 2:
+        exponent += 0.12 * max(strength_gap, 0.0) + 0.05 * max(expected_total - 2.25, 0.0)
+    elif goals_b > goals_a and margin >= 2:
+        exponent += 0.12 * max(-strength_gap, 0.0) + 0.05 * max(expected_total - 2.25, 0.0)
+    elif margin == 1 and abs(strength_gap) > 0.22 and expected_total >= 2.35:
+        exponent -= 0.045 * abs(strength_gap)
+
+    if goals_a > 0 and goals_b > 0:
+        exponent += 0.08 * both_score_signal
+    if total_goals >= 4:
+        exponent += 0.07 * (signal_a["high_goal"] + signal_b["high_goal"])
+        exponent += 0.05 * max(expected_total - 2.65, 0.0)
+    if ctx.knockout and total_goals >= 4:
+        exponent -= 0.08
+
+    central_scores = {(1, 0), (0, 1), (2, 0), (0, 2), (1, 1)}
+    if (goals_a, goals_b) in central_scores and (expected_total >= 2.55 or abs(strength_gap) >= 0.30):
+        exponent -= 0.035 + 0.030 * max(expected_total - 2.55, 0.0) + 0.025 * abs(strength_gap)
+
+    return math.exp(clamp(exponent, -0.36, 0.36))
+
+
+def apply_historical_score_shape_adjustment(
+    dist: Dict[Tuple[int, int], float],
+    team_a: Team,
+    team_b: Team,
+    profile_a: TeamProfile,
+    profile_b: TeamProfile,
+    mu_a: float,
+    mu_b: float,
+    ctx: MatchContext,
+    *,
+    state_a: Optional[dict] = None,
+    state_b: Optional[dict] = None,
+    strength: float = 0.42,
+) -> Tuple[Dict[Tuple[int, int], float], Dict[str, object]]:
+    strength = clamp(strength, 0.0, 1.0)
+    if strength <= 0.0 or not dist:
+        return dict(dist), {"applied": False, "strength": 0.0}
+
+    signal_a = score_shape_team_signal(profile_a, state_a)
+    signal_b = score_shape_team_signal(profile_b, state_b)
+    original_bucket = {"a": 0.0, "draw": 0.0, "b": 0.0}
+    for (goals_a, goals_b), prob in dist.items():
+        original_bucket[score_shape_outcome(goals_a, goals_b)] += float(prob)
+
+    raw: Dict[Tuple[int, int], float] = {}
+    raw_bucket = {"a": 0.0, "draw": 0.0, "b": 0.0}
+    for (goals_a, goals_b), prob in dist.items():
+        base_weight = score_shape_weight(goals_a, goals_b, mu_a, mu_b, signal_a, signal_b, ctx)
+        weight = 1.0 + strength * (base_weight - 1.0)
+        adjusted = max(float(prob) * clamp(weight, 0.72, 1.30), 0.0)
+        outcome = score_shape_outcome(goals_a, goals_b)
+        raw[(goals_a, goals_b)] = adjusted
+        raw_bucket[outcome] += adjusted
+
+    adjusted_dist: Dict[Tuple[int, int], float] = {}
+    for score, prob in raw.items():
+        outcome = score_shape_outcome(*score)
+        if raw_bucket[outcome] <= 0.0:
+            adjusted_dist[score] = float(dist.get(score, 0.0))
+        else:
+            adjusted_dist[score] = prob * original_bucket[outcome] / raw_bucket[outcome]
+
+    total = sum(adjusted_dist.values())
+    if total > 0.0:
+        for key in list(adjusted_dist):
+            adjusted_dist[key] /= total
+
+    top_before_pair, top_before_prob = max(dist.items(), key=lambda item: item[1])
+    top_after_pair, top_after_prob = max(adjusted_dist.items(), key=lambda item: item[1])
+    stronger_is_a = signal_a["strength"] >= signal_b["strength"]
+    favorite_name = team_a.name if stronger_is_a else team_b.name
+    favorite_signal = signal_a if stronger_is_a else signal_b
+    rival_signal = signal_b if stronger_is_a else signal_a
+    if favorite_signal["attack"] > 0.10 and rival_signal["concede"] > 0.05:
+        label = "favorece ventajas más amplias si el favorito domina"
+    elif signal_a["attack"] > 0.05 and signal_b["attack"] > 0.05 and (signal_a["concede"] + signal_b["concede"]) > -0.10:
+        label = "sube escenarios donde ambos equipos anotan"
+    elif favorite_signal["defense"] > 0.12 and rival_signal["attack"] < 0.02:
+        label = "refuerza marcadores con portería a cero del favorito"
+    else:
+        label = "mantiene marcador conservador, pero corrige por perfil histórico"
+
+    meta = {
+        "applied": True,
+        "strength": strength,
+        "label": label,
+        "favorite_name": favorite_name,
+        "top_before": f"{top_before_pair[0]}-{top_before_pair[1]}",
+        "top_before_prob": float(top_before_prob),
+        "top_after": f"{top_after_pair[0]}-{top_after_pair[1]}",
+        "top_after_prob": float(top_after_prob),
+        "attack_signal_a": signal_a["attack"],
+        "attack_signal_b": signal_b["attack"],
+        "concede_signal_a": signal_a["concede"],
+        "concede_signal_b": signal_b["concede"],
+    }
+    return adjusted_dist, meta
+
+
 def factor_breakdown(
     team_a: Team,
     team_b: Team,
@@ -1595,8 +1811,29 @@ def predict_match(
     ctx = ctx or MatchContext()
     team_a = teams[team_a_name]
     team_b = teams[team_b_name]
+    profile_a = profile_for(team_a)
+    profile_b = profile_for(team_b)
     mu_a, mu_b = expected_goals(team_a, team_b, ctx, state_a=state_a, state_b=state_b)
     dist, model_stack = build_model_stack(mu_a, mu_b, ctx, max_goals=10, market_strength=0.30)
+    dist, score_shape_meta = apply_historical_score_shape_adjustment(
+        dist,
+        team_a,
+        team_b,
+        profile_a,
+        profile_b,
+        mu_a,
+        mu_b,
+        ctx,
+        state_a=state_a,
+        state_b=state_b,
+        strength=0.46,
+    )
+    if model_stack is not None:
+        model_stack = dict(model_stack)
+        top_pair, top_prob = max(dist.items(), key=lambda item: item[1])
+        model_stack["score_shape_adjustment"] = score_shape_meta
+        model_stack["final_name"] = "Ensamble + asimetría histórica"
+        model_stack["ensemble_top_score"] = (f"{top_pair[0]}-{top_pair[1]}", float(top_prob))
 
     win_a = 0.0
     draw = 0.0
@@ -1613,7 +1850,7 @@ def predict_match(
 
     exact.sort(key=lambda item: item[1], reverse=True)
     penca_scores = penca_ovacion_score_options(dist, top_scores)
-    score_guidance = score_precision_profile(dist, penca_scores)
+    score_guidance = score_precision_profile(dist, penca_scores, score_shape_meta)
     advance_a = None
     advance_b = None
     knockout_detail = None
@@ -1794,6 +2031,25 @@ def predict_match_live(
         rem_mu_a, rem_mu_b = apply_live_pattern_adjustment(rem_mu_a, rem_mu_b, patterns, "extra_time")
         remainder_dist, model_stack = build_model_stack(rem_mu_a, rem_mu_b, None, max_goals=4, market_strength=0.0)
         final_dist = combine_current_score_distribution(current_score_a, current_score_b, remainder_dist)
+        final_dist, score_shape_meta = apply_historical_score_shape_adjustment(
+            final_dist,
+            team_a,
+            team_b,
+            profile_a,
+            profile_b,
+            current_score_a + rem_mu_a,
+            current_score_b + rem_mu_b,
+            ctx,
+            state_a=state_a,
+            state_b=state_b,
+            strength=0.18 * (1.0 - progress),
+        )
+        if model_stack is not None:
+            model_stack = dict(model_stack)
+            top_pair, top_prob = max(final_dist.items(), key=lambda item: item[1])
+            model_stack["score_shape_adjustment"] = score_shape_meta
+            model_stack["final_name"] = "Ensamble live + asimetría histórica"
+            model_stack["ensemble_top_score"] = (f"{top_pair[0]}-{top_pair[1]}", float(top_prob))
         win_a = 0.0
         draw = 0.0
         win_b = 0.0
@@ -1836,7 +2092,7 @@ def predict_match_live(
             win_b=win_b,
             exact_scores=exact[:top_scores],
             penca_scores=penca_scores,
-            score_guidance=score_precision_profile(final_dist, penca_scores),
+            score_guidance=score_precision_profile(final_dist, penca_scores, score_shape_meta),
             advance_a=advance_a,
             advance_b=advance_b,
             knockout_detail={
@@ -1895,6 +2151,25 @@ def predict_match_live(
     live_market_strength = 0.08 if progress > 0.0 else 0.20
     remainder_dist, model_stack = build_model_stack(rem_mu_a, rem_mu_b, ctx, max_goals=6, market_strength=live_market_strength)
     final_dist = combine_current_score_distribution(current_score_a, current_score_b, remainder_dist)
+    final_dist, score_shape_meta = apply_historical_score_shape_adjustment(
+        final_dist,
+        team_a,
+        team_b,
+        profile_a,
+        profile_b,
+        current_score_a + rem_mu_a,
+        current_score_b + rem_mu_b,
+        ctx,
+        state_a=state_a,
+        state_b=state_b,
+        strength=0.46 * (1.0 - progress),
+    )
+    if model_stack is not None:
+        model_stack = dict(model_stack)
+        top_pair, top_prob = max(final_dist.items(), key=lambda item: item[1])
+        model_stack["score_shape_adjustment"] = score_shape_meta
+        model_stack["final_name"] = "Ensamble live + asimetría histórica"
+        model_stack["ensemble_top_score"] = (f"{top_pair[0]}-{top_pair[1]}", float(top_prob))
 
     win_a = 0.0
     draw = 0.0
@@ -1947,7 +2222,7 @@ def predict_match_live(
         win_b=win_b,
         exact_scores=exact[:top_scores],
         penca_scores=penca_scores,
-        score_guidance=score_precision_profile(final_dist, penca_scores),
+        score_guidance=score_precision_profile(final_dist, penca_scores, score_shape_meta),
         advance_a=advance_a,
         advance_b=advance_b,
         knockout_detail=knockout_detail,
@@ -4477,6 +4752,27 @@ def penca_ovacion_score_options(dist: Dict[Tuple[int, int], float], top_n: int =
     return scored[:top_n]
 
 
+def penca_asymmetric_score_options(dist: Dict[Tuple[int, int], float], top_n: int = 4) -> List[Dict[str, float | str]]:
+    """Candidates that keep the ticket from over-concentrating on 1-0/2-0/1-1."""
+    scored = []
+    for goals_a, goals_b in dist:
+        total_goals = goals_a + goals_b
+        margin = abs(goals_a - goals_b)
+        both_score = goals_a > 0 and goals_b > 0
+        if margin >= 2 or total_goals >= 3 or (both_score and max(goals_a, goals_b) >= 2):
+            scored.append(score_expected_points_for_penca(dist, goals_a, goals_b))
+    scored.sort(
+        key=lambda item: (
+            float(item["expected_points"]),
+            float(item["exact_prob"]),
+            float(item["difference_prob"]),
+            float(item["result_prob"]),
+        ),
+        reverse=True,
+    )
+    return scored[:top_n]
+
+
 def penca_ovacion_top_score(prediction: MatchPrediction) -> Dict[str, float | str]:
     if prediction.penca_scores:
         return prediction.penca_scores[0]
@@ -4507,6 +4803,7 @@ def goal_marginal_options(
 def score_precision_profile(
     dist: Dict[Tuple[int, int], float],
     penca_scores: Optional[List[Dict[str, float | str]]] = None,
+    score_shape_meta: Optional[Dict[str, object]] = None,
 ) -> Dict[str, object]:
     exact_ranked = sorted(dist.items(), key=lambda item: item[1], reverse=True)
     if exact_ranked:
@@ -4558,9 +4855,15 @@ def score_precision_profile(
         "top5_coverage": top5_coverage,
         "goal_options_a": goal_marginal_options(dist, "a"),
         "goal_options_b": goal_marginal_options(dist, "b"),
+        "asymmetric_score_options": penca_asymmetric_score_options(dist, top_n=4),
         "precision_score": precision_score,
         "precision_label": precision_label,
         "recommendation_note": recommendation_note,
+        "score_shape_label": (score_shape_meta or {}).get("label", "sin ajuste histórico específico"),
+        "score_shape_favorite": (score_shape_meta or {}).get("favorite_name"),
+        "score_shape_strength": float((score_shape_meta or {}).get("strength", 0.0) or 0.0),
+        "score_shape_before": (score_shape_meta or {}).get("top_before"),
+        "score_shape_after": (score_shape_meta or {}).get("top_after"),
     }
 
 
@@ -6663,6 +6966,19 @@ def goal_forecast_html(entry: dict, prediction: MatchPrediction) -> str:
         )
     else:
         consensus_note = "Sin línea externa de goles cargada; usa el modelo propio y se ajustará automáticamente si el feed trae mercado/consenso de goles."
+    shape_label = str(guidance.get("score_shape_label", "sin ajuste histórico específico"))
+    shape_before = guidance.get("score_shape_before")
+    shape_after = guidance.get("score_shape_after")
+    if shape_before and shape_after and shape_before != shape_after:
+        shape_note = (
+            f"El ajuste histórico de asimetría movió el marcador líder de {shape_before} a {shape_after}: "
+            f"se revisan equipos que históricamente convierten o conceden con marcadores menos centrados."
+        )
+    else:
+        shape_note = (
+            "El ajuste histórico de asimetría no cambió el marcador líder; el exacto recomendado sigue siendo "
+            "el que mejor combina probabilidad y puntos esperados."
+        )
     return (
         "<div class=\"goal-forecast-block\">"
         "<h4>Pronóstico de goles</h4>"
@@ -6679,9 +6995,11 @@ def goal_forecast_html(entry: dict, prediction: MatchPrediction) -> str:
         f"<div><span>Ambos equipos anotan</span><strong>{format_pct(float(depth.get('both_teams_score', 0.0)))}</strong></div>"
         f"<div><span>Cobertura top-5 marcadores</span><strong>{format_pct(float(guidance.get('top5_coverage', depth.get('top5_coverage', 0.0))))}</strong></div>"
         f"<div><span>Estado vs consenso</span><strong>{html.escape(str(depth.get('goal_consensus_status', 'sin consenso externo')))}</strong></div>"
+        f"<div><span>Ajuste histórico del marcador</span><strong>{html.escape(shape_label)}</strong></div>"
         "</div>"
         f"<p class=\"meta\">{consensus_note}</p>"
-        f"<p class=\"meta\">{html.escape(str(guidance.get('recommendation_note', 'El marcador recomendado se calcula con la distribucion completa de marcadores.')))}</p>"
+        f"<p class=\"meta\">{html.escape(str(guidance.get('recommendation_note', 'El marcador recomendado se calcula con la distribución completa de marcadores.')))}</p>"
+        f"<p class=\"meta\">{html.escape(shape_note)}</p>"
         "</div>"
     )
 
@@ -6775,6 +7093,25 @@ def penca_ovacion_score_html(prediction: MatchPrediction) -> str:
         )
         return f"<div class=\"scores score-marginals\"><h4>{html.escape(team_name)}: goles más probables</h4><ul>{rows}</ul></div>"
 
+    def asymmetric_options_list(options: object) -> str:
+        if not isinstance(options, list) or not options:
+            return ""
+        rows = "".join(
+            "<li>"
+            f"<strong>{html.escape(str(item['score']))}</strong>"
+            f"<span>{float(item['expected_points']):.2f} pts esp. | exacto {format_pct(float(item['exact_prob']))} | "
+            f"diferencia {format_pct(float(item['difference_prob']))}</span>"
+            "</li>"
+            for item in options[:4]
+            if isinstance(item, dict)
+        )
+        return (
+            "<div class=\"scores asymmetric-scores\">"
+            "<h4>Marcadores amplios o menos centrados a vigilar</h4>"
+            f"<ul>{rows}</ul>"
+            "</div>"
+        )
+
     options = "".join(
         "<li>"
         f"<strong>{html.escape(str(item['score']))}</strong>"
@@ -6795,12 +7132,15 @@ def penca_ovacion_score_html(prediction: MatchPrediction) -> str:
         f"<div><span>Probabilidad de clavar exacto</span><strong>{format_pct(float(top['exact_prob']))}</strong></div>"
         f"<div><span>Probabilidad de al menos diferencia correcta</span><strong>{format_pct(float(top['difference_prob']))}</strong></div>"
         f"<div><span>Cobertura top-5 marcadores</span><strong>{format_pct(float(guidance.get('top5_coverage', 0.0)))}</strong></div>"
+        f"<div><span>Ajuste histórico del marcador</span><strong>{html.escape(str(guidance.get('score_shape_label', 'sin ajuste histórico específico')))}</strong></div>"
         "</div>"
         f"<p class=\"meta\">{html.escape(str(guidance.get('recommendation_note', 'Usa este marcador como entrada principal y revisa las alternativas si quieres cubrir.')))}</p>"
+        f"<p class=\"meta\">Marcador del modelo: {html.escape(str(guidance.get('top_exact_score', projected_score_value(prediction))))}. Marcador para Penca: {html.escape(str(top['score']))}. Si difieren, Penca prioriza puntos esperados según exacto, diferencia y ganador.</p>"
         "<div class=\"certainty-grid score-guidance-grid\">"
         f"{goal_options_list(guidance.get('goal_options_a'), prediction.team_a)}"
         f"{goal_options_list(guidance.get('goal_options_b'), prediction.team_b)}"
         "</div>"
+        f"{asymmetric_options_list(guidance.get('asymmetric_score_options'))}"
         "<div class=\"scores\"><h4>Alternativas por puntos esperados</h4>"
         f"<ul>{options}</ul></div>"
         "</div>"

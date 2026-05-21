@@ -279,6 +279,63 @@ class RegressionLogicTest(unittest.TestCase):
         self.assertTrue(prediction.score_guidance)
         self.assertIn("goal_options_a", prediction.score_guidance)
         self.assertIn("top5_coverage", prediction.score_guidance)
+        self.assertIn("score_shape_label", prediction.score_guidance)
+
+    def test_historical_score_shape_adjustment_preserves_result_probabilities(self):
+        teams = app.load_teams()
+        team_a = teams["Spain"]
+        team_b = teams["Saudi Arabia"]
+        dist = {
+            (1, 0): 0.18,
+            (2, 0): 0.20,
+            (3, 0): 0.15,
+            (3, 1): 0.10,
+            (1, 1): 0.16,
+            (0, 0): 0.09,
+            (0, 1): 0.07,
+            (1, 2): 0.05,
+        }
+        adjusted, meta = app.apply_historical_score_shape_adjustment(
+            dist,
+            team_a,
+            team_b,
+            app.profile_for(team_a),
+            app.profile_for(team_b),
+            2.45,
+            0.65,
+            app.MatchContext(neutral=True),
+            strength=0.75,
+        )
+
+        for outcome in ("a", "draw", "b"):
+            before = sum(prob for score, prob in dist.items() if app.score_shape_outcome(*score) == outcome)
+            after = sum(prob for score, prob in adjusted.items() if app.score_shape_outcome(*score) == outcome)
+            self.assertAlmostEqual(after, before, places=8)
+        self.assertAlmostEqual(sum(adjusted.values()), 1.0, places=8)
+        self.assertTrue(meta["applied"])
+
+    def test_score_shape_weight_boosts_supported_asymmetric_scores(self):
+        strong_attack = {
+            "attack": 0.8,
+            "defense": 0.5,
+            "concede": -0.4,
+            "clean_sheet": 0.6,
+            "scoring_rate": 0.8,
+            "high_goal": 0.7,
+            "strength": 0.6,
+        }
+        fragile_defense = {
+            "attack": 0.1,
+            "defense": -0.2,
+            "concede": 0.5,
+            "clean_sheet": -0.3,
+            "scoring_rate": 0.1,
+            "high_goal": 0.0,
+            "strength": -0.2,
+        }
+        central_weight = app.score_shape_weight(1, 0, 2.55, 0.65, strong_attack, fragile_defense, app.MatchContext(neutral=True))
+        asymmetric_weight = app.score_shape_weight(3, 0, 2.55, 0.65, strong_attack, fragile_defense, app.MatchContext(neutral=True))
+        self.assertGreater(asymmetric_weight, central_weight)
 
     def test_score_precision_profile_exposes_goal_marginals_and_exact_pick(self):
         dist = {
@@ -295,6 +352,7 @@ class RegressionLogicTest(unittest.TestCase):
         self.assertGreater(profile["top5_coverage"], profile["top3_coverage"])
         self.assertEqual(profile["goal_options_a"][0]["goals"], 1)
         self.assertEqual(profile["goal_options_b"][0]["goals"], 1)
+        self.assertTrue(profile["asymmetric_score_options"])
 
     def test_full_scorecard_lists_match_score_to_enter(self):
         teams = app.load_teams()
@@ -339,6 +397,8 @@ class RegressionLogicTest(unittest.TestCase):
         self.assertIn("Horario del feed en EDT", html)
         self.assertIn("Qué dice cada modelo", html)
         self.assertIn("model-compare-collapse", html)
+        self.assertIn("Ajuste histórico del marcador", html)
+        self.assertIn("Marcadores amplios o menos centrados a vigilar", html)
 
     def test_consensus_champion_blend_decays_with_live_and_final_results(self):
         pending = [{"projection": False, "status_state": "pre"} for _ in range(4)]
