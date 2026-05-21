@@ -15,6 +15,11 @@ if str(PACKAGE_ROOT) not in sys.path:
 import modelo_quiniela_2026 as app
 import sync_live_data_2026 as sync
 from worldcup2026.dashboard.html_builder import render_dashboard_html
+from worldcup2026.distributions import (
+    build_model_stack,
+    independent_score_distribution,
+    overdispersed_score_distribution,
+)
 from worldcup2026.live.adjustment import live_game_state_adjustment, live_stats_adjustment
 from worldcup2026.simulation.match import sample_knockout_resolution, simulate_match_sample
 from worldcup2026.types import KnockoutResolution
@@ -408,6 +413,7 @@ class RegressionLogicTest(unittest.TestCase):
         self.assertIn("Horario del feed en EDT", html)
         self.assertIn("Qué dice cada modelo", html)
         self.assertIn("model-compare-collapse", html)
+        self.assertIn("Overdispersión calibrada", html)
         self.assertIn("Ajuste histórico del marcador", html)
         self.assertIn("Marcadores amplios o menos centrados a vigilar", html)
         self.assertIn("Modo seguro", html)
@@ -619,6 +625,32 @@ class RegressionLogicTest(unittest.TestCase):
         self.assertLess(adjusted_total, base_total)
         self.assertIn("aplicado", adjusted_prediction.statistical_depth["goal_consensus_status"])
         self.assertIn("Pronóstico de goles", app.goal_forecast_html({"goal_consensus_source": "mercado"}, adjusted_prediction))
+
+    def test_model_stack_includes_calibrated_overdispersion_layer(self):
+        ctx = app.MatchContext(
+            neutral=True,
+            market_prob_a=0.52,
+            market_prob_draw=0.25,
+            market_prob_b=0.23,
+        )
+        dist, meta = build_model_stack(1.75, 0.95, ctx, max_goals=7, market_strength=0.30)
+
+        self.assertIn("overdispersed", meta["weights"])
+        self.assertEqual(meta["overdispersed_name"], "Overdispersión calibrada")
+        self.assertIn("outcome_temperature", meta)
+        self.assertAlmostEqual(sum(meta["weights"].values()), 1.0, places=6)
+        self.assertAlmostEqual(sum(dist.values()), 1.0, places=6)
+        self.assertGreaterEqual(float(meta["outcome_temperature"]), 0.90)
+        self.assertLessEqual(float(meta["outcome_temperature"]), 1.12)
+
+    def test_overdispersed_distribution_keeps_more_high_goal_tail(self):
+        ctx = app.MatchContext(neutral=True)
+        base = independent_score_distribution(1.7, 1.2, max_goals=7)
+        over = overdispersed_score_distribution(1.7, 1.2, ctx, max_goals=7)
+        base_tail = sum(prob for (goals_a, goals_b), prob in base.items() if goals_a + goals_b >= 5)
+        over_tail = sum(prob for (goals_a, goals_b), prob in over.items() if goals_a + goals_b >= 5)
+
+        self.assertGreater(over_tail, base_tail)
 
     def test_annotate_market_moves_computes_prob_deltas(self):
         fixtures = [{"id": "10", "market_prob_a": 0.52, "market_prob_draw": 0.24, "market_prob_b": 0.24}]

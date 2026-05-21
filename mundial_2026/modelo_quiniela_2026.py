@@ -674,6 +674,7 @@ def compute_statistical_depth(
                 str((model_stack or {}).get("primary_name", "")),
                 str((model_stack or {}).get("contrast_name", "")),
                 str((model_stack or {}).get("low_score_name", "")),
+                str((model_stack or {}).get("overdispersed_name", "")),
                 str((model_stack or {}).get("final_name", "")),
             ]
             if model_stack
@@ -681,6 +682,7 @@ def compute_statistical_depth(
         ),
         "model_stack_weights": dict((model_stack or {}).get("weights", {})) if model_stack else {},
         "market_shrink": float((model_stack or {}).get("market_shrink", 0.0)) if model_stack else 0.0,
+        "outcome_temperature": float((model_stack or {}).get("outcome_temperature", 1.0)) if model_stack else 1.0,
     }
 
 
@@ -5827,7 +5829,7 @@ def external_estimator_methodology_items() -> List[dict]:
         {
             "name": "SPI / modelos ofensivo-defensivos",
             "signal": "Ataque y defensa convertidos a goles esperados y probabilidades de marcador.",
-            "usage": "El modelo replica esa lógica con goles esperados, distribución de marcadores y ensamble Poisson/Dixon-Coles.",
+            "usage": "El modelo replica esa lógica con goles esperados, distribución de marcadores, Dixon-Coles y overdispersión calibrada.",
         },
         {
             "name": "Mercado y consenso profesional",
@@ -6346,7 +6348,7 @@ def agentic_learning_items() -> List[dict]:
         },
         {
             "agent": "Agente predictivo",
-            "job": "Combina Poisson/Dixon-Coles, Elo/FIFA, ensamble ligero, consenso externo y Monte Carlo de torneo.",
+            "job": "Combina Poisson/Dixon-Coles, overdispersión calibrada, Elo/FIFA, ensamble ligero, consenso externo y Monte Carlo de torneo.",
             "learns": "Cuando cambia un resultado, recalcula grupos, cruces, llave, campeón y boletos recomendados.",
         },
         {
@@ -7266,6 +7268,8 @@ def model_comparison_lines(prediction: MatchPrediction) -> List[str]:
     lines.append(row("primary_name", "primary_probs", "primary_top_score"))
     lines.append(row("contrast_name", "contrast_probs", "contrast_top_score"))
     lines.append(row("low_score_name", "low_score_probs", "low_score_top_score"))
+    if "overdispersed_name" in stack:
+        lines.append(row("overdispersed_name", "overdispersed_probs", "overdispersed_top_score"))
     lines.append(row("final_name", "ensemble_probs", "ensemble_top_score"))
     return lines
 
@@ -7279,7 +7283,17 @@ def model_comparison_html(prediction: MatchPrediction) -> str:
         name = str(stack.get(name_key, "Modelo"))
         probs = stack.get(probs_key, {}) or {}
         top_score, top_score_prob = stack.get(score_key, ("0-0", 0.0))
-        weight_key = "primary" if name_key == "primary_name" else "contrast" if name_key == "contrast_name" else "low_score" if name_key == "low_score_name" else None
+        weight_key = (
+            "primary"
+            if name_key == "primary_name"
+            else "contrast"
+            if name_key == "contrast_name"
+            else "low_score"
+            if name_key == "low_score_name"
+            else "overdispersed"
+            if name_key == "overdispersed_name"
+            else None
+        )
         weight_html = ""
         if weight_key and stack.get("weights", {}).get(weight_key) is not None:
             weight_html = f"<p><strong>Peso actual:</strong> {format_pct(float(stack['weights'][weight_key]))}</p>"
@@ -7296,11 +7310,12 @@ def model_comparison_html(prediction: MatchPrediction) -> str:
 
     inner = (
         "<div class=\"reason-block model-compare-block\">"
-        "<p class=\"meta\">Aquí se ven por separado el modelo principal, el contraste y el ajuste de baja anotación. El ensamble final repondera esos modelos según consenso y cercanía al mercado cuando hay cuotas confiables.</p>"
+        "<p class=\"meta\">Aquí se ven por separado el modelo principal, el contraste, el ajuste de baja anotación y la overdispersión calibrada. El ensamble final repondera esos modelos según consenso, dispersión y cercanía al mercado cuando hay cuotas confiables.</p>"
         "<div class=\"model-compare-grid\">"
         f"{card('primary_name', 'primary_probs', 'primary_top_score', 'primary')}"
         f"{card('contrast_name', 'contrast_probs', 'contrast_top_score', 'contrast')}"
         f"{card('low_score_name', 'low_score_probs', 'low_score_top_score', 'low-score')}"
+        f"{card('overdispersed_name', 'overdispersed_probs', 'overdispersed_top_score', 'overdispersed') if 'overdispersed_name' in stack else ''}"
         f"{card('final_name', 'ensemble_probs', 'ensemble_top_score', 'ensemble')}"
         "</div>"
         "</div>"
@@ -8419,7 +8434,7 @@ def build_methodology_html(
         "</article>"
         "<article>"
         "<h3>Stack estadístico</h3>"
-        "<p>La capa prepartido mezcla el modelo principal Bivariante Poisson, un modelo de contraste Poisson independiente, un ajuste de baja anotación y un ensamble ligero final. Ese ensamble ahora repondera los modelos según consenso y cercanía al mercado cuando hay cuotas confiables.</p>"
+        "<p>La capa prepartido mezcla el modelo principal Bivariante Poisson, un modelo de contraste Poisson independiente, un ajuste de baja anotación, una distribución de overdispersión calibrada y un ensamble ligero final. Ese ensamble ahora repondera los modelos según consenso, dispersión y cercanía al mercado cuando hay cuotas confiables.</p>"
         "</article>"
         "<article>"
         "<h3>Estrategia de datos</h3>"
@@ -8427,7 +8442,7 @@ def build_methodology_html(
         "</article>"
         "<article>"
         "<h3>Modelos visibles en la web</h3>"
-        "<p>En cada tarjeta de partido verás por separado qué dice Bivariante Poisson, qué dice Poisson independiente, qué dice el ajuste de baja anotación y cuál es el ensamble final publicado. Así puedes comparar si coinciden o si hay dispersión entre modelos.</p>"
+        "<p>En cada tarjeta de partido verás por separado qué dice Bivariante Poisson, qué dice Poisson independiente, qué dice el ajuste de baja anotación, qué dice la overdispersión calibrada y cuál es el ensamble final publicado. Así puedes comparar si coinciden o si hay dispersión entre modelos.</p>"
         "</article>"
         "<article>"
         "<h3>Estado dinámico</h3>"
@@ -9200,6 +9215,7 @@ def audit_dashboard_html(dashboard_html: str) -> List[str]:
         "Cómo evitamos que el modelo se sobreconfíe",
         "Shrinkage bayesiano",
         "Desacuerdo entre modelos",
+        "Overdispersión calibrada",
         "Backtesting por buckets",
         "Límite de confianza operativa",
         "Predicción potenciada",
