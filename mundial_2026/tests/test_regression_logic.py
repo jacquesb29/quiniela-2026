@@ -268,6 +268,12 @@ class RegressionLogicTest(unittest.TestCase):
         self.assertEqual(options[0]["score"], "2-0")
         self.assertGreater(options[0]["expected_points"], app.score_expected_points_for_penca(dist, 1, 0)["expected_points"])
         self.assertAlmostEqual(float(options[0]["difference_prob"]), 0.36)
+        self.assertIn("risk_adjusted_points", options[0])
+        self.assertIn("points_sd", options[0])
+        portfolio = app.penca_score_portfolio(dist)
+        self.assertIn("balanced", portfolio)
+        self.assertIn("safe", portfolio)
+        self.assertIn("upside", portfolio)
 
     def test_predict_match_exposes_penca_ovacion_recommended_score(self):
         teams = app.load_teams()
@@ -280,6 +286,9 @@ class RegressionLogicTest(unittest.TestCase):
         self.assertIn("goal_options_a", prediction.score_guidance)
         self.assertIn("top5_coverage", prediction.score_guidance)
         self.assertIn("score_shape_label", prediction.score_guidance)
+        self.assertIn("penca_certainty_index", prediction.score_guidance)
+        self.assertIn("safe_score", prediction.score_guidance)
+        self.assertIn("upside_score", prediction.score_guidance)
 
     def test_historical_score_shape_adjustment_preserves_result_probabilities(self):
         teams = app.load_teams()
@@ -399,6 +408,8 @@ class RegressionLogicTest(unittest.TestCase):
         self.assertIn("model-compare-collapse", html)
         self.assertIn("Ajuste histórico del marcador", html)
         self.assertIn("Marcadores amplios o menos centrados a vigilar", html)
+        self.assertIn("Modo seguro", html)
+        self.assertIn("Modo agresivo", html)
 
     def test_consensus_champion_blend_decays_with_live_and_final_results(self):
         pending = [{"projection": False, "status_state": "pre"} for _ in range(4)]
