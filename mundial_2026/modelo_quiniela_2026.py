@@ -5688,6 +5688,131 @@ def build_quiniela_strategy_html(entries: Sequence[dict]) -> str:
     )
 
 
+def build_competitive_penca_html(entries: Sequence[dict]) -> str:
+    """Render a quick decision board with safe, optimal and differential Penca modes."""
+
+    if not entries:
+        return ""
+    profiles = [quiniela_strategy_profile(entry) for entry in entries]
+    if not profiles:
+        return ""
+
+    def as_score_dict(item: dict, key: str) -> dict:
+        value = item.get(key)
+        if isinstance(value, dict):
+            return value
+        return {
+            "score": item.get("score", ""),
+            "expected_points": float(item.get("penca_expected_points", 0.0)),
+            "exact_prob": float(item.get("score_prob", 0.0)),
+            "difference_prob": float(item.get("penca_difference_prob", 0.0)),
+            "result_prob": float(item.get("penca_result_prob", item.get("pick_prob", 0.0))),
+        }
+
+    def optimal_score(item: dict) -> dict:
+        return {
+            "score": item.get("score", ""),
+            "expected_points": float(item.get("penca_expected_points", 0.0)),
+            "exact_prob": float(item.get("score_prob", 0.0)),
+            "difference_prob": float(item.get("penca_difference_prob", 0.0)),
+            "result_prob": float(item.get("penca_result_prob", item.get("pick_prob", 0.0))),
+        }
+
+    def mode_row(item: dict, score: dict, label: str) -> str:
+        detail = (
+            f"{item['pick_label']} {format_pct(float(item['pick_prob']))} | "
+            f"marcador {score.get('score', '')} | "
+            f"{float(score.get('expected_points', 0.0)):.2f} pts esp. | "
+            f"exacto {format_pct(float(score.get('exact_prob', 0.0)))} | "
+            f"diferencia {format_pct(float(score.get('difference_prob', 0.0)))}"
+        )
+        if label == "Diferencial":
+            detail += (
+                f" | edge vs popular {float(item.get('edge_vs_public', 0.0)):+.1%} | "
+                f"ganancia esperada {float(item.get('expected_gain_vs_popular', 0.0)):+.1%}"
+            )
+        return (
+            "<li>"
+            f"<strong>{html.escape(str(item['title']))}</strong>"
+            f"<span>{html.escape(detail)}</span>"
+            f"<em>{html.escape(label)}: {html.escape(str(item['strategy_action']))}</em>"
+            "</li>"
+        )
+
+    safe_items = sorted(
+        profiles,
+        key=lambda item: (
+            float(as_score_dict(item, "safe_score").get("result_prob", 0.0)),
+            float(as_score_dict(item, "safe_score").get("difference_prob", 0.0)),
+            float(item["pick_prob"]),
+            float(item["gap"]),
+        ),
+        reverse=True,
+    )[:8]
+    optimal_items = sorted(
+        profiles,
+        key=lambda item: (
+            float(item["penca_expected_points"]),
+            float(item["pick_prob"]),
+            float(item["score_prob"]),
+        ),
+        reverse=True,
+    )[:8]
+    differential_items = sorted(
+        [
+            item
+            for item in profiles
+            if float(item.get("expected_gain_vs_popular", 0.0)) > 0.0
+            or item["strategy_tier"] == "Diferencial positivo"
+        ],
+        key=lambda item: (
+            float(item.get("expected_gain_vs_popular", 0.0)),
+            float(item.get("leverage_score", 0.0)),
+            float(as_score_dict(item, "upside_score").get("expected_points", 0.0)),
+        ),
+        reverse=True,
+    )[:8]
+
+    def rows(items: Sequence[dict], mode: str) -> str:
+        if not items:
+            return "<li><strong>Sin candidatos claros</strong><span>El corte actual no muestra suficiente ventaja para este modo.</span></li>"
+        if mode == "safe":
+            return "".join(mode_row(item, as_score_dict(item, "safe_score"), "Seguro") for item in items)
+        if mode == "differential":
+            return "".join(mode_row(item, as_score_dict(item, "upside_score"), "Diferencial") for item in items)
+        return "".join(mode_row(item, optimal_score(item), "Óptimo") for item in items)
+
+    safe_points = sum(float(as_score_dict(item, "safe_score").get("expected_points", 0.0)) for item in safe_items)
+    optimal_points = sum(float(optimal_score(item).get("expected_points", 0.0)) for item in optimal_items)
+    differential_points = sum(float(as_score_dict(item, "upside_score").get("expected_points", 0.0)) for item in differential_items)
+    return (
+        "<section class=\"panel competitive-penca-panel\">"
+        "<div class=\"panel-head\"><div>"
+        "<p class=\"eyebrow\">Modo Penca competitivo</p>"
+        "<h2>Tres formas de cargar el marcador según tu estrategia.</h2>"
+        "<p class=\"lede-tight\">No todos juegan igual: si quieres proteger puntos usa modo seguro; si quieres maximizar puntos esperados usa modo óptimo; si necesitas ganarle a boletos populares usa modo diferencial.</p>"
+        "</div></div>"
+        "<div class=\"confidence-tiles competitive-penca-tiles\">"
+        f"<div class=\"summary-tile\"><span>Modo seguro</span><strong>{safe_points:.1f} pts esp.</strong><small>Prioriza ganador/diferencia y baja varianza.</small></div>"
+        f"<div class=\"summary-tile\"><span>Modo óptimo</span><strong>{optimal_points:.1f} pts esp.</strong><small>Maximiza puntos esperados bajo regla 8/5/3.</small></div>"
+        f"<div class=\"summary-tile\"><span>Modo diferencial</span><strong>{differential_points:.1f} pts esp.</strong><small>Busca ventaja contra el pick popular cuando hay edge.</small></div>"
+        "</div>"
+        "<div class=\"certainty-grid competitive-penca-grid\">"
+        "<article><h3>Jugar seguro</h3><ul>"
+        f"{rows(safe_items, 'safe')}"
+        "</ul></article>"
+        "<article><h3>Jugar óptimo</h3><ul>"
+        f"{rows(optimal_items, 'optimal')}"
+        "</ul></article>"
+        "<article><h3>Jugar diferencial</h3><ul>"
+        f"{rows(differential_items, 'differential')}"
+        "</ul></article>"
+        "</div>"
+        "<p class=\"meta\">Lectura rápida: si solo quieres llenar una vez, usa modo óptimo. Si vas líder o quieres evitar daño, usa seguro en partidos cerrados. Si necesitas remontar o diferenciarte, mira diferencial.</p>"
+        "</section>"
+    )
+
+
 def build_full_scorecard_markdown(entries: Sequence[dict]) -> List[str]:
     if not entries:
         return ["### Marcadores para cargar en Penca", "_Sin partidos cargados._"]
@@ -9136,6 +9261,7 @@ def build_dashboard_html(
     provider_matrix_html = build_provider_matrix_html(entries)
     global_confidence_html = build_global_confidence_html(entries)
     max_certainty_html = build_max_certainty_html(entries)
+    competitive_penca_html = build_competitive_penca_html(entries)
     strategy_html = build_quiniela_strategy_html(entries)
     full_scorecard_html = build_full_scorecard_html(entries)
     consensus_guardrail_html = build_consensus_guardrail_html(bracket_payload, entries)
@@ -9163,6 +9289,7 @@ def build_dashboard_html(
             "provider_matrix_html": provider_matrix_html,
             "global_confidence_html": global_confidence_html,
             "max_certainty_html": max_certainty_html,
+            "competitive_penca_html": competitive_penca_html,
             "strategy_html": strategy_html,
             "full_scorecard_html": full_scorecard_html,
             "consensus_guardrail_html": consensus_guardrail_html,
@@ -9409,6 +9536,10 @@ def audit_dashboard_html(dashboard_html: str) -> List[str]:
         "actualiza llave, picks, goles y marcadores",
         "Marcadores dinámicos",
         "Los marcadores cambian a medida que avanza el campeonato",
+        "Modo Penca competitivo",
+        "Jugar seguro",
+        "Jugar óptimo",
+        "Jugar diferencial",
         "Durante el partido",
         "Después de cada final",
         "marcador para cargar en Penca",
@@ -9481,6 +9612,8 @@ def audit_dashboard_html(dashboard_html: str) -> List[str]:
             errors.append(f"Dashboard no contiene bloque requerido: {snippet}.")
     if "&lt;section class=&quot;certainty-panel&quot;&gt;" in dashboard_html:
         errors.append("Dashboard escapó el HTML del módulo de máxima firmeza.")
+    if "&lt;section class=&#34;panel competitive-penca-panel&#34;&gt;" in dashboard_html:
+        errors.append("Dashboard escapó el HTML del módulo Penca competitivo.")
     return errors
 
 

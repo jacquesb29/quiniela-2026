@@ -531,6 +531,12 @@ class RegressionLogicTest(unittest.TestCase):
         self.assertIn("Penca:", html)
         self.assertIn("Marcadores dinámicos", html)
         self.assertIn("Los marcadores cambian a medida que avanza el campeonato", html)
+        self.assertIn("Modo Penca competitivo", html)
+        self.assertIn("Jugar seguro", html)
+        self.assertIn("Jugar óptimo", html)
+        self.assertIn("Jugar diferencial", html)
+        self.assertIn('<section class="panel competitive-penca-panel">', html)
+        self.assertNotIn("&lt;section class=&#34;panel competitive-penca-panel&#34;&gt;", html)
 
     def test_consensus_champion_blend_decays_with_live_and_final_results(self):
         pending = [{"projection": False, "status_state": "pre"} for _ in range(4)]

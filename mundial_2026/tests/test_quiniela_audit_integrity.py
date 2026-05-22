@@ -241,6 +241,7 @@ class QuinielaAuditIntegrityTest(unittest.TestCase):
                 "<p>Monte Carlo vigente</p><p>15.000 simulaciones por corrida</p>"
                 "<p>actualiza llave, picks, goles y marcadores</p>"
                 "<p>Marcadores dinámicos</p><p>Los marcadores cambian a medida que avanza el campeonato</p>"
+                "<p>Modo Penca competitivo</p><p>Jugar seguro</p><p>Jugar óptimo</p><p>Jugar diferencial</p>"
                 "<p>Durante el partido</p><p>Después de cada final</p><p>marcador para cargar en Penca</p>"
                 "<p>Partidos totales del Mundial 2026</p><p>No son 72 en total</p>"
                 "<p>Solo compara partidos con los mismos dos equipos</p><p>Si cambia el cruce proyectado</p>"
