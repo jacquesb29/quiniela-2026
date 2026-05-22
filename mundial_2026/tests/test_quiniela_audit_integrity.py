@@ -246,6 +246,7 @@ class QuinielaAuditIntegrityTest(unittest.TestCase):
                 "<p>Solo compara partidos con los mismos dos equipos</p><p>Si cambia el cruce proyectado</p>"
                 "<p>Estrategia para ganar la quiniela</p><p>Ventaja vs boleto popular</p><p>Diferenciales positivos</p>"
                 "<p>Cobertura recomendada</p><p>Marcador exacto principal</p>"
+                "<p>Máximo realista exacto único</p><p>Marcadores para cubrir 90%</p><p>Guardrail exacto</p>"
                 "<p>Marcadores para cargar en Penca</p><p>Boleto completo</p>"
                 "<p>Picks base o principales</p>"
                 "<p>Partidos cerrados o de riesgo alto</p>"

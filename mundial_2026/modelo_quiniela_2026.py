@@ -4753,6 +4753,20 @@ def score_expected_points_for_penca(dist: Dict[Tuple[int, int], float], pick_a: 
     points_sd = math.sqrt(max(0.0, expected_points_squared - expected_points * expected_points))
     margin = abs(pick_diff)
     total_goals = pick_a + pick_b
+    mean_total_goals = sum((goals_a + goals_b) * float(prob) for (goals_a, goals_b), prob in dist.items())
+    top_exact_prob = max((float(prob) for prob in dist.values()), default=0.0)
+    relative_exact_strength = exact_prob / max(top_exact_prob, 1e-9)
+    high_total_penalty = max(0.0, total_goals - (mean_total_goals + 2.15))
+    tail_score_penalty = 0.10 if total_goals >= 5 and relative_exact_strength < 0.45 else 0.0
+    extreme_score_penalty = 0.12 if max(pick_a, pick_b) >= 4 and exact_prob < 0.025 else 0.0
+    realism_index = clamp(
+        1.0
+        - 0.10 * high_total_penalty
+        - tail_score_penalty
+        - extreme_score_penalty,
+        0.55,
+        1.0,
+    )
     asymmetric_bonus = 1.0 if (margin >= 2 or total_goals >= 3 or (pick_a > 0 and pick_b > 0 and max(pick_a, pick_b) >= 2)) else 0.0
     safety_index = clamp(
         0.40 * result_prob
@@ -4765,9 +4779,11 @@ def score_expected_points_for_penca(dist: Dict[Tuple[int, int], float], pick_a: 
     )
     risk_adjusted_points = expected_points - 0.18 * points_sd + 0.70 * difference_prob + 0.25 * result_prob
     upside_score = expected_points + 1.65 * exact_prob + 0.18 * asymmetric_bonus - 0.08 * max(0, total_goals - 5)
+    realism_adjusted_points = expected_points * (0.82 + 0.18 * realism_index) + 0.28 * exact_prob + 0.08 * difference_prob
     return {
         "score": f"{pick_a}-{pick_b}",
         "expected_points": expected_points,
+        "realism_adjusted_points": realism_adjusted_points,
         "exact_prob": exact_prob,
         "difference_prob": difference_prob,
         "result_prob": result_prob,
@@ -4775,6 +4791,7 @@ def score_expected_points_for_penca(dist: Dict[Tuple[int, int], float], pick_a: 
         "risk_adjusted_points": risk_adjusted_points,
         "safety_index": safety_index,
         "upside_score": upside_score,
+        "realism_index": realism_index,
         "asymmetric_bonus": asymmetric_bonus,
     }
 
@@ -4783,6 +4800,7 @@ def penca_ovacion_score_options(dist: Dict[Tuple[int, int], float], top_n: int =
     scored = [score_expected_points_for_penca(dist, goals_a, goals_b) for goals_a, goals_b in dist]
     scored.sort(
         key=lambda item: (
+            float(item["realism_adjusted_points"]),
             float(item["expected_points"]),
             float(item["exact_prob"]),
             float(item["difference_prob"]),
@@ -4796,14 +4814,22 @@ def penca_ovacion_score_options(dist: Dict[Tuple[int, int], float], top_n: int =
 def penca_asymmetric_score_options(dist: Dict[Tuple[int, int], float], top_n: int = 4) -> List[Dict[str, float | str]]:
     """Candidates that keep the ticket from over-concentrating on 1-0/2-0/1-1."""
     scored = []
+    top_exact_prob = max((float(prob) for prob in dist.values()), default=0.0)
+    mean_total_goals = sum((goals_a + goals_b) * float(prob) for (goals_a, goals_b), prob in dist.items())
     for goals_a, goals_b in dist:
         total_goals = goals_a + goals_b
         margin = abs(goals_a - goals_b)
         both_score = goals_a > 0 and goals_b > 0
+        exact_prob = float(dist.get((goals_a, goals_b), 0.0))
+        too_deep_in_tail = total_goals > mean_total_goals + 2.35 and exact_prob < 0.50 * top_exact_prob
+        too_extreme = total_goals >= 6 and exact_prob < 0.65 * top_exact_prob
+        if too_deep_in_tail or too_extreme:
+            continue
         if margin >= 2 or total_goals >= 3 or (both_score and max(goals_a, goals_b) >= 2):
             scored.append(score_expected_points_for_penca(dist, goals_a, goals_b))
     scored.sort(
         key=lambda item: (
+            float(item["realism_adjusted_points"]),
             float(item["expected_points"]),
             float(item["exact_prob"]),
             float(item["difference_prob"]),
@@ -4830,6 +4856,7 @@ def penca_score_portfolio(dist: Dict[Tuple[int, int], float]) -> Dict[str, Dict[
     balanced = max(
         candidates,
         key=lambda item: (
+            float(item["realism_adjusted_points"]),
             float(item["expected_points"]),
             float(item["exact_prob"]),
             float(item["difference_prob"]),
@@ -4850,6 +4877,7 @@ def penca_score_portfolio(dist: Dict[Tuple[int, int], float]) -> Dict[str, Dict[
         plausible_upside_candidates,
         key=lambda item: (
             float(item["upside_score"]),
+            float(item["realism_adjusted_points"]),
             float(item["exact_prob"]),
             float(item["expected_points"]),
             float(item["asymmetric_bonus"]),
@@ -4885,6 +4913,34 @@ def goal_marginal_options(
     return [{"goals": goals, "prob": probability} for goals, probability in ranked[:top_n]]
 
 
+def exact_score_coverage_targets(
+    exact_ranked: Sequence[Tuple[Tuple[int, int], float]],
+    thresholds: Sequence[float] = (0.90, 0.95),
+) -> Dict[str, object]:
+    """How many exact scores are needed to cover high exact-score probability."""
+
+    result: Dict[str, object] = {}
+    cumulative = 0.0
+    reached: Dict[float, Tuple[int, float, List[str]]] = {}
+    score_labels: List[str] = []
+    for index, ((goals_a, goals_b), prob) in enumerate(exact_ranked, start=1):
+        cumulative += float(prob)
+        if index <= 12:
+            score_labels.append(f"{goals_a}-{goals_b}")
+        for threshold in thresholds:
+            if threshold not in reached and cumulative >= threshold:
+                reached[threshold] = (index, cumulative, list(score_labels))
+    for threshold in thresholds:
+        key = str(int(round(threshold * 100)))
+        count, coverage, labels = reached.get(threshold, (len(exact_ranked), cumulative, list(score_labels)))
+        result[f"coverage{key}_count"] = int(count)
+        result[f"coverage{key}"] = float(coverage)
+        result[f"coverage{key}_scores"] = labels
+    result["top10_coverage"] = sum(float(prob) for _, prob in exact_ranked[:10])
+    result["top12_scores"] = score_labels
+    return result
+
+
 def score_precision_profile(
     dist: Dict[Tuple[int, int], float],
     penca_scores: Optional[List[Dict[str, float | str]]] = None,
@@ -4906,6 +4962,7 @@ def score_precision_profile(
     recommended_exact_prob = float(top_penca.get("exact_prob", 0.0))
     recommended_points_sd = float(top_penca.get("points_sd", 0.0))
     top5_coverage = sum(prob for _, prob in exact_ranked[:5])
+    coverage_targets = exact_score_coverage_targets(exact_ranked)
     exact_gap = max(0.0, float(top_exact_prob) - second_exact_prob)
     precision_score = clamp(
         0.50 * (float(top_exact_prob) / 0.24)
@@ -4920,6 +4977,12 @@ def score_precision_profile(
         precision_label = "Marcador con precisión media"
     else:
         precision_label = "Marcador frágil"
+    if float(top_exact_prob) >= 0.24:
+        exact_ceiling_label = "Techo alto para fútbol, pero no 90-95%"
+    elif float(top_exact_prob) >= 0.16:
+        exact_ceiling_label = "Techo realista de exacto único"
+    else:
+        exact_ceiling_label = "Exacto único frágil"
 
     penca_certainty_index = clamp(
         0.34 * float(top_penca.get("result_prob", 0.0))
@@ -4962,10 +5025,19 @@ def score_precision_profile(
         "score_portfolio": portfolio,
         "top_exact_score": top_exact_score,
         "top_exact_prob": float(top_exact_prob),
+        "single_exact_upper_bound": float(top_exact_prob),
+        "single_exact_ceiling_label": exact_ceiling_label,
         "second_exact_prob": second_exact_prob,
         "exact_gap": exact_gap,
         "top3_coverage": sum(prob for _, prob in exact_ranked[:3]),
         "top5_coverage": top5_coverage,
+        "top10_coverage": float(coverage_targets.get("top10_coverage", 0.0)),
+        "coverage90_count": int(coverage_targets.get("coverage90_count", 0)),
+        "coverage90": float(coverage_targets.get("coverage90", 0.0)),
+        "coverage90_scores": coverage_targets.get("coverage90_scores", []),
+        "coverage95_count": int(coverage_targets.get("coverage95_count", 0)),
+        "coverage95": float(coverage_targets.get("coverage95", 0.0)),
+        "coverage95_scores": coverage_targets.get("coverage95_scores", []),
         "goal_options_a": goal_marginal_options(dist, "a"),
         "goal_options_b": goal_marginal_options(dist, "b"),
         "asymmetric_score_options": penca_asymmetric_score_options(dist, top_n=4),
@@ -7443,6 +7515,26 @@ def penca_ovacion_score_html(prediction: MatchPrediction) -> str:
             "</div>"
         )
 
+    def exact_coverage_tile(label: str, count_key: str, coverage_key: str, scores_key: str) -> str:
+        count = int(guidance.get(count_key, 0) or 0)
+        coverage = float(guidance.get(coverage_key, 0.0) or 0.0)
+        scores = guidance.get(scores_key, [])
+        score_text = ", ".join(str(score) for score in scores[:6]) if isinstance(scores, list) else ""
+        if count > 6:
+            score_text = f"{score_text}..."
+        note = (
+            "No es viable como un solo marcador; requiere cartera de marcadores."
+            if count > 1
+            else "Cobertura alcanzada con un marcador, caso extremadamente raro."
+        )
+        return (
+            "<div>"
+            f"<span>{html.escape(label)}</span>"
+            f"<strong>{count} marcadores</strong>"
+            f"<small>{format_pct(coverage)} cubierto. {html.escape(score_text)}. {note}</small>"
+            "</div>"
+        )
+
     options = "".join(
         "<li>"
         f"<strong>{html.escape(str(item['score']))}</strong>"
@@ -7459,13 +7551,17 @@ def penca_ovacion_score_html(prediction: MatchPrediction) -> str:
         f"<div><span>Marcador recomendado para cargar</span><strong>{html.escape(str(top['score']))}</strong></div>"
         f"<div><span>Marcador exacto más probable</span><strong>{html.escape(str(guidance.get('top_exact_score', prediction.exact_scores[0][0] if prediction.exact_scores else top['score'])))}</strong></div>"
         f"<div><span>Calidad del marcador exacto</span><strong>{html.escape(str(guidance.get('precision_label', 'sin clasificar')))}</strong></div>"
+        f"<div><span>Máximo realista exacto único</span><strong>{format_pct(float(guidance.get('single_exact_upper_bound', top['exact_prob'])))}</strong><small>{html.escape(str(guidance.get('single_exact_ceiling_label', 'un exacto único no llega a 90-95%')))}</small></div>"
         f"<div><span>Puntos esperados del pick</span><strong>{float(top['expected_points']):.2f} / 8</strong></div>"
         f"<div><span>Probabilidad de clavar exacto</span><strong>{format_pct(float(top['exact_prob']))}</strong></div>"
         f"<div><span>Probabilidad de al menos diferencia correcta</span><strong>{format_pct(float(top['difference_prob']))}</strong></div>"
         f"<div><span>Cobertura top-5 marcadores</span><strong>{format_pct(float(guidance.get('top5_coverage', 0.0)))}</strong></div>"
+        f"{exact_coverage_tile('Marcadores para cubrir 90%', 'coverage90_count', 'coverage90', 'coverage90_scores')}"
+        f"{exact_coverage_tile('Marcadores para cubrir 95%', 'coverage95_count', 'coverage95', 'coverage95_scores')}"
         f"<div><span>Ajuste histórico del marcador</span><strong>{html.escape(str(guidance.get('score_shape_label', 'sin ajuste histórico específico')))}</strong></div>"
         f"<div><span>Firmeza del marcador Penca</span><strong>{html.escape(str(guidance.get('penca_certainty_label', 'sin clasificar')))} | {format_pct(float(guidance.get('penca_certainty_index', 0.0)))}</strong></div>"
         "</div>"
+        "<p class=\"meta\"><strong>Guardrail exacto:</strong> ningún marcador único se mostrará como 90-95% salvo que la distribución real lo soporte. Para llegar a 90-95% en marcador exacto necesitas una cartera de marcadores; si Penca solo permite uno, usamos el que maximiza puntos esperados.</p>"
         f"<p class=\"meta\">{html.escape(str(guidance.get('recommendation_note', 'Usa este marcador como entrada principal y revisa las alternativas si quieres cubrir.')))}</p>"
         f"<p class=\"meta\">Marcador del modelo: {html.escape(str(guidance.get('top_exact_score', projected_score_value(prediction))))}. Marcador para Penca: {html.escape(str(top['score']))}. Si difieren, Penca prioriza puntos esperados según exacto, diferencia y ganador.</p>"
         "<div class=\"subgrid penca-mode-grid\">"
@@ -9327,6 +9423,9 @@ def audit_dashboard_html(dashboard_html: str) -> List[str]:
         "Diferenciales positivos",
         "Cobertura recomendada",
         "Marcador exacto principal",
+        "Máximo realista exacto único",
+        "Marcadores para cubrir 90%",
+        "Guardrail exacto",
         "certainty-panel",
         "Auditoría del boleto",
         "Picks base o principales",
