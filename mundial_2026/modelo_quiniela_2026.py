@@ -5471,6 +5471,103 @@ def quiniela_strategy_profile(entry: dict) -> dict:
     }
 
 
+def penca_score_from_profile(item: dict, key: str) -> dict:
+    """Return a score option from a strategy profile with a safe fallback."""
+
+    value = item.get(key)
+    if isinstance(value, dict):
+        return value
+    return {
+        "score": item.get("score", ""),
+        "expected_points": float(item.get("penca_expected_points", 0.0)),
+        "exact_prob": float(item.get("score_prob", 0.0)),
+        "difference_prob": float(item.get("penca_difference_prob", 0.0)),
+        "result_prob": float(item.get("penca_result_prob", item.get("pick_prob", 0.0))),
+    }
+
+
+def penca_optimal_score_from_profile(item: dict) -> dict:
+    return penca_score_from_profile(item, "balanced_score")
+
+
+def format_penca_score_with_teams(prediction: MatchPrediction, score: object) -> str:
+    parts = str(score or "").split("-")
+    if len(parts) != 2:
+        return str(score or "")
+    return f"{prediction.team_a} {parts[0]} - {parts[1]} {prediction.team_b}"
+
+
+def penca_decision_profile(entry: dict) -> dict:
+    """Choose the scenario and exact score to load for this refresh."""
+
+    prediction: MatchPrediction = entry["prediction"]
+    item = quiniela_strategy_profile(entry)
+    status_class, status_text = dashboard_status(entry)
+    optimal_score = penca_optimal_score_from_profile(item)
+    live_score_available = entry.get("live_score_a") is not None and entry.get("live_score_b") is not None
+    final_score_available = entry.get("actual_score_a") is not None and entry.get("actual_score_b") is not None
+
+    if final_score_available:
+        score = {
+            "score": f"{int(entry.get('actual_score_a'))}-{int(entry.get('actual_score_b'))}",
+            "expected_points": 0.0,
+            "exact_prob": 1.0,
+            "difference_prob": 1.0,
+            "result_prob": 1.0,
+        }
+        scenario = "Finalizado"
+        action = "No cargar como predicción: usar solo para recalibrar el modelo y la llave."
+        reason = "Resultado cerrado; la siguiente corrida recalcula cruces, probabilidades y marcadores futuros."
+        priority = 0
+    elif live_score_available or status_class == "live":
+        score = optimal_score
+        scenario = "In-play real"
+        action = "Si la Penca permite cambios en vivo, cargar este marcador actualizado; si no, usarlo solo para seguimiento."
+        reason = f"El partido está en vivo ({status_text}); el marcador se recalcula con minuto, marcador, eventos y momentum disponibles."
+        priority = 100
+    elif item["strategy_tier"] == "Diferencial positivo" and float(item.get("expected_gain_vs_popular", 0.0)) > 0.0:
+        score = penca_score_from_profile(item, "upside_score")
+        scenario = "Diferencial"
+        action = "Escoger este escenario si necesitas ganarle al boleto popular; si vas liderando, baja a modo óptimo."
+        reason = (
+            f"El modelo ve ventaja contra el pick popular: ganancia esperada "
+            f"{float(item.get('expected_gain_vs_popular', 0.0)):+.1%}."
+        )
+        priority = 75
+    elif item["strategy_tier"] in {"Cubrir si puedes", "Riesgo alto"} or float(item["gap"]) < 0.12 or float(item["pick_prob"]) < 0.52:
+        score = penca_score_from_profile(item, "safe_score")
+        scenario = "Seguro / cobertura"
+        action = (
+            f"Si solo puedes cargar un marcador, pon este. Si la app permite cobertura, considera también "
+            f"{item['second_label']}."
+        )
+        reason = f"Partido abierto: brecha contra segunda opción {format_pct(float(item['gap']))}."
+        priority = 65
+    else:
+        score = optimal_score
+        scenario = "Óptimo"
+        action = "Escoger este escenario como carga principal: maximiza puntos esperados bajo regla 8/5/3."
+        reason = "El pick del modelo y el marcador Penca están alineados con mejor expectativa de puntos."
+        priority = 55 if not entry.get("projection") else 35
+
+    return {
+        **item,
+        "status_class": status_class,
+        "status_text": status_text,
+        "scenario": scenario,
+        "scenario_action": action,
+        "scenario_reason": reason,
+        "scenario_priority": priority,
+        "scenario_score": score,
+        "score_to_enter": str(score.get("score", "")),
+        "score_to_enter_with_teams": format_penca_score_with_teams(prediction, score.get("score", "")),
+        "scenario_expected_points": float(score.get("expected_points", 0.0)),
+        "scenario_exact_prob": float(score.get("exact_prob", 0.0)),
+        "scenario_difference_prob": float(score.get("difference_prob", 0.0)),
+        "scenario_result_prob": float(score.get("result_prob", 0.0)),
+    }
+
+
 def quiniela_strategy_metrics(strategy_profiles: Sequence[dict]) -> dict:
     if not strategy_profiles:
         return {
@@ -5813,6 +5910,74 @@ def build_competitive_penca_html(entries: Sequence[dict]) -> str:
     )
 
 
+def build_current_penca_decision_html(entries: Sequence[dict]) -> str:
+    """Render the current scenario and exact score to enter in Penca."""
+
+    if not entries:
+        return ""
+    decisions = [penca_decision_profile(entry) for entry in entries]
+    live_decisions = [item for item in decisions if item["status_class"] == "live"]
+    pending_decisions = [item for item in decisions if item["status_class"] in {"pending", "projection"}]
+    final_count = sum(1 for item in decisions if item["status_class"] == "final")
+    live_count = len(live_decisions)
+    projected_count = sum(1 for item in decisions if item.get("projection"))
+    next_decisions = sorted(
+        pending_decisions,
+        key=lambda item: (
+            float(item["scenario_priority"]),
+            float(item["scenario_expected_points"]),
+            float(item["pick_prob"]),
+        ),
+        reverse=True,
+    )
+    visible = (sorted(live_decisions, key=lambda item: float(item["scenario_priority"]), reverse=True) + next_decisions)[:14]
+    if not visible:
+        visible = sorted(decisions, key=lambda item: float(item["scenario_priority"]), reverse=True)[:14]
+
+    def row(item: dict) -> str:
+        projection_badge = " | cruce proyectado" if item.get("projection") else ""
+        detail = (
+            f"{item['scenario']} | {item['pick_label']} {format_pct(float(item['pick_prob']))} | "
+            f"marcador {item['score_to_enter']} | {float(item['scenario_expected_points']):.2f} pts esp. | "
+            f"exacto {format_pct(float(item['scenario_exact_prob']))} | diferencia {format_pct(float(item['scenario_difference_prob']))}"
+        )
+        return (
+            "<li>"
+            f"<strong>{html.escape(str(item['title']))}</strong>"
+            f"<span>{html.escape(detail)}{html.escape(projection_badge)}</span>"
+            f"<em>{html.escape(str(item['scenario_action']))}</em>"
+            f"<small>{html.escape(str(item['scenario_reason']))}</small>"
+            "</li>"
+        )
+
+    mode_counts: Dict[str, int] = {}
+    for item in decisions:
+        mode_counts[str(item["scenario"])] = mode_counts.get(str(item["scenario"]), 0) + 1
+    dominant_mode = max(mode_counts.items(), key=lambda item: item[1])[0] if mode_counts else "Óptimo"
+    return (
+        "<section class=\"panel current-penca-panel\" id=\"escenarios\">"
+        "<div class=\"panel-head\"><div>"
+        "<p class=\"eyebrow\">Decisión dinámica</p>"
+        "<h2>Escenario recomendado ahora y marcador que debes poner en Penca</h2>"
+        "<p class=\"lede-tight\">Esta es la capa operativa: en cada refresh decide si conviene modo óptimo, seguro/cobertura, diferencial o in-play. El marcador mostrado es el que debes cargar si solo puedes poner un marcador.</p>"
+        "</div></div>"
+        "<div class=\"confidence-tiles current-penca-tiles\">"
+        f"<div class=\"summary-tile\"><span>Modo dominante ahora</span><strong>{html.escape(dominant_mode)}</strong><small>No es fijo: cambia con resultados, live, noticias, lesiones y llave.</small></div>"
+        f"<div class=\"summary-tile\"><span>Partidos en vivo</span><strong>{live_count}</strong><small>Si entra live, el escenario pasa a in-play real.</small></div>"
+        f"<div class=\"summary-tile\"><span>Partidos ya cerrados</span><strong>{final_count}</strong><small>Se usan para recalibrar y mover cruces futuros.</small></div>"
+        f"<div class=\"summary-tile\"><span>Cruces proyectados</span><strong>{projected_count}</strong><small>Cambian automáticamente cuando un equipo gana, empata o queda eliminado.</small></div>"
+        "</div>"
+        "<div class=\"scenario-table-card\">"
+        "<h3>Qué escoger en este corte</h3>"
+        "<ul class=\"scenario-decision-list\">"
+        f"{''.join(row(item) for item in visible)}"
+        "</ul>"
+        "</div>"
+        "<p class=\"meta\">Se recalcula cada 5 minutos por GitHub Actions durante el torneo. Cuando cambie un resultado real, también se recalculan llave, probabilidades, escenario recomendado y marcador para Penca.</p>"
+        "</section>"
+    )
+
+
 def build_full_scorecard_markdown(entries: Sequence[dict]) -> List[str]:
     if not entries:
         return ["### Marcadores para cargar en Penca", "_Sin partidos cargados._"]
@@ -5847,6 +6012,7 @@ def build_full_scorecard_html(entries: Sequence[dict]) -> str:
     for index, entry in enumerate(entries, start=1):
         prediction: MatchPrediction = entry["prediction"]
         top_penca = penca_ovacion_top_score(prediction)
+        decision = penca_decision_profile(entry)
         guidance = prediction.score_guidance or {}
         pick_label, pick_prob = pick_summary(prediction)
         status_class, status_text = dashboard_status(entry)
@@ -5860,6 +6026,7 @@ def build_full_scorecard_html(entries: Sequence[dict]) -> str:
             f"<td>{index:03d}</td>"
             f"<td><strong>{html.escape(str(entry['title']))}</strong><span>{html.escape(str(entry['stage_label']))} | {html.escape(status_text)}</span></td>"
             f"<td><strong>{html.escape(prediction.team_a)} {html.escape(str(top_penca['score']).split('-')[0])} - {html.escape(str(top_penca['score']).split('-')[-1])} {html.escape(prediction.team_b)}</strong><span>Orden: {html.escape(prediction.team_a)} - {html.escape(prediction.team_b)}</span></td>"
+            f"<td><strong>{html.escape(str(decision['scenario']))}</strong><span>{html.escape(str(decision['score_to_enter_with_teams']))}</span><em>{html.escape(str(decision['scenario_action']))}</em></td>"
             f"<td>{html.escape(pick_label)} <span>{format_pct(pick_prob)}</span></td>"
             f"<td>{html.escape(top_exact)} <span>marcador más probable del modelo</span></td>"
             f"<td>{format_pct(float(top_penca.get('exact_prob', 0.0)))} <span>exacto recomendado</span></td>"
@@ -5880,7 +6047,7 @@ def build_full_scorecard_html(entries: Sequence[dict]) -> str:
         "<div class=\"summary-tile\"><span>Cómo leerlo</span><strong>Equipo A - Equipo B</strong><small>No inviertas el orden al cargarlo en la app.</small></div>"
         "</div>"
         "<div class=\"scorecard-table-wrap\"><table class=\"scorecard-table\">"
-        "<thead><tr><th>#</th><th>Partido</th><th>Marcador para cargar en Penca</th><th>Pick</th><th>Más probable del modelo</th><th>Prob. exacto</th><th>Puntos esperados</th></tr></thead>"
+        "<thead><tr><th>#</th><th>Partido</th><th>Marcador para cargar en Penca</th><th>Escenario a escoger</th><th>Pick</th><th>Más probable del modelo</th><th>Prob. exacto</th><th>Puntos esperados</th></tr></thead>"
         f"<tbody>{''.join(rows)}</tbody>"
         "</table></div>"
         "</section>"
@@ -9261,6 +9428,7 @@ def build_dashboard_html(
     provider_matrix_html = build_provider_matrix_html(entries)
     global_confidence_html = build_global_confidence_html(entries)
     max_certainty_html = build_max_certainty_html(entries)
+    current_penca_decision_html = build_current_penca_decision_html(entries)
     competitive_penca_html = build_competitive_penca_html(entries)
     strategy_html = build_quiniela_strategy_html(entries)
     full_scorecard_html = build_full_scorecard_html(entries)
@@ -9289,6 +9457,7 @@ def build_dashboard_html(
             "provider_matrix_html": provider_matrix_html,
             "global_confidence_html": global_confidence_html,
             "max_certainty_html": max_certainty_html,
+            "current_penca_decision_html": current_penca_decision_html,
             "competitive_penca_html": competitive_penca_html,
             "strategy_html": strategy_html,
             "full_scorecard_html": full_scorecard_html,
@@ -9536,6 +9705,10 @@ def audit_dashboard_html(dashboard_html: str) -> List[str]:
         "actualiza llave, picks, goles y marcadores",
         "Marcadores dinámicos",
         "Los marcadores cambian a medida que avanza el campeonato",
+        "Escenario recomendado ahora",
+        "marcador que debes poner en Penca",
+        "Escenario a escoger",
+        "Se recalcula cada 5 minutos",
         "Modo Penca competitivo",
         "Jugar seguro",
         "Jugar óptimo",
@@ -9614,6 +9787,8 @@ def audit_dashboard_html(dashboard_html: str) -> List[str]:
         errors.append("Dashboard escapó el HTML del módulo de máxima firmeza.")
     if "&lt;section class=&#34;panel competitive-penca-panel&#34;&gt;" in dashboard_html:
         errors.append("Dashboard escapó el HTML del módulo Penca competitivo.")
+    if "&lt;section class=&#34;panel current-penca-panel&#34;" in dashboard_html:
+        errors.append("Dashboard escapó el HTML del módulo de decisión dinámica.")
     return errors
 
 

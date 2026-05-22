@@ -28,6 +28,7 @@ def render_dashboard_html(context: Dict[str, Any]) -> str:
         "provider_matrix_html",
         "global_confidence_html",
         "max_certainty_html",
+        "current_penca_decision_html",
         "competitive_penca_html",
         "strategy_html",
         "full_scorecard_html",

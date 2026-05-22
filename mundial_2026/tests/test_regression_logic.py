@@ -531,12 +531,43 @@ class RegressionLogicTest(unittest.TestCase):
         self.assertIn("Penca:", html)
         self.assertIn("Marcadores dinámicos", html)
         self.assertIn("Los marcadores cambian a medida que avanza el campeonato", html)
+        self.assertIn("Escenario recomendado ahora", html)
+        self.assertIn("marcador que debes poner en Penca", html)
+        self.assertIn("Escenario a escoger", html)
+        self.assertIn("Se recalcula cada 5 minutos", html)
         self.assertIn("Modo Penca competitivo", html)
         self.assertIn("Jugar seguro", html)
         self.assertIn("Jugar óptimo", html)
         self.assertIn("Jugar diferencial", html)
+        self.assertIn('<section class="panel current-penca-panel"', html)
+        self.assertNotIn("&lt;section class=&#34;panel current-penca-panel&#34;", html)
         self.assertIn('<section class="panel competitive-penca-panel">', html)
         self.assertNotIn("&lt;section class=&#34;panel competitive-penca-panel&#34;&gt;", html)
+
+    def test_penca_decision_switches_to_in_play_when_match_is_live(self):
+        teams = app.load_teams()
+        states = app.initial_team_states(teams)
+        entries = app.dashboard_fixture_entries(
+            [
+                {
+                    "team_a": "Spain",
+                    "team_b": "Saudi Arabia",
+                    "status_state": "in",
+                    "status_detail": "45'",
+                    "live_score_a": 1,
+                    "live_score_b": 0,
+                    "neutral": True,
+                    "stage": "group",
+                }
+            ],
+            teams,
+            states,
+            top_scores=3,
+        )
+        decision = app.penca_decision_profile(entries[0])
+        self.assertEqual(decision["scenario"], "In-play real")
+        self.assertIn("Spain", decision["score_to_enter_with_teams"])
+        self.assertIn("Saudi Arabia", decision["score_to_enter_with_teams"])
 
     def test_consensus_champion_blend_decays_with_live_and_final_results(self):
         pending = [{"projection": False, "status_state": "pre"} for _ in range(4)]

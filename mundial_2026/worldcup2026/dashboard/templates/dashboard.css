@@ -90,6 +90,7 @@ h3 { font-size: 1.05rem; }
 #metodologia,
 #lectura-critica,
 #boleto,
+#escenarios,
 #marcadores,
 #llave,
 #partidos,
@@ -1733,6 +1734,64 @@ h3 { font-size: 1.05rem; }
   background: rgba(15,109,102,0.10);
   color: var(--accent-dark);
 }
+.current-penca-panel {
+  background:
+    radial-gradient(circle at 12% 12%, rgba(15,109,102,0.16), transparent 28%),
+    radial-gradient(circle at 88% 12%, rgba(181,131,47,0.18), transparent 32%),
+    linear-gradient(135deg, rgba(255, 253, 247, 0.98), rgba(235, 244, 241, 0.96));
+}
+.current-penca-panel .summary-tile {
+  background: #fffdf7;
+  border: 1px solid rgba(15,109,102,0.16);
+}
+.current-penca-panel .summary-tile span,
+.current-penca-panel .summary-tile small {
+  color: var(--muted);
+}
+.current-penca-panel .summary-tile strong {
+  color: var(--accent-dark);
+}
+.scenario-table-card {
+  margin-top: 14px;
+  border-radius: 22px;
+  border: 1px solid rgba(15,109,102,0.14);
+  background: rgba(255,255,255,0.70);
+  padding: 16px;
+}
+.scenario-decision-list {
+  list-style: none;
+  padding: 0;
+  margin: 14px 0 0;
+  display: grid;
+  gap: 11px;
+}
+.scenario-decision-list li {
+  display: grid;
+  gap: 5px;
+  padding: 12px;
+  border-radius: 16px;
+  background: rgba(15,109,102,0.06);
+  border: 1px solid rgba(15,109,102,0.10);
+}
+.scenario-decision-list li strong {
+  color: var(--ink);
+}
+.scenario-decision-list li span,
+.scenario-decision-list li small {
+  color: var(--muted);
+  line-height: 1.38;
+}
+.scenario-decision-list li em {
+  width: fit-content;
+  max-width: 100%;
+  border-radius: 999px;
+  padding: 5px 9px;
+  background: rgba(181,131,47,0.14);
+  color: #76551f;
+  font-style: normal;
+  font-size: 0.74rem;
+  font-weight: 900;
+}
 .scorecard-panel {
   background:
     radial-gradient(circle at 8% 10%, rgba(15,109,102,0.15), transparent 30%),
@@ -1760,7 +1819,7 @@ h3 { font-size: 1.05rem; }
 .scorecard-table {
   width: 100%;
   border-collapse: collapse;
-  min-width: 1040px;
+  min-width: 1220px;
 }
 .scorecard-table th,
 .scorecard-table td {
@@ -1784,10 +1843,19 @@ h3 { font-size: 1.05rem; }
   font-size: 0.9rem;
 }
 .scorecard-table td span {
+  display: block;
   margin-top: 4px;
   text-transform: none;
   letter-spacing: 0;
   font-size: 0.76rem;
+}
+.scorecard-table td em {
+  display: block;
+  margin-top: 5px;
+  color: var(--muted);
+  font-size: 0.72rem;
+  font-style: normal;
+  line-height: 1.32;
 }
 .scorecard-table tr.projected {
   background: rgba(181,131,47,0.06);
