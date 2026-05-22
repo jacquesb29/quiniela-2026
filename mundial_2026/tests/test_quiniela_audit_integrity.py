@@ -251,7 +251,7 @@ class QuinielaAuditIntegrityTest(unittest.TestCase):
                 "<p>Partidos cerrados o de riesgo alto</p>"
                 "<p>Marcadores exactos defendibles</p>"
                 "<p>Brecha mínima contra la segunda opción</p>"
-                "<p>Firmeza operativa media</p>"
+                "<p>Firmeza de picks base</p><p>Firmeza global del boleto</p>"
                 "<p>Checklist de auditoría</p>"
                 "<p>Picks más defendibles</p><p>Marcadores exactos más defendibles</p>"
                 "<p>Guardrail de consenso</p><p>Ajustes para boleto de quiniela</p>"

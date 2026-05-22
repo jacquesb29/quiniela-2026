@@ -604,7 +604,8 @@ class RegressionLogicTest(unittest.TestCase):
         self.assertIn("Hoja de máxima firmeza", html)
         self.assertIn("Auditoría del boleto", html)
         self.assertIn("Brecha mínima contra la segunda opción", html)
-        self.assertIn("Firmeza operativa media", html)
+        self.assertIn("Firmeza de picks base", html)
+        self.assertIn("Firmeza global del boleto", html)
         self.assertIn("Checklist de auditoría", html)
         self.assertIn("Picks más defendibles", html)
         self.assertIn("Spain vs Uruguay", html)
@@ -643,6 +644,8 @@ class RegressionLogicTest(unittest.TestCase):
         self.assertGreaterEqual(audit["traps"] + audit["high_variance"], 1)
         self.assertEqual(audit["defensible_scores"], 1)
         self.assertLess(audit["min_gap"], 0.10)
+        self.assertGreater(audit["base_firmness_index"], audit["avg_certainty"])
+        self.assertGreater(audit["base_avg_pick_prob"], 0.65)
 
     def test_structured_bracket_projection_uses_modal_matchup_not_exact_outcome(self):
         aggregate = {

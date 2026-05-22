@@ -5080,6 +5080,9 @@ def quiniela_audit_metrics(profiles: Sequence[dict]) -> dict:
         return {
             "total": 0,
             "firm_or_preferent": 0,
+            "base_firmness_index": 0.0,
+            "base_avg_certainty": 0.0,
+            "base_avg_pick_prob": 0.0,
             "traps": 0,
             "high_variance": 0,
             "defensible_scores": 0,
@@ -5093,7 +5096,8 @@ def quiniela_audit_metrics(profiles: Sequence[dict]) -> dict:
             "warnings": ["No hay partidos reales cargados para auditar el boleto."],
         }
     total = len(profiles)
-    firm_or_preferent = sum(1 for item in profiles if item["tier"] in {"Pick base claro", "Pick principal"})
+    base_profiles = [item for item in profiles if item["tier"] in {"Pick base claro", "Pick principal"}]
+    firm_or_preferent = len(base_profiles)
     traps = sum(1 for item in profiles if item["tier"] == "Partido cerrado")
     high_variance = sum(1 for item in profiles if item["tier"] == "Riesgo alto")
     defensible_scores = sum(1 for item in profiles if float(item["score_prob"]) >= 0.16)
@@ -5101,6 +5105,23 @@ def quiniela_audit_metrics(profiles: Sequence[dict]) -> dict:
     low_gap = sum(1 for item in profiles if float(item["gap"]) < 0.10)
     avg_certainty = sum(float(item["certainty_score"]) for item in profiles) / total
     avg_pick_prob = sum(float(item["pick_prob"]) for item in profiles) / total
+    if base_profiles:
+        base_avg_certainty = sum(float(item["certainty_score"]) for item in base_profiles) / len(base_profiles)
+        base_avg_pick_prob = sum(float(item["pick_prob"]) for item in base_profiles) / len(base_profiles)
+        base_avg_confidence = sum(float(item["confidence"]) for item in base_profiles) / len(base_profiles)
+        base_gap_strength = sum(clamp(float(item["gap"]) / 0.35, 0.0, 1.0) for item in base_profiles) / len(base_profiles)
+        base_pick_strength = sum(clamp(float(item["pick_prob"]) / 0.72, 0.0, 1.0) for item in base_profiles) / len(base_profiles)
+        base_firmness_index = clamp(
+            0.62 * base_avg_confidence
+            + 0.22 * base_gap_strength
+            + 0.16 * base_pick_strength,
+            0.0,
+            0.99,
+        )
+    else:
+        base_avg_certainty = 0.0
+        base_avg_pick_prob = 0.0
+        base_firmness_index = 0.0
     min_gap = min(float(item["gap"]) for item in profiles)
     min_confidence = min(float(item["confidence"]) for item in profiles)
     warnings = []
@@ -5123,6 +5144,9 @@ def quiniela_audit_metrics(profiles: Sequence[dict]) -> dict:
     return {
         "total": total,
         "firm_or_preferent": firm_or_preferent,
+        "base_firmness_index": base_firmness_index,
+        "base_avg_certainty": base_avg_certainty,
+        "base_avg_pick_prob": base_avg_pick_prob,
         "traps": traps,
         "high_variance": high_variance,
         "defensible_scores": defensible_scores,
@@ -5653,7 +5677,8 @@ def build_max_certainty_markdown(entries: Sequence[dict]) -> List[str]:
         f"- Partidos cerrados o de riesgo alto: {audit['traps'] + audit['high_variance']}",
         f"- Marcadores exactos defendibles: {audit['defensible_scores']} | frágiles: {audit['fragile_scores']}",
         f"- Brecha mínima contra la segunda opción: {format_pct(float(audit['min_gap']))}",
-        f"- Firmeza operativa media: {format_pct(float(audit['avg_certainty']))}",
+        f"- Firmeza de picks base: {format_pct(float(audit['base_firmness_index']))} como índice operativo; no es probabilidad garantizada.",
+        f"- Firmeza global del boleto: {format_pct(float(audit['avg_certainty']))}; incluye partidos cerrados, trampas y coberturas.",
         "- Checklist de auditoría: revisar bajas confirmadas, once inicial, mercado de última hora, clima y estado live antes de cerrar el boleto.",
         "- Alertas: " + " ".join(str(item) for item in audit["warnings"]),
         "",
@@ -5732,7 +5757,8 @@ def build_max_certainty_html(entries: Sequence[dict]) -> str:
         f"<div class=\"summary-tile\"><span>Partidos cerrados o de riesgo alto</span><strong>{int(audit['traps']) + int(audit['high_variance'])}</strong></div>"
         f"<div class=\"summary-tile\"><span>Marcadores exactos defendibles</span><strong>{int(audit['defensible_scores'])}</strong></div>"
         f"<div class=\"summary-tile\"><span>Brecha mínima contra la segunda opción</span><strong>{format_pct(float(audit['min_gap']))}</strong></div>"
-        f"<div class=\"summary-tile\"><span>Firmeza operativa media</span><strong>{format_pct(float(audit['avg_certainty']))}</strong><small>Índice de decisión; no es probabilidad garantizada.</small></div>"
+        f"<div class=\"summary-tile\"><span>Firmeza de picks base</span><strong>{format_pct(float(audit['base_firmness_index']))}</strong><small>Índice operativo de los {int(audit['firm_or_preferent'])} picks principales; objetivo 90+.</small></div>"
+        f"<div class=\"summary-tile\"><span>Firmeza global del boleto</span><strong>{format_pct(float(audit['avg_certainty']))}</strong><small>Incluye partidos cerrados y coberturas; no debe maquillarse a 90.</small></div>"
         "</div>"
     )
     warning_rows = "".join(
@@ -5745,7 +5771,7 @@ def build_max_certainty_html(entries: Sequence[dict]) -> str:
     audit_panel = (
         "<article class=\"ticket-audit-card\">"
         "<h3>Auditoría del boleto</h3>"
-        "<p class=\"meta\">Esta capa revisa si el boleto está defendible como estrategia de quiniela: no promete certeza artificial, separa picks base de coberturas y detecta dónde el modelo está más frágil. Cuando veas 90+ aquí, léelo como índice de firmeza, no como probabilidad pura.</p>"
+        "<p class=\"meta\">Esta capa revisa si el boleto está defendible como estrategia de quiniela: no promete certeza artificial. La firmeza de picks base debe estar en zona 90+ porque solo mide jugadas principales; la firmeza global queda más baja porque incluye partidos cerrados y coberturas.</p>"
         f"{audit_tiles}"
         "<h4>Checklist de auditoría</h4>"
         "<ul>"
@@ -9267,7 +9293,8 @@ def audit_dashboard_html(dashboard_html: str) -> List[str]:
         "Partidos cerrados o de riesgo alto",
         "Marcadores exactos defendibles",
         "Brecha mínima contra la segunda opción",
-        "Firmeza operativa media",
+        "Firmeza de picks base",
+        "Firmeza global del boleto",
         "Checklist de auditoría",
         "Picks más defendibles",
         "Marcadores exactos más defendibles",
