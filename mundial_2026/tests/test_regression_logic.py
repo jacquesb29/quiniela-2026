@@ -372,14 +372,49 @@ class RegressionLogicTest(unittest.TestCase):
         self.assertEqual(options[0]["score"], "2-0")
         self.assertGreater(options[0]["expected_points"], app.score_expected_points_for_penca(dist, 1, 0)["expected_points"])
         self.assertAlmostEqual(float(options[0]["difference_prob"]), 0.36)
+        self.assertIn("ensemble_adjusted_points", options[0])
+        self.assertIn("ensemble_score_index", options[0])
+        self.assertIn("empirical_prior_index", options[0])
         self.assertIn("risk_adjusted_points", options[0])
         self.assertIn("realism_adjusted_points", options[0])
         self.assertIn("realism_index", options[0])
+        self.assertIn("plausibility_index", options[0])
+        self.assertIn("plausibility_note", options[0])
         self.assertIn("points_sd", options[0])
         portfolio = app.penca_score_portfolio(dist)
         self.assertIn("balanced", portfolio)
         self.assertIn("safe", portfolio)
         self.assertIn("upside", portfolio)
+
+    def test_score_optimizer_does_not_follow_poisson_tail_blindly(self):
+        dist = {
+            (4, 0): 0.19,
+            (2, 0): 0.17,
+            (1, 0): 0.16,
+            (3, 0): 0.10,
+            (2, 1): 0.12,
+            (1, 1): 0.12,
+            (0, 0): 0.14,
+        }
+        options = app.penca_ovacion_score_options(dist, top_n=3)
+        self.assertNotEqual(options[0]["score"], "4-0")
+        self.assertEqual(options[0]["score"], "1-0")
+        self.assertGreater(
+            float(options[0]["ensemble_adjusted_points"]),
+            float(app.score_expected_points_for_penca(dist, 4, 0)["ensemble_adjusted_points"]),
+        )
+
+    def test_score_labels_include_team_names_for_away_style_scores(self):
+        self.assertEqual(
+            app.score_label_with_teams("Qatar", "Switzerland", "0-2"),
+            "Qatar 0 - 2 Switzerland",
+        )
+        teams = app.load_teams()
+        prediction = app.predict_match(teams, "Qatar", "Switzerland", app.MatchContext(neutral=True), top_scores=3)
+        html = app.penca_ovacion_score_html(prediction)
+        self.assertIn("Qatar", html)
+        self.assertIn("Switzerland", html)
+        self.assertIn("Filtro de plausibilidad", html)
 
     def test_predict_match_exposes_penca_ovacion_recommended_score(self):
         teams = app.load_teams()
@@ -515,6 +550,8 @@ class RegressionLogicTest(unittest.TestCase):
         html = app.build_dashboard_html(entries, "", {}, {"completed_matches": 0}, Path("state.json"), Path("fixtures.json"))
         self.assertIn("Marcador más probable del modelo", html)
         self.assertIn("Marcador recomendado Penca Ovación", html)
+        self.assertIn("marcador optimizado por ensamble", html)
+        self.assertIn("Ensamble no solo Poisson", html)
         self.assertIn("Máximo realista exacto único", html)
         self.assertIn("Marcadores para cubrir 90%", html)
         self.assertIn("Guardrail exacto", html)
