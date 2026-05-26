@@ -1734,6 +1734,53 @@ h3 { font-size: 1.05rem; }
   background: rgba(15,109,102,0.10);
   color: var(--accent-dark);
 }
+.competitive-penca-panel {
+  background:
+    radial-gradient(circle at 14% 10%, rgba(181, 131, 47, 0.16), transparent 32%),
+    radial-gradient(circle at 88% 18%, rgba(15, 109, 102, 0.12), transparent 34%),
+    linear-gradient(135deg, rgba(255, 253, 247, 0.99), rgba(239, 246, 241, 0.97));
+  color: var(--ink);
+}
+.competitive-penca-panel .eyebrow {
+  color: var(--accent-dark);
+}
+.competitive-penca-panel .lede-tight,
+.competitive-penca-panel .meta {
+  color: var(--muted);
+}
+.competitive-penca-panel .summary-tile {
+  background: rgba(255, 255, 255, 0.86);
+  border: 1px solid rgba(15,109,102,0.16);
+  box-shadow: 0 14px 30px rgba(49, 40, 23, 0.06);
+}
+.competitive-penca-panel .summary-tile span,
+.competitive-penca-panel .summary-tile small {
+  color: var(--muted);
+}
+.competitive-penca-panel .summary-tile strong {
+  color: var(--accent-dark);
+}
+.competitive-penca-grid article {
+  background: rgba(255, 255, 255, 0.78);
+  border-color: rgba(15,109,102,0.16);
+  color: var(--ink);
+}
+.competitive-penca-grid h3 {
+  color: var(--ink);
+}
+.competitive-penca-grid li {
+  border-bottom-color: rgba(15,109,102,0.18);
+}
+.competitive-penca-grid li strong {
+  color: var(--ink);
+}
+.competitive-penca-grid li span {
+  color: #425156;
+}
+.competitive-penca-grid li em {
+  background: rgba(15,109,102,0.10);
+  color: var(--accent-dark);
+}
 .current-penca-panel {
   background:
     radial-gradient(circle at 12% 12%, rgba(15,109,102,0.16), transparent 28%),
