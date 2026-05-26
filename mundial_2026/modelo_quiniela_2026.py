@@ -4806,6 +4806,108 @@ def score_marginal_fit(
     return clamp(0.54 * marginal_a + 0.46 * marginal_b - 0.025 * distance, 0.0, 1.0)
 
 
+def calibrated_integer_score_profile(
+    pick_a: int,
+    pick_b: int,
+    mean_goals_a: float,
+    mean_goals_b: float,
+    prior_index: float,
+) -> Dict[str, float | str]:
+    """Scoreline calibration layer for Penca.
+
+    Poisson-like distributions often put the mode on 1-0, 2-0 or 1-1. That is
+    reasonable as a probability mode, but Penca rewards exact goals and goal
+    difference, so the submitted score should also respect the expected goal
+    total, expected margin and whether the underdog is likely to score.
+    """
+
+    mean_total = mean_goals_a + mean_goals_b
+    pick_total = pick_a + pick_b
+    mean_edge = mean_goals_a - mean_goals_b
+    pick_edge = pick_a - pick_b
+    expected_margin = abs(mean_edge)
+    pick_margin = abs(pick_edge)
+    favorite_mean = max(mean_goals_a, mean_goals_b)
+    underdog_mean = min(mean_goals_a, mean_goals_b)
+    favorite_pick = pick_a if mean_goals_a >= mean_goals_b else pick_b
+    underdog_pick = pick_b if mean_goals_a >= mean_goals_b else pick_a
+
+    side_fit = math.exp(-0.48 * (abs(pick_a - mean_goals_a) + abs(pick_b - mean_goals_b)))
+    total_fit = math.exp(-0.42 * abs(pick_total - mean_total))
+    margin_fit = math.exp(-0.52 * abs(pick_margin - expected_margin))
+    edge_direction_fit = 1.0 if pick_edge == 0 or mean_edge == 0 or (pick_edge > 0) == (mean_edge > 0) else 0.62
+
+    penalty = 0.0
+    boost = 0.0
+    notes: List[str] = []
+
+    if favorite_mean >= 2.10 and favorite_pick <= 1:
+        penalty += 0.22
+        notes.append("sube goles del favorito: su media esperada supera 2")
+    elif favorite_mean >= 1.70 and favorite_pick <= 1 and expected_margin >= 0.75:
+        penalty += 0.13
+        notes.append("evita infravalorar al favorito")
+
+    if favorite_mean < 1.62 and favorite_pick >= 3:
+        penalty += 0.14
+        notes.append("recorta goleada sin volumen esperado")
+    if pick_total >= mean_total + 2.15:
+        penalty += 0.11
+        notes.append("evita cola alta de goles")
+
+    if underdog_mean <= 0.42 and underdog_pick >= 1:
+        penalty += 0.15
+        notes.append("baja gol del equipo con poca producción esperada")
+    elif underdog_mean >= 0.72 and underdog_pick == 0 and favorite_mean >= 1.35:
+        penalty += 0.08
+        notes.append("el rival tiene señal suficiente para anotar")
+
+    if pick_a == pick_b == 1 and mean_total >= 2.55:
+        penalty += 0.12
+        notes.append("1-1 queda corto para el total esperado")
+    if pick_a == pick_b == 0 and mean_total >= 1.85:
+        penalty += 0.14
+        notes.append("0-0 queda demasiado conservador")
+
+    if favorite_pick >= 2 and underdog_pick == 0 and favorite_mean >= 1.85 and underdog_mean <= 0.58:
+        boost += 0.11
+        notes.append("ventaja con portería en cero sí tiene soporte")
+    if favorite_pick >= 2 and underdog_pick >= 1 and favorite_mean >= 1.55 and underdog_mean >= 0.62:
+        boost += 0.10
+        notes.append("ambos anotan con favorito superior")
+    if favorite_pick >= 3 and underdog_pick == 0 and favorite_mean >= 2.25 and underdog_mean <= 0.35:
+        boost += 0.10
+        notes.append("goleada moderada plausible por brecha de goles")
+    if pick_margin >= 2 and expected_margin >= 1.20 and favorite_pick >= 2:
+        boost += 0.08
+        notes.append("margen amplio alineado con la brecha esperada")
+    if pick_margin == 1 and 0.38 <= expected_margin <= 1.20 and pick_total >= 2:
+        boost += 0.05
+        notes.append("margen de un gol encaja con partido competitivo")
+
+    index = clamp(
+        0.34 * side_fit
+        + 0.25 * total_fit
+        + 0.20 * margin_fit
+        + 0.09 * edge_direction_fit
+        + 0.12 * prior_index
+        + boost
+        - penalty,
+        0.0,
+        1.0,
+    )
+    note = "; ".join(notes[:2]) if notes else "marcador entero alineado con goles esperados y margen"
+    return {
+        "scoreline_calibration_index": index,
+        "scoreline_calibration_boost": boost,
+        "scoreline_calibration_penalty": penalty,
+        "scoreline_calibration_note": note,
+        "side_fit": side_fit,
+        "total_fit": total_fit,
+        "margin_fit": margin_fit,
+    }
+
+
 def score_expected_points_for_penca(
     dist: Dict[Tuple[int, int], float],
     pick_a: int,
@@ -4856,6 +4958,16 @@ def score_expected_points_for_penca(
     top_prior_prob = max(EMPIRICAL_SCORE_PRIOR.values())
     prior_index = clamp(prior_prob / max(top_prior_prob, 1e-9), 0.0, 1.0)
     marginal_fit = score_marginal_fit(dist, pick_a, pick_b, mean_goals_a, mean_goals_b)
+    calibration_profile = calibrated_integer_score_profile(
+        pick_a,
+        pick_b,
+        mean_goals_a,
+        mean_goals_b,
+        prior_index,
+    )
+    scoreline_calibration_index = float(calibration_profile["scoreline_calibration_index"])
+    scoreline_calibration_boost = float(calibration_profile["scoreline_calibration_boost"])
+    scoreline_calibration_penalty = float(calibration_profile["scoreline_calibration_penalty"])
     shape_boost = score_shape_decision_boost(pick_a, pick_b, score_shape_meta)
     high_total_penalty = max(0.0, total_goals - (mean_total_goals + 2.15))
     tail_score_penalty = 0.10 if total_goals >= 5 and relative_exact_strength < 0.45 else 0.0
@@ -4903,12 +5015,13 @@ def score_expected_points_for_penca(
     penca_points_index = clamp(expected_points / 4.2, 0.0, 1.0)
     ensemble_score_index = clamp(
         (
-            0.30 * penca_points_index
-            + 0.21 * model_score_index
-            + 0.16 * clamp(result_prob, 0.0, 1.0)
-            + 0.13 * clamp(difference_prob / 0.32, 0.0, 1.0)
+            0.27 * penca_points_index
+            + 0.13 * model_score_index
+            + 0.15 * clamp(result_prob, 0.0, 1.0)
+            + 0.12 * clamp(difference_prob / 0.32, 0.0, 1.0)
             + 0.10 * prior_index
-            + 0.07 * marginal_fit
+            + 0.08 * marginal_fit
+            + 0.12 * scoreline_calibration_index
             + 0.03 * plausibility_index
         )
         * shape_boost
@@ -4922,6 +5035,9 @@ def score_expected_points_for_penca(
         + 0.12 * difference_prob
         + 0.10 * prior_index
         + 0.06 * marginal_fit
+        + 0.24 * scoreline_calibration_index
+        + 0.08 * scoreline_calibration_boost
+        - 0.18 * scoreline_calibration_penalty
         - 0.16 * clean_sheet_margin_penalty
         - 0.10 * empirical_tail_penalty
     )
@@ -4952,6 +5068,13 @@ def score_expected_points_for_penca(
         "empirical_prior": prior_prob,
         "empirical_prior_index": prior_index,
         "marginal_fit": marginal_fit,
+        "scoreline_calibration_index": scoreline_calibration_index,
+        "scoreline_calibration_boost": scoreline_calibration_boost,
+        "scoreline_calibration_penalty": scoreline_calibration_penalty,
+        "scoreline_calibration_note": str(calibration_profile["scoreline_calibration_note"]),
+        "scoreline_side_fit": float(calibration_profile["side_fit"]),
+        "scoreline_total_fit": float(calibration_profile["total_fit"]),
+        "scoreline_margin_fit": float(calibration_profile["margin_fit"]),
         "shape_boost": shape_boost,
         "realism_index": realism_index,
         "plausibility_index": plausibility_index,
@@ -4960,6 +5083,76 @@ def score_expected_points_for_penca(
         "plausibility_note": plausibility_note,
         "asymmetric_bonus": asymmetric_bonus,
     }
+
+
+def parse_score_pair(score: object) -> Tuple[int, int]:
+    try:
+        left, right = str(score).split("-", 1)
+        return int(left), int(right)
+    except (TypeError, ValueError):
+        return (0, 0)
+
+
+POISSON_CENTRAL_SCORES = {(0, 0), (1, 0), (0, 1), (1, 1), (2, 0), (0, 2)}
+
+
+def promote_calibrated_scoreline(scored: List[Dict[str, float | str]]) -> List[Dict[str, float | str]]:
+    """Promote a calibrated integer score when it is close enough on points.
+
+    This keeps the app from blindly submitting the modal Poisson-looking score
+    when another score has nearly the same Penca value but better support from
+    expected goals, expected margin and empirical scoreline shape.
+    """
+
+    if len(scored) < 2:
+        return scored
+    best = scored[0]
+    best_a, best_b = parse_score_pair(best.get("score", "0-0"))
+    best_total = best_a + best_b
+    best_calibration = float(best.get("scoreline_calibration_index", 0.0))
+    best_ensemble = float(best.get("ensemble_adjusted_points", 0.0))
+    best_expected = float(best.get("expected_points", 0.0))
+    best_exact = float(best.get("exact_prob", 0.0))
+
+    promotable: List[Dict[str, float | str]] = []
+    for candidate in scored[1:8]:
+        cand_a, cand_b = parse_score_pair(candidate.get("score", "0-0"))
+        cand_total = cand_a + cand_b
+        cand_calibration = float(candidate.get("scoreline_calibration_index", 0.0))
+        cand_ensemble = float(candidate.get("ensemble_adjusted_points", 0.0))
+        cand_expected = float(candidate.get("expected_points", 0.0))
+        cand_exact = float(candidate.get("exact_prob", 0.0))
+        if cand_calibration < best_calibration + 0.055:
+            continue
+        if cand_ensemble < best_ensemble - 0.28:
+            continue
+        if cand_expected < best_expected - 0.24:
+            continue
+        if cand_exact < max(0.006, 0.58 * best_exact):
+            continue
+        is_less_modal = (best_a, best_b) in POISSON_CENTRAL_SCORES and (cand_a, cand_b) != (best_a, best_b)
+        adds_supported_goal = cand_total > best_total and cand_calibration >= 0.78
+        improves_margin_shape = abs(cand_a - cand_b) > abs(best_a - best_b) and cand_calibration >= 0.86
+        if is_less_modal or adds_supported_goal or improves_margin_shape:
+            promotable.append(candidate)
+
+    if not promotable:
+        return scored
+    promoted = max(
+        promotable,
+        key=lambda item: (
+            float(item.get("scoreline_calibration_index", 0.0)),
+            float(item.get("ensemble_adjusted_points", 0.0)),
+            float(item.get("expected_points", 0.0)),
+            float(item.get("exact_prob", 0.0)),
+        ),
+    )
+    reordered = [promoted] + [item for item in scored if item is not promoted]
+    promoted["calibrated_promotion"] = 1.0
+    promoted["promotion_note"] = (
+        "Promovido porque está muy cerca en puntos esperados y encaja mejor con goles esperados/margen que el marcador modal."
+    )
+    return reordered
 
 
 def penca_ovacion_score_options(
@@ -4981,6 +5174,7 @@ def penca_ovacion_score_options(
         ),
         reverse=True,
     )
+    scored = promote_calibrated_scoreline(scored)
     return scored[:top_n]
 
 
@@ -5194,6 +5388,11 @@ def score_precision_profile(
             f"Para Penca conviene {recommended_score}: puede sacrificar {format_pct(exact_loss)} de probabilidad exacta "
             f"frente a {top_exact_score}, pero el ensamble mejora puntos esperados, plausibilidad y estabilidad."
         )
+    if float(top_penca.get("calibrated_promotion", 0.0)) > 0.0:
+        recommendation_note = (
+            f"{recommendation_note} Además, fue promovido por calibración de marcador entero: "
+            f"{top_penca.get('promotion_note', '')}"
+        )
 
     return {
         "recommended_score": recommended_score,
@@ -5207,7 +5406,13 @@ def score_precision_profile(
         "recommended_ensemble_score_index": float(top_penca.get("ensemble_score_index", 0.0)),
         "recommended_empirical_prior_index": float(top_penca.get("empirical_prior_index", 0.0)),
         "recommended_marginal_fit": float(top_penca.get("marginal_fit", 0.0)),
-        "score_selector_method": "Ensamble de marcador: distribución del modelo + prior histórico + puntos Penca + plausibilidad",
+        "recommended_scoreline_calibration_index": float(top_penca.get("scoreline_calibration_index", 0.0)),
+        "recommended_scoreline_calibration_note": str(top_penca.get("scoreline_calibration_note", "marcador entero alineado con goles esperados")),
+        "recommended_calibrated_promotion": float(top_penca.get("calibrated_promotion", 0.0)),
+        "recommended_promotion_note": str(top_penca.get("promotion_note", "")),
+        "recommended_scoreline_total_fit": float(top_penca.get("scoreline_total_fit", 0.0)),
+        "recommended_scoreline_margin_fit": float(top_penca.get("scoreline_margin_fit", 0.0)),
+        "score_selector_method": "Ensamble de marcador: puntos Penca + distribución del modelo + calibración de goles enteros + prior histórico + plausibilidad",
         "recommended_plausibility_index": float(top_penca.get("plausibility_index", top_penca.get("realism_index", 1.0))),
         "recommended_plausibility_note": str(top_penca.get("plausibility_note", "marcador de forma normal")),
         "recommended_clean_sheet_margin_penalty": float(top_penca.get("clean_sheet_margin_penalty", 0.0)),
@@ -8046,6 +8251,11 @@ def penca_ovacion_score_html(prediction: MatchPrediction) -> str:
         "</li>"
         for item in prediction.penca_scores[:5]
     )
+    promotion_tile = (
+        f"<div><span>Corrección anti-Poisson modal</span><strong>Aplicada</strong><small>{html.escape(str(guidance.get('recommended_promotion_note', 'Se eligió una alternativa más calibrada.')))}</small></div>"
+        if float(guidance.get("recommended_calibrated_promotion", 0.0) or 0.0) > 0.0
+        else ""
+    )
     return (
         "<div class=\"reason-block penca-block\">"
         "<h4>Penca Ovación: marcador optimizado por ensamble</h4>"
@@ -8054,6 +8264,8 @@ def penca_ovacion_score_html(prediction: MatchPrediction) -> str:
         f"<div><span>Marcador recomendado para cargar</span><strong>{html.escape(top_score_label)}</strong></div>"
         f"<div><span>Marcador exacto más probable</span><strong>{html.escape(top_exact_label)}</strong></div>"
         f"<div><span>Selector de marcador</span><strong>Ensamble no solo Poisson</strong><small>{html.escape(str(guidance.get('score_selector_method', 'Distribución + puntos + plausibilidad')))}</small></div>"
+        f"<div><span>Calibración de goles enteros</span><strong>{format_pct(float(guidance.get('recommended_scoreline_calibration_index', 0.0)))}</strong><small>{html.escape(str(guidance.get('recommended_scoreline_calibration_note', 'Ajusta el marcador contra goles esperados, margen y prior histórico.')))}</small></div>"
+        f"{promotion_tile}"
         f"<div><span>Calidad del marcador exacto</span><strong>{html.escape(str(guidance.get('precision_label', 'sin clasificar')))}</strong></div>"
         f"<div><span>Ajuste histórico del marcador</span><strong>{format_pct(float(guidance.get('recommended_empirical_prior_index', 0.0)))}</strong><small>Compatibilidad con frecuencias históricas de marcadores de fútbol.</small></div>"
         f"<div><span>Filtro de plausibilidad</span><strong>{format_pct(float(guidance.get('recommended_plausibility_index', 1.0)))}</strong><small>{html.escape(str(guidance.get('recommended_plausibility_note', 'marcador de forma normal')))}</small></div>"

@@ -398,7 +398,9 @@ class RegressionLogicTest(unittest.TestCase):
         }
         options = app.penca_ovacion_score_options(dist, top_n=3)
         self.assertNotEqual(options[0]["score"], "4-0")
-        self.assertEqual(options[0]["score"], "1-0")
+        self.assertEqual(options[0]["score"], "2-0")
+        self.assertGreater(float(options[0].get("scoreline_calibration_index", 0.0)), 0.90)
+        self.assertEqual(float(options[0].get("calibrated_promotion", 0.0)), 1.0)
         self.assertGreater(
             float(options[0]["ensemble_adjusted_points"]),
             float(app.score_expected_points_for_penca(dist, 4, 0)["ensemble_adjusted_points"]),
