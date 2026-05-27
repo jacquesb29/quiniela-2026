@@ -4947,10 +4947,14 @@ def scoreline_scenario_profile(
     scenario_index = 0.42 * exact_ratio + 0.20 * prior_index + 0.20 * result_strength + 0.18 * diff_strength
     modal_lock_penalty = 0.0
 
+    is_narrow_clean_sheet = underdog_pick == 0 and favorite_pick == 1
     is_modal_clean_sheet = underdog_pick == 0 and favorite_pick == 2
     is_higher_clean_sheet = underdog_pick == 0 and favorite_pick in {3, 4}
     is_favorite_btss = favorite_pick >= 2 and underdog_pick == 1
     is_low_margin_favorite = favorite_pick == 1 and underdog_pick == 0
+    is_one_one = pick_a == pick_b == 1
+    is_two_two = pick_a == pick_b == 2
+    is_scoreless = pick_a == pick_b == 0
     is_draw = pick_a == pick_b
 
     if favorite_mean >= 2.30 and underdog_mean <= 0.26:
@@ -4965,34 +4969,66 @@ def scoreline_scenario_profile(
             scenario_index -= 0.12
             modal_lock_penalty = 0.34
             note = "evita que el 2-0 gane solo por ser el modo Poisson"
+        elif is_narrow_clean_sheet:
+            scenario_index -= 0.24
+            modal_lock_penalty = 0.28
+            note = "1-0 queda corto para un favorito dominante"
         elif is_low_margin_favorite:
             scenario_index -= 0.24
             note = "1-0 queda corto para un favorito con más de dos goles esperados"
         elif is_favorite_btss:
             scenario_index -= 0.10
+            modal_lock_penalty = 0.12
             note = "gol del débil poco respaldado por su producción esperada"
+        elif is_one_one or is_scoreless:
+            scenario_index -= 0.22
+            modal_lock_penalty = 0.22
+            note = "empate corto no encaja con favorito dominante"
     elif favorite_mean >= 1.85 and expected_margin >= 0.90:
         scenario_family = "favorito claro"
         if is_modal_clean_sheet:
             scenario_index += 0.08
             note = "favorito claro: 2-0 sigue defendible por ganador y diferencia"
+        elif is_narrow_clean_sheet and mean_total >= 2.25:
+            scenario_index -= 0.10
+            modal_lock_penalty = 0.18
+            note = "1-0 puede quedar corto: revisar 2-0/2-1 según gol rival"
         elif is_higher_clean_sheet and favorite_pick == 3:
             scenario_index += 0.15 if exact_ratio >= 0.62 else 0.02
             note = "3-0 alternativo si está cerca del modo y el total esperado lo soporta"
         elif is_favorite_btss and underdog_mean >= 0.48:
             scenario_index += 0.12
             note = "favorito claro con riesgo de gol rival: 2-1/3-1 gana sentido"
+        elif favorite_pick == 3 and underdog_pick == 1 and underdog_mean >= 0.50 and favorite_mean >= 2.20:
+            scenario_index += 0.10
+            note = "favorito claro y abierto: 3-1 tiene lectura si el rival anota"
         elif is_low_margin_favorite and mean_total >= 2.30:
             scenario_index -= 0.08
             note = "1-0 queda algo corto para el total esperado"
-    elif favorite_mean >= 1.35 and underdog_mean >= 0.55 and expected_margin <= 0.95:
+        elif is_draw:
+            scenario_index -= 0.12
+            modal_lock_penalty = 0.16
+            note = "empate no es el guion base de un favorito claro"
+    elif favorite_mean >= 1.35 and underdog_mean >= 0.55 and expected_margin <= 1.10:
         scenario_family = "partido competitivo"
         if is_favorite_btss:
             scenario_index += 0.20
             note = "partido competitivo: ganador por un gol con ambos anotando"
+        elif favorite_pick == 1 and underdog_pick == 0 and underdog_mean >= 0.66:
+            scenario_index -= 0.12
+            modal_lock_penalty = 0.18
+            note = "1-0 es frágil: el rival tiene señal suficiente para marcar"
         elif is_draw and pick_total in {2, 4}:
-            scenario_index += 0.12
-            note = "partido parejo: empate con goles tiene soporte de escenario"
+            if is_one_one and mean_total >= 2.65:
+                scenario_index -= 0.08
+                modal_lock_penalty = 0.16
+                note = "1-1 queda bajo para un partido parejo con volumen de goles"
+            elif is_two_two and mean_total >= 2.65:
+                scenario_index += 0.18
+                note = "partido parejo y abierto: 2-2 entra como escenario real"
+            else:
+                scenario_index += 0.12
+                note = "partido parejo: empate con goles tiene soporte de escenario"
         elif underdog_pick == 0 and favorite_pick >= 2:
             scenario_index -= 0.10
             modal_lock_penalty = 0.14
@@ -5005,6 +5041,18 @@ def scoreline_scenario_profile(
         elif pick_total >= 3:
             scenario_index -= 0.12
             note = "total bajo: no sobrecargar goles sin evidencia"
+    else:
+        if is_one_one and mean_total >= 2.55:
+            scenario_index -= 0.08
+            modal_lock_penalty = 0.14
+            note = "1-1 puede quedar corto para el total esperado"
+        elif is_two_two and mean_total >= 2.70:
+            scenario_index += 0.12
+            note = "2-2 recibe soporte por partido abierto"
+        elif is_narrow_clean_sheet and mean_total >= 2.30:
+            scenario_index -= 0.08
+            modal_lock_penalty = 0.14
+            note = "1-0 puede quedar corto frente al total esperado"
 
     if pick_total >= mean_total + 2.35 and exact_ratio < 0.55:
         scenario_index -= 0.16
@@ -5227,6 +5275,7 @@ def parse_score_pair(score: object) -> Tuple[int, int]:
 
 
 POISSON_CENTRAL_SCORES = {(0, 0), (1, 0), (0, 1), (1, 1), (2, 0), (0, 2)}
+POISSON_MODAL_LOCK_SCORES = POISSON_CENTRAL_SCORES | {(2, 1), (1, 2), (2, 2)}
 
 
 def promote_calibrated_scoreline(scored: List[Dict[str, float | str]]) -> List[Dict[str, float | str]]:
@@ -5234,7 +5283,7 @@ def promote_calibrated_scoreline(scored: List[Dict[str, float | str]]) -> List[D
 
     This keeps the app from blindly submitting the modal Poisson-looking score
     when another score has nearly the same Penca value but better support from
-    expected goals, expected margin and empirical scoreline shape.
+    expected goals, expected margin, scenario script and empirical scoreline shape.
     """
 
     if len(scored) < 2:
@@ -5250,7 +5299,7 @@ def promote_calibrated_scoreline(scored: List[Dict[str, float | str]]) -> List[D
     best_modal_lock_penalty = float(best.get("poisson_modal_lock_penalty", 0.0))
 
     promotable: List[Dict[str, float | str]] = []
-    for candidate in scored[1:8]:
+    for candidate in scored[1:12]:
         cand_a, cand_b = parse_score_pair(candidate.get("score", "0-0"))
         cand_total = cand_a + cand_b
         cand_calibration = float(candidate.get("scoreline_calibration_index", 0.0))
@@ -5260,6 +5309,7 @@ def promote_calibrated_scoreline(scored: List[Dict[str, float | str]]) -> List[D
         cand_scenario = float(candidate.get("scenario_ensemble_index", 0.0))
         cand_family = str(candidate.get("scoreline_scenario_family", ""))
         same_winner = score_result_code(best_a, best_b) == score_result_code(cand_a, cand_b) != "X"
+        same_result = score_result_code(best_a, best_b) == score_result_code(cand_a, cand_b)
         scenario_beats_modal = (
             cand_family == "favorito dominante"
             and same_winner
@@ -5268,11 +5318,22 @@ def promote_calibrated_scoreline(scored: List[Dict[str, float | str]]) -> List[D
             and max(cand_a, cand_b) == 3
             and cand_scenario + best_modal_lock_penalty >= best_scenario + 0.42
         )
-        if cand_calibration < best_calibration + (0.015 if scenario_beats_modal else 0.055):
+        broad_scenario_beats_modal = (
+            not scenario_beats_modal
+            and same_result
+            and (best_a, best_b) in POISSON_MODAL_LOCK_SCORES
+            and (cand_a, cand_b) != (best_a, best_b)
+            and cand_scenario + best_modal_lock_penalty >= best_scenario + 0.26
+            and cand_total <= best_total + 2
+            and cand_total >= max(0, best_total - 1)
+        )
+        if cand_calibration < best_calibration + (
+            0.015 if scenario_beats_modal else -0.030 if broad_scenario_beats_modal else 0.055
+        ):
             continue
-        max_ensemble_gap = 0.50 if scenario_beats_modal else 0.28
-        max_expected_gap = 0.42 if scenario_beats_modal else 0.24
-        min_exact_ratio = 0.70 if scenario_beats_modal else 0.58
+        max_ensemble_gap = 0.50 if scenario_beats_modal else 0.38 if broad_scenario_beats_modal else 0.28
+        max_expected_gap = 0.42 if scenario_beats_modal else 0.34 if broad_scenario_beats_modal else 0.24
+        min_exact_ratio = 0.70 if scenario_beats_modal else 0.55 if broad_scenario_beats_modal else 0.58
         if cand_ensemble < best_ensemble - max_ensemble_gap:
             continue
         if cand_expected < best_expected - max_expected_gap:
@@ -5282,7 +5343,7 @@ def promote_calibrated_scoreline(scored: List[Dict[str, float | str]]) -> List[D
         is_less_modal = (best_a, best_b) in POISSON_CENTRAL_SCORES and (cand_a, cand_b) != (best_a, best_b)
         adds_supported_goal = cand_total > best_total and cand_calibration >= 0.78
         improves_margin_shape = abs(cand_a - cand_b) > abs(best_a - best_b) and cand_calibration >= 0.86
-        if scenario_beats_modal or is_less_modal or adds_supported_goal or improves_margin_shape:
+        if scenario_beats_modal or broad_scenario_beats_modal or is_less_modal or adds_supported_goal or improves_margin_shape:
             promotable.append(candidate)
 
     if not promotable:
