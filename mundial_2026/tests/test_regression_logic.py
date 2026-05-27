@@ -406,6 +406,31 @@ class RegressionLogicTest(unittest.TestCase):
             float(app.score_expected_points_for_penca(dist, 4, 0)["ensemble_adjusted_points"]),
         )
 
+    def test_score_optimizer_uses_match_scenario_not_only_poisson_mode(self):
+        dist = {
+            (2, 0): 0.23,
+            (3, 0): 0.21,
+            (4, 0): 0.14,
+            (1, 0): 0.14,
+            (5, 0): 0.05,
+            (2, 1): 0.03,
+            (0, 0): 0.06,
+            (1, 1): 0.04,
+            (3, 1): 0.03,
+            (0, 1): 0.02,
+            (4, 1): 0.02,
+            (6, 0): 0.03,
+        }
+        options = app.penca_ovacion_score_options(dist, top_n=4)
+        self.assertEqual(options[0]["score"], "3-0")
+        self.assertEqual(options[0]["scoreline_scenario_family"], "favorito dominante")
+        self.assertEqual(float(options[0].get("calibrated_promotion", 0.0)), 1.0)
+        self.assertGreater(
+            float(options[0]["scenario_ensemble_index"]),
+            float(options[1]["scenario_ensemble_index"]),
+        )
+        self.assertGreater(float(options[1].get("poisson_modal_lock_penalty", 0.0)), 0.0)
+
     def test_score_labels_include_team_names_for_away_style_scores(self):
         self.assertEqual(
             app.score_label_with_teams("Qatar", "Switzerland", "0-2"),

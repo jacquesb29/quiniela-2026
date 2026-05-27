@@ -4908,6 +4908,119 @@ def calibrated_integer_score_profile(
     }
 
 
+def scoreline_scenario_profile(
+    pick_a: int,
+    pick_b: int,
+    mean_goals_a: float,
+    mean_goals_b: float,
+    exact_prob: float,
+    top_exact_prob: float,
+    result_prob: float,
+    difference_prob: float,
+    prior_index: float,
+) -> Dict[str, float | str]:
+    """Non-Poisson scenario layer for the score submitted to Penca.
+
+    Exact-score modes in football naturally cluster around 1-0, 2-0 and 1-1.
+    That is useful information, but the Penca score should also reflect the
+    match script: dominant favorite, favorite with BTTS risk, low-tempo trap,
+    or balanced/open match. This layer gives those scripts an explicit vote so
+    Poisson's modal score is not the only force in the recommendation.
+    """
+
+    mean_total = mean_goals_a + mean_goals_b
+    mean_edge = mean_goals_a - mean_goals_b
+    favorite_is_a = mean_edge >= 0.0
+    favorite_mean = mean_goals_a if favorite_is_a else mean_goals_b
+    underdog_mean = mean_goals_b if favorite_is_a else mean_goals_a
+    favorite_pick = pick_a if favorite_is_a else pick_b
+    underdog_pick = pick_b if favorite_is_a else pick_a
+    pick_total = pick_a + pick_b
+    pick_margin = abs(pick_a - pick_b)
+    expected_margin = abs(mean_edge)
+    exact_ratio = clamp(exact_prob / max(top_exact_prob, 1e-9), 0.0, 1.0)
+    result_strength = clamp(result_prob, 0.0, 1.0)
+    diff_strength = clamp(difference_prob / 0.32, 0.0, 1.0)
+
+    scenario_family = "marcador balanceado"
+    note = "escenario mixto: combina marcador exacto, diferencia y lectura del partido"
+    scenario_index = 0.42 * exact_ratio + 0.20 * prior_index + 0.20 * result_strength + 0.18 * diff_strength
+    modal_lock_penalty = 0.0
+
+    is_modal_clean_sheet = underdog_pick == 0 and favorite_pick == 2
+    is_higher_clean_sheet = underdog_pick == 0 and favorite_pick in {3, 4}
+    is_favorite_btss = favorite_pick >= 2 and underdog_pick == 1
+    is_low_margin_favorite = favorite_pick == 1 and underdog_pick == 0
+    is_draw = pick_a == pick_b
+
+    if favorite_mean >= 2.30 and underdog_mean <= 0.26:
+        scenario_family = "favorito dominante"
+        if is_higher_clean_sheet and favorite_pick == 3:
+            scenario_index += 0.34
+            note = "favorito muy superior: el 3-0 tiene mejor lectura de escenario que el 2-0 modal"
+        elif is_higher_clean_sheet and favorite_pick == 4:
+            scenario_index += 0.10 if exact_ratio >= 0.45 else -0.08
+            note = "goleada alta: solo sirve si la cola de goles tiene soporte"
+        elif is_modal_clean_sheet:
+            scenario_index -= 0.12
+            modal_lock_penalty = 0.34
+            note = "evita que el 2-0 gane solo por ser el modo Poisson"
+        elif is_low_margin_favorite:
+            scenario_index -= 0.24
+            note = "1-0 queda corto para un favorito con más de dos goles esperados"
+        elif is_favorite_btss:
+            scenario_index -= 0.10
+            note = "gol del débil poco respaldado por su producción esperada"
+    elif favorite_mean >= 1.85 and expected_margin >= 0.90:
+        scenario_family = "favorito claro"
+        if is_modal_clean_sheet:
+            scenario_index += 0.08
+            note = "favorito claro: 2-0 sigue defendible por ganador y diferencia"
+        elif is_higher_clean_sheet and favorite_pick == 3:
+            scenario_index += 0.15 if exact_ratio >= 0.62 else 0.02
+            note = "3-0 alternativo si está cerca del modo y el total esperado lo soporta"
+        elif is_favorite_btss and underdog_mean >= 0.48:
+            scenario_index += 0.12
+            note = "favorito claro con riesgo de gol rival: 2-1/3-1 gana sentido"
+        elif is_low_margin_favorite and mean_total >= 2.30:
+            scenario_index -= 0.08
+            note = "1-0 queda algo corto para el total esperado"
+    elif favorite_mean >= 1.35 and underdog_mean >= 0.55 and expected_margin <= 0.95:
+        scenario_family = "partido competitivo"
+        if is_favorite_btss:
+            scenario_index += 0.20
+            note = "partido competitivo: ganador por un gol con ambos anotando"
+        elif is_draw and pick_total in {2, 4}:
+            scenario_index += 0.12
+            note = "partido parejo: empate con goles tiene soporte de escenario"
+        elif underdog_pick == 0 and favorite_pick >= 2:
+            scenario_index -= 0.10
+            modal_lock_penalty = 0.14
+            note = "portería a cero menos sólida en partido competitivo"
+    elif mean_total <= 2.05:
+        scenario_family = "partido de baja anotación"
+        if pick_total <= 2 and pick_margin <= 1:
+            scenario_index += 0.14
+            note = "baja anotación: marcador corto es el escenario natural"
+        elif pick_total >= 3:
+            scenario_index -= 0.12
+            note = "total bajo: no sobrecargar goles sin evidencia"
+
+    if pick_total >= mean_total + 2.35 and exact_ratio < 0.55:
+        scenario_index -= 0.16
+        note = "cola alta de goles: exige soporte fuerte para jugarla"
+    if pick_margin >= expected_margin + 2.15 and exact_ratio < 0.60:
+        scenario_index -= 0.12
+        note = "margen demasiado amplio frente a la brecha esperada"
+
+    return {
+        "scenario_ensemble_index": clamp(scenario_index, 0.0, 1.0),
+        "scoreline_scenario_family": scenario_family,
+        "scoreline_scenario_note": note,
+        "poisson_modal_lock_penalty": clamp(modal_lock_penalty, 0.0, 1.0),
+    }
+
+
 def score_expected_points_for_penca(
     dist: Dict[Tuple[int, int], float],
     pick_a: int,
@@ -4968,6 +5081,19 @@ def score_expected_points_for_penca(
     scoreline_calibration_index = float(calibration_profile["scoreline_calibration_index"])
     scoreline_calibration_boost = float(calibration_profile["scoreline_calibration_boost"])
     scoreline_calibration_penalty = float(calibration_profile["scoreline_calibration_penalty"])
+    scenario_profile = scoreline_scenario_profile(
+        pick_a,
+        pick_b,
+        mean_goals_a,
+        mean_goals_b,
+        exact_prob,
+        top_exact_prob,
+        result_prob,
+        difference_prob,
+        prior_index,
+    )
+    scenario_ensemble_index = float(scenario_profile["scenario_ensemble_index"])
+    poisson_modal_lock_penalty = float(scenario_profile["poisson_modal_lock_penalty"])
     shape_boost = score_shape_decision_boost(pick_a, pick_b, score_shape_meta)
     high_total_penalty = max(0.0, total_goals - (mean_total_goals + 2.15))
     tail_score_penalty = 0.10 if total_goals >= 5 and relative_exact_strength < 0.45 else 0.0
@@ -5016,13 +5142,14 @@ def score_expected_points_for_penca(
     ensemble_score_index = clamp(
         (
             0.27 * penca_points_index
-            + 0.13 * model_score_index
+            + 0.07 * model_score_index
             + 0.15 * clamp(result_prob, 0.0, 1.0)
             + 0.12 * clamp(difference_prob / 0.32, 0.0, 1.0)
             + 0.10 * prior_index
             + 0.08 * marginal_fit
             + 0.12 * scoreline_calibration_index
-            + 0.03 * plausibility_index
+            + 0.08 * scenario_ensemble_index
+            + 0.01 * plausibility_index
         )
         * shape_boost
         - 0.035 * clamp(points_sd / 3.8, 0.0, 1.0),
@@ -5036,8 +5163,10 @@ def score_expected_points_for_penca(
         + 0.10 * prior_index
         + 0.06 * marginal_fit
         + 0.24 * scoreline_calibration_index
+        + 0.34 * scenario_ensemble_index
         + 0.08 * scoreline_calibration_boost
         - 0.18 * scoreline_calibration_penalty
+        - 0.22 * poisson_modal_lock_penalty
         - 0.16 * clean_sheet_margin_penalty
         - 0.10 * empirical_tail_penalty
     )
@@ -5075,6 +5204,10 @@ def score_expected_points_for_penca(
         "scoreline_side_fit": float(calibration_profile["side_fit"]),
         "scoreline_total_fit": float(calibration_profile["total_fit"]),
         "scoreline_margin_fit": float(calibration_profile["margin_fit"]),
+        "scenario_ensemble_index": scenario_ensemble_index,
+        "scoreline_scenario_family": str(scenario_profile["scoreline_scenario_family"]),
+        "scoreline_scenario_note": str(scenario_profile["scoreline_scenario_note"]),
+        "poisson_modal_lock_penalty": poisson_modal_lock_penalty,
         "shape_boost": shape_boost,
         "realism_index": realism_index,
         "plausibility_index": plausibility_index,
@@ -5113,6 +5246,8 @@ def promote_calibrated_scoreline(scored: List[Dict[str, float | str]]) -> List[D
     best_ensemble = float(best.get("ensemble_adjusted_points", 0.0))
     best_expected = float(best.get("expected_points", 0.0))
     best_exact = float(best.get("exact_prob", 0.0))
+    best_scenario = float(best.get("scenario_ensemble_index", 0.0))
+    best_modal_lock_penalty = float(best.get("poisson_modal_lock_penalty", 0.0))
 
     promotable: List[Dict[str, float | str]] = []
     for candidate in scored[1:8]:
@@ -5122,18 +5257,32 @@ def promote_calibrated_scoreline(scored: List[Dict[str, float | str]]) -> List[D
         cand_ensemble = float(candidate.get("ensemble_adjusted_points", 0.0))
         cand_expected = float(candidate.get("expected_points", 0.0))
         cand_exact = float(candidate.get("exact_prob", 0.0))
-        if cand_calibration < best_calibration + 0.055:
+        cand_scenario = float(candidate.get("scenario_ensemble_index", 0.0))
+        cand_family = str(candidate.get("scoreline_scenario_family", ""))
+        same_winner = score_result_code(best_a, best_b) == score_result_code(cand_a, cand_b) != "X"
+        scenario_beats_modal = (
+            cand_family == "favorito dominante"
+            and same_winner
+            and (best_a, best_b) in {(2, 0), (0, 2)}
+            and min(cand_a, cand_b) == 0
+            and max(cand_a, cand_b) == 3
+            and cand_scenario + best_modal_lock_penalty >= best_scenario + 0.42
+        )
+        if cand_calibration < best_calibration + (0.015 if scenario_beats_modal else 0.055):
             continue
-        if cand_ensemble < best_ensemble - 0.28:
+        max_ensemble_gap = 0.50 if scenario_beats_modal else 0.28
+        max_expected_gap = 0.42 if scenario_beats_modal else 0.24
+        min_exact_ratio = 0.70 if scenario_beats_modal else 0.58
+        if cand_ensemble < best_ensemble - max_ensemble_gap:
             continue
-        if cand_expected < best_expected - 0.24:
+        if cand_expected < best_expected - max_expected_gap:
             continue
-        if cand_exact < max(0.006, 0.58 * best_exact):
+        if cand_exact < max(0.006, min_exact_ratio * best_exact):
             continue
         is_less_modal = (best_a, best_b) in POISSON_CENTRAL_SCORES and (cand_a, cand_b) != (best_a, best_b)
         adds_supported_goal = cand_total > best_total and cand_calibration >= 0.78
         improves_margin_shape = abs(cand_a - cand_b) > abs(best_a - best_b) and cand_calibration >= 0.86
-        if is_less_modal or adds_supported_goal or improves_margin_shape:
+        if scenario_beats_modal or is_less_modal or adds_supported_goal or improves_margin_shape:
             promotable.append(candidate)
 
     if not promotable:
@@ -5150,7 +5299,7 @@ def promote_calibrated_scoreline(scored: List[Dict[str, float | str]]) -> List[D
     reordered = [promoted] + [item for item in scored if item is not promoted]
     promoted["calibrated_promotion"] = 1.0
     promoted["promotion_note"] = (
-        "Promovido porque está muy cerca en puntos esperados y encaja mejor con goles esperados/margen que el marcador modal."
+        "Promovido porque el ensamble de escenarios, goles esperados y margen lo prefiere frente al marcador modal."
     )
     return reordered
 
@@ -5225,7 +5374,7 @@ def penca_score_portfolio(
         if float(item["exact_prob"]) >= max(0.006, 0.28 * top_exact_prob)
         and sum(int(part) for part in str(item["score"]).split("-")) <= 6
     ] or candidates
-    balanced = max(
+    balanced_ranked = sorted(
         candidates,
         key=lambda item: (
             float(item["ensemble_adjusted_points"]),
@@ -5237,7 +5386,9 @@ def penca_score_portfolio(
             float(item["difference_prob"]),
             float(item["result_prob"]),
         ),
+        reverse=True,
     )
+    balanced = promote_calibrated_scoreline(balanced_ranked)[0]
     safe = max(
         candidates,
         key=lambda item: (
@@ -5412,7 +5563,11 @@ def score_precision_profile(
         "recommended_promotion_note": str(top_penca.get("promotion_note", "")),
         "recommended_scoreline_total_fit": float(top_penca.get("scoreline_total_fit", 0.0)),
         "recommended_scoreline_margin_fit": float(top_penca.get("scoreline_margin_fit", 0.0)),
-        "score_selector_method": "Ensamble de marcador: puntos Penca + distribución del modelo + calibración de goles enteros + prior histórico + plausibilidad",
+        "recommended_scenario_ensemble_index": float(top_penca.get("scenario_ensemble_index", 0.0)),
+        "recommended_scoreline_scenario_family": str(top_penca.get("scoreline_scenario_family", "marcador balanceado")),
+        "recommended_scoreline_scenario_note": str(top_penca.get("scoreline_scenario_note", "escenario mixto")),
+        "recommended_poisson_modal_lock_penalty": float(top_penca.get("poisson_modal_lock_penalty", 0.0)),
+        "score_selector_method": "Ensamble de marcador: puntos Penca + distribución del modelo + escenarios de partido + prior histórico + plausibilidad",
         "recommended_plausibility_index": float(top_penca.get("plausibility_index", top_penca.get("realism_index", 1.0))),
         "recommended_plausibility_note": str(top_penca.get("plausibility_note", "marcador de forma normal")),
         "recommended_clean_sheet_margin_penalty": float(top_penca.get("clean_sheet_margin_penalty", 0.0)),
@@ -8259,11 +8414,12 @@ def penca_ovacion_score_html(prediction: MatchPrediction) -> str:
     return (
         "<div class=\"reason-block penca-block\">"
         "<h4>Penca Ovación: marcador optimizado por ensamble</h4>"
-        "<p class=\"meta\">Regla aplicada: 8 puntos por marcador exacto, 5 por diferencia de goles y 3 por ganador. La lista ya no depende solo de Poisson: combina probabilidad del modelo, prior histórico de marcadores, marginales de goles, plausibilidad y puntos esperados.</p>"
+        "<p class=\"meta\">Regla aplicada: 8 puntos por marcador exacto, 5 por diferencia de goles y 3 por ganador. La lista ya no depende solo de Poisson: combina probabilidad del modelo, escenarios de partido, prior histórico de marcadores, marginales de goles, plausibilidad y puntos esperados.</p>"
         "<div class=\"subgrid\">"
         f"<div><span>Marcador recomendado para cargar</span><strong>{html.escape(top_score_label)}</strong></div>"
         f"<div><span>Marcador exacto más probable</span><strong>{html.escape(top_exact_label)}</strong></div>"
         f"<div><span>Selector de marcador</span><strong>Ensamble no solo Poisson</strong><small>{html.escape(str(guidance.get('score_selector_method', 'Distribución + puntos + plausibilidad')))}</small></div>"
+        f"<div><span>Escenario de partido</span><strong>{html.escape(str(guidance.get('recommended_scoreline_scenario_family', 'marcador balanceado')).title())}</strong><small>{html.escape(str(guidance.get('recommended_scoreline_scenario_note', 'Escenario mixto.')))}</small></div>"
         f"<div><span>Calibración de goles enteros</span><strong>{format_pct(float(guidance.get('recommended_scoreline_calibration_index', 0.0)))}</strong><small>{html.escape(str(guidance.get('recommended_scoreline_calibration_note', 'Ajusta el marcador contra goles esperados, margen y prior histórico.')))}</small></div>"
         f"{promotion_tile}"
         f"<div><span>Calidad del marcador exacto</span><strong>{html.escape(str(guidance.get('precision_label', 'sin clasificar')))}</strong></div>"
