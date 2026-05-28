@@ -428,6 +428,7 @@ def simulate_match_sample(
     cached_simulation_expected_goals,
     simulation_state_signature,
     sample_score,
+    simulation_score_sampler=None,
     sample_cards_fn,
     sample_knockout_resolution_fn,
     update_simulation_state_fn,
@@ -442,7 +443,21 @@ def simulate_match_sample(
         simulation_state_signature(state_a),
         simulation_state_signature(state_b),
     )
-    score_a, score_b = sample_score(mu_a, mu_b, ctx)
+    if simulation_score_sampler is not None:
+        score_a, score_b = simulation_score_sampler(
+            teams,
+            states,
+            team_a,
+            team_b,
+            stage,
+            ctx,
+            mu_a,
+            mu_b,
+            state_a=state_a,
+            state_b=state_b,
+        )
+    else:
+        score_a, score_b = sample_score(mu_a, mu_b, ctx)
     yellows_a, reds_a, yellows_b, reds_b = sample_cards_fn(
         teams,
         team_a,

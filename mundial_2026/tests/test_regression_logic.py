@@ -461,6 +461,41 @@ class RegressionLogicTest(unittest.TestCase):
         one_nil = app.score_expected_points_for_penca(dist, 1, 0)
         self.assertGreater(float(one_nil.get("poisson_modal_lock_penalty", 0.0)), 0.0)
 
+    def test_tournament_scoreline_adjustment_feeds_simulation_without_rewriting_1x2(self):
+        dist = {
+            (1, 0): 0.16,
+            (2, 1): 0.10,
+            (2, 0): 0.12,
+            (1, 1): 0.12,
+            (0, 0): 0.10,
+            (0, 1): 0.07,
+            (3, 1): 0.05,
+            (3, 0): 0.04,
+            (2, 2): 0.04,
+            (3, 2): 0.02,
+            (0, 2): 0.04,
+            (1, 2): 0.05,
+            (4, 2): 0.01,
+            (4, 1): 0.01,
+            (4, 0): 0.01,
+            (2, 3): 0.02,
+            (1, 3): 0.01,
+            (3, 3): 0.01,
+            (4, 3): 0.01,
+            (5, 3): 0.01,
+        }
+        adjusted, meta = app.apply_penca_tournament_scoreline_adjustment(
+            dist,
+            strength=0.25,
+            outcome_drift_cap=0.012,
+        )
+        self.assertTrue(meta["applied"])
+        self.assertGreater(adjusted[(2, 1)], dist[(2, 1)])
+        self.assertLess(adjusted[(1, 0)], dist[(1, 0)])
+        before = app.score_outcome_bucket_probabilities(dist)
+        after = app.score_outcome_bucket_probabilities(adjusted)
+        self.assertLessEqual(max(abs(after[key] - before[key]) for key in before), 0.013)
+
     def test_score_labels_include_team_names_for_away_style_scores(self):
         self.assertEqual(
             app.score_label_with_teams("Qatar", "Switzerland", "0-2"),

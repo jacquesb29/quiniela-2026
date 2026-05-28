@@ -2962,6 +2962,7 @@ def simulate_match_sample(
         cached_simulation_expected_goals=cached_simulation_expected_goals,
         simulation_state_signature=simulation_state_signature,
         sample_score=sample_score,
+        simulation_score_sampler=sample_simulation_scoreline,
         sample_cards_fn=sample_cards,
         sample_knockout_resolution_fn=sample_knockout_resolution,
         update_simulation_state_fn=update_simulation_state,
@@ -5386,6 +5387,288 @@ def penca_ovacion_score_options(
     )
     scored = promote_calibrated_scoreline(scored)
     return scored[:top_n]
+
+
+def score_outcome_bucket_probabilities(dist: Dict[Tuple[int, int], float]) -> Dict[str, float]:
+    buckets = {"a": 0.0, "draw": 0.0, "b": 0.0}
+    for (goals_a, goals_b), prob in dist.items():
+        buckets[score_shape_outcome(goals_a, goals_b)] += float(prob)
+    return buckets
+
+
+def constrain_scoreline_outcome_drift(
+    base_dist: Dict[Tuple[int, int], float],
+    adjusted_dist: Dict[Tuple[int, int], float],
+    *,
+    cap: float,
+) -> Dict[Tuple[int, int], float]:
+    """Limit how much exact-score calibration can move winner probabilities.
+
+    The Penca layer is allowed to change score shape and goal difference, but it
+    should not rewrite the tournament bracket by itself. This cap lets the
+    calibrated score sampler nudge 1X2 probabilities only when the full score
+    shape agrees, and only by a small amount per match.
+    """
+
+    cap = clamp(cap, 0.0, 0.05)
+    if cap <= 0.0:
+        return dict(base_dist)
+    base_buckets = score_outcome_bucket_probabilities(base_dist)
+    adjusted_buckets = score_outcome_bucket_probabilities(adjusted_dist)
+    targets = {
+        key: base_buckets[key] + clamp(adjusted_buckets[key] - base_buckets[key], -cap, cap)
+        for key in ("a", "draw", "b")
+    }
+    target_total = sum(targets.values())
+    if target_total <= 0.0:
+        return dict(base_dist)
+    targets = {key: value / target_total for key, value in targets.items()}
+
+    constrained: Dict[Tuple[int, int], float] = {}
+    for score, prob in adjusted_dist.items():
+        outcome = score_shape_outcome(*score)
+        bucket_prob = max(adjusted_buckets.get(outcome, 0.0), 1e-9)
+        constrained[score] = float(prob) * targets[outcome] / bucket_prob
+    total = sum(constrained.values())
+    if total > 0.0:
+        for key in list(constrained):
+            constrained[key] /= total
+    return constrained
+
+
+def apply_penca_tournament_scoreline_adjustment(
+    dist: Dict[Tuple[int, int], float],
+    *,
+    score_shape_meta: Optional[Dict[str, object]] = None,
+    strength: float = 0.20,
+    outcome_drift_cap: float = 0.018,
+) -> Tuple[Dict[Tuple[int, int], float], Dict[str, object]]:
+    """Feed the non-Poisson Penca score logic back into tournament simulation.
+
+    This is intentionally softer than the final Penca recommendation. It adjusts
+    the score distribution used by Monte Carlo so group goal difference, exact
+    score recommendations and bracket paths can respond to richer score scripts,
+    while a hard cap prevents the exact-score optimizer from inventing a new
+    1X2 forecast.
+    """
+
+    strength = clamp(strength, 0.0, 0.45)
+    if strength <= 0.0 or not dist:
+        return dict(dist), {"applied": False, "strength": 0.0}
+
+    mean_goals_a = sum(goals_a * float(prob) for (goals_a, _), prob in dist.items())
+    mean_goals_b = sum(goals_b * float(prob) for (_, goals_b), prob in dist.items())
+    top_pair, top_exact_prob = max(dist.items(), key=lambda item: item[1])
+    top_prior_prob = max(EMPIRICAL_SCORE_PRIOR.values())
+    result_buckets = {"1": 0.0, "X": 0.0, "2": 0.0}
+    difference_buckets: Dict[int, float] = {}
+    marginal_a: Dict[int, float] = {}
+    marginal_b: Dict[int, float] = {}
+    for (goals_a, goals_b), prob in dist.items():
+        prob = float(prob)
+        result_buckets[score_result_code(goals_a, goals_b)] += prob
+        difference_buckets[goals_a - goals_b] = difference_buckets.get(goals_a - goals_b, 0.0) + prob
+        marginal_a[goals_a] = marginal_a.get(goals_a, 0.0) + prob
+        marginal_b[goals_b] = marginal_b.get(goals_b, 0.0) + prob
+
+    raw: Dict[Tuple[int, int], float] = {}
+    total = 0.0
+    support_values: List[float] = []
+    for goals_a, goals_b in dist:
+        exact_prob = float(dist[(goals_a, goals_b)])
+        exact_ratio = clamp(exact_prob / max(float(top_exact_prob), 1e-9), 0.0, 1.0)
+        prior_index = clamp(empirical_score_prior(goals_a, goals_b) / max(top_prior_prob, 1e-9), 0.0, 1.0)
+        marginal_fit = clamp(
+            0.54 * marginal_a.get(goals_a, 0.0)
+            + 0.46 * marginal_b.get(goals_b, 0.0)
+            - 0.025 * (abs(goals_a - mean_goals_a) + abs(goals_b - mean_goals_b)),
+            0.0,
+            1.0,
+        )
+        calibration = calibrated_integer_score_profile(
+            goals_a,
+            goals_b,
+            mean_goals_a,
+            mean_goals_b,
+            prior_index,
+        )
+        scenario = scoreline_scenario_profile(
+            goals_a,
+            goals_b,
+            mean_goals_a,
+            mean_goals_b,
+            exact_prob,
+            float(top_exact_prob),
+            result_buckets[score_result_code(goals_a, goals_b)],
+            difference_buckets.get(goals_a - goals_b, 0.0),
+            prior_index,
+        )
+        shape_boost = score_shape_decision_boost(goals_a, goals_b, score_shape_meta)
+        shape_index = clamp((shape_boost - 0.90) / 0.22, 0.0, 1.0)
+        modal_lock_penalty = float(scenario.get("poisson_modal_lock_penalty", 0.0))
+        support_index = clamp(
+            0.28 * float(calibration["scoreline_calibration_index"])
+            + 0.24 * float(scenario["scenario_ensemble_index"])
+            + 0.18 * marginal_fit
+            + 0.14 * prior_index
+            + 0.10 * shape_index
+            + 0.06 * exact_ratio,
+            0.0,
+            1.0,
+        )
+        exponent = strength * clamp(2.45 * (support_index - 0.66), -0.65, 0.65)
+        exponent -= strength * 1.35 * modal_lock_penalty
+        if (goals_a, goals_b) in POISSON_CENTRAL_SCORES and support_index < 0.68:
+            exponent -= strength * 0.22
+        weight = clamp(math.exp(exponent), 0.78, 1.24)
+        raw[(goals_a, goals_b)] = exact_prob * weight
+        support_values.append(support_index)
+        total += raw[(goals_a, goals_b)]
+
+    if total <= 0.0:
+        return dict(dist), {"applied": False, "strength": 0.0}
+    for key in list(raw):
+        raw[key] /= total
+
+    adjusted = constrain_scoreline_outcome_drift(dist, raw, cap=outcome_drift_cap)
+    top_after_pair, top_after_prob = max(adjusted.items(), key=lambda item: item[1])
+    before_buckets = score_outcome_bucket_probabilities(dist)
+    after_buckets = score_outcome_bucket_probabilities(adjusted)
+    max_outcome_move = max(abs(after_buckets[key] - before_buckets[key]) for key in ("a", "draw", "b"))
+    meta = {
+        "applied": True,
+        "strength": strength,
+        "outcome_drift_cap": outcome_drift_cap,
+        "max_outcome_move": max_outcome_move,
+        "avg_scoreline_support": sum(support_values) / max(len(support_values), 1),
+        "top_before": f"{top_pair[0]}-{top_pair[1]}",
+        "top_before_prob": float(top_exact_prob),
+        "top_after": f"{top_after_pair[0]}-{top_after_pair[1]}",
+        "top_after_prob": float(top_after_prob),
+    }
+    return adjusted, meta
+
+
+@lru_cache(maxsize=32768)
+def cached_simulation_scoreline_distribution(
+    team_a_name: str,
+    team_b_name: str,
+    ctx: MatchContext,
+    state_signature_a: Tuple[float, ...],
+    state_signature_b: Tuple[float, ...],
+    max_goals: int,
+) -> Dict[Tuple[int, int], float]:
+    teams = load_teams()
+    team_a = teams[team_a_name]
+    team_b = teams[team_b_name]
+    state_a = simulation_state_from_signature(state_signature_a)
+    state_b = simulation_state_from_signature(state_signature_b)
+    mu_a, mu_b = expected_goals(team_a, team_b, ctx, state_a=state_a, state_b=state_b)
+    dist, _ = build_model_stack(mu_a, mu_b, ctx, max_goals=max_goals, market_strength=0.12)
+    profile_a = profile_for(team_a)
+    profile_b = profile_for(team_b)
+    shape_strength = 0.28 if not ctx.knockout else 0.20
+    dist, score_shape_meta = apply_historical_score_shape_adjustment(
+        dist,
+        team_a,
+        team_b,
+        profile_a,
+        profile_b,
+        mu_a,
+        mu_b,
+        ctx,
+        state_a=state_a,
+        state_b=state_b,
+        strength=shape_strength,
+    )
+    scoreline_strength = 0.22 if not ctx.knockout else 0.16
+    outcome_cap = 0.018 if not ctx.knockout else 0.012
+    dist, _ = apply_penca_tournament_scoreline_adjustment(
+        dist,
+        score_shape_meta=score_shape_meta,
+        strength=scoreline_strength,
+        outcome_drift_cap=outcome_cap,
+    )
+    return dist
+
+
+def sample_simulation_scoreline(
+    teams: Dict[str, Team],
+    states: Dict[str, dict],
+    team_a: str,
+    team_b: str,
+    stage: str,
+    ctx: MatchContext,
+    mu_a: float,
+    mu_b: float,
+    *,
+    state_a: Optional[dict] = None,
+    state_b: Optional[dict] = None,
+) -> Tuple[int, int]:
+    """Tournament sampler aligned with the Penca score optimizer.
+
+    The dashboard can afford full score-distribution scoring; Monte Carlo
+    cannot do that 1.5M+ times per run. This sampler therefore starts with the
+    fast ensemble score and applies only small, O(1) scenario corrections that
+    preserve the match result in almost every case while improving goals,
+    margins and Penca score realism.
+    """
+
+    score_a, score_b = sample_score(mu_a, mu_b, ctx)
+    state_a = state_a or ensure_state(states, team_a)
+    state_b = state_b or ensure_state(states, team_b)
+    profile_a = profile_for(teams[team_a])
+    profile_b = profile_for(teams[team_b])
+    signal_a = score_shape_team_signal(profile_a, state_a)
+    signal_b = score_shape_team_signal(profile_b, state_b)
+
+    total_mu = mu_a + mu_b
+    edge = mu_a - mu_b
+    favorite_is_a = edge >= 0.0
+    favorite_mu = mu_a if favorite_is_a else mu_b
+    underdog_mu = mu_b if favorite_is_a else mu_a
+    favorite_attack = signal_a["attack"] if favorite_is_a else signal_b["attack"]
+    underdog_attack = signal_b["attack"] if favorite_is_a else signal_a["attack"]
+    underdog_concede = signal_b["concede"] if favorite_is_a else signal_a["concede"]
+    favorite_defense = signal_a["defense"] if favorite_is_a else signal_b["defense"]
+    knockout_guard = 0.72 if ctx.knockout else 1.0
+
+    def as_favorite_score(favorite_goals: int, underdog_goals: int) -> Tuple[int, int]:
+        return (favorite_goals, underdog_goals) if favorite_is_a else (underdog_goals, favorite_goals)
+
+    favorite_score = score_a if favorite_is_a else score_b
+    underdog_score = score_b if favorite_is_a else score_a
+
+    if favorite_score == 1 and underdog_score == 0 and favorite_mu >= 1.35:
+        rival_goal_signal = clamp((underdog_mu - 0.56) / 0.45 + 0.22 * underdog_attack, 0.0, 1.0)
+        favorite_extra_signal = clamp((favorite_mu - 1.65) / 0.80 + 0.18 * favorite_attack, 0.0, 1.0)
+        if fast_random() < knockout_guard * 0.18 * rival_goal_signal:
+            return as_favorite_score(2, 1)
+        if total_mu >= 2.35 and fast_random() < knockout_guard * 0.12 * favorite_extra_signal:
+            return as_favorite_score(2, 0)
+
+    if favorite_score == 2 and underdog_score == 0:
+        btts_signal = clamp((underdog_mu - 0.58) / 0.50 + 0.20 * underdog_attack - 0.12 * favorite_defense, 0.0, 1.0)
+        domination_signal = clamp((favorite_mu - 2.15) / 0.85 + 0.18 * favorite_attack + 0.14 * underdog_concede, 0.0, 1.0)
+        if fast_random() < knockout_guard * 0.15 * btts_signal:
+            return as_favorite_score(2, 1)
+        if fast_random() < knockout_guard * 0.12 * domination_signal:
+            return as_favorite_score(3, 0)
+
+    if favorite_score == 0 and underdog_score == 0 and total_mu >= 1.85:
+        draw_with_goals_signal = clamp((total_mu - 1.85) / 0.85 + 0.16 * (signal_a["attack"] + signal_b["attack"]), 0.0, 1.0)
+        if fast_random() < knockout_guard * 0.20 * draw_with_goals_signal:
+            return (1, 1)
+
+    if score_a == 1 and score_b == 1 and total_mu >= 2.45:
+        open_draw_signal = clamp((total_mu - 2.45) / 0.95 + 0.12 * (signal_a["high_goal"] + signal_b["high_goal"]), 0.0, 1.0)
+        edge_signal = clamp((abs(edge) - 0.55) / 0.65, 0.0, 1.0)
+        if fast_random() < knockout_guard * 0.13 * open_draw_signal * (1.0 - 0.45 * edge_signal):
+            return (2, 2)
+        if favorite_mu >= 1.60 and fast_random() < knockout_guard * 0.06 * edge_signal:
+            return as_favorite_score(2, 1)
+
+    return score_a, score_b
 
 
 def penca_asymmetric_score_options(dist: Dict[Tuple[int, int], float], top_n: int = 4) -> List[Dict[str, float | str]]:
