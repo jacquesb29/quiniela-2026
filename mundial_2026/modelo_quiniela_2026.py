@@ -6545,6 +6545,138 @@ def quiniela_strategy_metrics(strategy_profiles: Sequence[dict]) -> dict:
     }
 
 
+def championship_penca_optimizer_metrics(entries: Sequence[dict]) -> dict:
+    """Summarize the real target: maximize Penca points as the tournament evolves.
+
+    Exact score betting pools are noisy. This profile keeps the product honest:
+    it reports what the model can optimize, what it cannot guarantee, and how
+    much of the recommendation is dynamic once matches start finishing.
+    """
+
+    if not entries:
+        return {
+            "total": 0,
+            "fixture_count": 0,
+            "projected_count": 0,
+            "live_count": 0,
+            "final_count": 0,
+            "pending_count": 0,
+            "expected_penca_points": 0.0,
+            "expected_penca_points_per_match": 0.0,
+            "expected_exact_scores": 0.0,
+            "exact_score_range_low": 0.0,
+            "exact_score_range_high": 0.0,
+            "expected_top3_scores": 0.0,
+            "avg_single_exact_ceiling": 0.0,
+            "avg_penca_certainty": 0.0,
+            "coverage_recommended": 0,
+            "coverage_min": 0,
+            "dominant_scenario": "Sin datos",
+            "decisions": [],
+        }
+    profiles = [quiniela_strategy_profile(entry) for entry in entries]
+    decisions = [penca_decision_profile(entry) for entry in entries]
+    metrics = quiniela_strategy_metrics(profiles)
+    fixture_entries = [entry for entry in entries if not entry.get("projection")]
+    live_count = sum(1 for entry in fixture_entries if fixture_is_live(entry))
+    final_count = sum(1 for entry in fixture_entries if fixture_is_final(entry))
+    projected_count = sum(1 for entry in entries if entry.get("projection"))
+    pending_count = max(len(fixture_entries) - live_count - final_count, 0)
+    mode_counts: Dict[str, int] = {}
+    for decision in decisions:
+        mode_counts[str(decision.get("scenario", "Óptimo"))] = mode_counts.get(str(decision.get("scenario", "Óptimo")), 0) + 1
+    dominant_scenario = max(mode_counts.items(), key=lambda item: item[1])[0] if mode_counts else "Óptimo"
+    top_decisions = sorted(
+        decisions,
+        key=lambda item: (
+            int(item.get("status_class") == "live"),
+            float(item.get("scenario_priority", 0.0)),
+            float(item.get("scenario_expected_points", 0.0)),
+            float(item.get("pick_prob", 0.0)),
+        ),
+        reverse=True,
+    )[:10]
+    avg_single_exact_ceiling = (
+        sum(float(item.get("score_prob", 0.0)) for item in profiles) / float(len(profiles))
+        if profiles
+        else 0.0
+    )
+    return {
+        **metrics,
+        "fixture_count": len(fixture_entries),
+        "projected_count": projected_count,
+        "live_count": live_count,
+        "final_count": final_count,
+        "pending_count": pending_count,
+        "dominant_scenario": dominant_scenario,
+        "avg_single_exact_ceiling": avg_single_exact_ceiling,
+        "decisions": top_decisions,
+    }
+
+
+def build_championship_penca_optimizer_html(entries: Sequence[dict]) -> str:
+    """Render the championship-level Penca plan without promising impossible certainty."""
+
+    if not entries:
+        return ""
+    metrics = championship_penca_optimizer_metrics(entries)
+    total = int(metrics["total"])
+    if total <= 0:
+        return ""
+
+    def decision_rows() -> str:
+        rows = []
+        for item in metrics["decisions"]:
+            detail = (
+                f"{item['scenario']} | {item['pick_label']} {format_pct(float(item['pick_prob']))} | "
+                f"marcador que debo poner en Penca: {item['score_to_enter_with_teams']} | "
+                f"{float(item['scenario_expected_points']):.2f}/8 pts esperados | "
+                f"exacto {format_pct(float(item['scenario_exact_prob']))} | "
+                f"diferencia {format_pct(float(item['scenario_difference_prob']))}"
+            )
+            rows.append(
+                "<li>"
+                f"<strong>{html.escape(str(item['title']))}</strong>"
+                f"<span>{html.escape(detail)}</span>"
+                f"<em>{html.escape(str(item['scenario_action']))}</em>"
+                f"<small>{html.escape(str(item['scenario_reason']))}</small>"
+                "</li>"
+            )
+        return "".join(rows)
+
+    return (
+        "<section class=\"panel championship-penca-panel\" id=\"campeonato\">"
+        "<div class=\"panel-head\"><div>"
+        "<p class=\"eyebrow\">Modo campeonato</p>"
+        "<h2>La meta no es prometer 104/104: es maximizar puntos de Penca en cada corte.</h2>"
+        "<p class=\"lede-tight\">No existe una metodología seria que garantice acertar todos los marcadores exactos antes de que se jueguen. Lo robusto es otra cosa: escoger el marcador con mayor valor esperado, cambiarlo cuando cambia la evidencia y no tratar como fijo un partido que el propio modelo marca como abierto.</p>"
+        "</div></div>"
+        "<div class=\"confidence-tiles championship-tiles\">"
+        f"<div class=\"summary-tile\"><span>Objetivo honesto</span><strong>Maximizar puntos</strong><small>No se promete 104/104 marcadores exactos; se optimiza regla 8/5/3.</small></div>"
+        f"<div class=\"summary-tile\"><span>Puntos esperados</span><strong>{float(metrics['expected_penca_points']):.1f}/{total * 8}</strong><small>{float(metrics['expected_penca_points_per_match']):.2f} por partido con marcador optimizado.</small></div>"
+        f"<div class=\"summary-tile\"><span>Exactos realistas</span><strong>{float(metrics['expected_penca_exact_scores']):.1f}/{total}</strong><small>Rango 90%: {float(metrics['exact_score_range_low']):.0f}-{float(metrics['exact_score_range_high']):.0f}. Un exacto único no llega a 90-95% en fútbol.</small></div>"
+        f"<div class=\"summary-tile\"><span>Si hubiera 3 marcadores</span><strong>{float(metrics['expected_top3_scores']):.1f}/{total}</strong><small>Cobertura teórica con tres opciones por partido; Penca normalmente exige uno.</small></div>"
+        f"<div class=\"summary-tile\"><span>Escenario dominante</span><strong>{html.escape(str(metrics['dominant_scenario']))}</strong><small>Puede pasar a in-play, seguro/cobertura o diferencial.</small></div>"
+        f"<div class=\"summary-tile\"><span>Partidos a cubrir</span><strong>{int(metrics['coverage_recommended'])}</strong><small>Partidos donde conviene cautela si tu formato permite cobertura.</small></div>"
+        f"<div class=\"summary-tile\"><span>Estado vivo</span><strong>{int(metrics['live_count'])} live / {int(metrics['final_count'])} final</strong><small>Los finales recalculan forma, tabla, llave y marcadores futuros.</small></div>"
+        f"<div class=\"summary-tile\"><span>Llave dinámica</span><strong>{int(metrics['projected_count'])} cruces</strong><small>Cuando cambia un clasificado, cambia el rival y también el marcador recomendado.</small></div>"
+        "</div>"
+        "<div class=\"championship-explain-grid\">"
+        "<article><h3>Cómo subir la probabilidad real de ganar</h3><p>Subir el número de “certeza” a 90-95 sin evidencia sería maquillaje. La mejora real viene de priorizar puntos esperados, usar el exacto solo donde sea defendible, cubrir partidos cerrados y actualizar tras cada final o evento live.</p></article>"
+        "<article><h3>Cómo cambian los marcadores</h3><p>Antes del torneo cambian poco; durante el Mundial cambian por resultados reales, tabla de grupo, rival proyectado, bajas, noticias, tarjetas, fatiga, minuto, marcador en vivo y eventos disponibles del feed.</p></article>"
+        "<article><h3>Qué cargar en la app</h3><p>Si solo tienes un marcador, usa la columna “Marcador para cargar en Penca”. Si la app permite editar antes del cierre, vuelve a revisar el corte más reciente antes de cada partido.</p></article>"
+        "</div>"
+        "<div class=\"scenario-table-card championship-action-card\">"
+        "<h3>Marcadores prioritarios de este corte</h3>"
+        "<ul class=\"scenario-decision-list\">"
+        f"{decision_rows()}"
+        "</ul>"
+        "</div>"
+        "<p class=\"meta\">Guardrail: si el exacto recomendado tiene baja probabilidad, el sistema todavía puede recomendarlo por puntos esperados, pero lo etiqueta como frágil. Eso es normal: en fútbol el marcador exacto es la parte más incierta de la quiniela.</p>"
+        "</section>"
+    )
+
+
 def build_quiniela_strategy_markdown(entries: Sequence[dict]) -> List[str]:
     if not entries:
         return ["_Sin partidos cargados para optimizar estrategia de quiniela._"]
@@ -10347,6 +10479,7 @@ def build_dashboard_html(
     landing_proof_html = build_landing_proof_html(entries, bracket_payload, backtest)
     runtime_status_html = build_runtime_status_html(entries, bracket_payload)
     score_dynamics_html = build_score_dynamics_html(entries)
+    championship_penca_html = build_championship_penca_optimizer_html(entries)
     methodology_html = build_methodology_html(bracket_payload, backtest, entries)
     calibration_depth_html = build_calibration_depth_html(entries, backtest)
     prediction_power_html = build_prediction_power_html(entries)
@@ -10376,6 +10509,7 @@ def build_dashboard_html(
             "landing_proof_html": landing_proof_html,
             "runtime_status_html": runtime_status_html,
             "score_dynamics_html": score_dynamics_html,
+            "championship_penca_html": championship_penca_html,
             "methodology_html": methodology_html,
             "calibration_depth_html": calibration_depth_html,
             "prediction_power_html": prediction_power_html,
@@ -10631,6 +10765,12 @@ def audit_dashboard_html(dashboard_html: str) -> List[str]:
         "actualiza llave, picks, goles y marcadores",
         "Marcadores dinámicos",
         "Los marcadores cambian a medida que avanza el campeonato",
+        "Modo campeonato",
+        "La meta no es prometer 104/104",
+        "No se promete 104/104 marcadores exactos",
+        "marcador que debo poner en Penca",
+        "Exactos realistas",
+        "Llave dinámica",
         "Escenario recomendado ahora",
         "marcador que debes poner en Penca",
         "Escenario a escoger",
@@ -10717,6 +10857,8 @@ def audit_dashboard_html(dashboard_html: str) -> List[str]:
         errors.append("Dashboard escapó el HTML del módulo Penca competitivo.")
     if "&lt;section class=&#34;panel current-penca-panel&#34;" in dashboard_html:
         errors.append("Dashboard escapó el HTML del módulo de decisión dinámica.")
+    if "&lt;section class=&#34;panel championship-penca-panel&#34;" in dashboard_html:
+        errors.append("Dashboard escapó el HTML del módulo campeonato Penca.")
     return errors
 
 

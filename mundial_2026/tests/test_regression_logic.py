@@ -329,6 +329,8 @@ class RegressionLogicTest(unittest.TestCase):
         self.assertIn("Uso educativo y entretenimiento", template)
         self.assertIn("no garantiza ganar", template)
         self.assertIn("score_dynamics_html", template)
+        self.assertIn("championship_penca_html", template)
+        self.assertIn("Campeonato", template)
 
     def test_pages_build_records_dashboard_timestamp_in_latest_json(self):
         script = (PACKAGE_ROOT / "build_pages_site.sh").read_text(encoding="utf-8")
@@ -660,6 +662,12 @@ class RegressionLogicTest(unittest.TestCase):
         self.assertIn("Penca:", html)
         self.assertIn("Marcadores dinámicos", html)
         self.assertIn("Los marcadores cambian a medida que avanza el campeonato", html)
+        self.assertIn("Modo campeonato", html)
+        self.assertIn("No se promete 104/104 marcadores exactos", html)
+        self.assertIn("Exactos realistas", html)
+        self.assertIn("marcador que debo poner en Penca", html)
+        self.assertIn('<section class="panel championship-penca-panel"', html)
+        self.assertNotIn("&lt;section class=&#34;panel championship-penca-panel&#34;", html)
         self.assertIn("Escenario recomendado ahora", html)
         self.assertIn("marcador que debes poner en Penca", html)
         self.assertIn("Escenario a escoger", html)
@@ -672,6 +680,40 @@ class RegressionLogicTest(unittest.TestCase):
         self.assertNotIn("&lt;section class=&#34;panel current-penca-panel&#34;", html)
         self.assertIn('<section class="panel competitive-penca-panel">', html)
         self.assertNotIn("&lt;section class=&#34;panel competitive-penca-panel&#34;&gt;", html)
+
+    def test_championship_penca_optimizer_is_honest_and_dynamic(self):
+        teams = app.load_teams()
+        states = app.initial_team_states(teams)
+        entries = app.dashboard_fixture_entries(
+            [
+                {
+                    "team_a": "Spain",
+                    "team_b": "Saudi Arabia",
+                    "status_state": "pre",
+                    "neutral": True,
+                    "stage": "group",
+                },
+                {
+                    "team_a": "Argentina",
+                    "team_b": "Algeria",
+                    "status_state": "in",
+                    "live_score_a": 1,
+                    "live_score_b": 0,
+                    "status_detail": "54'",
+                    "neutral": True,
+                    "stage": "group",
+                },
+            ],
+            teams,
+            states,
+            top_scores=3,
+        )
+        html = app.build_championship_penca_optimizer_html(entries)
+        self.assertIn("La meta no es prometer 104/104", html)
+        self.assertIn("Maximizar puntos", html)
+        self.assertIn("marcador que debo poner en Penca", html)
+        self.assertIn("Los finales recalculan forma, tabla, llave y marcadores futuros", html)
+        self.assertIn("in-play", html.lower())
 
     def test_penca_decision_switches_to_in_play_when_match_is_live(self):
         teams = app.load_teams()

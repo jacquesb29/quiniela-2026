@@ -86,6 +86,7 @@ h3 { font-size: 1.05rem; }
   background: rgba(15,109,102,0.10);
 }
 #estado,
+#campeonato,
 #modelo,
 #metodologia,
 #lectura-critica,
@@ -2370,6 +2371,76 @@ strong {
   padding-top: 14px;
   border-top: 1px dashed rgba(15,109,102,0.20);
 }
+.championship-penca-panel {
+  background:
+    radial-gradient(circle at 12% 12%, rgba(181,131,47,0.18), transparent 30%),
+    radial-gradient(circle at 88% 18%, rgba(15,109,102,0.14), transparent 34%),
+    linear-gradient(135deg, rgba(255,253,247,0.99), rgba(238,246,242,0.97));
+  color: var(--ink);
+}
+.championship-penca-panel .eyebrow {
+  color: var(--accent-dark);
+}
+.championship-penca-panel .lede-tight,
+.championship-penca-panel .meta {
+  color: var(--muted);
+}
+.championship-penca-panel .summary-tile {
+  background: #fffdf7;
+  border: 1px solid rgba(15,109,102,0.16);
+  box-shadow: 0 14px 30px rgba(49, 40, 23, 0.06);
+}
+.championship-penca-panel .summary-tile span,
+.championship-penca-panel .summary-tile small {
+  color: var(--muted);
+}
+.championship-penca-panel .summary-tile strong {
+  color: var(--accent-dark);
+}
+.championship-explain-grid {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin: 14px 0;
+}
+.championship-explain-grid article {
+  border-radius: 20px;
+  padding: 15px;
+  background: rgba(255,255,255,0.78);
+  border: 1px solid rgba(15,109,102,0.14);
+}
+.championship-explain-grid h3 {
+  color: var(--ink);
+  margin-bottom: 8px;
+}
+.championship-explain-grid p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.42;
+}
+.championship-action-card {
+  background: rgba(255,255,255,0.76);
+}
+.competitive-penca-panel .certainty-grid article,
+.strategy-panel .certainty-grid article,
+.championship-penca-panel .scenario-table-card {
+  color: var(--ink) !important;
+}
+.competitive-penca-panel .certainty-grid li strong,
+.competitive-penca-panel .certainty-grid h3,
+.strategy-panel .certainty-grid li strong,
+.strategy-panel .certainty-grid h3 {
+  color: var(--ink) !important;
+}
+.competitive-penca-panel .certainty-grid li span,
+.strategy-panel .certainty-grid li span {
+  color: #425156 !important;
+}
+.competitive-penca-panel .certainty-grid li em,
+.strategy-panel .certainty-grid li em {
+  background: rgba(15,109,102,0.10) !important;
+  color: var(--accent-dark) !important;
+}
 .scores h4 {
   margin: 14px 0 8px;
   color: var(--accent);
@@ -2432,7 +2503,8 @@ pre {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
   .score-dynamics-status,
-  .score-dynamics-grid {
+  .score-dynamics-grid,
+  .championship-explain-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
   .ticket-snapshot-grid {
@@ -2466,6 +2538,7 @@ pre {
   .ticket-snapshot-grid,
   .score-dynamics-status,
   .score-dynamics-grid,
+  .championship-explain-grid,
   .confidence-tiles,
   .proof-grid {
     grid-template-columns: 1fr;
