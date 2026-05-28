@@ -528,6 +528,20 @@ class RegressionLogicTest(unittest.TestCase):
         self.assertIn("safe_score", prediction.score_guidance)
         self.assertIn("upside_score", prediction.score_guidance)
 
+    def test_elite_knockout_match_keeps_upset_variance(self):
+        teams = app.load_teams()
+        prediction = app.predict_match(
+            teams,
+            "Spain",
+            "France",
+            app.MatchContext(neutral=True, knockout=True),
+            include_advancement=True,
+            top_scores=3,
+        )
+        self.assertIsNotNone(prediction.advance_a)
+        self.assertLess(prediction.advance_a, 0.70)
+        self.assertGreater(prediction.advance_b, 0.30)
+
     def test_historical_score_shape_adjustment_preserves_result_probabilities(self):
         teams = app.load_teams()
         team_a = teams["Spain"]

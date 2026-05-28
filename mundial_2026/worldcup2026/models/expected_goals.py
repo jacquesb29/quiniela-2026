@@ -214,10 +214,14 @@ def expected_goals(
     fifa_diff = profile_a.fifa_strength_index - profile_b.fifa_strength_index
     history_weight = (0.11 if ctx.knockout else 0.06) * importance_scale
 
-    delta_score = elo_diff / 255.0
-    delta_score += 0.16 * fifa_diff
-    delta_score += 0.10 * (profile_a.history.strength_index - profile_b.history.strength_index)
-    delta_score += 0.95 * (attack_edge_a - attack_edge_b)
+    # Elo/FIFA already influence attack_metric and defense_metric. Keep the
+    # direct layer as a guardrail, not a second full-strength vote.
+    delta_score = elo_diff / PARAMS.expected_goal_elo_divisor
+    delta_score += PARAMS.expected_goal_fifa_weight * fifa_diff
+    delta_score += PARAMS.expected_goal_history_strength_weight * (
+        profile_a.history.strength_index - profile_b.history.strength_index
+    )
+    delta_score += PARAMS.expected_goal_attack_edge_weight * (attack_edge_a - attack_edge_b)
     delta_score += history_weight * (profile_a.heritage_index - profile_b.heritage_index)
     delta_score += 0.05 * (profile_a.history.world_cup_index - profile_b.history.world_cup_index)
     delta_score += 0.07 * (profile_a.resource_index - profile_b.resource_index)
@@ -250,6 +254,8 @@ def expected_goals(
         delta_score -= 0.08 * market_draw_suppression
 
     share_a = logistic(delta_score)
+    if ctx.knockout:
+        share_a = 0.5 + (share_a - 0.5) * (1.0 - PARAMS.knockout_favorite_share_shrink)
 
     total_goals = 2.28
     total_goals += 0.16 * abs(elo_diff) / 400.0

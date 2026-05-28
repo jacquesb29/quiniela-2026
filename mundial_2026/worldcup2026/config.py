@@ -69,6 +69,11 @@ class ModelHyperparameters:
     temporal_cv_fold_size: int = 8
     auto_parallel_min_iterations: int = 4000
     auto_parallel_max_workers_floor: int = 1
+    expected_goal_elo_divisor: float = 340.0
+    expected_goal_fifa_weight: float = 0.08
+    expected_goal_history_strength_weight: float = 0.08
+    expected_goal_attack_edge_weight: float = 0.78
+    knockout_favorite_share_shrink: float = 0.08
 
 
 PARAMS = ModelHyperparameters()
