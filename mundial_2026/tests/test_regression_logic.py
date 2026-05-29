@@ -705,6 +705,9 @@ class RegressionLogicTest(unittest.TestCase):
         self.assertNotIn("&lt;section class=&#34;panel current-penca-panel&#34;", html)
         self.assertIn('<section class="panel competitive-penca-panel">', html)
         self.assertNotIn("&lt;section class=&#34;panel competitive-penca-panel&#34;&gt;", html)
+        self.assertIn("Last-pass contrast guardrail", html)
+        self.assertIn(".competitive-penca-panel .summary-tile strong", html)
+        self.assertIn("color: var(--accent-dark) !important", html)
 
     def test_championship_penca_optimizer_is_honest_and_dynamic(self):
         teams = app.load_teams()

@@ -2469,6 +2469,125 @@ pre {
   overflow: auto;
   padding-right: 4px;
 }
+
+/* Last-pass contrast guardrail: these panels are intentionally light, so they
+   must not inherit the cream-on-dark text rules used by the hero/bracket cards. */
+.competitive-penca-panel,
+.current-penca-panel,
+.championship-penca-panel,
+.strategy-panel,
+.scorecard-panel,
+.consensus-panel,
+.calibration-panel,
+.power-panel,
+.provider-panel,
+.agentic-panel {
+  color: var(--ink) !important;
+}
+.competitive-penca-panel h2,
+.competitive-penca-panel h3,
+.current-penca-panel h2,
+.current-penca-panel h3,
+.championship-penca-panel h2,
+.championship-penca-panel h3,
+.strategy-panel h2,
+.strategy-panel h3,
+.scorecard-panel h2,
+.scorecard-panel h3,
+.consensus-panel h2,
+.consensus-panel h3,
+.calibration-panel h2,
+.calibration-panel h3,
+.power-panel h2,
+.power-panel h3,
+.provider-panel h2,
+.provider-panel h3,
+.agentic-panel h2,
+.agentic-panel h3 {
+  color: var(--ink) !important;
+}
+.competitive-penca-panel .summary-tile,
+.current-penca-panel .summary-tile,
+.championship-penca-panel .summary-tile,
+.strategy-panel .summary-tile,
+.scorecard-panel .summary-tile,
+.consensus-panel .summary-tile,
+.calibration-panel .summary-tile,
+.power-panel .summary-tile,
+.provider-panel .summary-tile,
+.agentic-panel .summary-tile,
+.competitive-penca-panel .certainty-grid article,
+.current-penca-panel .scenario-table-card,
+.championship-penca-panel .scenario-table-card,
+.strategy-panel .certainty-grid article {
+  background: rgba(255, 255, 255, 0.90) !important;
+  color: var(--ink) !important;
+  border-color: rgba(15,109,102,0.18) !important;
+}
+.competitive-penca-panel .summary-tile strong,
+.current-penca-panel .summary-tile strong,
+.championship-penca-panel .summary-tile strong,
+.strategy-panel .summary-tile strong,
+.scorecard-panel .summary-tile strong,
+.consensus-panel .summary-tile strong,
+.calibration-panel .summary-tile strong,
+.power-panel .summary-tile strong,
+.provider-panel .summary-tile strong,
+.agentic-panel .summary-tile strong,
+.competitive-penca-panel .certainty-grid li strong,
+.strategy-panel .certainty-grid li strong {
+  color: var(--accent-dark) !important;
+}
+.competitive-penca-panel .summary-tile span,
+.competitive-penca-panel .summary-tile small,
+.current-penca-panel .summary-tile span,
+.current-penca-panel .summary-tile small,
+.championship-penca-panel .summary-tile span,
+.championship-penca-panel .summary-tile small,
+.strategy-panel .summary-tile span,
+.strategy-panel .summary-tile small,
+.scorecard-panel .summary-tile span,
+.scorecard-panel .summary-tile small,
+.consensus-panel .summary-tile span,
+.consensus-panel .summary-tile small,
+.calibration-panel .summary-tile span,
+.calibration-panel .summary-tile small,
+.power-panel .summary-tile span,
+.power-panel .summary-tile small,
+.provider-panel .summary-tile span,
+.provider-panel .summary-tile small,
+.agentic-panel .summary-tile span,
+.agentic-panel .summary-tile small,
+.competitive-penca-panel .meta,
+.competitive-penca-panel .lede-tight,
+.current-penca-panel .meta,
+.current-penca-panel .lede-tight,
+.championship-penca-panel .meta,
+.championship-penca-panel .lede-tight,
+.strategy-panel .meta,
+.strategy-panel .lede-tight,
+.scorecard-panel .meta,
+.scorecard-panel .lede-tight,
+.consensus-panel .meta,
+.consensus-panel .lede-tight,
+.calibration-panel .meta,
+.calibration-panel .lede-tight,
+.power-panel .meta,
+.power-panel .lede-tight,
+.provider-panel .meta,
+.provider-panel .lede-tight,
+.agentic-panel .meta,
+.agentic-panel .lede-tight,
+.competitive-penca-panel .certainty-grid li span,
+.strategy-panel .certainty-grid li span {
+  color: #3d4b50 !important;
+}
+.competitive-penca-panel .certainty-grid li em,
+.strategy-panel .certainty-grid li em {
+  background: rgba(15,109,102,0.12) !important;
+  color: var(--accent-dark) !important;
+  border: 1px solid rgba(15,109,102,0.12);
+}
 @media (max-width: 820px) {
   .landing-nav {
     align-items: flex-start;
