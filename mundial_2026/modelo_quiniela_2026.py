@@ -9337,6 +9337,7 @@ def coherent_bracket_matches(bracket_payload: dict) -> Dict[str, dict]:
         visual["selected_winner"] = winner
         visual["selected_loser"] = loser
         visual["conditional_winner_prob"] = conditional_prob
+        visual["winner_prob"] = float(match.get("winner_prob", 0.0) or 0.0)
         return visual
 
     def find_consistent_matchup(match: dict, team_a: str, team_b: str) -> Optional[dict]:
@@ -9377,24 +9378,43 @@ def coherent_bracket_matches(bracket_payload: dict) -> Dict[str, dict]:
         if not matchup:
             resolved[match_id] = fallback_match(match)
             continue
-        conditional_winners = matchup.get("conditional_winners", [])
-        selected_winner = conditional_winners[0]["team"] if conditional_winners else matchup.get("winner", left_team)
-        conditional_prob = (
-            float(conditional_winners[0]["conditional_prob"])
+        conditional_winners = conditional_winner_rows(matchup)
+        matchup_favorite = (
+            str(conditional_winners[0]["team"])
             if conditional_winners
-            else float(matchup.get("conditional_winner_prob", match.get("winner_prob", 0.0)))
+            else str(matchup.get("winner", left_team))
         )
-        overall_prob = (
-            float(conditional_winners[0]["overall_prob"])
+        matchup_favorite_prob = (
+            float(conditional_winners[0].get("conditional_prob", 0.0) or 0.0)
             if conditional_winners
-            else float(matchup.get("winner_prob", match.get("winner_prob", 0.0)))
+            else float(matchup.get("conditional_winner_prob", match.get("winner_prob", 0.0)) or 0.0)
+        )
+        matchup_favorite_overall_prob = (
+            float(conditional_winners[0].get("overall_prob", 0.0) or 0.0)
+            if conditional_winners
+            else float(matchup.get("winner_prob", match.get("winner_prob", 0.0)) or 0.0)
+        )
+        slot_winner = str(match.get("winner", ""))
+        matchup_teams = {str(matchup.get("team_a", "")), str(matchup.get("team_b", ""))}
+        selected_winner = slot_winner if slot_winner in matchup_teams else matchup_favorite
+        selected_row = conditional_winner_for_team(matchup, selected_winner)
+        conditional_prob = (
+            float(selected_row.get("conditional_prob", matchup_favorite_prob) or 0.0)
+            if selected_row
+            else matchup_favorite_prob
+        )
+        advance_probabilities = match.get("advance_probabilities") or {}
+        overall_prob = (
+            float(advance_probabilities.get(selected_winner, match.get("winner_prob", 0.0)) or 0.0)
+            if selected_winner == slot_winner
+            else float((selected_row or {}).get("overall_prob", matchup.get("winner_prob", 0.0)) or 0.0)
         )
         override = quiniela_override_for_match(match_id, matchup, str(selected_winner))
         original_winner = selected_winner
         if override:
             selected_winner = override["winner"]
             conditional_prob = float(override["conditional_prob"])
-            overall_prob = float(override["overall_prob"])
+            overall_prob = float(advance_probabilities.get(selected_winner, override["overall_prob"]) or 0.0)
         visual = dict(match)
         visual["team_a"] = matchup.get("team_a", match.get("team_a"))
         visual["team_b"] = matchup.get("team_b", match.get("team_b"))
@@ -9402,6 +9422,14 @@ def coherent_bracket_matches(bracket_payload: dict) -> Dict[str, dict]:
         visual["matchup_prob"] = float(matchup.get("matchup_prob", match.get("matchup_prob", 0.0)))
         visual["conditional_winner_prob"] = conditional_prob
         visual["winner_prob"] = overall_prob
+        visual["matchup_favorite"] = matchup_favorite
+        visual["matchup_favorite_prob"] = matchup_favorite_prob
+        visual["matchup_favorite_overall_prob"] = matchup_favorite_overall_prob
+        visual["slot_winner_mode"] = (
+            "quiniela_override"
+            if override
+            else ("global_slot" if selected_winner != matchup_favorite else "conditional_favorite")
+        )
         visual["selected_winner"] = selected_winner
         visual["selected_loser"] = visual["team_b"] if selected_winner == visual["team_a"] else visual["team_a"]
         if override:
@@ -10738,6 +10766,15 @@ def audit_bracket_payload(bracket_payload: dict, teams: Dict[str, Team], min_ite
                 prob = float(match.get(prob_key) or 0.0)
                 if prob < 0.0 or prob > 1.0:
                     errors.append(f"{match_id} tiene {prob_key} fuera de rango: {prob}.")
+        advance_probabilities = match.get("advance_probabilities") or {}
+        if winner in advance_probabilities and "winner_prob" in match:
+            expected_winner_prob = float(advance_probabilities.get(winner, 0.0) or 0.0)
+            published_winner_prob = float(match.get("winner_prob", 0.0) or 0.0)
+            if abs(expected_winner_prob - published_winner_prob) > 0.000001:
+                errors.append(
+                    f"{match_id} mezcla probabilidad global del casillero: "
+                    f"{winner} aparece con {published_winner_prob:.4f}, pero su avance global es {expected_winner_prob:.4f}."
+                )
         penalties_prob = float(match.get("penalties_prob", 0.0) or 0.0)
         if penalties_prob > 0.01 and not match.get("top_penalty_scores"):
             errors.append(f"{match_id} tiene probabilidad de penales pero no publica marcadores probables de tanda.")

@@ -388,8 +388,8 @@ class RefactorSmokeTest(unittest.TestCase):
         self.assertIn("15.000 simulaciones", html)
         self.assertIn("Octavos 5", html)
         self.assertIn("Cuartos 3", html)
-        self.assertIn("Turkey</span></div><div class=\"team-divider\"></div><div class=\"team-row favorite\"><span class=\"team-name\">Spain", html)
-        self.assertNotIn("Belgium</span></div><div class=\"team-divider\"></div><div class=\"team-row favorite\"><span class=\"team-name\">Spain", html)
+        self.assertIn("Belgium</span></div><div class=\"team-divider\"></div><div class=\"team-row favorite\"><span class=\"team-name\">Spain", html)
+        self.assertIn("Cruce: favorito condicional Turkey", html)
 
 
 if __name__ == "__main__":

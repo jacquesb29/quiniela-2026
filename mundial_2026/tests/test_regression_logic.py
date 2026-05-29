@@ -927,6 +927,66 @@ class RegressionLogicTest(unittest.TestCase):
         self.assertAlmostEqual(projection["conditional_winner_prob"], 20 / 45)
         self.assertAlmostEqual(projection["winner_prob"], 50 / 90)
 
+    def test_coherent_bracket_preserves_global_slot_probability(self):
+        payload = {
+            "matches": {
+                "M81": {
+                    "match_id": "M81",
+                    "id": "M81",
+                    "stage": "round32",
+                    "team_a": "Turkey",
+                    "team_b": "Iran",
+                    "winner": "Turkey",
+                    "winner_prob": 0.36,
+                    "conditional_winner_prob": 0.92,
+                },
+                "M82": {
+                    "match_id": "M82",
+                    "id": "M82",
+                    "stage": "round32",
+                    "team_a": "Belgium",
+                    "team_b": "Czech Republic",
+                    "winner": "Belgium",
+                    "winner_prob": 0.30,
+                    "conditional_winner_prob": 0.79,
+                },
+                "M93": {
+                    "match_id": "M93",
+                    "id": "M93",
+                    "stage": "round16",
+                    "team_a": "Turkey",
+                    "team_b": "Belgium",
+                    "winner": "Belgium",
+                    "winner_prob": 0.301,
+                    "conditional_winner_prob": 0.480,
+                    "advance_probabilities": {"Belgium": 0.301, "Turkey": 0.221},
+                    "matchup_scenarios": [
+                        {
+                            "team_a": "Turkey",
+                            "team_b": "Belgium",
+                            "winner": "Turkey",
+                            "matchup_prob": 0.186,
+                            "conditional_winner_prob": 0.520,
+                            "winner_prob": 0.096,
+                            "conditional_winners": [
+                                {"team": "Turkey", "conditional_prob": 0.520, "overall_prob": 0.096},
+                                {"team": "Belgium", "conditional_prob": 0.480, "overall_prob": 0.089},
+                            ],
+                        }
+                    ],
+                },
+            }
+        }
+
+        coherent = app.coherent_bracket_matches(payload)
+        match = coherent["M93"]
+
+        self.assertEqual(match["winner"], "Belgium")
+        self.assertEqual(match["matchup_favorite"], "Turkey")
+        self.assertEqual(match["slot_winner_mode"], "global_slot")
+        self.assertAlmostEqual(match["conditional_winner_prob"], 0.480)
+        self.assertAlmostEqual(match["winner_prob"], 0.301)
+
     def test_update_simulation_state_tracks_recent_xg_signals(self):
         teams = app.load_teams()
         states = app.initial_team_states(teams)
