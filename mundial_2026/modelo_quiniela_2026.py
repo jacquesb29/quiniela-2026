@@ -6015,6 +6015,11 @@ def quiniela_certainty_profile(entry: dict) -> dict:
     penca_expected_points = float(penca_score["expected_points"])
     penca_difference_prob = float(penca_score["difference_prob"])
     penca_result_prob = float(penca_score["result_prob"])
+    score_portfolio = guidance.get("score_portfolio")
+    if isinstance(score_portfolio, dict) and isinstance(score_portfolio.get("balanced"), dict):
+        balanced_score = score_portfolio["balanced"]
+    else:
+        balanced_score = penca_score
     fallback_penca_certainty = clamp(
         0.44 * penca_result_prob
         + 0.34 * penca_difference_prob
@@ -6080,6 +6085,7 @@ def quiniela_certainty_profile(entry: dict) -> dict:
         "penca_result_prob": penca_result_prob,
         "penca_certainty": penca_certainty,
         "penca_certainty_label": str(guidance.get("penca_certainty_label", "")),
+        "balanced_score": balanced_score,
         "safe_score": guidance.get("safe_score"),
         "upside_score": guidance.get("upside_score"),
         "tier": tier,
@@ -6613,6 +6619,13 @@ def championship_penca_optimizer_metrics(entries: Sequence[dict]) -> dict:
             "expected_top3_scores": 0.0,
             "avg_single_exact_ceiling": 0.0,
             "avg_penca_certainty": 0.0,
+            "active_decision_total": 0,
+            "scenario_expected_penca_points": 0.0,
+            "scenario_expected_penca_points_per_match": 0.0,
+            "scenario_expected_exact_scores": 0.0,
+            "scenario_expected_difference_scores": 0.0,
+            "scenario_exact_range_low": 0.0,
+            "scenario_exact_range_high": 0.0,
             "coverage_recommended": 0,
             "coverage_min": 0,
             "dominant_scenario": "Sin datos",
@@ -6630,6 +6643,18 @@ def championship_penca_optimizer_metrics(entries: Sequence[dict]) -> dict:
     for decision in decisions:
         mode_counts[str(decision.get("scenario", "Óptimo"))] = mode_counts.get(str(decision.get("scenario", "Óptimo")), 0) + 1
     dominant_scenario = max(mode_counts.items(), key=lambda item: item[1])[0] if mode_counts else "Óptimo"
+    active_decisions = [item for item in decisions if str(item.get("scenario")) != "Finalizado"]
+    active_total = len(active_decisions)
+    scenario_expected_penca_points = sum(float(item.get("scenario_expected_points", 0.0)) for item in active_decisions)
+    scenario_expected_exact_scores = sum(float(item.get("scenario_exact_prob", 0.0)) for item in active_decisions)
+    scenario_expected_difference_scores = sum(float(item.get("scenario_difference_prob", 0.0)) for item in active_decisions)
+    scenario_exact_sd = math.sqrt(
+        sum(
+            float(item.get("scenario_exact_prob", 0.0))
+            * (1.0 - float(item.get("scenario_exact_prob", 0.0)))
+            for item in active_decisions
+        )
+    )
     top_decisions = sorted(
         decisions,
         key=lambda item: (
@@ -6654,6 +6679,15 @@ def championship_penca_optimizer_metrics(entries: Sequence[dict]) -> dict:
         "pending_count": pending_count,
         "dominant_scenario": dominant_scenario,
         "avg_single_exact_ceiling": avg_single_exact_ceiling,
+        "active_decision_total": active_total,
+        "scenario_expected_penca_points": scenario_expected_penca_points,
+        "scenario_expected_penca_points_per_match": (
+            scenario_expected_penca_points / float(active_total) if active_total else 0.0
+        ),
+        "scenario_expected_exact_scores": scenario_expected_exact_scores,
+        "scenario_expected_difference_scores": scenario_expected_difference_scores,
+        "scenario_exact_range_low": max(0.0, scenario_expected_exact_scores - 1.64 * scenario_exact_sd),
+        "scenario_exact_range_high": min(float(active_total), scenario_expected_exact_scores + 1.64 * scenario_exact_sd),
         "decisions": top_decisions,
     }
 
@@ -6667,6 +6701,8 @@ def build_championship_penca_optimizer_html(entries: Sequence[dict]) -> str:
     total = int(metrics["total"])
     if total <= 0:
         return ""
+    active_total = int(metrics.get("active_decision_total", total) or total)
+    active_points_denominator = max(active_total * 8, 0)
 
     def decision_rows() -> str:
         rows = []
@@ -6697,8 +6733,9 @@ def build_championship_penca_optimizer_html(entries: Sequence[dict]) -> str:
         "</div></div>"
         "<div class=\"confidence-tiles championship-tiles\">"
         f"<div class=\"summary-tile\"><span>Objetivo honesto</span><strong>Maximizar puntos</strong><small>No se promete 104/104 marcadores exactos; se optimiza regla 8/5/3.</small></div>"
-        f"<div class=\"summary-tile\"><span>Puntos esperados</span><strong>{float(metrics['expected_penca_points']):.1f}/{total * 8}</strong><small>{float(metrics['expected_penca_points_per_match']):.2f} por partido con marcador optimizado.</small></div>"
-        f"<div class=\"summary-tile\"><span>Exactos realistas</span><strong>{float(metrics['expected_penca_exact_scores']):.1f}/{total}</strong><small>Rango 90%: {float(metrics['exact_score_range_low']):.0f}-{float(metrics['exact_score_range_high']):.0f}. Un exacto único no llega a 90-95% en fútbol.</small></div>"
+        f"<div class=\"summary-tile\"><span>Puntos esperados activos</span><strong>{float(metrics['scenario_expected_penca_points']):.1f}/{active_points_denominator}</strong><small>{float(metrics['scenario_expected_penca_points_per_match']):.2f} por partido según el marcador que realmente se recomienda cargar ahora.</small></div>"
+        f"<div class=\"summary-tile\"><span>Exactos realistas activos</span><strong>{float(metrics['scenario_expected_exact_scores']):.1f}/{active_total}</strong><small>Rango 90%: {float(metrics['scenario_exact_range_low']):.0f}-{float(metrics['scenario_exact_range_high']):.0f}. Un exacto único no llega a 90-95% en fútbol.</small></div>"
+        f"<div class=\"summary-tile\"><span>Diferencias esperadas activas</span><strong>{float(metrics['scenario_expected_difference_scores']):.1f}/{active_total}</strong><small>Incluye exactos; en Penca normalmente es donde se recuperan puntos cuando no entra el marcador exacto.</small></div>"
         f"<div class=\"summary-tile\"><span>Si hubiera 3 marcadores</span><strong>{float(metrics['expected_top3_scores']):.1f}/{total}</strong><small>Cobertura teórica con tres opciones por partido; Penca normalmente exige uno.</small></div>"
         f"<div class=\"summary-tile\"><span>Escenario dominante</span><strong>{html.escape(str(metrics['dominant_scenario']))}</strong><small>Puede pasar a in-play, seguro/cobertura o diferencial.</small></div>"
         f"<div class=\"summary-tile\"><span>Partidos a cubrir</span><strong>{int(metrics['coverage_recommended'])}</strong><small>Partidos donde conviene cautela si tu formato permite cobertura.</small></div>"

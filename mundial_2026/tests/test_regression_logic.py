@@ -527,6 +527,17 @@ class RegressionLogicTest(unittest.TestCase):
         self.assertIn("penca_certainty_index", prediction.score_guidance)
         self.assertIn("safe_score", prediction.score_guidance)
         self.assertIn("upside_score", prediction.score_guidance)
+        self.assertIn("score_portfolio", prediction.score_guidance)
+
+        entry = {
+            "title": "Spain vs Saudi Arabia",
+            "stage_label": "Grupo H",
+            "prediction": prediction,
+            "status_state": "pre",
+        }
+        profile = app.quiniela_certainty_profile(entry)
+        self.assertIn("balanced_score", profile)
+        self.assertIsInstance(profile["balanced_score"], dict)
 
     def test_elite_knockout_match_keeps_upset_variance(self):
         teams = app.load_teams()
@@ -725,9 +736,16 @@ class RegressionLogicTest(unittest.TestCase):
         html = app.build_championship_penca_optimizer_html(entries)
         self.assertIn("La meta no es prometer 104/104", html)
         self.assertIn("Maximizar puntos", html)
+        self.assertIn("Puntos esperados activos", html)
+        self.assertIn("según el marcador que realmente se recomienda cargar ahora", html)
         self.assertIn("marcador que debo poner en Penca", html)
         self.assertIn("Los finales recalculan forma, tabla, llave y marcadores futuros", html)
         self.assertIn("in-play", html.lower())
+
+        metrics = app.championship_penca_optimizer_metrics(entries)
+        self.assertGreater(metrics["active_decision_total"], 0)
+        self.assertGreater(metrics["scenario_expected_penca_points"], 0.0)
+        self.assertGreater(metrics["scenario_expected_difference_scores"], 0.0)
 
     def test_penca_decision_switches_to_in_play_when_match_is_live(self):
         teams = app.load_teams()
