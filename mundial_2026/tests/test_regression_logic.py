@@ -463,6 +463,30 @@ class RegressionLogicTest(unittest.TestCase):
         one_nil = app.score_expected_points_for_penca(dist, 1, 0)
         self.assertGreater(float(one_nil.get("poisson_modal_lock_penalty", 0.0)), 0.0)
 
+    def test_score_optimizer_tracks_popular_score_and_differential_value(self):
+        dist = {
+            (1, 0): 0.18,
+            (2, 0): 0.18,
+            (2, 1): 0.16,
+            (3, 1): 0.13,
+            (1, 1): 0.12,
+            (0, 0): 0.08,
+            (0, 1): 0.05,
+            (1, 2): 0.04,
+            (3, 0): 0.04,
+            (2, 2): 0.02,
+        }
+        options = app.penca_ovacion_score_options(dist, top_n=5)
+        self.assertIn("public_score_popularity_index", options[0])
+        self.assertIn("differential_value_index", options[0])
+        self.assertIn("competitive_adjusted_points", options[0])
+        popular = app.score_expected_points_for_penca(dist, 2, 0)
+        less_obvious = app.score_expected_points_for_penca(dist, 3, 1)
+        self.assertGreater(float(popular["public_score_popularity_index"]), float(less_obvious["public_score_popularity_index"]))
+        portfolio = app.penca_score_portfolio(dist)
+        self.assertIn("differential", portfolio)
+        self.assertIn("differential_value_index", portfolio["differential"])
+
     def test_tournament_scoreline_adjustment_feeds_simulation_without_rewriting_1x2(self):
         dist = {
             (1, 0): 0.16,
@@ -528,6 +552,9 @@ class RegressionLogicTest(unittest.TestCase):
         self.assertIn("safe_score", prediction.score_guidance)
         self.assertIn("upside_score", prediction.score_guidance)
         self.assertIn("score_portfolio", prediction.score_guidance)
+        self.assertIn("recommended_public_score_popularity_index", prediction.score_guidance)
+        self.assertIn("recommended_differential_value_index", prediction.score_guidance)
+        self.assertIn("differential", prediction.score_guidance["score_portfolio"])
 
         entry = {
             "title": "Spain vs Saudi Arabia",
@@ -537,6 +564,7 @@ class RegressionLogicTest(unittest.TestCase):
         }
         profile = app.quiniela_certainty_profile(entry)
         self.assertIn("balanced_score", profile)
+        self.assertIn("differential_score", profile)
         self.assertIsInstance(profile["balanced_score"], dict)
 
     def test_elite_knockout_match_keeps_upset_variance(self):
@@ -681,7 +709,9 @@ class RegressionLogicTest(unittest.TestCase):
         self.assertIn("Ajuste histórico del marcador", html)
         self.assertIn("Marcadores amplios o menos centrados a vigilar", html)
         self.assertIn("Modo seguro", html)
-        self.assertIn("Modo agresivo", html)
+        self.assertIn("Modo diferencial", html)
+        self.assertIn("Popularidad estimada del marcador", html)
+        self.assertIn("Valor diferencial del marcador", html)
         self.assertIn("Qué cargar primero en Penca", html)
         self.assertIn("Modelo:", html)
         self.assertIn("Penca:", html)

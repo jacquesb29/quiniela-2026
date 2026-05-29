@@ -4819,6 +4819,76 @@ def empirical_score_prior(goals_a: int, goals_b: int) -> float:
     return 0.012 * math.exp(-0.38 * total - 0.22 * margin)
 
 
+CONVENTIONAL_SCORE_POPULARITY = {
+    (1, 0): 0.92,
+    (0, 1): 0.88,
+    (2, 0): 0.95,
+    (0, 2): 0.90,
+    (1, 1): 0.94,
+    (2, 1): 0.84,
+    (1, 2): 0.80,
+    (0, 0): 0.74,
+    (3, 0): 0.58,
+    (0, 3): 0.52,
+    (3, 1): 0.56,
+    (1, 3): 0.50,
+    (2, 2): 0.50,
+}
+
+
+def public_scoreline_popularity_proxy(
+    pick_a: int,
+    pick_b: int,
+    mean_goals_a: float,
+    mean_goals_b: float,
+    exact_prob: float,
+    top_exact_prob: float,
+    difference_prob: float,
+    prior_index: float,
+) -> float:
+    """Estimate how crowded a scoreline is likely to be in a casual pool.
+
+    This is not treated as truth or market data. It is a strategic proxy: many
+    participants over-select familiar scores such as 1-0, 2-0, 2-1 and 1-1.
+    The Penca optimizer can use that signal to distinguish "safe/obvious" from
+    "differential but still defensible" score choices.
+    """
+
+    total_goals = pick_a + pick_b
+    margin = abs(pick_a - pick_b)
+    mean_edge = mean_goals_a - mean_goals_b
+    pick_result = score_result_code(pick_a, pick_b)
+    favorite_result = "1" if mean_edge > 0.25 else "2" if mean_edge < -0.25 else "X"
+    conventional = CONVENTIONAL_SCORE_POPULARITY.get(
+        (pick_a, pick_b),
+        clamp(0.42 - 0.055 * max(total_goals - 3, 0) - 0.035 * max(margin - 2, 0), 0.16, 0.46),
+    )
+    exact_visibility = clamp(exact_prob / max(top_exact_prob, 1e-9), 0.0, 1.0)
+    difference_visibility = clamp(difference_prob / 0.34, 0.0, 1.0)
+    simple_score_bias = clamp(1.0 - 0.13 * max(total_goals - 2, 0) - 0.08 * max(margin - 2, 0), 0.22, 1.0)
+    if pick_result == favorite_result:
+        result_visibility = 0.78
+    elif pick_result == "X" and abs(mean_edge) <= 0.45:
+        result_visibility = 0.66
+    elif pick_result != "X":
+        result_visibility = 0.42
+    else:
+        result_visibility = 0.34
+    if pick_result != "X" and min(pick_a, pick_b) == 0 and margin <= 2:
+        result_visibility += 0.05
+
+    return clamp(
+        0.31 * conventional
+        + 0.22 * exact_visibility
+        + 0.16 * simple_score_bias
+        + 0.14 * result_visibility
+        + 0.10 * difference_visibility
+        + 0.07 * prior_index,
+        0.0,
+        1.0,
+    )
+
+
 def score_shape_decision_boost(goals_a: int, goals_b: int, score_shape_meta: Optional[Dict[str, object]] = None) -> float:
     if not score_shape_meta:
         return 1.0
@@ -5188,6 +5258,16 @@ def score_expected_points_for_penca(
     scenario_ensemble_index = float(scenario_profile["scenario_ensemble_index"])
     poisson_modal_lock_penalty = float(scenario_profile["poisson_modal_lock_penalty"])
     shape_boost = score_shape_decision_boost(pick_a, pick_b, score_shape_meta)
+    public_score_popularity_index = public_scoreline_popularity_proxy(
+        pick_a,
+        pick_b,
+        mean_goals_a,
+        mean_goals_b,
+        exact_prob,
+        top_exact_prob,
+        difference_prob,
+        prior_index,
+    )
     high_total_penalty = max(0.0, total_goals - (mean_total_goals + 2.15))
     tail_score_penalty = 0.10 if total_goals >= 5 and relative_exact_strength < 0.45 else 0.0
     extreme_score_penalty = 0.12 if max(pick_a, pick_b) >= 4 and exact_prob < 0.025 else 0.0
@@ -5249,6 +5329,18 @@ def score_expected_points_for_penca(
         0.0,
         1.0,
     )
+    differential_value_index = clamp(
+        0.30 * ensemble_score_index
+        + 0.20 * plausibility_index
+        + 0.17 * scoreline_calibration_index
+        + 0.13 * scenario_ensemble_index
+        + 0.10 * prior_index
+        + 0.06 * model_score_index
+        + 0.04 * asymmetric_bonus
+        - 0.26 * public_score_popularity_index,
+        0.0,
+        1.0,
+    )
     ensemble_adjusted_points = (
         expected_points * (0.70 + 0.30 * ensemble_score_index)
         + 0.42 * exact_prob
@@ -5262,6 +5354,11 @@ def score_expected_points_for_penca(
         - 0.22 * poisson_modal_lock_penalty
         - 0.16 * clean_sheet_margin_penalty
         - 0.10 * empirical_tail_penalty
+    )
+    competitive_adjusted_points = (
+        ensemble_adjusted_points
+        + 0.28 * differential_value_index
+        - 0.08 * public_score_popularity_index
     )
     realism_adjusted_points = (
         expected_points * (0.78 + 0.22 * plausibility_index)
@@ -5284,9 +5381,12 @@ def score_expected_points_for_penca(
         "safety_index": safety_index,
         "upside_score": upside_score,
         "ensemble_adjusted_points": ensemble_adjusted_points,
+        "competitive_adjusted_points": competitive_adjusted_points,
         "ensemble_score_index": ensemble_score_index,
         "model_score_index": model_score_index,
         "penca_points_index": penca_points_index,
+        "public_score_popularity_index": public_score_popularity_index,
+        "differential_value_index": differential_value_index,
         "empirical_prior": prior_prob,
         "empirical_prior_index": prior_index,
         "marginal_fit": marginal_fit,
@@ -5420,6 +5520,7 @@ def penca_ovacion_score_options(
         key=lambda item: (
             float(item["ensemble_adjusted_points"]),
             float(item["ensemble_score_index"]),
+            float(item.get("competitive_adjusted_points", 0.0)),
             float(item["realism_adjusted_points"]),
             float(item.get("plausibility_index", 0.0)),
             float(item["expected_points"]),
@@ -5767,6 +5868,7 @@ def penca_score_portfolio(
         key=lambda item: (
             float(item["ensemble_adjusted_points"]),
             float(item["ensemble_score_index"]),
+            float(item.get("competitive_adjusted_points", 0.0)),
             float(item["realism_adjusted_points"]),
             float(item.get("plausibility_index", 0.0)),
             float(item["expected_points"]),
@@ -5797,7 +5899,18 @@ def penca_score_portfolio(
             float(item["asymmetric_bonus"]),
         ),
     )
-    return {"balanced": balanced, "safe": safe, "upside": upside}
+    differential = max(
+        plausible_upside_candidates,
+        key=lambda item: (
+            float(item.get("competitive_adjusted_points", item.get("ensemble_adjusted_points", 0.0))),
+            float(item.get("differential_value_index", 0.0)),
+            -float(item.get("public_score_popularity_index", 0.0)),
+            float(item.get("plausibility_index", 0.0)),
+            float(item["expected_points"]),
+            float(item["exact_prob"]),
+        ),
+    )
+    return {"balanced": balanced, "safe": safe, "upside": upside, "differential": differential}
 
 
 def penca_ovacion_top_score(prediction: MatchPrediction) -> Dict[str, float | str]:
@@ -5932,6 +6045,11 @@ def score_precision_profile(
             f"{recommendation_note} Además, fue promovido por calibración de marcador entero: "
             f"{top_penca.get('promotion_note', '')}"
         )
+    if float(top_penca.get("differential_value_index", 0.0)) >= 0.55:
+        recommendation_note = (
+            f"{recommendation_note} También tiene valor diferencial: no parece tan obvio para el boleto popular, "
+            "pero conserva soporte de puntos esperados."
+        )
 
     return {
         "recommended_score": recommended_score,
@@ -5942,8 +6060,11 @@ def score_precision_profile(
         "recommended_points_sd": recommended_points_sd,
         "recommended_risk_adjusted_points": float(top_penca.get("risk_adjusted_points", 0.0)),
         "recommended_ensemble_adjusted_points": float(top_penca.get("ensemble_adjusted_points", top_penca.get("realism_adjusted_points", 0.0))),
+        "recommended_competitive_adjusted_points": float(top_penca.get("competitive_adjusted_points", top_penca.get("ensemble_adjusted_points", 0.0))),
         "recommended_ensemble_score_index": float(top_penca.get("ensemble_score_index", 0.0)),
         "recommended_empirical_prior_index": float(top_penca.get("empirical_prior_index", 0.0)),
+        "recommended_public_score_popularity_index": float(top_penca.get("public_score_popularity_index", 0.0)),
+        "recommended_differential_value_index": float(top_penca.get("differential_value_index", 0.0)),
         "recommended_marginal_fit": float(top_penca.get("marginal_fit", 0.0)),
         "recommended_scoreline_calibration_index": float(top_penca.get("scoreline_calibration_index", 0.0)),
         "recommended_scoreline_calibration_note": str(top_penca.get("scoreline_calibration_note", "marcador entero alineado con goles esperados")),
@@ -5955,7 +6076,7 @@ def score_precision_profile(
         "recommended_scoreline_scenario_family": str(top_penca.get("scoreline_scenario_family", "marcador balanceado")),
         "recommended_scoreline_scenario_note": str(top_penca.get("scoreline_scenario_note", "escenario mixto")),
         "recommended_poisson_modal_lock_penalty": float(top_penca.get("poisson_modal_lock_penalty", 0.0)),
-        "score_selector_method": "Ensamble de marcador: puntos Penca + distribución del modelo + escenarios de partido + prior histórico + plausibilidad",
+        "score_selector_method": "Ensamble de marcador: puntos Penca + distribución del modelo + escenarios de partido + prior histórico + plausibilidad + valor competitivo vs marcador popular",
         "recommended_plausibility_index": float(top_penca.get("plausibility_index", top_penca.get("realism_index", 1.0))),
         "recommended_plausibility_note": str(top_penca.get("plausibility_note", "marcador de forma normal")),
         "recommended_clean_sheet_margin_penalty": float(top_penca.get("clean_sheet_margin_penalty", 0.0)),
@@ -6088,6 +6209,7 @@ def quiniela_certainty_profile(entry: dict) -> dict:
         "balanced_score": balanced_score,
         "safe_score": guidance.get("safe_score"),
         "upside_score": guidance.get("upside_score"),
+        "differential_score": (score_portfolio.get("differential") if isinstance(score_portfolio, dict) else guidance.get("upside_score")),
         "tier": tier,
         "action": action,
         "score_note": score_note,
@@ -6938,7 +7060,8 @@ def build_competitive_penca_html(entries: Sequence[dict]) -> str:
         if label == "Diferencial":
             detail += (
                 f" | edge vs popular {float(item.get('edge_vs_public', 0.0)):+.1%} | "
-                f"ganancia esperada {float(item.get('expected_gain_vs_popular', 0.0)):+.1%}"
+                f"ganancia esperada {float(item.get('expected_gain_vs_popular', 0.0)):+.1%} | "
+                f"valor diferencial marcador {format_pct(float(score.get('differential_value_index', 0.0)))}"
             )
         return (
             "<li>"
@@ -6977,7 +7100,8 @@ def build_competitive_penca_html(entries: Sequence[dict]) -> str:
         key=lambda item: (
             float(item.get("expected_gain_vs_popular", 0.0)),
             float(item.get("leverage_score", 0.0)),
-            float(as_score_dict(item, "upside_score").get("expected_points", 0.0)),
+            float(as_score_dict(item, "differential_score").get("competitive_adjusted_points", 0.0)),
+            float(as_score_dict(item, "differential_score").get("differential_value_index", 0.0)),
         ),
         reverse=True,
     )[:8]
@@ -6988,12 +7112,12 @@ def build_competitive_penca_html(entries: Sequence[dict]) -> str:
         if mode == "safe":
             return "".join(mode_row(item, as_score_dict(item, "safe_score"), "Seguro") for item in items)
         if mode == "differential":
-            return "".join(mode_row(item, as_score_dict(item, "upside_score"), "Diferencial") for item in items)
+            return "".join(mode_row(item, as_score_dict(item, "differential_score"), "Diferencial") for item in items)
         return "".join(mode_row(item, optimal_score(item), "Óptimo") for item in items)
 
     safe_points = sum(float(as_score_dict(item, "safe_score").get("expected_points", 0.0)) for item in safe_items)
     optimal_points = sum(float(optimal_score(item).get("expected_points", 0.0)) for item in optimal_items)
-    differential_points = sum(float(as_score_dict(item, "upside_score").get("expected_points", 0.0)) for item in differential_items)
+    differential_points = sum(float(as_score_dict(item, "differential_score").get("expected_points", 0.0)) for item in differential_items)
     return (
         "<section class=\"panel competitive-penca-panel\">"
         "<div class=\"panel-head\"><div>"
@@ -8981,6 +9105,8 @@ def penca_ovacion_score_html(prediction: MatchPrediction) -> str:
         f"{promotion_tile}"
         f"<div><span>Calidad del marcador exacto</span><strong>{html.escape(str(guidance.get('precision_label', 'sin clasificar')))}</strong></div>"
         f"<div><span>Ajuste histórico del marcador</span><strong>{format_pct(float(guidance.get('recommended_empirical_prior_index', 0.0)))}</strong><small>Compatibilidad con frecuencias históricas de marcadores de fútbol.</small></div>"
+        f"<div><span>Popularidad estimada del marcador</span><strong>{format_pct(float(guidance.get('recommended_public_score_popularity_index', 0.0)))}</strong><small>Proxy de qué tan probable es que otros jueguen este marcador obvio.</small></div>"
+        f"<div><span>Valor diferencial del marcador</span><strong>{format_pct(float(guidance.get('recommended_differential_value_index', 0.0)))}</strong><small>Útil si buscas ganarle a boletos populares sin abandonar el modelo.</small></div>"
         f"<div><span>Filtro de plausibilidad</span><strong>{format_pct(float(guidance.get('recommended_plausibility_index', 1.0)))}</strong><small>{html.escape(str(guidance.get('recommended_plausibility_note', 'marcador de forma normal')))}</small></div>"
         f"<div><span>Máximo realista exacto único</span><strong>{format_pct(float(guidance.get('single_exact_upper_bound', top['exact_prob'])))}</strong><small>{html.escape(str(guidance.get('single_exact_ceiling_label', 'un exacto único no llega a 90-95%')))}</small></div>"
         f"<div><span>Puntos esperados del pick</span><strong>{float(top['expected_points']):.2f} / 8</strong></div>"
@@ -8998,7 +9124,7 @@ def penca_ovacion_score_html(prediction: MatchPrediction) -> str:
         "<div class=\"subgrid penca-mode-grid\">"
         f"{portfolio_tile('Modo principal', guidance.get('score_portfolio', {}).get('balanced') if isinstance(guidance.get('score_portfolio'), dict) else top, 'Maximiza puntos esperados.')}"
         f"{portfolio_tile('Modo seguro', guidance.get('safe_score'), 'Baja varianza: favorece diferencia/ganador.')}"
-        f"{portfolio_tile('Modo agresivo', guidance.get('upside_score'), 'Más techo si necesitas diferenciarte.')}"
+        f"{portfolio_tile('Modo diferencial', guidance.get('score_portfolio', {}).get('differential') if isinstance(guidance.get('score_portfolio'), dict) else guidance.get('upside_score'), 'Menos obvio: busca valor contra marcador popular.')}"
         "</div>"
         "<div class=\"certainty-grid score-guidance-grid\">"
         f"{goal_options_list(guidance.get('goal_options_a'), prediction.team_a)}"
