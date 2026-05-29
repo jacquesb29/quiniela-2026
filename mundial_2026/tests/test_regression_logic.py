@@ -18,6 +18,7 @@ from worldcup2026.dashboard.html_builder import render_dashboard_html
 from worldcup2026.distributions import (
     build_model_stack,
     independent_score_distribution,
+    ml_calibrated_score_distribution,
     overdispersed_score_distribution,
 )
 from worldcup2026.live.adjustment import live_game_state_adjustment, live_stats_adjustment
@@ -706,6 +707,7 @@ class RegressionLogicTest(unittest.TestCase):
         self.assertIn("Qué dice cada modelo", html)
         self.assertIn("model-compare-collapse", html)
         self.assertIn("Overdispersión calibrada", html)
+        self.assertIn("ML ligero regularizado", html)
         self.assertIn("Ajuste histórico del marcador", html)
         self.assertIn("Marcadores amplios o menos centrados a vigilar", html)
         self.assertIn("Modo seguro", html)
@@ -1108,12 +1110,23 @@ class RegressionLogicTest(unittest.TestCase):
         dist, meta = build_model_stack(1.75, 0.95, ctx, max_goals=7, market_strength=0.30)
 
         self.assertIn("overdispersed", meta["weights"])
+        self.assertIn("ml", meta["weights"])
         self.assertEqual(meta["overdispersed_name"], "Overdispersión calibrada")
+        self.assertEqual(meta["ml_name"], "ML ligero regularizado")
         self.assertIn("outcome_temperature", meta)
         self.assertAlmostEqual(sum(meta["weights"].values()), 1.0, places=6)
         self.assertAlmostEqual(sum(dist.values()), 1.0, places=6)
         self.assertGreaterEqual(float(meta["outcome_temperature"]), 0.90)
         self.assertLessEqual(float(meta["outcome_temperature"]), 1.12)
+        self.assertIn("ml_probs", meta)
+        self.assertIn("ml_top_score", meta)
+
+    def test_ml_calibrated_distribution_is_normalized_and_visible(self):
+        ctx = app.MatchContext(neutral=True, knockout=True, market_total_line=2.4)
+        dist = ml_calibrated_score_distribution(1.85, 1.10, ctx, max_goals=8)
+        self.assertAlmostEqual(sum(dist.values()), 1.0, places=6)
+        self.assertGreater(len(dist), 0)
+        self.assertGreater(max(dist.values()), 0.0)
 
     def test_overdispersed_distribution_keeps_more_high_goal_tail(self):
         ctx = app.MatchContext(neutral=True)

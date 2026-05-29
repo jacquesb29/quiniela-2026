@@ -84,7 +84,9 @@ from worldcup2026.distributions import (
     build_model_stack,
     cached_low_score_distribution,
     low_score_rho,
+    ml_calibrated_score_distribution,
     model_blend_weights,
+    overdispersed_score_distribution,
 )
 from worldcup2026.logging_utils import log
 from worldcup2026.metrics import avg_or_none, brier_decomposition, summarize_temporal_windows
@@ -675,6 +677,7 @@ def compute_statistical_depth(
                 str((model_stack or {}).get("contrast_name", "")),
                 str((model_stack or {}).get("low_score_name", "")),
                 str((model_stack or {}).get("overdispersed_name", "")),
+                str((model_stack or {}).get("ml_name", "")),
                 str((model_stack or {}).get("final_name", "")),
             ]
             if model_stack
@@ -1622,18 +1625,26 @@ def independent_sample_score(mu_a: float, mu_b: float) -> Tuple[int, int]:
 def sample_score(mu_a: float, mu_b: float, ctx: Optional[MatchContext] = None) -> Tuple[int, int]:
     weights = model_blend_weights(mu_a, mu_b, ctx)
     roll = fast_random()
-    if roll < weights["primary"]:
+    cutoff = weights["primary"]
+    if roll < cutoff:
         return correlated_sample_score(mu_a, mu_b, ctx)
-    if roll < weights["primary"] + weights["contrast"]:
+    cutoff += weights["contrast"]
+    if roll < cutoff:
         return independent_sample_score(mu_a, mu_b)
-    rho = low_score_rho(mu_a, mu_b, ctx)
-    low_score_dist = cached_low_score_distribution(
-        int(round(mu_a * 20.0)),
-        int(round(mu_b * 20.0)),
-        int(round(rho * 100.0)),
-        7,
-    )
-    return _sample_from_distribution(low_score_dist)
+    cutoff += weights.get("low_score", 0.0)
+    if roll < cutoff:
+        rho = low_score_rho(mu_a, mu_b, ctx)
+        low_score_dist = cached_low_score_distribution(
+            int(round(mu_a * 20.0)),
+            int(round(mu_b * 20.0)),
+            int(round(rho * 100.0)),
+            7,
+        )
+        return _sample_from_distribution(low_score_dist)
+    cutoff += weights.get("overdispersed", 0.0)
+    if roll < cutoff:
+        return _sample_from_distribution(overdispersed_score_distribution(mu_a, mu_b, ctx, max_goals=7))
+    return _sample_from_distribution(ml_calibrated_score_distribution(mu_a, mu_b, ctx, max_goals=7))
 
 
 def penalties_context_state(ctx_morale: float, state: Optional[dict]) -> dict:
@@ -7496,7 +7507,7 @@ def external_estimator_methodology_items() -> List[dict]:
         {
             "name": "SPI / modelos ofensivo-defensivos",
             "signal": "Ataque y defensa convertidos a goles esperados y probabilidades de marcador.",
-            "usage": "El modelo replica esa lógica con goles esperados, distribución de marcadores, Dixon-Coles y overdispersión calibrada.",
+            "usage": "El modelo replica esa lógica con goles esperados, distribución de marcadores, Dixon-Coles, overdispersión calibrada y una capa ML ligera regularizada.",
         },
         {
             "name": "Mercado y consenso profesional",
@@ -8015,7 +8026,7 @@ def agentic_learning_items() -> List[dict]:
         },
         {
             "agent": "Agente predictivo",
-            "job": "Combina Poisson/Dixon-Coles, overdispersión calibrada, Elo/FIFA, ensamble ligero, consenso externo y Monte Carlo de torneo.",
+            "job": "Combina Poisson/Dixon-Coles, overdispersión calibrada, ML ligero, Elo/FIFA, ensamble, consenso externo y Monte Carlo de torneo.",
             "learns": "Cuando cambia un resultado, recalcula grupos, cruces, llave, campeón y boletos recomendados.",
         },
         {
@@ -8929,7 +8940,19 @@ def model_comparison_lines(prediction: MatchPrediction) -> List[str]:
         name = str(stack.get(name_key, "Modelo"))
         probs = stack.get(probs_key, {}) or {}
         top_score, top_score_prob = stack.get(score_key, ("0-0", 0.0))
-        weight_key = "primary" if name_key == "primary_name" else "contrast" if name_key == "contrast_name" else "low_score" if name_key == "low_score_name" else None
+        weight_key = (
+            "primary"
+            if name_key == "primary_name"
+            else "contrast"
+            if name_key == "contrast_name"
+            else "low_score"
+            if name_key == "low_score_name"
+            else "overdispersed"
+            if name_key == "overdispersed_name"
+            else "ml"
+            if name_key == "ml_name"
+            else None
+        )
         weight_label = ""
         if weight_key and stack.get("weights", {}).get(weight_key) is not None:
             weight_label = f" | peso actual {format_pct(float(stack['weights'][weight_key]))}"
@@ -8946,6 +8969,8 @@ def model_comparison_lines(prediction: MatchPrediction) -> List[str]:
     lines.append(row("low_score_name", "low_score_probs", "low_score_top_score"))
     if "overdispersed_name" in stack:
         lines.append(row("overdispersed_name", "overdispersed_probs", "overdispersed_top_score"))
+    if "ml_name" in stack:
+        lines.append(row("ml_name", "ml_probs", "ml_top_score"))
     lines.append(row("final_name", "ensemble_probs", "ensemble_top_score"))
     return lines
 
@@ -8968,6 +8993,8 @@ def model_comparison_html(prediction: MatchPrediction) -> str:
             if name_key == "low_score_name"
             else "overdispersed"
             if name_key == "overdispersed_name"
+            else "ml"
+            if name_key == "ml_name"
             else None
         )
         weight_html = ""
@@ -8986,12 +9013,13 @@ def model_comparison_html(prediction: MatchPrediction) -> str:
 
     inner = (
         "<div class=\"reason-block model-compare-block\">"
-        "<p class=\"meta\">Aquí se ven por separado el modelo principal, el contraste, el ajuste de baja anotación y la overdispersión calibrada. El ensamble final repondera esos modelos según consenso, dispersión y cercanía al mercado cuando hay cuotas confiables.</p>"
+        "<p class=\"meta\">Aquí se ven por separado el modelo principal, el contraste, el ajuste de baja anotación, la overdispersión calibrada y el calibrador ML ligero. El ensamble final repondera esos modelos según consenso, dispersión y cercanía al mercado cuando hay cuotas confiables.</p>"
         "<div class=\"model-compare-grid\">"
         f"{card('primary_name', 'primary_probs', 'primary_top_score', 'primary')}"
         f"{card('contrast_name', 'contrast_probs', 'contrast_top_score', 'contrast')}"
         f"{card('low_score_name', 'low_score_probs', 'low_score_top_score', 'low-score')}"
         f"{card('overdispersed_name', 'overdispersed_probs', 'overdispersed_top_score', 'overdispersed') if 'overdispersed_name' in stack else ''}"
+        f"{card('ml_name', 'ml_probs', 'ml_top_score', 'ml') if 'ml_name' in stack else ''}"
         f"{card('final_name', 'ensemble_probs', 'ensemble_top_score', 'ensemble')}"
         "</div>"
         "</div>"
@@ -10191,7 +10219,7 @@ def build_methodology_html(
         "</article>"
         "<article>"
         "<h3>Stack estadístico</h3>"
-        "<p>La capa prepartido mezcla el modelo principal Bivariante Poisson, un modelo de contraste Poisson independiente, un ajuste de baja anotación, una distribución de overdispersión calibrada y un ensamble ligero final. Ese ensamble ahora repondera los modelos según consenso, dispersión y cercanía al mercado cuando hay cuotas confiables.</p>"
+        "<p>La capa prepartido mezcla el modelo principal Bivariante Poisson, un modelo de contraste Poisson independiente, un ajuste de baja anotación, una distribución de overdispersión calibrada, un calibrador ML ligero regularizado y un ensamble final. Ese ensamble repondera los modelos según consenso, dispersión y cercanía al mercado cuando hay cuotas confiables.</p>"
         "</article>"
         "<article>"
         "<h3>Estrategia de datos</h3>"
@@ -10199,7 +10227,7 @@ def build_methodology_html(
         "</article>"
         "<article>"
         "<h3>Modelos visibles en la web</h3>"
-        "<p>En cada tarjeta de partido verás por separado qué dice Bivariante Poisson, qué dice Poisson independiente, qué dice el ajuste de baja anotación, qué dice la overdispersión calibrada y cuál es el ensamble final publicado. Así puedes comparar si coinciden o si hay dispersión entre modelos.</p>"
+        "<p>En cada tarjeta de partido verás por separado qué dice Bivariante Poisson, qué dice Poisson independiente, qué dice el ajuste de baja anotación, qué dice la overdispersión calibrada, qué aporta el ML ligero y cuál es el ensamble final publicado. Así puedes comparar si coinciden o si hay dispersión entre modelos.</p>"
         "</article>"
         "<article>"
         "<h3>Estado dinámico</h3>"
@@ -11658,7 +11686,8 @@ def print_prediction(prediction: MatchPrediction, show_factors: bool = False) ->
         print(
             "  Stack estadistico: "
             f"{prediction.model_stack.get('primary_name')} + {prediction.model_stack.get('contrast_name')} + "
-            f"{prediction.model_stack.get('low_score_name')} + {prediction.model_stack.get('final_name')} "
+            f"{prediction.model_stack.get('low_score_name')} + {prediction.model_stack.get('overdispersed_name')} + "
+            f"{prediction.model_stack.get('ml_name')} + {prediction.model_stack.get('final_name')} "
             f"| coincidencia entre modelos {agreement:.1%}"
         )
     print("  Marcadores finales más probables:" if prediction.advance_a is not None else "  Marcadores más probables:")

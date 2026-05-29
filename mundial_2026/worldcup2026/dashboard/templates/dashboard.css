@@ -2312,6 +2312,9 @@ strong {
 .model-card.overdispersed {
   background: linear-gradient(180deg, rgba(90,125,150,0.13), rgba(255,255,255,0.75));
 }
+.model-card.ml {
+  background: linear-gradient(180deg, rgba(42,126,96,0.14), rgba(255,255,255,0.76));
+}
 .model-card.ensemble {
   background: linear-gradient(180deg, rgba(176,71,60,0.10), rgba(255,255,255,0.75));
 }

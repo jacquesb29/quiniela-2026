@@ -199,6 +199,128 @@ def overdispersed_score_distribution(
     )
 
 
+def _safe_sigmoid(value: float) -> float:
+    value = clamp(value, -8.0, 8.0)
+    return 1.0 / (1.0 + math.exp(-value))
+
+
+def ml_adjusted_goal_means(mu_a: float, mu_b: float, ctx: object | None = None) -> Tuple[float, float]:
+    """Regularized ML-style goal correction.
+
+    This is a lightweight, auditable model member: nonlinear features adjust
+    goal total and favorite share, but the movement is intentionally capped so
+    it cannot overpower the calibrated football models before live backtesting.
+    """
+
+    base_total = max(mu_a + mu_b, 0.20)
+    edge = mu_a - mu_b
+    closeness = clamp(1.0 - abs(edge) / max(base_total, 1.0), 0.0, 1.0)
+    knockout = bool(ctx and getattr(ctx, "knockout", False))
+    importance = float(getattr(ctx, "importance", 1.0)) if ctx else 1.0
+    draw_signal = 0.0
+    if ctx and getattr(ctx, "market_prob_draw", None) is not None:
+        draw_signal = clamp(
+            float(getattr(ctx, "market_prob_draw")) - PARAMS.low_score_draw_threshold,
+            PARAMS.low_score_draw_negative_cap,
+            PARAMS.low_score_draw_positive_cap,
+        )
+
+    total_target = base_total
+    total_target *= 1.0 - PARAMS.ml_knockout_total_guard * closeness * (1.0 if knockout else 0.0)
+    total_target *= 1.0 + PARAMS.ml_high_total_boost * clamp((base_total - 2.55) / 1.20, 0.0, 1.0)
+    total_target *= 1.0 - 0.04 * max(draw_signal, 0.0)
+    total_target *= 1.0 + 0.015 * max(importance - 1.0, 0.0)
+
+    if ctx and getattr(ctx, "market_total_line", None) is not None:
+        try:
+            market_total = float(getattr(ctx, "market_total_line"))
+            total_target = (
+                (1.0 - PARAMS.ml_total_market_blend) * total_target
+                + PARAMS.ml_total_market_blend * market_total
+            )
+        except (TypeError, ValueError):
+            pass
+
+    total_target = clamp(total_target, max(0.85, base_total - 0.38), min(4.35, base_total + 0.38))
+
+    share_a = clamp(mu_a / base_total, 0.06, 0.94)
+    logit_share = math.log(share_a / (1.0 - share_a))
+    logit_share += PARAMS.ml_favorite_share_weight * clamp(edge, -1.60, 1.60)
+    if ctx and getattr(ctx, "market_prob_a", None) is not None and getattr(ctx, "market_prob_b", None) is not None:
+        try:
+            market_edge = float(getattr(ctx, "market_prob_a")) - float(getattr(ctx, "market_prob_b"))
+            logit_share += PARAMS.ml_market_edge_weight * clamp(market_edge, -0.70, 0.70)
+        except (TypeError, ValueError):
+            pass
+    if knockout and closeness > 0.55:
+        logit_share *= 1.0 - 0.05 * closeness
+
+    adjusted_share_a = clamp(_safe_sigmoid(logit_share), 0.07, 0.93)
+    return (
+        clamp(total_target * adjusted_share_a, 0.05, 4.10),
+        clamp(total_target * (1.0 - adjusted_share_a), 0.05, 4.10),
+    )
+
+
+def ml_score_shape_weight(
+    goals_a: int,
+    goals_b: int,
+    mu_a: float,
+    mu_b: float,
+    ctx: object | None = None,
+) -> float:
+    total_mu = max(mu_a + mu_b, 0.20)
+    total_goals = goals_a + goals_b
+    edge = mu_a - mu_b
+    margin = abs(goals_a - goals_b)
+    favorite_is_a = edge >= 0.0
+    favorite_wins = goals_a > goals_b if favorite_is_a else goals_b > goals_a
+    closeness = clamp(1.0 - abs(edge) / max(total_mu, 1.0), 0.0, 1.0)
+    knockout = bool(ctx and getattr(ctx, "knockout", False))
+    high_total_signal = clamp((total_mu - 2.45) / 1.25, 0.0, 1.0)
+    low_total_signal = clamp((2.10 - total_mu) / 0.90, 0.0, 1.0)
+    weight = 1.0
+
+    if total_goals >= 4:
+        weight *= 1.0 + PARAMS.ml_score_shape_strength * high_total_signal
+    if total_goals <= 1:
+        weight *= 1.0 + 0.45 * PARAMS.ml_score_shape_strength * low_total_signal
+    if margin >= 3 and closeness > 0.55:
+        weight *= 1.0 - 0.70 * PARAMS.ml_score_shape_strength * closeness
+    if margin >= 2 and favorite_wins and abs(edge) > 0.55:
+        weight *= 1.0 + 0.50 * PARAMS.ml_score_shape_strength * clamp(abs(edge), 0.0, 1.6)
+    if goals_a == goals_b and knockout:
+        weight *= 1.0 + 0.35 * PARAMS.ml_score_shape_strength * closeness
+    return clamp(weight, 0.78, 1.28)
+
+
+def ml_calibrated_score_distribution(
+    mu_a: float,
+    mu_b: float,
+    ctx: object | None = None,
+    max_goals: int = 10,
+) -> Dict[Tuple[int, int], float]:
+    adj_mu_a, adj_mu_b = ml_adjusted_goal_means(mu_a, mu_b, ctx)
+    alpha = clamp(overdispersion_alpha(adj_mu_a, adj_mu_b, ctx) + 0.025, 0.06, 0.26)
+    dist = cached_overdispersed_score_distribution(
+        quantize_for_cache(adj_mu_a),
+        quantize_for_cache(adj_mu_b),
+        int(round(alpha * 1000.0)),
+        max_goals,
+    )
+    adjusted: Dict[Tuple[int, int], float] = {}
+    total = 0.0
+    for (goals_a, goals_b), prob in dist.items():
+        weighted = prob * ml_score_shape_weight(goals_a, goals_b, adj_mu_a, adj_mu_b, ctx)
+        adjusted[(goals_a, goals_b)] = weighted
+        total += weighted
+    if total <= 0.0:
+        return dict(dist)
+    for key in list(adjusted):
+        adjusted[key] /= total
+    return adjusted
+
+
 def low_score_rho(mu_a: float, mu_b: float, ctx: object | None = None) -> float:
     closeness = clamp(1.0 - abs(mu_a - mu_b) / max(mu_a + mu_b, 1.0), 0.0, 1.0)
     draw_signal = 0.0
@@ -411,13 +533,23 @@ def model_blend_weights(mu_a: float, mu_b: float, ctx: object | None = None) -> 
         0.04,
         PARAMS.model_overdispersed_max,
     )
-    primary = max(PARAMS.model_primary_min, 1.0 - contrast - low_score - overdispersed)
-    total = primary + contrast + low_score + overdispersed
+    ml = clamp(
+        PARAMS.model_ml_base
+        + PARAMS.model_ml_total_weight * clamp((total_goals - 2.20) / 1.60, 0.0, 1.0)
+        + PARAMS.model_ml_closeness_weight * closeness
+        + PARAMS.model_ml_market_weight * (1.0 if ctx and getattr(ctx, "market_total_line", None) is not None else 0.0)
+        + (PARAMS.model_ml_knockout_bonus if ctx and getattr(ctx, "knockout", False) else 0.0),
+        0.06,
+        PARAMS.model_ml_max,
+    )
+    primary = max(PARAMS.model_primary_min, 1.0 - contrast - low_score - overdispersed - ml)
+    total = primary + contrast + low_score + overdispersed + ml
     return {
         "primary": primary / total,
         "contrast": contrast / total,
         "low_score": low_score / total,
         "overdispersed": overdispersed / total,
+        "ml": ml / total,
     }
 
 
@@ -449,10 +581,12 @@ def build_model_stack(
     contrast = independent_score_distribution(mu_a, mu_b, max_goals=max_goals)
     low_score = low_score_adjusted_distribution(mu_a, mu_b, ctx, max_goals=max_goals)
     overdispersed = overdispersed_score_distribution(mu_a, mu_b, ctx, max_goals=max_goals)
+    ml_calibrated = ml_calibrated_score_distribution(mu_a, mu_b, ctx, max_goals=max_goals)
     primary_probs = outcome_probabilities_from_distribution(primary)
     contrast_probs = outcome_probabilities_from_distribution(contrast)
     low_score_probs = outcome_probabilities_from_distribution(low_score)
     overdispersed_probs = outcome_probabilities_from_distribution(overdispersed)
+    ml_probs = outcome_probabilities_from_distribution(ml_calibrated)
     base_weights = model_blend_weights(mu_a, mu_b, ctx)
     market_probs = None
     if ctx and getattr(ctx, "market_prob_a", None) is not None and getattr(ctx, "market_prob_draw", None) is not None and getattr(ctx, "market_prob_b", None) is not None:
@@ -466,6 +600,7 @@ def build_model_stack(
         ModelOutput("Poisson independiente", contrast, contrast_probs, base_weights["contrast"], top_score_from_distribution(contrast)),
         ModelOutput("Ajuste de baja anotación", low_score, low_score_probs, base_weights["low_score"], top_score_from_distribution(low_score)),
         ModelOutput("Overdispersión calibrada", overdispersed, overdispersed_probs, base_weights["overdispersed"], top_score_from_distribution(overdispersed)),
+        ModelOutput("ML ligero regularizado", ml_calibrated, ml_probs, base_weights["ml"], top_score_from_distribution(ml_calibrated)),
     ]
     adaptive_weights = adaptive_ensemble_weights(models, market_probs=market_probs)
     ensemble = blend_distributions([(weight, model.dist) for weight, model in zip(adaptive_weights, models)])
@@ -502,12 +637,14 @@ def build_model_stack(
         "contrast_name": models[1].name,
         "low_score_name": models[2].name,
         "overdispersed_name": models[3].name,
+        "ml_name": models[4].name,
         "final_name": "Ensamble ligero",
         "weights": {
             "primary": adaptive_weights[0],
             "contrast": adaptive_weights[1],
             "low_score": adaptive_weights[2],
             "overdispersed": adaptive_weights[3],
+            "ml": adaptive_weights[4],
         },
         "base_weights": base_weights,
         "agreement": agreement,
@@ -517,12 +654,15 @@ def build_model_stack(
         "contrast_probs": contrast_probs,
         "low_score_probs": low_score_probs,
         "overdispersed_probs": overdispersed_probs,
+        "ml_probs": ml_probs,
         "ensemble_probs": ensemble_probs,
         "primary_top_score": models[0].top_score,
         "contrast_top_score": models[1].top_score,
         "low_score_top_score": models[2].top_score,
         "overdispersed_top_score": models[3].top_score,
+        "ml_top_score": models[4].top_score,
         "ensemble_top_score": top_score_from_distribution(ensemble),
+        "ml_note": "Calibrador ML ligero con features no lineales de total de goles, favoritismo, mercado, knockout y forma del marcador.",
     }
     return ensemble, meta
 
