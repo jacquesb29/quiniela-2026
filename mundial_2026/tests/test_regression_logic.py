@@ -885,11 +885,11 @@ class RegressionLogicTest(unittest.TestCase):
     def test_structured_bracket_projection_uses_modal_matchup_not_exact_outcome(self):
         aggregate = {
             "outcomes": {
-                ("Team A", "Team B", "Team A"): 40,
+                ("Team A", "Team B", "Team A"): 50,
                 ("Team A", "Team B", "Team B"): 35,
-                ("Team C", "Team D", "Team C"): 45,
+                ("Team C", "Team D", "Team C"): 35,
             },
-            "winner": {"Team A": 40, "Team B": 35, "Team C": 45},
+            "winner": {"Team A": 50, "Team B": 35, "Team C": 35},
             "went_extra_time": 20,
             "went_penalties": 10,
             "penalty_scores": {(5, 4): 6, (4, 3): 4},
@@ -899,9 +899,33 @@ class RegressionLogicTest(unittest.TestCase):
 
         self.assertEqual((projection["team_a"], projection["team_b"]), ("Team A", "Team B"))
         self.assertEqual(projection["winner"], "Team A")
-        self.assertAlmostEqual(projection["matchup_prob"], 75 / 120)
-        self.assertAlmostEqual(projection["conditional_winner_prob"], 40 / 75)
-        self.assertAlmostEqual(projection["winner_prob"], 40 / 120)
+        self.assertAlmostEqual(projection["matchup_prob"], 85 / 120)
+        self.assertAlmostEqual(projection["conditional_winner_prob"], 50 / 85)
+        self.assertAlmostEqual(projection["winner_prob"], 50 / 120)
+
+    def test_structured_bracket_projection_prefers_global_slot_winner(self):
+        aggregate = {
+            "outcomes": {
+                ("Colombia", "Croatia", "Colombia"): 25,
+                ("Colombia", "Croatia", "Croatia"): 20,
+                ("Portugal", "Croatia", "Croatia"): 30,
+                ("Portugal", "Japan", "Portugal"): 15,
+            },
+            "winner": {"Colombia": 25, "Croatia": 50, "Portugal": 15},
+            "went_extra_time": 20,
+            "went_penalties": 10,
+            "penalty_scores": {(5, 4): 6, (4, 3): 4},
+        }
+
+        projection = app.structured_match_projection("M83", aggregate, 90)
+
+        self.assertEqual((projection["team_a"], projection["team_b"]), ("Colombia", "Croatia"))
+        self.assertEqual(projection["winner"], "Croatia")
+        self.assertEqual(projection["matchup_favorite"], "Colombia")
+        self.assertEqual(projection["slot_winner_mode"], "global_slot")
+        self.assertAlmostEqual(projection["matchup_prob"], 45 / 90)
+        self.assertAlmostEqual(projection["conditional_winner_prob"], 20 / 45)
+        self.assertAlmostEqual(projection["winner_prob"], 50 / 90)
 
     def test_update_simulation_state_tracks_recent_xg_signals(self):
         teams = app.load_teams()

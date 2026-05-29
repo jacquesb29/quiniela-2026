@@ -3305,10 +3305,39 @@ def structured_match_projection(match_id: str, aggregate: dict, iterations: int)
                 "conditional_winners": winner_rows[:3],
             }
         )
-    primary_matchup = matchup_scenarios[0]
+    slot_winner, slot_winner_count = max(aggregate["winner"].items(), key=lambda item: item[1])
+    primary_matchup = next(
+        (
+            scenario
+            for scenario in matchup_scenarios
+            if slot_winner in {scenario.get("team_a"), scenario.get("team_b")}
+        ),
+        matchup_scenarios[0],
+    )
     team_a = primary_matchup["team_a"]
     team_b = primary_matchup["team_b"]
-    winner = primary_matchup["winner"]
+    matchup_favorite = primary_matchup["winner"]
+    matchup_favorite_prob = primary_matchup["conditional_winner_prob"]
+    matchup_favorite_overall_prob = primary_matchup["winner_prob"]
+    winner = slot_winner if slot_winner in {team_a, team_b} else matchup_favorite
+    winner_row = next(
+        (
+            row
+            for row in primary_matchup.get("conditional_winners", [])
+            if row.get("team") == winner
+        ),
+        None,
+    )
+    conditional_winner_prob = (
+        float(winner_row.get("conditional_prob", primary_matchup["conditional_winner_prob"]))
+        if winner_row
+        else float(primary_matchup["conditional_winner_prob"])
+    )
+    winner_prob = (
+        float(slot_winner_count) / float(iterations)
+        if winner == slot_winner
+        else float(primary_matchup["winner_prob"])
+    )
     penalty_scores = sorted(aggregate.get("penalty_scores", {}).items(), key=lambda item: item[1], reverse=True)[:3]
     return {
         "match_id": match_id,
@@ -3318,8 +3347,12 @@ def structured_match_projection(match_id: str, aggregate: dict, iterations: int)
         "team_b": team_b,
         "winner": winner,
         "matchup_prob": primary_matchup["matchup_prob"],
-        "conditional_winner_prob": primary_matchup["conditional_winner_prob"],
-        "winner_prob": primary_matchup["winner_prob"],
+        "conditional_winner_prob": conditional_winner_prob,
+        "winner_prob": winner_prob,
+        "matchup_favorite": matchup_favorite,
+        "matchup_favorite_prob": matchup_favorite_prob,
+        "matchup_favorite_overall_prob": matchup_favorite_overall_prob,
+        "slot_winner_mode": "global_slot" if winner != matchup_favorite else "conditional_favorite",
         "extra_time_prob": aggregate["went_extra_time"] / float(iterations),
         "penalties_prob": aggregate["went_penalties"] / float(iterations),
         "top_scenarios": top_scenarios,
@@ -3346,11 +3379,20 @@ def format_match_projection(match_id: str, aggregate: dict, iterations: int) -> 
     penalties_prob = projection["penalties_prob"]
     lines = [
         f"### {BRACKET_MATCH_TITLES.get(match_id, match_id)}",
-        f"- Cruce que aparece más veces en la simulación: {team_a} vs {team_b}",
+        f"- Cruce usado para este casillero: {team_a} vs {team_b}",
         f"- Probabilidad de que este cruce ocurra: {outcome_prob:.1%}",
-        f"- Favorito si ese cruce se juega: {winner} ({conditional_winner_prob:.1%})",
-        f"- Probabilidad global de que {winner} salga de este casillero: {winner_prob:.1%}",
+        f"- Ganador proyectado del casillero: {winner} ({winner_prob:.1%} global)",
     ]
+    matchup_favorite = projection.get("matchup_favorite", winner)
+    matchup_favorite_prob = float(projection.get("matchup_favorite_prob", conditional_winner_prob) or 0.0)
+    if matchup_favorite == winner:
+        lines.append(f"- Si se juega ese cruce, {winner} avanza {conditional_winner_prob:.1%}.")
+    else:
+        lines.append(
+            f"- Nota de lectura: en ese cruce específico el favorito condicional es "
+            f"{matchup_favorite} ({matchup_favorite_prob:.1%}), pero {winner} es quien más sale "
+            "del casillero al sumar todas las rutas simuladas."
+        )
     alternatives = [
         f"{scenario['team_a']} vs {scenario['team_b']} | gana más probable {scenario['winner']} | este escenario aparece {scenario['prob']:.1%}"
         for scenario in projection.get("top_scenarios", [])[1:]
@@ -4428,11 +4470,13 @@ def projected_bracket_entries(
                 "goal_consensus_source": goal_consensus_source(base_fixture),
                 "projection": True,
                 "projection_note": (
-                    f"Cruce más probable hoy: {team_a} vs {team_b} | "
+                    f"Cruce usado para este casillero hoy: {team_a} vs {team_b} | "
                     f"probabilidad de que se dé {format_pct(match_projection['matchup_prob'])} | "
-                    f"favorito para avanzar si se juega hoy: {match_projection['winner']} "
-                    f"{format_pct(float(match_projection.get('conditional_winner_prob', match_projection['winner_prob'])))} | "
-                    f"probabilidad global de ese avance: {format_pct(match_projection['winner_prob'])}"
+                    f"ganador global del casillero: {match_projection['winner']} "
+                    f"{format_pct(match_projection['winner_prob'])} | "
+                    f"si se juega exactamente este cruce: "
+                    f"{match_projection.get('matchup_favorite', match_projection['winner'])} "
+                    f"{format_pct(float(match_projection.get('matchup_favorite_prob', match_projection.get('conditional_winner_prob', 0.0))))}"
                 ),
                 "projection_alternatives": match_projection.get("top_scenarios", [])[1:],
                 "projection_penalties": match_projection.get("penalties_prob", 0.0),
@@ -9403,10 +9447,10 @@ def build_bracket_visual_html(bracket_payload: dict, entries: Optional[Sequence[
         if alternatives:
             extra_parts.append(
                 "<div class=\"mini\">"
-                "<strong>Otros cruces que tambien aparecen:</strong> "
+                "<strong>Otros cruces que también aparecen:</strong> "
                 + html.escape(
                     "; ".join(
-                        f"{scenario['team_a']} vs {scenario['team_b']} | favorito {scenario['winner']} | escenario {format_pct(float(scenario['prob']))}"
+                        f"{scenario['team_a']} vs {scenario['team_b']} | avanza {scenario['winner']} | escenario {format_pct(float(scenario['prob']))}"
                         for scenario in alternatives[:2]
                     )
                 )
@@ -9449,10 +9493,19 @@ def build_bracket_visual_html(bracket_payload: dict, entries: Optional[Sequence[
 
         row_a_class = "team-row favorite" if match.get("winner") == match.get("team_a") else "team-row"
         row_b_class = "team-row favorite" if match.get("winner") == match.get("team_b") else "team-row"
-        badge_text = "Boleto" if match.get("quiniela_override") else "Favorito"
+        badge_text = "Boleto" if match.get("quiniela_override") else "Avanza"
         row_a_badge = f"<span class=\"team-badge\">{badge_text}</span>" if "favorite" in row_a_class else ""
         row_b_badge = f"<span class=\"team-badge\">{badge_text}</span>" if "favorite" in row_b_class else ""
         conditional_prob = float(match.get("conditional_winner_prob", match.get("winner_prob", 0.0)))
+        matchup_favorite = str(match.get("matchup_favorite") or match.get("winner", "?"))
+        matchup_favorite_prob = float(match.get("matchup_favorite_prob", conditional_prob) or 0.0)
+        if matchup_favorite == str(match.get("winner")):
+            conditional_label = f"Si se juega, avanza {winner} {format_pct(conditional_prob)}"
+        else:
+            conditional_label = (
+                f"Cruce: favorito condicional {html.escape(matchup_favorite)} "
+                f"{format_pct(matchup_favorite_prob)}"
+            )
         return (
             "<article class=\"bracket-match\">"
             f"<p class=\"match-kicker\">{html.escape(str(match.get('title', '')))}</p>"
@@ -9463,7 +9516,8 @@ def build_bracket_visual_html(bracket_payload: dict, entries: Optional[Sequence[
             "</div>"
             "<div class=\"bracket-pills\">"
             f"<span>Cruce {format_pct(float(match.get('matchup_prob', 0.0)))}</span>"
-            f"<span>Si se juega, avanza {winner} {format_pct(conditional_prob)}</span>"
+            f"<span>Casillero: avanza {winner} {format_pct(float(match.get('winner_prob', 0.0)))}</span>"
+            f"<span>{conditional_label}</span>"
             "</div>"
             f"{detail_html}"
             "</article>"
@@ -10706,10 +10760,14 @@ def audit_bracket_payload(bracket_payload: dict, teams: Dict[str, Team], min_ite
                 if match.get("winner") != published.get("winner"):
                     winner_rows = conditional_winner_rows(published)
                     published_teams = {row.get("team") for row in winner_rows}
-                    if not override:
-                        errors.append(f"{match_id} no publica el favorito condicional del cruce mostrado.")
-                    elif match.get("winner") not in published_teams or not match.get("override_reason"):
+                    slot_winner_mode = str(match.get("slot_winner_mode") or "")
+                    global_slot_allowed = (
+                        slot_winner_mode == "global_slot" and match.get("winner") in published_teams
+                    )
+                    if override and (match.get("winner") not in published_teams or not match.get("override_reason")):
                         errors.append(f"{match_id} aplica ajuste de quiniela sin trazabilidad suficiente.")
+                    elif not override and not global_slot_allowed:
+                        errors.append(f"{match_id} no publica el favorito condicional del cruce mostrado.")
                 if abs(float(match.get("matchup_prob", 0.0) or 0.0) - float(published.get("matchup_prob", 0.0) or 0.0)) > 0.000001:
                     errors.append(f"{match_id} mezcla probabilidad del escenario con probabilidad del cruce mostrado.")
             if "conditional_winner_prob" not in match:
@@ -10733,10 +10791,16 @@ def audit_bracket_payload(bracket_payload: dict, teams: Dict[str, Team], min_ite
         for match_id, left_source, right_source in round_matches
     }
     source_map["M104"] = ("M101", "M102", "loser")
+    coherent_matches = coherent_bracket_matches(bracket_payload)
     for match_id, (left_source, right_source, source_kind) in source_map.items():
-        match = matches.get(match_id)
-        left = matches.get(left_source)
-        right = matches.get(right_source)
+        if match_id == "M104":
+            match = matches.get(match_id)
+            left = matches.get(left_source)
+            right = matches.get(right_source)
+        else:
+            match = coherent_matches.get(match_id) or matches.get(match_id)
+            left = coherent_matches.get(left_source) or matches.get(left_source)
+            right = coherent_matches.get(right_source) or matches.get(right_source)
         if not match or not left or not right:
             continue
         expected_pair = {sourced_team(left, source_kind), sourced_team(right, source_kind)}
