@@ -15,10 +15,10 @@
       ]
     },
     {
-      "name": "Tier 2 - Historico de selecciones desde 1990",
-      "purpose": "Memoria moderna de rendimiento, ataque, defensa, Mundial y penales.",
+      "name": "Tier 2 - Histórico trazable de selecciones desde 1950",
+      "purpose": "Memoria larga con mínimo verificable de 25.000 partidos oficiales, decaimiento temporal, ataque, defensa, Mundial y penales.",
       "sources": [
-        "International results dataset",
+        "International results dataset: 29.562 partidos oficiales cerrados desde 1950 en el corte auditado",
         "Shootouts dataset",
         "Former team names mapping"
       ]

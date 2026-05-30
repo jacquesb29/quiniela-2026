@@ -109,8 +109,9 @@ def proxy_historical_snapshot(
     shootout = clamp(0.46 + 0.06 * coach_overrides.get(team.name, 0.0), 0.05, 0.95)
     return HistoricalSnapshotCls(
         source_names=(team_name_aliases.get(team.name, team.name),),
-        matches_since_1990=0,
-        weighted_matches_since_1990=0.0,
+        history_start_year=1950,
+        matches_since_start=0,
+        weighted_matches_since_start=0.0,
         points_per_match=1.25,
         weighted_points_per_match=1.25,
         goals_for_per_match=1.2,
@@ -121,13 +122,13 @@ def proxy_historical_snapshot(
         weighted_goal_diff_per_match=0.0,
         scoring_rate=0.62,
         clean_sheet_rate=0.26,
-        competitive_matches_since_1990=0,
+        competitive_matches_since_start=0,
         competitive_points_per_match=1.25,
         competitive_goal_diff_per_match=0.0,
-        world_cup_matches_since_1990=0,
+        world_cup_matches_since_start=0,
         world_cup_points_per_match=0.0,
         world_cup_goal_diff_per_match=0.0,
-        shootout_matches_since_1990=0,
+        shootout_matches_since_start=0,
         shootout_win_rate=0.5,
         strength_index=strength,
         attack_index=attack,
@@ -154,24 +155,25 @@ def historical_snapshot(
     if not row:
         return proxy_snapshot_fn(team)
     proxy = proxy_snapshot_fn(team)
-    weighted_matches = float(row.get("weighted_matches_since_1990", 0.0))
-    matches_since_1990 = int(row.get("matches_since_1990", 0))
-    competitive_matches = int(row.get("competitive_matches_since_1990", 0))
-    world_cup_matches = int(row.get("world_cup_matches_since_1990", 0))
-    shootout_matches = int(row.get("shootout_matches_since_1990", 0))
+    history_start_year = int(payload.get("meta", {}).get("start_year", 1950))
+    weighted_matches = float(row.get("weighted_matches_since_start", row.get("weighted_matches_since_1990", 0.0)))
+    matches_since_start = int(row.get("matches_since_start", row.get("matches_since_1990", 0)))
+    competitive_matches = int(row.get("competitive_matches_since_start", row.get("competitive_matches_since_1990", 0)))
+    world_cup_matches = int(row.get("world_cup_matches_since_start", row.get("world_cup_matches_since_1990", 0)))
+    shootout_matches = int(row.get("shootout_matches_since_start", row.get("shootout_matches_since_1990", 0)))
 
     strength_index = clamp(
-        empirical_bayes_shrinkage(float(row.get("strength_index", proxy.strength_index)), weighted_matches or matches_since_1990, proxy.strength_index, 18.0),
+        empirical_bayes_shrinkage(float(row.get("strength_index", proxy.strength_index)), weighted_matches or matches_since_start, proxy.strength_index, 18.0),
         0.0,
         1.0,
     )
     attack_index = clamp(
-        empirical_bayes_shrinkage(float(row.get("attack_index", proxy.attack_index)), weighted_matches or matches_since_1990, proxy.attack_index, 18.0),
+        empirical_bayes_shrinkage(float(row.get("attack_index", proxy.attack_index)), weighted_matches or matches_since_start, proxy.attack_index, 18.0),
         0.0,
         1.0,
     )
     defense_index = clamp(
-        empirical_bayes_shrinkage(float(row.get("defense_index", proxy.defense_index)), weighted_matches or matches_since_1990, proxy.defense_index, 18.0),
+        empirical_bayes_shrinkage(float(row.get("defense_index", proxy.defense_index)), weighted_matches or matches_since_start, proxy.defense_index, 18.0),
         0.0,
         1.0,
     )
@@ -192,8 +194,9 @@ def historical_snapshot(
     )
     return HistoricalSnapshotCls(
         source_names=tuple(row.get("source_names") or [team_name_aliases.get(team.name, team.name)]),
-        matches_since_1990=matches_since_1990,
-        weighted_matches_since_1990=weighted_matches,
+        history_start_year=history_start_year,
+        matches_since_start=matches_since_start,
+        weighted_matches_since_start=weighted_matches,
         points_per_match=float(row.get("points_per_match", proxy.points_per_match)),
         weighted_points_per_match=float(row.get("weighted_points_per_match", proxy.weighted_points_per_match)),
         goals_for_per_match=float(row.get("goals_for_per_match", 1.2)),
@@ -204,13 +207,13 @@ def historical_snapshot(
         weighted_goal_diff_per_match=float(row.get("weighted_goal_diff_per_match", 0.0)),
         scoring_rate=float(row.get("scoring_rate", 0.62)),
         clean_sheet_rate=float(row.get("clean_sheet_rate", 0.26)),
-        competitive_matches_since_1990=competitive_matches,
+        competitive_matches_since_start=competitive_matches,
         competitive_points_per_match=float(row.get("competitive_points_per_match", proxy.competitive_points_per_match)),
         competitive_goal_diff_per_match=float(row.get("competitive_goal_diff_per_match", 0.0)),
-        world_cup_matches_since_1990=world_cup_matches,
+        world_cup_matches_since_start=world_cup_matches,
         world_cup_points_per_match=float(row.get("world_cup_points_per_match", proxy.world_cup_points_per_match)),
         world_cup_goal_diff_per_match=float(row.get("world_cup_goal_diff_per_match", 0.0)),
-        shootout_matches_since_1990=shootout_matches,
+        shootout_matches_since_start=shootout_matches,
         shootout_win_rate=float(row.get("shootout_win_rate", proxy.shootout_win_rate)),
         strength_index=strength_index,
         attack_index=attack_index,

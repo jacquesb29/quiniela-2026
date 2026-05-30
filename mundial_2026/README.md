@@ -73,13 +73,13 @@ python3 mundial_2026/modelo_quiniela_2026.py predict "España" Uruguay
 Predecir un partido con Monte Carlo:
 
 ```bash
-python3 mundial_2026/modelo_quiniela_2026.py predict "España" Uruguay --monte-carlo 10000 --seed 7
+python3 mundial_2026/modelo_quiniela_2026.py predict "España" Uruguay --monte-carlo 15000 --seed 7
 ```
 
 Predecir un partido de eliminacion directa con prorroga y penales:
 
 ```bash
-python3 mundial_2026/modelo_quiniela_2026.py predict "España" Uruguay --stage round16 --monte-carlo 10000 --seed 7
+python3 mundial_2026/modelo_quiniela_2026.py predict "España" Uruguay --stage round16 --monte-carlo 15000 --seed 7
 ```
 
 Predecir con contexto de sede, disciplina y grupo:
@@ -113,13 +113,13 @@ python3 mundial_2026/modelo_quiniela_2026.py power-table
 Ver probabilidades de clasificacion desde los repechajes:
 
 ```bash
-python3 mundial_2026/modelo_quiniela_2026.py playoffs --iterations 10000
+python3 mundial_2026/modelo_quiniela_2026.py playoffs --iterations 15000
 ```
 
 Simular el torneo completo con Monte Carlo:
 
 ```bash
-python3 mundial_2026/modelo_quiniela_2026.py simulate-tournament --iterations 10000 --top 20
+python3 mundial_2026/modelo_quiniela_2026.py simulate-tournament --iterations 15000 --top 20
 ```
 
 Simular el torneo completo usando el draw oficial incluido:
@@ -127,7 +127,7 @@ Simular el torneo completo usando el draw oficial incluido:
 ```bash
 python3 mundial_2026/modelo_quiniela_2026.py simulate-tournament \
   --config mundial_2026/tournament_2026_draw.json \
-  --iterations 10000 \
+  --iterations 15000 \
   --top 24
 ```
 
@@ -201,6 +201,7 @@ python3 mundial_2026/sync_fifa_rankings.py
 - `sync_live_data_2026.py` tambien puede enriquecer partidos en vivo con un proveedor mas profundo de eventos y estadisticas. Si defines `API_FOOTBALL_KEY`, el pipeline intenta usar API-Football para lineups, eventos y stats live, manteniendo ESPN como base y fallback.
 - La web ya muestra un mapa de proveedores para no depender solo de ESPN. El orden practico recomendado es: ESPN como fallback, API-Football como live profundo ya cableado, Sportmonks como segundo live profundo, The Odds API/OddsJam/Pinnacle/Betfair como mercado, NewsAPI/GDELT/fuentes oficiales como noticias, y Sportradar/Opta/Stats Perform como capa enterprise si hay contrato.
 - La llave publicada en el dashboard cloud ahora usa 15000 iteraciones por defecto para reducir ruido Monte Carlo frente a configuraciones mas chicas.
+- La base histórica se reconstruye desde 1950 y exige al menos 25000 partidos oficiales cerrados. En el corte auditado contiene 29562 partidos oficiales con marcador válido; la definición excluye `Friendly` y `Unofficial Friendly`.
 - Si un partido real se va a proroga o penales y lo marcas en el JSON, el estado acumula fatiga adicional y baja de disponibilidad para el siguiente partido.
 - Si corriges un resultado viejo, lo correcto es ejecutar `state-reset` y luego volver a correr `fixtures` sobre el archivo completo en orden cronologico.
 - Conviene poner un `id` estable en cada partido del JSON para que el script no aplique dos veces el mismo resultado.

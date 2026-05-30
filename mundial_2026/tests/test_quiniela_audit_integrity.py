@@ -70,10 +70,19 @@ class QuinielaAuditIntegrityTest(unittest.TestCase):
         self.assertIn("M104", bracket.get("matches", {}))
         self.assertIn("M103", bracket.get("matches", {}))
 
+    def test_historical_base_uses_at_least_25000_official_matches_since_1950(self):
+        history = json.loads((PACKAGE_ROOT / "historical_features_1950.json").read_text())
+        meta = history["meta"]
+        self.assertEqual(meta["from_date"], "1950-01-01")
+        self.assertGreaterEqual(int(meta["official_matches_since_start"]), 25000)
+        self.assertGreaterEqual(int(meta["minimum_official_matches_required"]), 25000)
+        self.assertIn("Friendly", meta["official_match_definition"])
+
     def test_github_pages_workflow_runs_full_auto_refresh(self):
         workflow = (REPO_ROOT / ".github" / "workflows" / "quiniela-pages.yml").read_text()
         self.assertRegex(workflow, r"cron:\s*[\"']\*/5 \* \* \* \*[\"']")
         self.assertIn("--iterations 15000", workflow)
+        self.assertIn("build_historical_features_1950.py --download --min-official-matches 25000", workflow)
         self.assertIn("python3 -m unittest discover -s mundial_2026/tests", workflow)
         self.assertIn("audit-quiniela", workflow)
         self.assertIn("API_FOOTBALL_KEY", workflow)

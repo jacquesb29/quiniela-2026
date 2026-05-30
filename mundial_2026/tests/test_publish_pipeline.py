@@ -40,6 +40,18 @@ class PublishPipelineTest(unittest.TestCase):
             (publish_root / "teams_2026.json").write_text(
                 json.dumps({"meta": {"fifa_rankings_as_of": "2026-05-10"}})
             )
+            (publish_root / "historical_features_1950.json").write_text(
+                json.dumps(
+                    {
+                        "meta": {
+                            "from_date": "1950-01-01",
+                            "official_matches_since_start": 29562,
+                            "minimum_official_matches_required": 25000,
+                            "official_match_definition": "Partidos internacionales oficiales.",
+                        }
+                    }
+                )
+            )
 
             env = dict(os.environ)
             env["WORLDCUP_PUBLISH_ROOT"] = str(publish_root)
@@ -68,7 +80,12 @@ class PublishPipelineTest(unittest.TestCase):
             self.assertEqual(latest["live_feed_stack"], ["espn_scoreboard"])
             self.assertEqual(latest["live_feed_providers"], ["api_football"])
             self.assertEqual(latest["official_fifa_rankings_as_of"], "2026-05-10")
+            self.assertEqual(latest["historical_base"]["from_date"], "1950-01-01")
+            self.assertEqual(latest["historical_base"]["official_matches"], 29562)
+            self.assertEqual(latest["historical_base"]["minimum_official_matches_required"], 25000)
             self.assertEqual(latest["files"]["dashboard"], "dashboard_actual_2026.html")
+            self.assertEqual(latest["files"]["historical_features"], "historical_features_1950.json")
+            self.assertTrue((site_dir / "historical_features_1950.json").exists())
             datetime.fromisoformat(latest["updated_at_utc"])
 
 

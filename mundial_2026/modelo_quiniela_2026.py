@@ -192,7 +192,7 @@ from worldcup2026.utils.naming import (
 
 
 DATA_FILE = Path(__file__).with_name("teams_2026.json")
-HISTORICAL_FEATURES_FILE = Path(__file__).with_name("historical_features_1990.json")
+HISTORICAL_FEATURES_FILE = Path(__file__).with_name("historical_features_1950.json")
 TOURNAMENT_CONFIG_FILE = Path(__file__).with_name("tournament_2026_draw.json")
 RUNTIME_DIR = Path(__file__).with_name("runtime")
 LEGACY_STATE_FILE = Path(__file__).with_name("tournament_state_2026.json")
@@ -306,8 +306,9 @@ class SquadAggregate:
 @dataclass(frozen=True)
 class HistoricalSnapshot:
     source_names: Tuple[str, ...]
-    matches_since_1990: int
-    weighted_matches_since_1990: float
+    history_start_year: int
+    matches_since_start: int
+    weighted_matches_since_start: float
     points_per_match: float
     weighted_points_per_match: float
     goals_for_per_match: float
@@ -318,13 +319,13 @@ class HistoricalSnapshot:
     weighted_goal_diff_per_match: float
     scoring_rate: float
     clean_sheet_rate: float
-    competitive_matches_since_1990: int
+    competitive_matches_since_start: int
     competitive_points_per_match: float
     competitive_goal_diff_per_match: float
-    world_cup_matches_since_1990: int
+    world_cup_matches_since_start: int
     world_cup_points_per_match: float
     world_cup_goal_diff_per_match: float
-    shootout_matches_since_1990: int
+    shootout_matches_since_start: int
     shootout_win_rate: float
     strength_index: float
     attack_index: float
@@ -697,11 +698,11 @@ def top_factor_drivers(factors: Optional[Dict[str, float]], limit: int = 3) -> L
         "fifa_strength_diff": "Ranking FIFA / puntos FIFA",
         "resource_diff": "Recursos/PIB proxy",
         "heritage_diff": "Historia mundialista",
-        "historical_strength_diff": "Historia competitiva desde 1990",
-        "historical_attack_diff": "Ataque histórico desde 1990",
-        "historical_defense_diff": "Defensa histórica desde 1990",
-        "competitive_history_diff": "Rendimiento competitivo desde 1990",
-        "world_cup_history_diff": "Rendimiento en Mundiales desde 1990",
+        "historical_strength_diff": "Historia competitiva desde 1950",
+        "historical_attack_diff": "Ataque histórico desde 1950",
+        "historical_defense_diff": "Defensa histórica desde 1950",
+        "competitive_history_diff": "Rendimiento competitivo desde 1950",
+        "world_cup_history_diff": "Rendimiento en Mundiales desde 1950",
         "coach_diff": "Entrenador",
         "trajectory_diff": "Trayectoria futbolística",
         "attack_unit_diff": "Ataque",
@@ -1545,11 +1546,11 @@ def apply_historical_score_shape_adjustment(
         "attack_signal_b": signal_b["attack"],
         "concede_signal_a": signal_a["concede"],
         "concede_signal_b": signal_b["concede"],
-        "historical_sample_a": float(profile_a.history.weighted_matches_since_1990),
-        "historical_sample_b": float(profile_b.history.weighted_matches_since_1990),
+        "historical_sample_a": float(profile_a.history.weighted_matches_since_start),
+        "historical_sample_b": float(profile_b.history.weighted_matches_since_start),
         "historical_data_note": (
-            f"{team_a.name}: {profile_a.history.matches_since_1990} partidos desde 1990; "
-            f"{team_b.name}: {profile_b.history.matches_since_1990} partidos desde 1990"
+            f"{team_a.name}: {profile_a.history.matches_since_start} partidos desde {profile_a.history.history_start_year}; "
+            f"{team_b.name}: {profile_b.history.matches_since_start} partidos desde {profile_b.history.history_start_year}"
         ),
     }
     return adjusted_dist, meta
@@ -8357,7 +8358,7 @@ def build_provider_matrix_html(entries: Sequence[dict]) -> str:
         for item in catalog
     )
     best_next = [
-        "Ya corre automático: fixture/resultados ESPN, clima Open-Meteo, noticias abiertas GDELT, FIFA rankings e histórico desde 1990.",
+        "Ya corre automático: fixture/resultados ESPN, clima Open-Meteo, noticias abiertas GDELT, FIFA rankings e histórico trazable desde 1950.",
         "Los marcadores Penca se recalculan en cada refresh: si cambia el resultado real, una baja, el cruce proyectado o la evidencia live, cambia el marcador recomendado.",
         "Si aparece una fuente sin key con eventos tiro-a-tiro confiables para Mundial 2026, se puede sumar; por ahora no conviene scrapear SofaScore/FotMob/Flashscore sin licencia.",
     ]
@@ -10193,6 +10194,10 @@ def build_methodology_html(
 ) -> str:
     iterations = int(bracket_payload.get("iterations", 0) or 0)
     montecarlo_line = f"{iterations:,}".replace(",", ".") + " iteraciones" if iterations else "iteraciones variables"
+    history_meta = historical_features_payload().get("meta", {})
+    official_history_count = int(history_meta.get("official_matches_since_start", 0) or 0)
+    history_start_year = int(history_meta.get("start_year", 1950) or 1950)
+    official_history_line = f"{official_history_count:,}".replace(",", ".")
     quality_html = build_methodology_quality_html(entries, bracket_payload, backtest)
     return (
         "<section class=\"panel methodology\">"
@@ -10210,8 +10215,8 @@ def build_methodology_html(
         "<p>Combina fuerza de cada selección, contexto del partido y un stack de modelos para estimar marcador final y probabilidades de victoria, empate y derrota.</p>"
         "</article>"
         "<article>"
-        "<h3>Capa histórica desde 1990</h3>"
-        "<p>Además del Elo y la forma actual, el modelo incorpora resultados de selecciones desde 1990: rendimiento total, competitivo, mundialista, ataque, defensa y tandas de penales. Esa memoria histórica ahora usa shrinkage bayesiano empírico para no sobrepremiar muestras chicas y para sumar contexto sin tapar lo que está pasando hoy.</p>"
+        "<h3>Capa histórica desde 1950</h3>"
+        f"<p>Además del Elo y la forma actual, el modelo incorpora una base trazable de {html.escape(official_history_line)} partidos oficiales cerrados desde {history_start_year}: rendimiento total, competitivo, mundialista, ataque, defensa y tandas de penales. Para esta cifra se excluyen amistosos. Esa memoria histórica usa decaimiento temporal y shrinkage bayesiano empírico: aprende del pasado largo sin permitir que partidos antiguos tapen lo que está pasando hoy.</p>"
         "</article>"
         "<article>"
         "<h3>Cuadro completo</h3>"
@@ -10223,7 +10228,7 @@ def build_methodology_html(
         "</article>"
         "<article>"
         "<h3>Estrategia de datos</h3>"
-        "<p>El modelo prioriza fuentes sólidas y trazables antes que volumen bruto. Aquí la meta no es meter cientos de terabytes por marketing, sino usar capas de alta señal: datos oficiales, historia desde 1990, feed en vivo y mercado como referencia suave.</p>"
+        f"<p>El modelo prioriza fuentes sólidas y trazables antes que volumen bruto. Aquí la meta no es inflar cifras por marketing, sino usar capas de alta señal: {html.escape(official_history_line)} partidos oficiales cerrados desde {history_start_year}, datos oficiales, feed en vivo y mercado como referencia suave.</p>"
         "</article>"
         "<article>"
         "<h3>Modelos visibles en la web</h3>"
@@ -11753,17 +11758,17 @@ def print_team_profile(team: Team) -> None:
     print(f"  Flexibilidad tactica: {profile.tactical_flexibility:.2f}")
     print(f"  Resiliencia de viaje: {profile.travel_resilience:.2f}")
     print(f"  Ritmo de juego: {profile.tempo:.2f}")
-    print(f"  Partidos historicos desde 1990: {history.matches_since_1990}")
-    print(f"  Puntos por partido desde 1990: {history.points_per_match:.2f}")
-    print(f"  Puntos ponderados recientes desde 1990: {history.weighted_points_per_match:.2f}")
-    print(f"  Rendimiento competitivo desde 1990: {history.competitive_points_per_match:.2f}")
-    print(f"  Partidos de Mundial desde 1990: {history.world_cup_matches_since_1990}")
-    print(f"  Rendimiento en Mundiales desde 1990: {history.world_cup_points_per_match:.2f}")
-    print(f"  Tandas de penales desde 1990: {history.shootout_matches_since_1990}")
-    print(f"  Eficacia en penales desde 1990: {history.shootout_win_rate:.2f}")
-    print(f"  Fuerza historica desde 1990: {history.strength_index:.2f}")
-    print(f"  Ataque historico desde 1990: {history.attack_index:.2f}")
-    print(f"  Defensa historica desde 1990: {history.defense_index:.2f}")
+    print(f"  Partidos historicos desde {history.history_start_year}: {history.matches_since_start}")
+    print(f"  Puntos por partido desde {history.history_start_year}: {history.points_per_match:.2f}")
+    print(f"  Puntos ponderados recientes desde {history.history_start_year}: {history.weighted_points_per_match:.2f}")
+    print(f"  Rendimiento competitivo desde {history.history_start_year}: {history.competitive_points_per_match:.2f}")
+    print(f"  Partidos de Mundial desde {history.history_start_year}: {history.world_cup_matches_since_start}")
+    print(f"  Rendimiento en Mundiales desde {history.history_start_year}: {history.world_cup_points_per_match:.2f}")
+    print(f"  Tandas de penales desde {history.history_start_year}: {history.shootout_matches_since_start}")
+    print(f"  Eficacia en penales desde {history.history_start_year}: {history.shootout_win_rate:.2f}")
+    print(f"  Fuerza historica desde {history.history_start_year}: {history.strength_index:.2f}")
+    print(f"  Ataque historico desde {history.history_start_year}: {history.attack_index:.2f}")
+    print(f"  Defensa historica desde {history.history_start_year}: {history.defense_index:.2f}")
     print(f"  Rendimiento competitivo historico: {history.competitive_index:.2f}")
     print(f"  Rendimiento mundialista moderno: {history.world_cup_index:.2f}")
     print(f"  Solidez historica en penales: {history.shootout_index:.2f}")

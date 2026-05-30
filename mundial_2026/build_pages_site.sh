@@ -14,6 +14,7 @@ cp "$SCRIPT_DIR/reporte_actual_2026.md" "$SITE_DIR/reporte_actual_2026.md"
 cp "$SCRIPT_DIR/llave_actual_2026.md" "$SITE_DIR/llave_actual_2026.md"
 cp "$SCRIPT_DIR/llave_actual_2026.json" "$SITE_DIR/llave_actual_2026.json"
 cp "$SCRIPT_DIR/fixtures_live_2026.json" "$SITE_DIR/fixtures_live_2026.json"
+cp "$SCRIPT_DIR/historical_features_1950.json" "$SITE_DIR/historical_features_1950.json"
 
 python3 - <<'PY'
 import json
@@ -26,14 +27,18 @@ script_dir = Path(os.environ["SCRIPT_DIR"])
 site_dir = script_dir / "site"
 fixtures_path = script_dir / "fixtures_live_2026.json"
 teams_path = script_dir / "teams_2026.json"
+history_path = script_dir / "historical_features_1950.json"
 dashboard_path = script_dir / "dashboard_actual_2026.html"
 fixtures_payload = []
 teams_payload = {}
+history_payload = {}
 dashboard_updated_at = None
 if fixtures_path.exists():
     fixtures_payload = json.loads(fixtures_path.read_text())
 if teams_path.exists():
     teams_payload = json.loads(teams_path.read_text())
+if history_path.exists():
+    history_payload = json.loads(history_path.read_text())
 if dashboard_path.exists():
     match = re.search(r'<meta name="dashboard-updated-at" content="([^"]+)"', dashboard_path.read_text())
     if match:
@@ -52,12 +57,19 @@ payload = {
     "live_feed_stack": live_sources or ["espn_scoreboard"],
     "live_feed_providers": live_providers,
     "official_fifa_rankings_as_of": (teams_payload.get("meta") or {}).get("fifa_rankings_as_of"),
+    "historical_base": {
+        "from_date": (history_payload.get("meta") or {}).get("from_date"),
+        "official_matches": (history_payload.get("meta") or {}).get("official_matches_since_start"),
+        "minimum_official_matches_required": (history_payload.get("meta") or {}).get("minimum_official_matches_required"),
+        "definition": (history_payload.get("meta") or {}).get("official_match_definition"),
+    },
     "files": {
         "dashboard": "dashboard_actual_2026.html",
         "report": "reporte_actual_2026.md",
         "bracket_markdown": "llave_actual_2026.md",
         "bracket_json": "llave_actual_2026.json",
         "fixtures_live": "fixtures_live_2026.json",
+        "historical_features": "historical_features_1950.json",
     },
 }
 (site_dir / "latest.json").write_text(json.dumps(payload, indent=2))
