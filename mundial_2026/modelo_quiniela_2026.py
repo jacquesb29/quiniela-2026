@@ -221,6 +221,65 @@ CONSENSUS_CHAMPION_PRIORS = {
 CONSENSUS_CHAMPION_BLEND = 0.50
 CONSENSUS_CHAMPION_MIN_BLEND = 0.08
 CONSENSUS_LIVE_PROGRESS_WEIGHT = 0.55
+DARK_HORSE_ESTABLISHED_FAVORITES = {
+    "Spain",
+    "France",
+    "England",
+    "Argentina",
+    "Brazil",
+    "Germany",
+}
+DARK_HORSE_EXTERNAL_SIGNALS = {
+    "Portugal": {
+        "signal_weight": 0.95,
+        "source": "Opta post-sorteo + Klement",
+        "url": "https://www.si.com/soccer/opta-supercomputer-predicts-2026-world-cup-winner-groups-complete",
+        "note": "No es tapado puro: aparece como candidato secundario serio y también como finalista en un modelo alternativo.",
+    },
+    "Netherlands": {
+        "signal_weight": 0.92,
+        "source": "Sports Illustrated + Klement",
+        "url": "https://www.si.com/soccer/10-dark-horse-candidates-to-win-2026-world-cup",
+        "note": "Tiene recorrido de tapado fuerte: varias lecturas externas lo mantienen vivo y un modelo alternativo lo proyecta campeón.",
+    },
+    "Morocco": {
+        "signal_weight": 0.88,
+        "source": "FIFA + World Soccer Talk",
+        "url": "https://www.fifa.com/en/tournaments/mens/worldcup/canadamexicousa2026/articles/morocco-preview-team-profile-history",
+        "note": "El antecedente de semifinales en 2022 y su continuidad competitiva justifican vigilar su ruta.",
+    },
+    "Colombia": {
+        "signal_weight": 0.84,
+        "source": "Sky Sports",
+        "url": "https://www.skysports.com/football/news/11096/13621739/luis-diaz-led-colombia-labelled-a-dark-horse-for-world-cup-2026-by-nuno-espirito-santo",
+        "note": "Su techo ofensivo y la lectura externa reciente la convierten en candidata para romper una rama.",
+    },
+    "Norway": {
+        "signal_weight": 0.74,
+        "source": "World Soccer Talk",
+        "url": "https://worldsoccertalk.com/news/dark-horses-you-cannot-ignore-for-the-2026-fifa-world-cup/",
+        "note": "Su capacidad de gol puede elevar la varianza de una eliminatoria incluso sin convertirla en favorita estructural.",
+    },
+    "Japan": {
+        "signal_weight": 0.72,
+        "source": "World Soccer Talk",
+        "url": "https://worldsoccertalk.com/news/dark-horses-you-cannot-ignore-for-the-2026-fifa-world-cup/",
+        "note": "La disciplina táctica y la ruta simulada pueden darle valor en cruces cerrados.",
+    },
+    "Ecuador": {
+        "signal_weight": 0.68,
+        "source": "World Soccer Talk",
+        "url": "https://worldsoccertalk.com/news/dark-horses-you-cannot-ignore-for-the-2026-fifa-world-cup/",
+        "note": "Perfil físico y defensivo útil para incomodar favoritos; exige confirmar que la ruta siga abierta.",
+    },
+}
+DARK_HORSE_STAGE_MATCH_IDS = {
+    "reach_round16": tuple(f"M{match_id}" for match_id in range(73, 89)),
+    "reach_quarterfinal": tuple(f"M{match_id}" for match_id in range(89, 97)),
+    "reach_semifinal": tuple(f"M{match_id}" for match_id in range(97, 101)),
+    "reach_final": ("M101", "M102"),
+    "champion": ("M103",),
+}
 GOAL_CONSENSUS_TOTAL_FIELDS = (
     "market_total_line",
     "consensus_total_goals",
@@ -3652,6 +3711,108 @@ def consensus_adjusted_champion_probabilities(bracket_payload: dict, entries: Op
         for row in rows:
             row["adjusted_prob"] = float(row["adjusted_prob"]) / total
     return sorted(rows, key=lambda row: row["adjusted_prob"], reverse=True)
+
+
+def bracket_stage_team_probabilities(bracket_payload: dict, match_ids: Sequence[str]) -> Dict[str, float]:
+    totals: Dict[str, float] = {}
+    matches = bracket_payload.get("matches") or {}
+    for match_id in match_ids:
+        raw = (matches.get(match_id) or {}).get("advance_probabilities") or {}
+        for team, prob in raw.items():
+            name = str(team)
+            totals[name] = totals.get(name, 0.0) + float(prob or 0.0)
+    return {team: clamp(prob, 0.0, 1.0) for team, prob in totals.items()}
+
+
+def dark_horse_candidates(bracket_payload: dict, entries: Optional[Sequence[dict]] = None) -> List[dict]:
+    adjusted_rows = consensus_adjusted_champion_probabilities(bracket_payload, entries)
+    if not adjusted_rows:
+        return []
+    adjusted_map = {str(row["team"]): row for row in adjusted_rows}
+    stage_maps = {
+        stage: bracket_stage_team_probabilities(bracket_payload, match_ids)
+        for stage, match_ids in DARK_HORSE_STAGE_MATCH_IDS.items()
+    }
+    team_names = sorted(
+        set(adjusted_map)
+        | set(DARK_HORSE_EXTERNAL_SIGNALS)
+        | {team for stage_map in stage_maps.values() for team in stage_map}
+    )
+    candidates = []
+    for team in team_names:
+        if team in DARK_HORSE_ESTABLISHED_FAVORITES:
+            continue
+        adjusted_row = adjusted_map.get(team, {})
+        model_prob = float(adjusted_row.get("model_prob", stage_maps["champion"].get(team, 0.0)) or 0.0)
+        consensus_prob = float(adjusted_row.get("consensus_prob", 0.0) or 0.0)
+        adjusted_prob = float(adjusted_row.get("adjusted_prob", model_prob) or 0.0)
+        quarterfinal_prob = float(stage_maps["reach_quarterfinal"].get(team, 0.0) or 0.0)
+        semifinal_prob = float(stage_maps["reach_semifinal"].get(team, 0.0) or 0.0)
+        final_prob = float(stage_maps["reach_final"].get(team, 0.0) or 0.0)
+        external = DARK_HORSE_EXTERNAL_SIGNALS.get(team)
+        has_live_route = adjusted_prob >= 0.0025 or semifinal_prob >= 0.015 or quarterfinal_prob >= 0.045
+        if not has_live_route:
+            continue
+        if external is None and adjusted_prob < 0.008 and semifinal_prob < 0.045:
+            continue
+        if adjusted_prob >= 0.045 or semifinal_prob >= 0.15:
+            tier = "Candidato secundario"
+            action = "Mantener como alternativa real de llave y revisar antes de cada eliminatoria."
+        elif adjusted_prob >= 0.012 or semifinal_prob >= 0.065:
+            tier = "Tapado serio"
+            action = "Vigilar su rama: puede justificar cobertura si enfrenta a un favorito en un cruce cerrado."
+        else:
+            tier = "Tapado de mayor varianza"
+            action = "No sustituye la llave base; usarlo como alerta de sorpresa si la ruta y el live lo favorecen."
+        external_weight = float((external or {}).get("signal_weight", 0.0) or 0.0)
+        watch_index = 100.0 * clamp(
+            0.34 * min(adjusted_prob / 0.07, 1.0)
+            + 0.26 * min(semifinal_prob / 0.18, 1.0)
+            + 0.16 * min(final_prob / 0.10, 1.0)
+            + 0.14 * min(quarterfinal_prob / 0.30, 1.0)
+            + 0.10 * external_weight,
+            0.0,
+            1.0,
+        )
+        delta = model_prob - consensus_prob
+        if delta >= 0.01:
+            contrast = "El modelo propio lo ve más alto que el consenso."
+        elif delta <= -0.01:
+            contrast = "El consenso externo lo sostiene más que el modelo propio."
+        else:
+            contrast = "Modelo propio y consenso están razonablemente alineados."
+        candidates.append(
+            {
+                "team": team,
+                "tier": tier,
+                "action": action,
+                "watch_index": watch_index,
+                "model_prob": model_prob,
+                "consensus_prob": consensus_prob,
+                "adjusted_prob": adjusted_prob,
+                "quarterfinal_prob": quarterfinal_prob,
+                "semifinal_prob": semifinal_prob,
+                "final_prob": final_prob,
+                "contrast": contrast,
+                "external_source": str((external or {}).get("source", "Detección interna por ruta Monte Carlo")),
+                "external_url": str((external or {}).get("url", "")),
+                "external_note": str(
+                    (external or {}).get(
+                        "note",
+                        "El motor la detecta por su recorrido simulado; no hay una señal editorial externa añadida.",
+                    )
+                ),
+            }
+        )
+    return sorted(
+        candidates,
+        key=lambda item: (
+            float(item["watch_index"]),
+            float(item["adjusted_prob"]),
+            float(item["semifinal_prob"]),
+        ),
+        reverse=True,
+    )
 
 
 def consensus_bracket_alerts(bracket_payload: dict) -> List[dict]:
@@ -7618,6 +7779,75 @@ def build_consensus_guardrail_html(bracket_payload: dict, entries: Optional[Sequ
     )
 
 
+def build_dark_horses_markdown(bracket_payload: dict, entries: Optional[Sequence[dict]] = None) -> List[str]:
+    candidates = dark_horse_candidates(bracket_payload, entries)
+    if not candidates:
+        return ["_La corrida vigente no detecta tapados con una ruta suficientemente abierta._"]
+    lines = [
+        "- Regla: un tapado no se agrega por intuición. Debe conservar una ruta Monte Carlo visible hacia cuartos/semifinales o aparecer en una señal externa trazable. Las menciones externas son alertas; no reemplazan probabilidades ni fuerzan la llave.",
+        "- Lectura: candidato secundario no significa favorito. Tapado serio indica que conviene vigilar su rama. Tapado de mayor varianza solo justifica una alerta, no cambiar el boleto base.",
+    ]
+    for candidate in candidates:
+        lines.append(
+            f"- {candidate['team']} | {candidate['tier']} | índice de vigilancia {float(candidate['watch_index']):.0f}/100 | "
+            f"campeón calibrado {format_pct(float(candidate['adjusted_prob']))} | cuartos {format_pct(float(candidate['quarterfinal_prob']))} | "
+            f"semifinal {format_pct(float(candidate['semifinal_prob']))} | final {format_pct(float(candidate['final_prob']))} | "
+            f"{candidate['contrast']} Señal: {candidate['external_source']}."
+        )
+    return lines
+
+
+def build_dark_horses_html(bracket_payload: dict, entries: Optional[Sequence[dict]] = None) -> str:
+    candidates = dark_horse_candidates(bracket_payload, entries)
+    if not candidates:
+        return ""
+    cards = []
+    for candidate in candidates:
+        source_url = str(candidate["external_url"])
+        source_html = html.escape(str(candidate["external_source"]))
+        if source_url:
+            source_html = (
+                f"<a href=\"{html.escape(source_url, quote=True)}\" target=\"_blank\" rel=\"noopener noreferrer\">"
+                f"{source_html}</a>"
+            )
+        cards.append(
+            "<article class=\"dark-horse-card\">"
+            "<div class=\"dark-horse-card-top\">"
+            f"<span>{html.escape(str(candidate['tier']))}</span>"
+            f"<strong>{html.escape(str(candidate['team']))}</strong>"
+            f"<em>{float(candidate['watch_index']):.0f}/100 vigilancia</em>"
+            "</div>"
+            "<div class=\"dark-horse-metrics\">"
+            f"<span>Campeón calibrado <strong>{format_pct(float(candidate['adjusted_prob']))}</strong></span>"
+            f"<span>Cuartos <strong>{format_pct(float(candidate['quarterfinal_prob']))}</strong></span>"
+            f"<span>Semifinal <strong>{format_pct(float(candidate['semifinal_prob']))}</strong></span>"
+            f"<span>Final <strong>{format_pct(float(candidate['final_prob']))}</strong></span>"
+            "</div>"
+            f"<p><strong>Contraste:</strong> {html.escape(str(candidate['contrast']))}</p>"
+            f"<p><strong>Señal trazable:</strong> {source_html}. {html.escape(str(candidate['external_note']))}</p>"
+            f"<p class=\"dark-horse-action\"><strong>Acción:</strong> {html.escape(str(candidate['action']))}</p>"
+            "</article>"
+        )
+    leader = candidates[0]
+    external_count = sum(1 for candidate in candidates if candidate["external_url"])
+    return (
+        "<section class=\"panel dark-horse-panel\" id=\"tapados\">"
+        "<div class=\"panel-head\"><div>"
+        "<p class=\"eyebrow\">Radar de tapados</p>"
+        "<h2>Tapados con ruta realista</h2>"
+        "<p class=\"lede-tight\">Este módulo busca equipos capaces de romper la llave sin disfrazarlos de favoritos. Combina la ruta vigente de 15.000 simulaciones Monte Carlo, la probabilidad calibrada de campeón y señales externas recientes. El índice de vigilancia ordena alertas; no es una probabilidad de título. La señal editorial solo activa vigilancia: no reemplaza la llave base ni maquilla el pronóstico.</p>"
+        "</div></div>"
+        "<div class=\"confidence-tiles\">"
+        f"<div class=\"summary-tile\"><span>Tapados vigilados</span><strong>{len(candidates)}</strong><small>Se recalculan con cada corrida y cambian si cambia la llave.</small></div>"
+        f"<div class=\"summary-tile\"><span>Radar principal</span><strong>{html.escape(str(leader['team']))}</strong><small>{html.escape(str(leader['tier']))} | {float(leader['watch_index']):.0f}/100 vigilancia.</small></div>"
+        f"<div class=\"summary-tile\"><span>Señales externas trazables</span><strong>{external_count}</strong><small>Sirven como contraste visible; no fuerzan probabilidades.</small></div>"
+        "<div class=\"summary-tile\"><span>Regla de uso</span><strong>Vigilar, no inventar</strong><small>Un tapado exige ruta abierta; no sustituye automáticamente el boleto base.</small></div>"
+        "</div>"
+        f"<div class=\"dark-horse-grid\">{''.join(cards)}</div>"
+        "</section>"
+    )
+
+
 def calibration_depth_metrics(entries: Sequence[dict], backtest: dict) -> dict:
     fixture_entries = [entry for entry in entries if not entry.get("projection")]
     agreements = [
@@ -8546,6 +8776,8 @@ def build_dashboard_markdown(
     lines.extend(build_agentic_learning_markdown(entries, bracket_payload, backtest))
     lines.extend(["", "## Ajustes contra consenso externo", ""])
     lines.extend(build_consensus_guardrail_markdown(bracket_payload, entries))
+    lines.extend(["", "## Tapados con ruta realista", ""])
+    lines.extend(build_dark_horses_markdown(bracket_payload, entries))
     lines.extend(["", "## Qué cambió desde la última actualización", ""])
     lines.extend(
         build_recent_changes_markdown(
@@ -10770,6 +11002,7 @@ def build_dashboard_html(
     strategy_html = build_quiniela_strategy_html(entries)
     full_scorecard_html = build_full_scorecard_html(entries)
     consensus_guardrail_html = build_consensus_guardrail_html(bracket_payload, entries)
+    dark_horses_html = build_dark_horses_html(bracket_payload, entries)
     recent_changes_html = build_recent_changes_html(
         entries,
         previous_entries or [],
@@ -10800,6 +11033,7 @@ def build_dashboard_html(
             "strategy_html": strategy_html,
             "full_scorecard_html": full_scorecard_html,
             "consensus_guardrail_html": consensus_guardrail_html,
+            "dark_horses_html": dark_horses_html,
             "recent_changes_html": recent_changes_html,
             "backtesting_html": backtesting_html,
             "bracket_visual_html": bracket_visual_html,
@@ -11109,6 +11343,10 @@ def audit_dashboard_html(dashboard_html: str) -> List[str]:
         "Marcadores exactos más defendibles",
         "Ajustes para boleto de quiniela",
         "Guardrail de consenso",
+        "Radar de tapados",
+        "Tapados con ruta realista",
+        "índice de vigilancia",
+        "no reemplaza la llave base",
         "Metodología de estimadores externos",
         "Ratings tipo Elo / ClubElo",
         "Ranking FIFA oficial",

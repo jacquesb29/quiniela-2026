@@ -331,6 +331,8 @@ class RegressionLogicTest(unittest.TestCase):
         self.assertIn("no garantiza ganar", template)
         self.assertIn("score_dynamics_html", template)
         self.assertIn("championship_penca_html", template)
+        self.assertIn("dark_horses_html", template)
+        self.assertIn('href="#tapados"', template)
         self.assertIn("Campeonato", template)
 
     def test_pages_build_records_dashboard_timestamp_in_latest_json(self):
@@ -352,6 +354,40 @@ class RegressionLogicTest(unittest.TestCase):
         self.assertIn("consenso externo definido", html)
         self.assertIn("No es una caja negra", html)
         self.assertIn("Transparencia de fuentes", html)
+
+    def test_dark_horse_module_derives_secondary_candidates_from_bracket_route(self):
+        bracket_payload = {
+            "matches": {
+                "M89": {"advance_probabilities": {"Spain": 0.70, "Netherlands": 0.42, "Portugal": 0.32}},
+                "M97": {"advance_probabilities": {"Spain": 0.58, "Netherlands": 0.22, "Portugal": 0.16}},
+                "M101": {"advance_probabilities": {"Spain": 0.44, "Netherlands": 0.11, "Portugal": 0.08}},
+                "M103": {"advance_probabilities": {"Spain": 0.36, "Netherlands": 0.07, "Portugal": 0.05}},
+            }
+        }
+        candidates = app.dark_horse_candidates(bracket_payload, [])
+        names = [candidate["team"] for candidate in candidates]
+        self.assertIn("Netherlands", names)
+        self.assertIn("Portugal", names)
+        self.assertNotIn("Spain", names)
+        netherlands = next(candidate for candidate in candidates if candidate["team"] == "Netherlands")
+        self.assertGreater(netherlands["watch_index"], 0.0)
+        self.assertAlmostEqual(netherlands["semifinal_prob"], 0.22)
+
+    def test_dark_horse_html_is_transparent_about_external_signals(self):
+        bracket_payload = {
+            "matches": {
+                "M89": {"advance_probabilities": {"Netherlands": 0.31}},
+                "M97": {"advance_probabilities": {"Netherlands": 0.15}},
+                "M101": {"advance_probabilities": {"Netherlands": 0.07}},
+                "M103": {"advance_probabilities": {"Netherlands": 0.035}},
+            }
+        }
+        html = app.build_dark_horses_html(bracket_payload, [])
+        self.assertIn('id="tapados"', html)
+        self.assertIn("Tapados con ruta realista", html)
+        self.assertIn("La señal editorial solo activa vigilancia", html)
+        self.assertIn("no reemplaza la llave base", html)
+        self.assertIn("Netherlands", html)
 
     def test_provider_diagnostics_detect_configured_api_football_key(self):
         entries = [{"projection": False, "source": "espn_scoreboard", "status_state": "pre"}]
