@@ -1,7 +1,7 @@
 {
-  "updated_at_utc": "2026-05-30T22:22:13+00:00",
-  "publication_updated_at_utc": "2026-05-30T22:22:13+00:00",
-  "dashboard_updated_at_utc": "2026-05-30T22:22:13+00:00",
+  "updated_at_utc": "2026-06-01T16:22:28+00:00",
+  "publication_updated_at_utc": "2026-06-01T16:22:28+00:00",
+  "dashboard_updated_at_utc": "2026-06-01T16:22:28+00:00",
   "timestamp_consistency_note": "latest.json se escribe despues de copiar el HTML; compara dashboard_updated_at_utc contra publication_updated_at_utc para detectar desfases reales de publicacion o cache.",
   "refresh_interval_minutes": 5,
   "in_play_enabled": true,
@@ -14,7 +14,7 @@
   "official_fifa_rankings_as_of": "2026-01-19T16:51:00+00:00",
   "historical_base": {
     "from_date": "1950-01-01",
-    "official_matches": 29562,
+    "official_matches": 29566,
     "minimum_official_matches_required": 25000,
     "definition": "Partidos internacionales cerrados cuyo torneo no es Friendly ni Unofficial Friendly."
   },

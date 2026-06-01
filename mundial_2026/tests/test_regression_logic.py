@@ -332,6 +332,8 @@ class RegressionLogicTest(unittest.TestCase):
         self.assertIn("score_dynamics_html", template)
         self.assertIn("championship_penca_html", template)
         self.assertIn("dark_horses_html", template)
+        self.assertIn("external_benchmarks_html", template)
+        self.assertIn('href="#comparadores"', template)
         self.assertIn('href="#tapados"', template)
         self.assertIn("Campeonato", template)
 
@@ -354,6 +356,32 @@ class RegressionLogicTest(unittest.TestCase):
         self.assertIn("consenso externo definido", html)
         self.assertIn("No es una caja negra", html)
         self.assertIn("Transparencia de fuentes", html)
+
+    def test_external_benchmark_module_compares_published_models_without_blind_blend(self):
+        bracket_payload = {
+            "matches": {
+                "M103": {
+                    "advance_probabilities": {
+                        "Spain": 0.44,
+                        "France": 0.20,
+                        "England": 0.16,
+                        "Netherlands": 0.05,
+                        "Argentina": 0.15,
+                    }
+                }
+            }
+        }
+        entries = [{"projection": False, "status_state": "pre"} for _ in range(4)]
+        comparison = app.external_forecast_comparison(bracket_payload, entries)
+        self.assertEqual(comparison["leader"]["team"], "Spain")
+        self.assertEqual(len(comparison["benchmarks"]), 5)
+        self.assertGreaterEqual(comparison["agreement_count"], 3)
+        html = app.build_external_forecast_benchmarks_html(bracket_payload, entries)
+        self.assertIn('id="comparadores"', html)
+        self.assertIn("Goldman Sachs GIR", html)
+        self.assertIn("FairCast / University of Portsmouth", html)
+        self.assertIn("Panmure Liberum / Joachim Klement", html)
+        self.assertIn("No se promedian a ciegas", html)
 
     def test_dark_horse_module_derives_secondary_candidates_from_bracket_route(self):
         bracket_payload = {
@@ -673,6 +701,88 @@ class RegressionLogicTest(unittest.TestCase):
         central_weight = app.score_shape_weight(1, 0, 2.55, 0.65, strong_attack, fragile_defense, app.MatchContext(neutral=True))
         asymmetric_weight = app.score_shape_weight(3, 0, 2.55, 0.65, strong_attack, fragile_defense, app.MatchContext(neutral=True))
         self.assertGreater(asymmetric_weight, central_weight)
+
+    def test_team_specific_scoreline_families_distinguish_supported_goleada(self):
+        teams = app.load_teams()
+        profile = app.profile_for(teams["Spain"])
+        history = profile.history
+        supported_history = dataclasses.replace(
+            history,
+            scoreline_family_rates={
+                **history.scoreline_family_rates,
+                "clean_sheet_win_3_plus": 0.15,
+                "total_4_plus": 0.34,
+            },
+        )
+        unsupported_history = dataclasses.replace(
+            history,
+            scoreline_family_rates={
+                **history.scoreline_family_rates,
+                "clean_sheet_win_3_plus": 0.01,
+                "total_4_plus": 0.14,
+            },
+        )
+        supported = app.score_shape_team_signal(dataclasses.replace(profile, history=supported_history))
+        unsupported = app.score_shape_team_signal(dataclasses.replace(profile, history=unsupported_history))
+
+        self.assertGreater(supported["clean_sheet_win_3_plus"], unsupported["clean_sheet_win_3_plus"])
+        self.assertGreater(supported["open_match"], unsupported["open_match"])
+
+    def test_matchup_specific_history_does_not_promote_unsupported_three_nil(self):
+        dist = {
+            (2, 0): 0.25,
+            (3, 0): 0.20,
+            (1, 0): 0.15,
+            (4, 0): 0.10,
+            (2, 1): 0.08,
+            (1, 1): 0.08,
+            (0, 0): 0.06,
+            (3, 1): 0.04,
+            (0, 1): 0.02,
+            (4, 1): 0.02,
+        }
+        supported_meta = {
+            "favorite_is_a": True,
+            "favorite_clean_sheet_win_3_plus_signal": 0.90,
+            "rival_heavy_loss_signal": 0.80,
+        }
+        unsupported_meta = {
+            "favorite_is_a": True,
+            "favorite_clean_sheet_win_3_plus_signal": -0.90,
+            "rival_heavy_loss_signal": -0.80,
+        }
+
+        supported = app.score_expected_points_for_penca(dist, 3, 0, supported_meta)
+        unsupported = app.score_expected_points_for_penca(dist, 3, 0, unsupported_meta)
+        self.assertGreater(float(supported["shape_boost"]), float(unsupported["shape_boost"]))
+        self.assertGreater(
+            float(supported["ensemble_adjusted_points"]),
+            float(unsupported["ensemble_adjusted_points"]),
+        )
+
+    def test_matchup_family_index_uses_both_teams_for_exact_score(self):
+        supported = {
+            "scoreline_signal_a": {
+                "clean_sheet_win_3_plus": 0.85,
+                "clean_sheet_win_2": 0.40,
+            },
+            "scoreline_signal_b": {"heavy_loss": 0.75},
+        }
+        unsupported = {
+            "scoreline_signal_a": {
+                "clean_sheet_win_3_plus": -0.85,
+                "clean_sheet_win_2": -0.40,
+            },
+            "scoreline_signal_b": {"heavy_loss": -0.75},
+        }
+        self.assertGreater(
+            app.matchup_scoreline_family_index(3, 0, supported),
+            app.matchup_scoreline_family_index(3, 0, unsupported),
+        )
+        self.assertGreater(
+            app.matchup_scoreline_family_index(2, 0, supported),
+            app.matchup_scoreline_family_index(2, 0, unsupported),
+        )
 
     def test_score_precision_profile_exposes_goal_marginals_and_exact_pick(self):
         dist = {

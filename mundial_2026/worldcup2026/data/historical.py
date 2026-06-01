@@ -17,6 +17,25 @@ HISTORICAL_TEAM_NAME_ALIASES = {
     "Curacao": "Curaçao",
     "Dem. Rep. of Congo": "DR Congo",
 }
+DEFAULT_SCORELINE_FAMILY_RATES = {
+    "clean_sheet_win_1": 0.105,
+    "clean_sheet_win_2": 0.078,
+    "clean_sheet_win_3_plus": 0.047,
+    "btts_win_1": 0.128,
+    "btts_win_2_plus": 0.037,
+    "draw_00": 0.076,
+    "draw_11": 0.116,
+    "draw_22_plus": 0.052,
+    "clean_sheet_loss_1": 0.105,
+    "clean_sheet_loss_2": 0.078,
+    "clean_sheet_loss_3_plus": 0.047,
+    "btts_loss_1": 0.128,
+    "btts_loss_2_plus": 0.037,
+    "btts": 0.498,
+    "total_0_1": 0.274,
+    "total_2_3": 0.487,
+    "total_4_plus": 0.239,
+}
 
 
 def estimated_fifa_points(
@@ -130,6 +149,7 @@ def proxy_historical_snapshot(
         world_cup_goal_diff_per_match=0.0,
         shootout_matches_since_start=0,
         shootout_win_rate=0.5,
+        scoreline_family_rates=dict(DEFAULT_SCORELINE_FAMILY_RATES),
         strength_index=strength,
         attack_index=attack,
         defense_index=defense,
@@ -161,6 +181,20 @@ def historical_snapshot(
     competitive_matches = int(row.get("competitive_matches_since_start", row.get("competitive_matches_since_1990", 0)))
     world_cup_matches = int(row.get("world_cup_matches_since_start", row.get("world_cup_matches_since_1990", 0)))
     shootout_matches = int(row.get("shootout_matches_since_start", row.get("shootout_matches_since_1990", 0)))
+    raw_scoreline_family_rates = row.get("scoreline_family_rates") or {}
+    scoreline_family_rates = {
+        key: clamp(
+            empirical_bayes_shrinkage(
+                float(raw_scoreline_family_rates.get(key, prior)),
+                weighted_matches,
+                prior,
+                20.0,
+            ),
+            0.0,
+            1.0,
+        )
+        for key, prior in DEFAULT_SCORELINE_FAMILY_RATES.items()
+    }
 
     strength_index = clamp(
         empirical_bayes_shrinkage(float(row.get("strength_index", proxy.strength_index)), weighted_matches or matches_since_start, proxy.strength_index, 18.0),
@@ -215,6 +249,7 @@ def historical_snapshot(
         world_cup_goal_diff_per_match=float(row.get("world_cup_goal_diff_per_match", 0.0)),
         shootout_matches_since_start=shootout_matches,
         shootout_win_rate=float(row.get("shootout_win_rate", proxy.shootout_win_rate)),
+        scoreline_family_rates=scoreline_family_rates,
         strength_index=strength_index,
         attack_index=attack_index,
         defense_index=defense_index,

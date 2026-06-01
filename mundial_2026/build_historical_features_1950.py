@@ -26,6 +26,25 @@ COMPETITIVE_TOURNAMENT_EXCLUDE = {"Friendly", "Unofficial Friendly"}
 DATASET_SOURCE_RESULTS = "https://raw.githubusercontent.com/martj42/international_results/master/results.csv"
 DATASET_SOURCE_SHOOTOUTS = "https://raw.githubusercontent.com/martj42/international_results/master/shootouts.csv"
 DATASET_SOURCE_FORMER_NAMES = "https://raw.githubusercontent.com/martj42/international_results/master/former_names.csv"
+SCORELINE_FAMILY_KEYS = (
+    "clean_sheet_win_1",
+    "clean_sheet_win_2",
+    "clean_sheet_win_3_plus",
+    "btts_win_1",
+    "btts_win_2_plus",
+    "draw_00",
+    "draw_11",
+    "draw_22_plus",
+    "clean_sheet_loss_1",
+    "clean_sheet_loss_2",
+    "clean_sheet_loss_3_plus",
+    "btts_loss_1",
+    "btts_loss_2_plus",
+    "btts",
+    "total_0_1",
+    "total_2_3",
+    "total_4_plus",
+)
 
 
 def download_source(url: str, target_dir: Path) -> Path:
@@ -93,7 +112,7 @@ def build_team_name_map(teams: list[dict], former_names_path: Path, start_date: 
 
 
 def team_stat_bucket() -> dict[str, float]:
-    return {
+    bucket = {
         "matches": 0.0,
         "points": 0.0,
         "wins": 0.0,
@@ -120,6 +139,42 @@ def team_stat_bucket() -> dict[str, float]:
         "world_cup_scored_matches": 0.0,
         "world_cup_clean_sheet_matches": 0.0,
     }
+    for key in SCORELINE_FAMILY_KEYS:
+        bucket[f"weighted_scoreline_{key}"] = 0.0
+    return bucket
+
+
+def scoreline_families(goals_for: int, goals_against: int) -> tuple[str, ...]:
+    """Compact empirical families used by the exact-score recommendation layer."""
+
+    families = []
+    total = goals_for + goals_against
+    margin = abs(goals_for - goals_against)
+    if total <= 1:
+        families.append("total_0_1")
+    elif total <= 3:
+        families.append("total_2_3")
+    else:
+        families.append("total_4_plus")
+    if goals_for > 0 and goals_against > 0:
+        families.append("btts")
+    if goals_for > goals_against:
+        if goals_against == 0:
+            families.append(f"clean_sheet_win_{margin}" if margin <= 2 else "clean_sheet_win_3_plus")
+        else:
+            families.append("btts_win_1" if margin == 1 else "btts_win_2_plus")
+    elif goals_for == goals_against:
+        if goals_for == 0:
+            families.append("draw_00")
+        elif goals_for == 1:
+            families.append("draw_11")
+        else:
+            families.append("draw_22_plus")
+    elif goals_for == 0:
+        families.append(f"clean_sheet_loss_{margin}" if margin <= 2 else "clean_sheet_loss_3_plus")
+    else:
+        families.append("btts_loss_1" if margin == 1 else "btts_loss_2_plus")
+    return tuple(families)
 
 
 def update_bucket(bucket: dict[str, float], goals_for: int, goals_against: int, tournament: str, weight: float) -> None:
@@ -129,6 +184,8 @@ def update_bucket(bucket: dict[str, float], goals_for: int, goals_against: int, 
     bucket["weighted_matches"] += weight
     bucket["weighted_gf"] += weight * goals_for
     bucket["weighted_ga"] += weight * goals_against
+    for family in scoreline_families(goals_for, goals_against):
+        bucket[f"weighted_scoreline_{family}"] += weight
     if goals_for > 0:
         bucket["scored_matches"] += 1.0
     if goals_against == 0:
@@ -218,6 +275,10 @@ def build_output_record(team: str, aliases: list[str], bucket: dict[str, float],
 
     shootout_win_rate = metric_div(shootouts["wins"], shootout_matches, 0.0)
     shootout_win_rate_shrunk = metric_div(shootouts["wins"] + 1.5, shootout_matches + 3.0, 0.5)
+    scoreline_family_rates = {
+        key: round(metric_div(bucket[f"weighted_scoreline_{key}"], weighted_matches), 4)
+        for key in SCORELINE_FAMILY_KEYS
+    }
 
     return {
         "source_names": aliases,
@@ -254,6 +315,7 @@ def build_output_record(team: str, aliases: list[str], bucket: dict[str, float],
         "shootout_matches_since_start": int(shootout_matches),
         "shootout_win_rate": round(shootout_win_rate, 4),
         "shootout_win_rate_shrunk": round(shootout_win_rate_shrunk, 4),
+        "scoreline_family_rates": scoreline_family_rates,
     }
 
 
@@ -408,7 +470,7 @@ def main() -> None:
                 "as_of": TODAY.isoformat(),
                 "from_date": args.start_date,
                 "start_year": int(args.start_date[:4]),
-                "description": "Indicadores históricos trazables de selecciones nacionales desde 1950, con mezcla de rendimiento total, competitivo, mundialista y penales.",
+                "description": "Indicadores históricos trazables de selecciones nacionales desde 1950, con mezcla de rendimiento total, competitivo, mundialista, penales y familias empíricas de marcador.",
                 "source_results": DATASET_SOURCE_RESULTS,
                 "source_shootouts": DATASET_SOURCE_SHOOTOUTS,
                 "source_former_names": DATASET_SOURCE_FORMER_NAMES,

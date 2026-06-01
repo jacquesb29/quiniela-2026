@@ -273,6 +273,58 @@ DARK_HORSE_EXTERNAL_SIGNALS = {
         "note": "Perfil físico y defensivo útil para incomodar favoritos; exige confirmar que la ruta siga abierta.",
     },
 }
+EXTERNAL_FORECAST_BENCHMARKS = (
+    {
+        "name": "Goldman Sachs GIR",
+        "published_at": "30 may 2026",
+        "snapshot": "Post-sorteo, pretorneo",
+        "champion": "Spain",
+        "champion_prob": 0.257,
+        "final": "Spain vs Argentina",
+        "methodology": "Casi 20.000 partidos oficiales desde 1978; Elo, ataque, momentum, mentalidad y geografía. El informe prevé actualización tras cada jornada.",
+        "source_url": "https://static.poder360.com.br/2026/05/Goldman-Sachs-Copa-do-Mundo-2026-30mai2026.pdf",
+    },
+    {
+        "name": "Opta Analyst",
+        "published_at": "8 dic 2025",
+        "snapshot": "Pretorneo",
+        "champion": "Spain",
+        "champion_prob": 0.170,
+        "final": "No publicado en el corte",
+        "methodology": "Supercomputador Opta con ratings de equipos y simulación repetida del torneo. Sirve como control probabilístico independiente.",
+        "source_url": "https://theanalyst.com/articles/spain-2026-world-cup-favourites-opta-supercomputer",
+    },
+    {
+        "name": "PwC",
+        "published_at": "9 dic 2025",
+        "snapshot": "Pretorneo",
+        "champion": "Spain",
+        "champion_prob": 0.260,
+        "final": "No publicado en el corte",
+        "methodology": "Regresión logística + Bradley-Terry, variables económicas y futbolísticas, y 100.000 simulaciones de torneo.",
+        "source_url": "https://www.pwc.co.uk/press-room/press-releases/research-commentary/2025/PwC-analysis-England-favourites-to-win-2026-World-Cup.html",
+    },
+    {
+        "name": "FairCast / University of Portsmouth",
+        "published_at": "14 abr 2026",
+        "snapshot": "Pretorneo",
+        "champion": "England",
+        "champion_prob": 0.159,
+        "final": "No publicado en el corte",
+        "methodology": "Rating FairCast calibrado por backtesting y un millón de simulaciones. Es un contraste útil porque no coincide con el favorito principal.",
+        "source_url": "https://www.port.ac.uk/news-events-and-blogs/news/computer-model-predicts-england-as-favourites-for-the-2026-fifa-world-cup",
+    },
+    {
+        "name": "Panmure Liberum / Joachim Klement",
+        "published_at": "abr 2026",
+        "snapshot": "Modelo alternativo",
+        "champion": "Netherlands",
+        "champion_prob": None,
+        "final": "Netherlands vs Portugal",
+        "methodology": "Modelo macro-futbolístico alternativo con población, clima, PIB per cápita, localía y puntos FIFA. Útil como alerta de tapados, no como ancla principal.",
+        "source_url": "https://assets.sbs.com.au/07/69/796b14374c579c3eae5db7ed4a6d/2026-wc-prediction.pdf",
+    },
+)
 DARK_HORSE_STAGE_MATCH_IDS = {
     "reach_round16": tuple(f"M{match_id}" for match_id in range(73, 89)),
     "reach_quarterfinal": tuple(f"M{match_id}" for match_id in range(89, 97)),
@@ -386,6 +438,7 @@ class HistoricalSnapshot:
     world_cup_goal_diff_per_match: float
     shootout_matches_since_start: int
     shootout_win_rate: float
+    scoreline_family_rates: Dict[str, float]
     strength_index: float
     attack_index: float
     defense_index: float
@@ -1393,6 +1446,11 @@ def expected_goals(
     )
 
 
+def scoreline_family_signal(history: HistoricalSnapshot, key: str, baseline: float, scale: float) -> float:
+    rate = float(history.scoreline_family_rates.get(key, baseline))
+    return clamp((rate - baseline) / max(scale, 1e-6), -1.0, 1.0)
+
+
 def score_shape_team_signal(profile: TeamProfile, state: Optional[dict] = None) -> Dict[str, float]:
     """Historical scoring profile used to choose better exact-score shapes.
 
@@ -1445,6 +1503,31 @@ def score_shape_team_signal(profile: TeamProfile, state: Optional[dict] = None) 
         -1.0,
         1.0,
     )
+    clean_sheet_win_2 = scoreline_family_signal(history, "clean_sheet_win_2", 0.078, 0.070)
+    clean_sheet_win_3_plus = scoreline_family_signal(history, "clean_sheet_win_3_plus", 0.047, 0.055)
+    btts_win = clamp(
+        0.72 * scoreline_family_signal(history, "btts_win_1", 0.128, 0.100)
+        + 0.28 * scoreline_family_signal(history, "btts_win_2_plus", 0.037, 0.045),
+        -1.0,
+        1.0,
+    )
+    btts_loss = clamp(
+        0.72 * scoreline_family_signal(history, "btts_loss_1", 0.128, 0.100)
+        + 0.28 * scoreline_family_signal(history, "btts_loss_2_plus", 0.037, 0.045),
+        -1.0,
+        1.0,
+    )
+    heavy_loss = clamp(
+        0.68 * scoreline_family_signal(history, "clean_sheet_loss_3_plus", 0.047, 0.055)
+        + 0.32 * scoreline_family_signal(history, "btts_loss_2_plus", 0.037, 0.045),
+        -1.0,
+        1.0,
+    )
+    btts = scoreline_family_signal(history, "btts", 0.498, 0.180)
+    open_match = scoreline_family_signal(history, "total_4_plus", 0.239, 0.160)
+    low_total = scoreline_family_signal(history, "total_0_1", 0.274, 0.160)
+    draw_11 = scoreline_family_signal(history, "draw_11", 0.116, 0.085)
+    draw_22_plus = scoreline_family_signal(history, "draw_22_plus", 0.052, 0.065)
     return {
         "attack": attack,
         "defense": defense,
@@ -1452,6 +1535,16 @@ def score_shape_team_signal(profile: TeamProfile, state: Optional[dict] = None) 
         "clean_sheet": clean_sheet_signal,
         "scoring_rate": scoring_rate_signal,
         "high_goal": high_goal,
+        "clean_sheet_win_2": clean_sheet_win_2,
+        "clean_sheet_win_3_plus": clean_sheet_win_3_plus,
+        "btts_win": btts_win,
+        "btts_loss": btts_loss,
+        "heavy_loss": heavy_loss,
+        "btts": btts,
+        "open_match": open_match,
+        "low_total": low_total,
+        "draw_11": draw_11,
+        "draw_22_plus": draw_22_plus,
         "strength": clamp(
             0.42 * centered(profile.fifa_strength_index)
             + 0.24 * centered(history.strength_index)
@@ -1523,11 +1616,46 @@ def score_shape_weight(
     if ctx.knockout and total_goals >= 4:
         exponent -= 0.08
 
+    # Team-specific empirical families from the traceable historical base.
+    # This is deliberately a bounded correction: the expected-goals ensemble
+    # still leads, but a generic 2-0 or 1-1 no longer wins only by being common.
+    if goals_a == goals_b == 1:
+        exponent += 0.060 * (signal_a.get("draw_11", 0.0) + signal_b.get("draw_11", 0.0))
+    elif goals_a == goals_b and goals_a >= 2:
+        exponent += 0.070 * (signal_a.get("draw_22_plus", 0.0) + signal_b.get("draw_22_plus", 0.0))
+    elif goals_a > goals_b:
+        if goals_b == 0 and margin == 2:
+            exponent += 0.085 * signal_a.get("clean_sheet_win_2", 0.0)
+            exponent += 0.050 * signal_b.get("heavy_loss", 0.0)
+        elif goals_b == 0 and margin >= 3:
+            exponent += 0.145 * signal_a.get("clean_sheet_win_3_plus", 0.0)
+            exponent += 0.110 * signal_b.get("heavy_loss", 0.0)
+        elif goals_b > 0:
+            exponent += 0.090 * signal_a.get("btts_win", 0.0)
+            exponent += 0.060 * signal_b.get("btts_loss", 0.0)
+    elif goals_b > goals_a:
+        if goals_a == 0 and margin == 2:
+            exponent += 0.085 * signal_b.get("clean_sheet_win_2", 0.0)
+            exponent += 0.050 * signal_a.get("heavy_loss", 0.0)
+        elif goals_a == 0 and margin >= 3:
+            exponent += 0.145 * signal_b.get("clean_sheet_win_3_plus", 0.0)
+            exponent += 0.110 * signal_a.get("heavy_loss", 0.0)
+        elif goals_a > 0:
+            exponent += 0.090 * signal_b.get("btts_win", 0.0)
+            exponent += 0.060 * signal_a.get("btts_loss", 0.0)
+
+    if goals_a > 0 and goals_b > 0:
+        exponent += 0.045 * (signal_a.get("btts", 0.0) + signal_b.get("btts", 0.0))
+    if total_goals >= 4:
+        exponent += 0.045 * (signal_a.get("open_match", 0.0) + signal_b.get("open_match", 0.0))
+    elif total_goals <= 1:
+        exponent += 0.035 * (signal_a.get("low_total", 0.0) + signal_b.get("low_total", 0.0))
+
     central_scores = {(1, 0), (0, 1), (2, 0), (0, 2), (1, 1)}
     if (goals_a, goals_b) in central_scores and (expected_total >= 2.55 or abs(strength_gap) >= 0.30):
         exponent -= 0.035 + 0.030 * max(expected_total - 2.55, 0.0) + 0.025 * abs(strength_gap)
 
-    return math.exp(clamp(exponent, -0.36, 0.36))
+    return math.exp(clamp(exponent, -0.48, 0.48))
 
 
 def apply_historical_score_shape_adjustment(
@@ -1583,7 +1711,11 @@ def apply_historical_score_shape_adjustment(
     favorite_name = team_a.name if stronger_is_a else team_b.name
     favorite_signal = signal_a if stronger_is_a else signal_b
     rival_signal = signal_b if stronger_is_a else signal_a
-    if favorite_signal["attack"] > 0.10 and rival_signal["concede"] > 0.05:
+    if favorite_signal["clean_sheet_win_3_plus"] > 0.12 and rival_signal["heavy_loss"] > -0.10:
+        label = "histórico por equipo respalda una ventaja amplia con portería a cero"
+    elif favorite_signal["btts_win"] > 0.08 and rival_signal["btts_loss"] > -0.08:
+        label = "histórico por equipo respalda triunfo con goles de ambos"
+    elif favorite_signal["attack"] > 0.10 and rival_signal["concede"] > 0.05:
         label = "favorece ventajas más amplias si el favorito domina"
     elif signal_a["attack"] > 0.05 and signal_b["attack"] > 0.05 and (signal_a["concede"] + signal_b["concede"]) > -0.10:
         label = "sube escenarios donde ambos equipos anotan"
@@ -1597,6 +1729,7 @@ def apply_historical_score_shape_adjustment(
         "strength": strength,
         "label": label,
         "favorite_name": favorite_name,
+        "favorite_is_a": stronger_is_a,
         "top_before": f"{top_before_pair[0]}-{top_before_pair[1]}",
         "top_before_prob": float(top_before_prob),
         "top_after": f"{top_after_pair[0]}-{top_after_pair[1]}",
@@ -1605,6 +1738,17 @@ def apply_historical_score_shape_adjustment(
         "attack_signal_b": signal_b["attack"],
         "concede_signal_a": signal_a["concede"],
         "concede_signal_b": signal_b["concede"],
+        "scoreline_signal_a": dict(signal_a),
+        "scoreline_signal_b": dict(signal_b),
+        "favorite_clean_sheet_win_2_signal": favorite_signal["clean_sheet_win_2"],
+        "favorite_clean_sheet_win_3_plus_signal": favorite_signal["clean_sheet_win_3_plus"],
+        "favorite_btts_win_signal": favorite_signal["btts_win"],
+        "rival_heavy_loss_signal": rival_signal["heavy_loss"],
+        "rival_btts_loss_signal": rival_signal["btts_loss"],
+        "scoreline_family_note": (
+            "La recomendación exacta usa familias empíricas por selección con shrinkage bayesiano: "
+            "victorias amplias con portería a cero, triunfos con goles de ambos, empates y derrotas amplias."
+        ),
         "historical_sample_a": float(profile_a.history.weighted_matches_since_start),
         "historical_sample_b": float(profile_b.history.weighted_matches_since_start),
         "historical_data_note": (
@@ -5078,7 +5222,67 @@ def score_shape_decision_boost(goals_a: int, goals_b: int, score_shape_meta: Opt
         boost += 0.05
     if "conservador" in label and total <= 2:
         boost += 0.03
-    return clamp(boost, 0.90, 1.12)
+    favorite_is_a = bool(score_shape_meta.get("favorite_is_a", True))
+    favorite_goals = goals_a if favorite_is_a else goals_b
+    rival_goals = goals_b if favorite_is_a else goals_a
+    favorite_wins = favorite_goals > rival_goals
+    if favorite_wins and rival_goals == 0 and favorite_goals == 2:
+        boost += 0.045 * float(score_shape_meta.get("favorite_clean_sheet_win_2_signal", 0.0))
+    if favorite_wins and rival_goals == 0 and favorite_goals >= 3:
+        empirical_support = (
+            0.62 * float(score_shape_meta.get("favorite_clean_sheet_win_3_plus_signal", 0.0))
+            + 0.38 * float(score_shape_meta.get("rival_heavy_loss_signal", 0.0))
+        )
+        boost += 0.15 * empirical_support
+    if favorite_wins and rival_goals > 0:
+        empirical_support = (
+            0.60 * float(score_shape_meta.get("favorite_btts_win_signal", 0.0))
+            + 0.40 * float(score_shape_meta.get("rival_btts_loss_signal", 0.0))
+        )
+        boost += 0.10 * empirical_support
+    return clamp(boost, 0.84, 1.18)
+
+
+def matchup_scoreline_family_index(
+    goals_a: int,
+    goals_b: int,
+    score_shape_meta: Optional[Dict[str, object]] = None,
+) -> float:
+    """Compatibility of an exact score with both teams' empirical families.
+
+    A 2-0 remains a perfectly valid football score, but it no longer receives
+    the same treatment for every matchup. The historical family profile asks:
+    does this team often win this way, and does this rival often lose this way?
+    """
+
+    if not score_shape_meta:
+        return 0.50
+    signal_a = score_shape_meta.get("scoreline_signal_a")
+    signal_b = score_shape_meta.get("scoreline_signal_b")
+    if not isinstance(signal_a, dict) or not isinstance(signal_b, dict):
+        return 0.50
+    margin = abs(goals_a - goals_b)
+    if goals_a == goals_b == 1:
+        raw = 0.5 * float(signal_a.get("draw_11", 0.0)) + 0.5 * float(signal_b.get("draw_11", 0.0))
+    elif goals_a == goals_b and goals_a >= 2:
+        raw = 0.5 * float(signal_a.get("draw_22_plus", 0.0)) + 0.5 * float(signal_b.get("draw_22_plus", 0.0))
+    elif goals_a > goals_b and goals_b == 0 and margin >= 3:
+        raw = 0.62 * float(signal_a.get("clean_sheet_win_3_plus", 0.0)) + 0.38 * float(signal_b.get("heavy_loss", 0.0))
+    elif goals_b > goals_a and goals_a == 0 and margin >= 3:
+        raw = 0.62 * float(signal_b.get("clean_sheet_win_3_plus", 0.0)) + 0.38 * float(signal_a.get("heavy_loss", 0.0))
+    elif goals_a > goals_b and goals_b == 0 and margin == 2:
+        raw = 0.68 * float(signal_a.get("clean_sheet_win_2", 0.0)) + 0.32 * float(signal_b.get("heavy_loss", 0.0))
+    elif goals_b > goals_a and goals_a == 0 and margin == 2:
+        raw = 0.68 * float(signal_b.get("clean_sheet_win_2", 0.0)) + 0.32 * float(signal_a.get("heavy_loss", 0.0))
+    elif goals_a > goals_b and goals_b > 0:
+        raw = 0.60 * float(signal_a.get("btts_win", 0.0)) + 0.40 * float(signal_b.get("btts_loss", 0.0))
+    elif goals_b > goals_a and goals_a > 0:
+        raw = 0.60 * float(signal_b.get("btts_win", 0.0)) + 0.40 * float(signal_a.get("btts_loss", 0.0))
+    elif goals_a + goals_b <= 1:
+        raw = 0.5 * float(signal_a.get("low_total", 0.0)) + 0.5 * float(signal_b.get("low_total", 0.0))
+    else:
+        raw = 0.5 * float(signal_a.get("open_match", 0.0)) + 0.5 * float(signal_b.get("open_match", 0.0))
+    return clamp(0.50 + 0.42 * raw, 0.08, 0.92)
 
 
 def score_marginal_fit(
@@ -5431,6 +5635,7 @@ def score_expected_points_for_penca(
     scenario_ensemble_index = float(scenario_profile["scenario_ensemble_index"])
     poisson_modal_lock_penalty = float(scenario_profile["poisson_modal_lock_penalty"])
     shape_boost = score_shape_decision_boost(pick_a, pick_b, score_shape_meta)
+    matchup_family_index = matchup_scoreline_family_index(pick_a, pick_b, score_shape_meta)
     public_score_popularity_index = public_scoreline_popularity_proxy(
         pick_a,
         pick_b,
@@ -5495,7 +5700,7 @@ def score_expected_points_for_penca(
             + 0.08 * marginal_fit
             + 0.12 * scoreline_calibration_index
             + 0.08 * scenario_ensemble_index
-            + 0.01 * plausibility_index
+            + 0.05 * matchup_family_index
         )
         * shape_boost
         - 0.035 * clamp(points_sd / 3.8, 0.0, 1.0),
@@ -5522,6 +5727,7 @@ def score_expected_points_for_penca(
         + 0.06 * marginal_fit
         + 0.24 * scoreline_calibration_index
         + 0.34 * scenario_ensemble_index
+        + 0.22 * (matchup_family_index - 0.50)
         + 0.08 * scoreline_calibration_boost
         - 0.18 * scoreline_calibration_penalty
         - 0.22 * poisson_modal_lock_penalty
@@ -5575,6 +5781,7 @@ def score_expected_points_for_penca(
         "scoreline_scenario_note": str(scenario_profile["scoreline_scenario_note"]),
         "poisson_modal_lock_penalty": poisson_modal_lock_penalty,
         "shape_boost": shape_boost,
+        "matchup_family_index": matchup_family_index,
         "realism_index": realism_index,
         "plausibility_index": plausibility_index,
         "clean_sheet_margin_penalty": clean_sheet_margin_penalty,
@@ -5823,14 +6030,16 @@ def apply_penca_tournament_scoreline_adjustment(
         )
         shape_boost = score_shape_decision_boost(goals_a, goals_b, score_shape_meta)
         shape_index = clamp((shape_boost - 0.90) / 0.22, 0.0, 1.0)
+        matchup_family_index = matchup_scoreline_family_index(goals_a, goals_b, score_shape_meta)
         modal_lock_penalty = float(scenario.get("poisson_modal_lock_penalty", 0.0))
         support_index = clamp(
-            0.28 * float(calibration["scoreline_calibration_index"])
-            + 0.24 * float(scenario["scenario_ensemble_index"])
-            + 0.18 * marginal_fit
-            + 0.14 * prior_index
+            0.25 * float(calibration["scoreline_calibration_index"])
+            + 0.22 * float(scenario["scenario_ensemble_index"])
+            + 0.16 * marginal_fit
+            + 0.10 * prior_index
             + 0.10 * shape_index
-            + 0.06 * exact_ratio,
+            + 0.07 * exact_ratio
+            + 0.10 * matchup_family_index,
             0.0,
             1.0,
         )
@@ -6249,7 +6458,9 @@ def score_precision_profile(
         "recommended_scoreline_scenario_family": str(top_penca.get("scoreline_scenario_family", "marcador balanceado")),
         "recommended_scoreline_scenario_note": str(top_penca.get("scoreline_scenario_note", "escenario mixto")),
         "recommended_poisson_modal_lock_penalty": float(top_penca.get("poisson_modal_lock_penalty", 0.0)),
-        "score_selector_method": "Ensamble de marcador: puntos Penca + distribución del modelo + escenarios de partido + prior histórico + plausibilidad + valor competitivo vs marcador popular",
+        "score_selector_method": "Ensamble de marcador: puntos Penca + distribución multimodelo + familias históricas por selección + escenarios de partido + plausibilidad + valor competitivo vs marcador popular",
+        "recommended_historical_matchup_boost": float(top_penca.get("shape_boost", 1.0)),
+        "recommended_matchup_family_index": float(top_penca.get("matchup_family_index", 0.50)),
         "recommended_plausibility_index": float(top_penca.get("plausibility_index", top_penca.get("realism_index", 1.0))),
         "recommended_plausibility_note": str(top_penca.get("plausibility_note", "marcador de forma normal")),
         "recommended_clean_sheet_margin_penalty": float(top_penca.get("clean_sheet_margin_penalty", 0.0)),
@@ -6285,6 +6496,7 @@ def score_precision_profile(
         "score_shape_before": (score_shape_meta or {}).get("top_before"),
         "score_shape_after": (score_shape_meta or {}).get("top_after"),
         "historical_data_note": (score_shape_meta or {}).get("historical_data_note"),
+        "scoreline_family_note": (score_shape_meta or {}).get("scoreline_family_note"),
     }
 
 
@@ -7779,6 +7991,123 @@ def build_consensus_guardrail_html(bracket_payload: dict, entries: Optional[Sequ
     )
 
 
+def external_forecast_comparison(bracket_payload: dict, entries: Optional[Sequence[dict]] = None) -> dict:
+    adjusted_rows = consensus_adjusted_champion_probabilities(bracket_payload, entries)
+    adjusted_map = {str(row["team"]): row for row in adjusted_rows}
+    leader = adjusted_rows[0] if adjusted_rows else None
+    leader_team = str((leader or {}).get("team", "Sin llave"))
+    benchmarks = []
+    for benchmark in EXTERNAL_FORECAST_BENCHMARKS:
+        item = dict(benchmark)
+        champion = str(item["champion"])
+        ours = adjusted_map.get(champion, {})
+        ours_prob = float(ours.get("adjusted_prob", 0.0) or 0.0)
+        external_prob = item.get("champion_prob")
+        delta = ours_prob - float(external_prob) if external_prob is not None else None
+        if champion == leader_team:
+            reading = "Coincide con nuestro líder vigente."
+        elif ours_prob >= 0.06:
+            reading = "No lidera nuestra corrida, pero sigue siendo candidato serio."
+        elif champion in DARK_HORSE_EXTERNAL_SIGNALS:
+            reading = "Funciona como alerta de tapado; vigilar su ruta antes de subirlo."
+        else:
+            reading = "Divergencia visible: revisar variables y ruta, no copiar el pick."
+        item.update(
+            {
+                "ours_prob": ours_prob,
+                "delta": delta,
+                "agrees_with_leader": champion == leader_team,
+                "reading": reading,
+            }
+        )
+        benchmarks.append(item)
+    return {
+        "leader": leader,
+        "benchmarks": benchmarks,
+        "agreement_count": sum(1 for item in benchmarks if item["agrees_with_leader"]),
+        "distinct_champions": sorted({str(item["champion"]) for item in benchmarks}),
+    }
+
+
+def build_external_forecast_benchmarks_markdown(
+    bracket_payload: dict,
+    entries: Optional[Sequence[dict]] = None,
+) -> List[str]:
+    comparison = external_forecast_comparison(bracket_payload, entries)
+    leader = comparison["leader"]
+    if not leader:
+        return ["_Sin llave generada para comparar contra modelos externos publicados._"]
+    lines = [
+        f"- Nuestro líder vigente: {leader['team']} con {format_pct(float(leader['adjusted_prob']))} de probabilidad calibrada de campeón.",
+        f"- Coincidencias: {int(comparison['agreement_count'])}/{len(comparison['benchmarks'])} benchmarks publicados eligen al mismo campeón. No se promedian a ciegas: se usan para auditar divergencias.",
+        "- Próxima mejora que sí mueve calidad: recalibrar pesos con walk-forward apenas entren resultados reales del Mundial y añadir mercado live solo cuando exista un feed verificable.",
+    ]
+    for item in comparison["benchmarks"]:
+        external_prob = item.get("champion_prob")
+        external_text = format_pct(float(external_prob)) if external_prob is not None else "probabilidad no publicada"
+        lines.append(
+            f"- {item['name']} ({item['published_at']}): campeón {item['champion']} | externo {external_text} | "
+            f"nuestro modelo hoy {format_pct(float(item['ours_prob']))} | final {item['final']} | {item['reading']}"
+        )
+    return lines
+
+
+def build_external_forecast_benchmarks_html(
+    bracket_payload: dict,
+    entries: Optional[Sequence[dict]] = None,
+) -> str:
+    comparison = external_forecast_comparison(bracket_payload, entries)
+    leader = comparison["leader"]
+    if not leader:
+        return ""
+    cards = []
+    for item in comparison["benchmarks"]:
+        external_prob = item.get("champion_prob")
+        external_text = format_pct(float(external_prob)) if external_prob is not None else "No publicada"
+        delta = item.get("delta")
+        delta_text = f"{float(delta) * 100:+.1f} pp" if delta is not None else "Sin comparación porcentual"
+        agreement = "Coincide" if item["agrees_with_leader"] else "Contraste"
+        cards.append(
+            "<article class=\"benchmark-card\">"
+            "<div class=\"benchmark-card-top\">"
+            f"<span>{html.escape(str(item['snapshot']))}</span>"
+            f"<strong>{html.escape(str(item['name']))}</strong>"
+            f"<em>{html.escape(str(item['published_at']))}</em>"
+            "</div>"
+            "<div class=\"benchmark-metrics\">"
+            f"<span>Campeón publicado<strong>{html.escape(str(item['champion']))}</strong></span>"
+            f"<span>Probabilidad externa<strong>{html.escape(external_text)}</strong></span>"
+            f"<span>Nuestro modelo hoy<strong>{format_pct(float(item['ours_prob']))}</strong></span>"
+            f"<span>Brecha propia vs externa<strong>{html.escape(delta_text)}</strong></span>"
+            "</div>"
+            f"<p><strong>Final publicada:</strong> {html.escape(str(item['final']))}</p>"
+            f"<p><strong>Lectura:</strong> {html.escape(str(item['reading']))}</p>"
+            f"<p><strong>Método:</strong> {html.escape(str(item['methodology']))}</p>"
+            f"<p class=\"benchmark-source\"><a href=\"{html.escape(str(item['source_url']), quote=True)}\" target=\"_blank\" rel=\"noopener noreferrer\">Abrir fuente publicada</a><em>{html.escape(agreement)}</em></p>"
+            "</article>"
+        )
+    return (
+        "<section class=\"panel benchmark-panel\" id=\"comparadores\">"
+        "<div class=\"panel-head\"><div>"
+        "<p class=\"eyebrow\">Comparadores externos</p>"
+        "<h2>Qué dicen otros modelos y dónde debemos desconfiar</h2>"
+        "<p class=\"lede-tight\">Esta mesa compara nuestra llave vigente contra cortes publicados por Goldman Sachs, Opta, PwC, FairCast y Panmure Liberum/Klement. No se promedian a ciegas ni se usan para maquillar probabilidades: sirven para detectar divergencias, revisar supuestos y vigilar tapados.</p>"
+        "</div></div>"
+        "<div class=\"confidence-tiles\">"
+        f"<div class=\"summary-tile\"><span>Nuestro líder vigente</span><strong>{html.escape(str(leader['team']))}</strong><small>{format_pct(float(leader['adjusted_prob']))} campeón calibrado en esta corrida.</small></div>"
+        f"<div class=\"summary-tile\"><span>Benchmarks publicados</span><strong>{len(comparison['benchmarks'])}</strong><small>Cada tarjeta muestra fuente, fecha y metodología.</small></div>"
+        f"<div class=\"summary-tile\"><span>Coinciden con nuestro líder</span><strong>{int(comparison['agreement_count'])}/{len(comparison['benchmarks'])}</strong><small>El desacuerdo es información útil, no un error que deba ocultarse.</small></div>"
+        f"<div class=\"summary-tile\"><span>Campeones externos distintos</span><strong>{len(comparison['distinct_champions'])}</strong><small>{html.escape(', '.join(comparison['distinct_champions']))}</small></div>"
+        "</div>"
+        f"<div class=\"benchmark-grid\">{''.join(cards)}</div>"
+        "<div class=\"benchmark-next-step\">"
+        "<h3>Qué agregaría después</h3>"
+        "<p><strong>Sí:</strong> calibración walk-forward apenas haya resultados reales, tracking de error por ventanas y mercado live verificable si se conecta un proveedor. <strong>No:</strong> sumar PIB, población o clima dos veces si ya están absorbidos por recursos, FIFA, Elo y contexto; eso crea falsa precisión.</p>"
+        "</div>"
+        "</section>"
+    )
+
+
 def build_dark_horses_markdown(bracket_payload: dict, entries: Optional[Sequence[dict]] = None) -> List[str]:
     candidates = dark_horse_candidates(bracket_payload, entries)
     if not candidates:
@@ -8776,6 +9105,8 @@ def build_dashboard_markdown(
     lines.extend(build_agentic_learning_markdown(entries, bracket_payload, backtest))
     lines.extend(["", "## Ajustes contra consenso externo", ""])
     lines.extend(build_consensus_guardrail_markdown(bracket_payload, entries))
+    lines.extend(["", "## Comparación contra modelos externos publicados", ""])
+    lines.extend(build_external_forecast_benchmarks_markdown(bracket_payload, entries))
     lines.extend(["", "## Tapados con ruta realista", ""])
     lines.extend(build_dark_horses_markdown(bracket_payload, entries))
     lines.extend(["", "## Qué cambió desde la última actualización", ""])
@@ -9113,6 +9444,7 @@ def goal_forecast_html(entry: dict, prediction: MatchPrediction) -> str:
     shape_before = guidance.get("score_shape_before")
     shape_after = guidance.get("score_shape_after")
     historical_data_note = guidance.get("historical_data_note")
+    scoreline_family_note = guidance.get("scoreline_family_note")
     if shape_before and shape_after and shape_before != shape_after:
         shape_note = (
             f"El ajuste histórico de asimetría movió el marcador líder de {shape_before} a {shape_after}: "
@@ -9126,6 +9458,11 @@ def goal_forecast_html(entry: dict, prediction: MatchPrediction) -> str:
     historical_note_html = (
         f"<p class=\"meta\">Datos históricos usados para el perfil de marcador: {html.escape(str(historical_data_note))}.</p>"
         if historical_data_note
+        else ""
+    )
+    family_note_html = (
+        f"<p class=\"meta\">{html.escape(str(scoreline_family_note))}</p>"
+        if scoreline_family_note
         else ""
     )
     model_score_label = prediction_score_label(prediction, projected_score_value(prediction))
@@ -9160,6 +9497,7 @@ def goal_forecast_html(entry: dict, prediction: MatchPrediction) -> str:
         f"<p class=\"meta\">{html.escape(str(guidance.get('recommendation_note', 'El marcador recomendado se calcula con la distribución completa de marcadores.')))}</p>"
         f"<p class=\"meta\">{html.escape(shape_note)}</p>"
         f"{historical_note_html}"
+        f"{family_note_html}"
         "</div>"
     )
 
@@ -9356,7 +9694,7 @@ def penca_ovacion_score_html(prediction: MatchPrediction) -> str:
     return (
         "<div class=\"reason-block penca-block\">"
         "<h4>Penca Ovación: marcador optimizado por ensamble</h4>"
-        "<p class=\"meta\">Regla aplicada: 8 puntos por marcador exacto, 5 por diferencia de goles y 3 por ganador. La lista ya no depende solo de Poisson: combina probabilidad del modelo, escenarios de partido, prior histórico de marcadores, marginales de goles, plausibilidad y puntos esperados.</p>"
+        "<p class=\"meta\">Regla aplicada: 8 puntos por marcador exacto, 5 por diferencia de goles y 3 por ganador. La lista ya no depende solo de Poisson: combina probabilidad multimodelo, escenarios de partido, familias históricas de cada selección, marginales de goles, plausibilidad y puntos esperados.</p>"
         "<div class=\"subgrid\">"
         f"<div><span>Marcador recomendado para cargar</span><strong>{html.escape(top_score_label)}</strong></div>"
         f"<div><span>Marcador exacto más probable</span><strong>{html.escape(top_exact_label)}</strong></div>"
@@ -9366,6 +9704,8 @@ def penca_ovacion_score_html(prediction: MatchPrediction) -> str:
         f"{promotion_tile}"
         f"<div><span>Calidad del marcador exacto</span><strong>{html.escape(str(guidance.get('precision_label', 'sin clasificar')))}</strong></div>"
         f"<div><span>Ajuste histórico del marcador</span><strong>{format_pct(float(guidance.get('recommended_empirical_prior_index', 0.0)))}</strong><small>Compatibilidad con frecuencias históricas de marcadores de fútbol.</small></div>"
+        f"<div><span>Perfil histórico específico del cruce</span><strong>{float(guidance.get('recommended_historical_matchup_boost', 1.0)) - 1.0:+.1%}</strong><small>Corrección acotada por las familias de marcador de ambas selecciones; no es una probabilidad.</small></div>"
+        f"<div><span>Compatibilidad histórica del marcador con el cruce</span><strong>{format_pct(float(guidance.get('recommended_matchup_family_index', 0.50)))}</strong><small>Compara cómo suele ganar una selección y cómo suele perder la otra. No reemplaza la probabilidad multimodelo.</small></div>"
         f"<div><span>Popularidad estimada del marcador</span><strong>{format_pct(float(guidance.get('recommended_public_score_popularity_index', 0.0)))}</strong><small>Proxy de qué tan probable es que otros jueguen este marcador obvio.</small></div>"
         f"<div><span>Valor diferencial del marcador</span><strong>{format_pct(float(guidance.get('recommended_differential_value_index', 0.0)))}</strong><small>Útil si buscas ganarle a boletos populares sin abandonar el modelo.</small></div>"
         f"<div><span>Filtro de plausibilidad</span><strong>{format_pct(float(guidance.get('recommended_plausibility_index', 1.0)))}</strong><small>{html.escape(str(guidance.get('recommended_plausibility_note', 'marcador de forma normal')))}</small></div>"
@@ -10448,7 +10788,7 @@ def build_methodology_html(
         "</article>"
         "<article>"
         "<h3>Capa histórica desde 1950</h3>"
-        f"<p>Además del Elo y la forma actual, el modelo incorpora una base trazable de {html.escape(official_history_line)} partidos oficiales cerrados desde {history_start_year}: rendimiento total, competitivo, mundialista, ataque, defensa y tandas de penales. Para esta cifra se excluyen amistosos. Esa memoria histórica usa decaimiento temporal y shrinkage bayesiano empírico: aprende del pasado largo sin permitir que partidos antiguos tapen lo que está pasando hoy.</p>"
+        f"<p>Además del Elo y la forma actual, el modelo incorpora una base trazable de {html.escape(official_history_line)} partidos oficiales cerrados desde {history_start_year}: rendimiento total, competitivo, mundialista, ataque, defensa, tandas de penales y 17 familias empíricas de marcador por selección. Para esta cifra se excluyen amistosos. Esa memoria histórica usa decaimiento temporal y shrinkage bayesiano empírico: aprende del pasado largo sin permitir que partidos antiguos tapen lo que está pasando hoy.</p>"
         "</article>"
         "<article>"
         "<h3>Cuadro completo</h3>"
@@ -10456,7 +10796,7 @@ def build_methodology_html(
         "</article>"
         "<article>"
         "<h3>Stack estadístico</h3>"
-        "<p>La capa prepartido mezcla el modelo principal Bivariante Poisson, un modelo de contraste Poisson independiente, un ajuste de baja anotación, una distribución de overdispersión calibrada, un calibrador ML ligero regularizado y un ensamble final. Ese ensamble repondera los modelos según consenso, dispersión y cercanía al mercado cuando hay cuotas confiables.</p>"
+        "<p>La capa prepartido mezcla el modelo principal Bivariante Poisson, un modelo de contraste Poisson independiente, un ajuste de baja anotación, una distribución de overdispersión calibrada, un calibrador ML ligero regularizado y un ensamble final. Para elegir el marcador que cargas en Penca añade una capa distinta: compara familias históricas específicas de ambas selecciones para no someter el exacto únicamente a Poisson. El ensamble repondera los modelos según consenso, dispersión y cercanía al mercado cuando hay cuotas confiables.</p>"
         "</article>"
         "<article>"
         "<h3>Estrategia de datos</h3>"
@@ -11002,6 +11342,7 @@ def build_dashboard_html(
     strategy_html = build_quiniela_strategy_html(entries)
     full_scorecard_html = build_full_scorecard_html(entries)
     consensus_guardrail_html = build_consensus_guardrail_html(bracket_payload, entries)
+    external_benchmarks_html = build_external_forecast_benchmarks_html(bracket_payload, entries)
     dark_horses_html = build_dark_horses_html(bracket_payload, entries)
     recent_changes_html = build_recent_changes_html(
         entries,
@@ -11033,6 +11374,7 @@ def build_dashboard_html(
             "strategy_html": strategy_html,
             "full_scorecard_html": full_scorecard_html,
             "consensus_guardrail_html": consensus_guardrail_html,
+            "external_benchmarks_html": external_benchmarks_html,
             "dark_horses_html": dark_horses_html,
             "recent_changes_html": recent_changes_html,
             "backtesting_html": backtesting_html,
@@ -11343,6 +11685,12 @@ def audit_dashboard_html(dashboard_html: str) -> List[str]:
         "Marcadores exactos más defendibles",
         "Ajustes para boleto de quiniela",
         "Guardrail de consenso",
+        "Comparadores externos",
+        "Qué dicen otros modelos y dónde debemos desconfiar",
+        "No se promedian a ciegas",
+        "Goldman Sachs GIR",
+        "FairCast / University of Portsmouth",
+        "Panmure Liberum / Joachim Klement",
         "Radar de tapados",
         "Tapados con ruta realista",
         "índice de vigilancia",

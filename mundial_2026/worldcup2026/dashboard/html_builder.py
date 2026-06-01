@@ -34,6 +34,7 @@ def render_dashboard_html(context: Dict[str, Any]) -> str:
         "strategy_html",
         "full_scorecard_html",
         "consensus_guardrail_html",
+        "external_benchmarks_html",
         "dark_horses_html",
         "recent_changes_html",
         "backtesting_html",
