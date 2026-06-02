@@ -3721,7 +3721,7 @@ def command_project_bracket(args: argparse.Namespace, teams: Dict[str, Team]) ->
         "workers": workers,
         "scoreline_engine": "ensamble_no_solo_poisson_bayes_dinamico_v2",
         "bracket_recalculated_from_scoreline_ensemble": True,
-        "recalculation_policy": "La llave se reconstruye con 15.000 simulaciones después de cada actualización automática; si cambian marcadores, estados o señales relevantes, cambian también sus rutas simuladas.",
+        "recalculation_policy": "Los marcadores directos se refrescan cada 5 minutos. La llave completa se reconstruye con 15.000 simulaciones en el carril profundo cada hora y en ejecuciones manuales o push; si cambian marcadores, estados o señales relevantes, se propagan en la siguiente corrida profunda.",
         "matches": {
             match_id: structured_match_projection(match_id, aggregate, args.iterations)
             for match_id, aggregate in match_aggregate.items()
@@ -6854,7 +6854,7 @@ def build_ticket_snapshot_html(entries: Sequence[dict], updated_at: str) -> str:
         f"{tile('Marcadores defendibles', str(defensible_scores), 'Exactos con señal suficiente para cargar.')}"
         f"{tile('Aciertos esperados', expected_hits_label, 'Esperanza del resultado principal, no garantía.')}"
         f"{tile('Partidos cubiertos', modeled_total_label, modeled_note)}"
-        f"{tile('Última actualización', updated_at, 'GitHub Actions publica cada 5 minutos durante live.')}"
+        f"{tile('Última actualización', updated_at, 'GitHub Actions publica tarjetas live cada 5 minutos; la llave profunda se recalcula por separado.')}"
         "</div>"
         "<div class=\"ticket-snapshot-actions\">"
         "<a class=\"primary-action\" href=\"#marcadores\">Ver marcadores para cargar</a>"
@@ -7639,7 +7639,7 @@ def build_current_penca_decision_html(entries: Sequence[dict]) -> str:
         f"{''.join(row(item) for item in visible)}"
         "</ul>"
         "</div>"
-        "<p class=\"meta\">Se recalcula cada 5 minutos por GitHub Actions durante el torneo. Cuando cambie un resultado real, también se recalculan llave, probabilidades, escenario recomendado y marcador para Penca.</p>"
+        "<p class=\"meta\">Se recalcula cada 5 minutos el carril live de GitHub Actions durante el torneo. Cuando cambie un resultado real, se actualizan probabilidades, escenario recomendado y marcador para Penca; la llave completa se propaga en la siguiente corrida profunda horaria o manual.</p>"
         "</section>"
     )
 
@@ -8632,7 +8632,7 @@ def agentic_learning_items() -> List[dict]:
         {
             "agent": "Agente predictivo",
             "job": "Combina Poisson/Dixon-Coles, overdispersión calibrada, predictivo bayesiano dinámico, ML ligero, Elo/FIFA, ensamble, consenso externo y Monte Carlo de torneo.",
-            "learns": "Cuando cambia un resultado, recalcula grupos, cruces, llave, campeón y boletos recomendados.",
+            "learns": "Cuando cambia un resultado, recalcula de inmediato el tablero live y propaga grupos, cruces, llave y campeón en la siguiente corrida profunda.",
         },
         {
             "agent": "Agente de calibración",
@@ -9093,7 +9093,7 @@ def build_agentic_learning_html(entries: Sequence[dict], bracket_payload: dict, 
         "</div></div>"
         "<div class=\"confidence-tiles\">"
         f"{tile('Monte Carlo activo', iterations_label + ' simulaciones', 'La auditoría exige al menos 15.000 por corrida.')}"
-        f"{tile('Eficiencia operativa', 'apto para 5 min', 'Cache, ensamble ligero y auditoría automática para refrescar sin esperar horas.')}"
+        f"{tile('Eficiencia operativa', 'live ligero cada 5 min', 'El carril live publica rápido; la llave profunda de 15.000 simulaciones corre por separado.')}"
         f"{tile('Datos ya incorporados', f'{final_count} final / {live_count} live', f'Además {projected_count} cruces de llave recalculables.')}"
         f"{tile('Noticias multi-fuente', 'No solo ESPN', f'Fuente activa visible: {source_label}; stack preparado: {prepared_stack}.')}"
         "</div>"
@@ -9106,7 +9106,7 @@ def build_agentic_learning_html(entries: Sequence[dict], bracket_payload: dict, 
         "</ul></article>"
         "<article><h3>Qué tan eficiente es</h3><ul>"
         f"<li><strong>15.000 simulaciones</strong><span>La llave se calcula con rutas completas de torneo, no solo favoritos sueltos.</span><em>Más iteraciones reducen ruido Monte Carlo; no convierten un pick incierto en seguro.</em></li>"
-        f"<li><strong>Refresh cada 5 minutos</strong><span>GitHub Actions reconstruye la web y recalcula in-play cuando el feed trae cambios.</span><em>Si hay live profundo, cambian tiros, goles restantes, marcadores y probabilidades.</em></li>"
+        f"<li><strong>Refresh live cada 5 minutos</strong><span>GitHub Actions reconstruye el tablero ligero y recalcula in-play cuando el feed trae cambios.</span><em>La llave de 15.000 simulaciones se reconstruye en el carril profundo horario o manual.</em></li>"
         f"<li><strong>Calibración acumulada</strong><span>{completed} partidos cerrados disponibles para backtesting en este corte.</span><em>Cuando crece la muestra, el agente de calibración ajusta confianza y coberturas.</em></li>"
         "</ul></article>"
         "</div>"
@@ -10774,7 +10774,7 @@ def build_methodology_quality_html(
             "status": "Activo" if live_count else "Preparado",
             "tone": "ok" if live_count else "neutral",
             "detail": (
-                f"{live_count} partidos en vivo y {final_count} cerrados. El workflow recalcula cada 5 minutos y en cada push."
+                f"{live_count} partidos en vivo y {final_count} cerrados. El tablero live recalcula cada 5 minutos; la llave profunda corre cada hora y en cada push."
                 if total_fixtures
                 else "El workflow está listo, pero no hay partidos para monitorear."
             ),
@@ -10918,7 +10918,8 @@ def build_runtime_status_html(entries: Sequence[dict], bracket_payload: dict) ->
         (
             "Estado operativo",
             "Publicación automática en <strong>GitHub Actions + Pages</strong>. "
-            "Se reconstruye cada <strong>5 minutos</strong> y también en cada push a <strong>main</strong>.",
+            "El tablero live se reconstruye cada <strong>5 minutos</strong>. "
+            "La llave de 15.000 simulaciones se recalcula cada <strong>hora</strong> y también en cada push a <strong>main</strong>.",
         ),
         (
             "Monte Carlo publicado",
@@ -10957,7 +10958,7 @@ def build_runtime_status_html(entries: Sequence[dict], bracket_payload: dict) ->
         "<div class=\"runtime-chip-row\">"
         f"<span class=\"runtime-chip\">In-play <strong>{html.escape(in_play_label)}</strong></span>"
         f"<span class=\"runtime-chip\">Validación <strong>{html.escape('latest.json + badge En vivo + minuto')}</strong></span>"
-        f"<span class=\"runtime-chip\">Frecuencia <strong>{html.escape('cada 5 minutos')}</strong></span>"
+        f"<span class=\"runtime-chip\">Frecuencia <strong>{html.escape('live 5 min | llave profunda 60 min')}</strong></span>"
         "</div>"
     )
     return (
@@ -10995,7 +10996,7 @@ def build_landing_proof_html(entries: Sequence[dict], bracket_payload: dict, bac
         ),
         (
             "Actualización real",
-            f"GitHub Actions regenera cada 5 minutos. Modela {modeled_total} partidos: {len(fixture_entries)} fixtures directos y {len(projected_entries)} cruces de llave proyectados. Estado directo: {live_count} live, {final_count} final, {pending_count} pendientes.",
+            f"GitHub Actions regenera el tablero live cada 5 minutos y la llave profunda cada hora. Modela {modeled_total} partidos: {len(fixture_entries)} fixtures directos y {len(projected_entries)} cruces de llave proyectados. Estado directo: {live_count} live, {final_count} final, {pending_count} pendientes.",
             "ok",
         ),
         (
@@ -11689,7 +11690,7 @@ def audit_dashboard_html(dashboard_html: str) -> List[str]:
         "Primero decide como una mesa profesional",
         "Monte Carlo vigente",
         "15.000 simulaciones por corrida",
-        "actualiza llave, picks, goles y marcadores",
+        "actualiza picks, goles y marcadores live; la llave se propaga en el carril profundo",
         "Marcadores dinámicos",
         "Los marcadores cambian a medida que avanza el campeonato",
         "Modo campeonato",
@@ -11800,19 +11801,22 @@ def audit_dashboard_html(dashboard_html: str) -> List[str]:
     return errors
 
 
-def audit_workflow_text(workflow_text: str, min_iterations: int) -> List[str]:
+def audit_workflow_text(workflow_text: str, min_iterations: int, deep_workflow_text: str = "") -> List[str]:
     errors = []
+    combined_workflow_text = f"{workflow_text}\n{deep_workflow_text}"
     required = [
         "cron: \"*/5 * * * *\"",
         f"--iterations {min_iterations}",
         "python3 -m unittest discover -s mundial_2026/tests",
         "audit-quiniela",
         "API_FOOTBALL_KEY",
-        "cancel-in-progress: false",
+        "cancel-in-progress: true",
     ]
     for snippet in required:
-        if snippet not in workflow_text:
+        if snippet not in combined_workflow_text:
             errors.append(f"Workflow no contiene requisito: {snippet}.")
+    if deep_workflow_text and "cron: \"17 * * * *\"" not in deep_workflow_text:
+        errors.append("Workflow profundo no declara recálculo horario de llave.")
     return errors
 
 
@@ -11824,6 +11828,7 @@ def run_quiniela_audit(
     dashboard_html_path: Path,
     fixtures_path: Path,
     workflow_path: Path,
+    deep_workflow_path: Optional[Path] = None,
     min_iterations: int = 15000,
 ) -> List[str]:
     errors: List[str] = []
@@ -11842,7 +11847,12 @@ def run_quiniela_audit(
     else:
         errors.append(f"No existe dashboard HTML: {dashboard_html_path}.")
     if workflow_path.exists():
-        errors.extend(audit_workflow_text(workflow_path.read_text(), min_iterations))
+        deep_workflow_text = ""
+        if deep_workflow_path and deep_workflow_path.exists():
+            deep_workflow_text = deep_workflow_path.read_text()
+        elif deep_workflow_path:
+            errors.append(f"No existe workflow profundo: {deep_workflow_path}.")
+        errors.extend(audit_workflow_text(workflow_path.read_text(), min_iterations, deep_workflow_text))
     else:
         errors.append(f"No existe workflow: {workflow_path}.")
     return errors
@@ -11857,6 +11867,7 @@ def command_audit_quiniela(args: argparse.Namespace, teams: Dict[str, Team]) -> 
         dashboard_html_path=Path(args.dashboard_html),
         fixtures_path=Path(args.fixtures),
         workflow_path=Path(args.workflow_file),
+        deep_workflow_path=Path(args.deep_workflow_file) if args.deep_workflow_file else None,
         min_iterations=int(args.min_iterations),
     )
     if errors:

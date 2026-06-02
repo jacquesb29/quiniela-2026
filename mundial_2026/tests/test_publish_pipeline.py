@@ -75,6 +75,9 @@ class PublishPipelineTest(unittest.TestCase):
 
             latest = json.loads(latest_path.read_text())
             self.assertEqual(latest["refresh_interval_minutes"], 5)
+            self.assertEqual(latest["live_refresh_interval_minutes"], 5)
+            self.assertEqual(latest["deep_bracket_refresh_interval_minutes"], 60)
+            self.assertEqual(latest["monte_carlo_iterations"], 15000)
             self.assertEqual(latest["delivery"], "github_actions_pages")
             self.assertTrue(latest["in_play_enabled"])
             self.assertEqual(latest["live_feed_stack"], ["espn_scoreboard"])

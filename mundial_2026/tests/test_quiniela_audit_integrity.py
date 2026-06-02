@@ -82,17 +82,21 @@ class QuinielaAuditIntegrityTest(unittest.TestCase):
 
     def test_github_pages_workflow_runs_full_auto_refresh(self):
         workflow = (REPO_ROOT / ".github" / "workflows" / "quiniela-pages.yml").read_text()
+        deep_workflow = (REPO_ROOT / ".github" / "workflows" / "quiniela-deep.yml").read_text()
         self.assertRegex(workflow, r"cron:\s*[\"']\*/5 \* \* \* \*[\"']")
-        self.assertIn("--iterations 15000", workflow)
-        self.assertIn("build_historical_features_1950.py --download --min-official-matches 25000", workflow)
-        self.assertIn("python3 -m unittest discover -s mundial_2026/tests", workflow)
+        self.assertRegex(deep_workflow, r"cron:\s*[\"']17 \* \* \* \*[\"']")
+        self.assertIn("--iterations 15000", deep_workflow)
+        self.assertIn("build_historical_features_1950.py --download --min-official-matches 25000", deep_workflow)
+        self.assertIn("python3 -m unittest discover -s mundial_2026/tests", deep_workflow)
         self.assertIn("audit-quiniela", workflow)
         self.assertIn("API_FOOTBALL_KEY", workflow)
-        self.assertIn("cancel-in-progress: false", workflow)
+        self.assertIn("cancel-in-progress: true", workflow)
+        self.assertIn("cancel-in-progress: true", deep_workflow)
 
     def test_audit_workflow_text_requires_publish_gate(self):
         workflow = (REPO_ROOT / ".github" / "workflows" / "quiniela-pages.yml").read_text()
-        self.assertEqual(app.audit_workflow_text(workflow, 15000), [])
+        deep_workflow = (REPO_ROOT / ".github" / "workflows" / "quiniela-deep.yml").read_text()
+        self.assertEqual(app.audit_workflow_text(workflow, 15000, deep_workflow), [])
 
     def test_dashboard_audit_requires_ticket_audit_block(self):
         html = (
@@ -100,7 +104,7 @@ class QuinielaAuditIntegrityTest(unittest.TestCase):
             "<p>Quiniela Intelligence 2026</p><p>Prueba operacional</p><p>Una sala de decisión</p>"
             "<p>De datos a boleto</p><p>Primero decide como una mesa profesional</p>"
             "<p>Monte Carlo vigente</p><p>15.000 simulaciones por corrida</p>"
-            "<p>actualiza llave, picks, goles y marcadores</p>"
+            "<p>actualiza picks, goles y marcadores live; la llave se propaga en el carril profundo</p>"
             "<p>Marcadores dinámicos</p><p>Los marcadores cambian a medida que avanza el campeonato</p>"
             "<p>Durante el partido</p><p>Después de cada final</p><p>marcador para cargar en Penca</p>"
             "<p>Partidos totales del Mundial 2026</p><p>No son 72 en total</p>"
@@ -250,7 +254,7 @@ class QuinielaAuditIntegrityTest(unittest.TestCase):
                 "<p>Quiniela Intelligence 2026</p><p>Prueba operacional</p><p>Una sala de decisión</p>"
                 "<p>De datos a boleto</p><p>Primero decide como una mesa profesional</p>"
                 "<p>Monte Carlo vigente</p><p>15.000 simulaciones por corrida</p>"
-                "<p>actualiza llave, picks, goles y marcadores</p>"
+                "<p>actualiza picks, goles y marcadores live; la llave se propaga en el carril profundo</p>"
                 "<p>Marcadores dinámicos</p><p>Los marcadores cambian a medida que avanza el campeonato</p>"
                 "<p>Modo campeonato</p><p>La meta no es prometer 104/104</p>"
                 "<p>No se promete 104/104 marcadores exactos</p><p>marcador que debo poner en Penca</p>"
@@ -301,7 +305,7 @@ class QuinielaAuditIntegrityTest(unittest.TestCase):
                 "python3 mundial_2026/modelo_quiniela_2026.py project-bracket --iterations 15000\n"
                 "python3 mundial_2026/modelo_quiniela_2026.py audit-quiniela\n"
                 "API_FOOTBALL_KEY\n"
-                "cancel-in-progress: false\n"
+                "cancel-in-progress: true\n"
             )
             self.assertEqual(
                 app.run_quiniela_audit(

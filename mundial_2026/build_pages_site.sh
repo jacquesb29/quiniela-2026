@@ -56,6 +56,8 @@ payload = {
     "dashboard_updated_at_utc": dashboard_updated_at,
     "timestamp_consistency_note": "latest.json se escribe despues de copiar el HTML; compara dashboard_updated_at_utc contra publication_updated_at_utc para detectar desfases reales de publicacion o cache.",
     "refresh_interval_minutes": 5,
+    "live_refresh_interval_minutes": 5,
+    "deep_bracket_refresh_interval_minutes": 60,
     "in_play_enabled": True,
     "delivery": "github_actions_pages",
     "monte_carlo_iterations": bracket_payload.get("iterations"),

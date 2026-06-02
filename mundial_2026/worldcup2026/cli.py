@@ -107,6 +107,7 @@ def build_parser(
     audit.add_argument("--dashboard-html", default=dashboard_html_file)
     audit.add_argument("--fixtures", default=fixtures_template_file)
     audit.add_argument("--workflow-file", default=".github/workflows/quiniela-pages.yml")
+    audit.add_argument("--deep-workflow-file", default=".github/workflows/quiniela-deep.yml")
     audit.add_argument("--min-iterations", type=int, default=MIN_MONTE_CARLO_ITERATIONS)
 
     score_prob = subparsers.add_parser("score-prob", help="Da la probabilidad exacta de un marcador especifico.")
