@@ -35,7 +35,16 @@
     "rest_days_a": 5,
     "travel_km_a": 0.0,
     "rest_days_b": 5,
-    "travel_km_b": 8600.0
+    "travel_km_b": 8600.0,
+    "goalkeeper_change_a": false,
+    "goalkeeper_change_b": false,
+    "market_move_a": 0.0,
+    "market_move_draw": 0.0,
+    "market_move_b": 0.0,
+    "referee_sample_matches": 0,
+    "referee_yellow_bias": 0.0,
+    "referee_red_bias": 0.0,
+    "referee_penalty_bias": 0.0
   },
   {
     "id": "espn-760414",
@@ -73,7 +82,16 @@
     "rest_days_a": 5,
     "travel_km_a": 10800.0,
     "rest_days_b": 5,
-    "travel_km_b": 6400.0
+    "travel_km_b": 6400.0,
+    "goalkeeper_change_a": false,
+    "goalkeeper_change_b": false,
+    "market_move_a": 0.0,
+    "market_move_draw": 0.0,
+    "market_move_b": 0.0,
+    "referee_sample_matches": 0,
+    "referee_yellow_bias": 0.0,
+    "referee_red_bias": 0.0,
+    "referee_penalty_bias": 0.0
   },
   {
     "id": "espn-760416",
@@ -99,7 +117,7 @@
     "weather_wind_kmh": 14.0,
     "weather_wet_bulb_c": 18.0,
     "source": "espn_scoreboard",
-    "source_event_name": "Bosnia and Herzegovina at Canada",
+    "source_event_name": "Bosnia-Herzegovina at Canada",
     "raw_team_a": null,
     "raw_team_b": null,
     "placeholder_a": null,
@@ -111,7 +129,16 @@
     "rest_days_a": 5,
     "travel_km_a": 0.0,
     "rest_days_b": 5,
-    "travel_km_b": 6400.0
+    "travel_km_b": 6400.0,
+    "goalkeeper_change_a": false,
+    "goalkeeper_change_b": false,
+    "market_move_a": 0.0,
+    "market_move_draw": 0.0,
+    "market_move_b": 0.0,
+    "referee_sample_matches": 0,
+    "referee_yellow_bias": 0.0,
+    "referee_red_bias": 0.0,
+    "referee_penalty_bias": 0.0
   },
   {
     "id": "espn-760417",
@@ -149,7 +176,16 @@
     "rest_days_a": 5,
     "travel_km_a": 0.0,
     "rest_days_b": 5,
-    "travel_km_b": 5200.0
+    "travel_km_b": 5200.0,
+    "goalkeeper_change_a": false,
+    "goalkeeper_change_b": false,
+    "market_move_a": 0.0,
+    "market_move_draw": 0.0,
+    "market_move_b": 0.0,
+    "referee_sample_matches": 0,
+    "referee_yellow_bias": 0.0,
+    "referee_red_bias": 0.0,
+    "referee_penalty_bias": 0.0
   },
   {
     "id": "espn-760420",
@@ -187,7 +223,16 @@
     "rest_days_a": 5,
     "travel_km_a": 10800.0,
     "rest_days_b": 5,
-    "travel_km_b": 6400.0
+    "travel_km_b": 6400.0,
+    "goalkeeper_change_a": false,
+    "goalkeeper_change_b": false,
+    "market_move_a": 0.0,
+    "market_move_draw": 0.0,
+    "market_move_b": 0.0,
+    "referee_sample_matches": 0,
+    "referee_yellow_bias": 0.0,
+    "referee_red_bias": 0.0,
+    "referee_penalty_bias": 0.0
   },
   {
     "id": "espn-760419",
@@ -225,7 +270,16 @@
     "rest_days_a": 5,
     "travel_km_a": 5200.0,
     "rest_days_b": 5,
-    "travel_km_b": 8600.0
+    "travel_km_b": 8600.0,
+    "goalkeeper_change_a": false,
+    "goalkeeper_change_b": false,
+    "market_move_a": 0.0,
+    "market_move_draw": 0.0,
+    "market_move_b": 0.0,
+    "referee_sample_matches": 0,
+    "referee_yellow_bias": 0.0,
+    "referee_red_bias": 0.0,
+    "referee_penalty_bias": 0.0
   },
   {
     "id": "espn-760418",
@@ -263,7 +317,16 @@
     "rest_days_a": 5,
     "travel_km_a": 1200.0,
     "rest_days_b": 5,
-    "travel_km_b": 6400.0
+    "travel_km_b": 6400.0,
+    "goalkeeper_change_a": false,
+    "goalkeeper_change_b": false,
+    "market_move_a": 0.0,
+    "market_move_draw": 0.0,
+    "market_move_b": 0.0,
+    "referee_sample_matches": 0,
+    "referee_yellow_bias": 0.0,
+    "referee_red_bias": 0.0,
+    "referee_penalty_bias": 0.0
   },
   {
     "id": "espn-760421",
@@ -301,7 +364,16 @@
     "rest_days_a": 5,
     "travel_km_a": 10800.0,
     "rest_days_b": 5,
-    "travel_km_b": 6400.0
+    "travel_km_b": 6400.0,
+    "goalkeeper_change_a": false,
+    "goalkeeper_change_b": false,
+    "market_move_a": 0.0,
+    "market_move_draw": 0.0,
+    "market_move_b": 0.0,
+    "referee_sample_matches": 0,
+    "referee_yellow_bias": 0.0,
+    "referee_red_bias": 0.0,
+    "referee_penalty_bias": 0.0
   },
   {
     "id": "espn-760422",
@@ -339,7 +411,16 @@
     "rest_days_a": 5,
     "travel_km_a": 6400.0,
     "rest_days_b": 5,
-    "travel_km_b": 1200.0
+    "travel_km_b": 1200.0,
+    "goalkeeper_change_a": false,
+    "goalkeeper_change_b": false,
+    "market_move_a": 0.0,
+    "market_move_draw": 0.0,
+    "market_move_b": 0.0,
+    "referee_sample_matches": 0,
+    "referee_yellow_bias": 0.0,
+    "referee_red_bias": 0.0,
+    "referee_penalty_bias": 0.0
   },
   {
     "id": "espn-760425",
@@ -377,7 +458,16 @@
     "rest_days_a": 5,
     "travel_km_a": 6400.0,
     "rest_days_b": 5,
-    "travel_km_b": 10800.0
+    "travel_km_b": 10800.0,
+    "goalkeeper_change_a": false,
+    "goalkeeper_change_b": false,
+    "market_move_a": 0.0,
+    "market_move_draw": 0.0,
+    "market_move_b": 0.0,
+    "referee_sample_matches": 0,
+    "referee_yellow_bias": 0.0,
+    "referee_red_bias": 0.0,
+    "referee_penalty_bias": 0.0
   },
   {
     "id": "espn-760423",
@@ -415,7 +505,16 @@
     "rest_days_a": 5,
     "travel_km_a": 8600.0,
     "rest_days_b": 5,
-    "travel_km_b": 5200.0
+    "travel_km_b": 5200.0,
+    "goalkeeper_change_a": false,
+    "goalkeeper_change_b": false,
+    "market_move_a": 0.0,
+    "market_move_draw": 0.0,
+    "market_move_b": 0.0,
+    "referee_sample_matches": 0,
+    "referee_yellow_bias": 0.0,
+    "referee_red_bias": 0.0,
+    "referee_penalty_bias": 0.0
   },
   {
     "id": "espn-760424",
@@ -453,7 +552,16 @@
     "rest_days_a": 5,
     "travel_km_a": 6400.0,
     "rest_days_b": 5,
-    "travel_km_b": 8600.0
+    "travel_km_b": 8600.0,
+    "goalkeeper_change_a": false,
+    "goalkeeper_change_b": false,
+    "market_move_a": 0.0,
+    "market_move_draw": 0.0,
+    "market_move_b": 0.0,
+    "referee_sample_matches": 0,
+    "referee_yellow_bias": 0.0,
+    "referee_red_bias": 0.0,
+    "referee_penalty_bias": 0.0
   },
   {
     "id": "espn-760428",
@@ -478,7 +586,7 @@
     "weather_precipitation_pct": 38.0,
     "weather_wind_kmh": 11.0,
     "weather_wet_bulb_c": 24.0,
-    "source": "espn_scoreboard",
+    "source": "espn_scoreboard+open_news",
     "source_event_name": "Cape Verde at Spain",
     "raw_team_a": null,
     "raw_team_b": null,
@@ -491,7 +599,31 @@
     "rest_days_a": 5,
     "travel_km_a": 6400.0,
     "rest_days_b": 5,
-    "travel_km_b": 8600.0
+    "travel_km_b": 8600.0,
+    "open_news_provider": "gdelt",
+    "open_news_sources": [
+      "ianslive.in",
+      "prokerala.com"
+    ],
+    "news_headlines": [
+      "prokerala.com: Spain Fermin Lopez ruled out of World Cup with broken foot",
+      "ianslive.in: Spain Fermin Lopez ruled out of World Cup with broken foot"
+    ],
+    "news_notes_a": [
+      "prokerala.com: Spain Fermin Lopez ruled out of World Cup with broken foot",
+      "ianslive.in: Spain Fermin Lopez ruled out of World Cup with broken foot"
+    ],
+    "morale_a": -0.08,
+    "injuries_a": 0.1,
+    "goalkeeper_change_a": false,
+    "goalkeeper_change_b": false,
+    "market_move_a": 0.0,
+    "market_move_draw": 0.0,
+    "market_move_b": 0.0,
+    "referee_sample_matches": 0,
+    "referee_yellow_bias": 0.0,
+    "referee_red_bias": 0.0,
+    "referee_penalty_bias": 0.0
   },
   {
     "id": "espn-760426",
@@ -529,7 +661,16 @@
     "rest_days_a": 5,
     "travel_km_a": 6400.0,
     "rest_days_b": 5,
-    "travel_km_b": 8600.0
+    "travel_km_b": 8600.0,
+    "goalkeeper_change_a": false,
+    "goalkeeper_change_b": false,
+    "market_move_a": 0.0,
+    "market_move_draw": 0.0,
+    "market_move_b": 0.0,
+    "referee_sample_matches": 0,
+    "referee_yellow_bias": 0.0,
+    "referee_red_bias": 0.0,
+    "referee_penalty_bias": 0.0
   },
   {
     "id": "espn-760429",
@@ -567,7 +708,16 @@
     "rest_days_a": 5,
     "travel_km_a": 10800.0,
     "rest_days_b": 5,
-    "travel_km_b": 5200.0
+    "travel_km_b": 5200.0,
+    "goalkeeper_change_a": false,
+    "goalkeeper_change_b": false,
+    "market_move_a": 0.0,
+    "market_move_draw": 0.0,
+    "market_move_b": 0.0,
+    "referee_sample_matches": 0,
+    "referee_yellow_bias": 0.0,
+    "referee_red_bias": 0.0,
+    "referee_penalty_bias": 0.0
   },
   {
     "id": "espn-760427",
@@ -593,7 +743,7 @@
     "weather_wind_kmh": 11.0,
     "weather_wet_bulb_c": 20.0,
     "source": "espn_scoreboard",
-    "source_event_name": "New Zealand at IR Iran",
+    "source_event_name": "New Zealand at Iran",
     "raw_team_a": null,
     "raw_team_b": null,
     "placeholder_a": null,
@@ -605,7 +755,16 @@
     "rest_days_a": 5,
     "travel_km_a": 10800.0,
     "rest_days_b": 5,
-    "travel_km_b": 12200.0
+    "travel_km_b": 12200.0,
+    "goalkeeper_change_a": false,
+    "goalkeeper_change_b": false,
+    "market_move_a": 0.0,
+    "market_move_draw": 0.0,
+    "market_move_b": 0.0,
+    "referee_sample_matches": 0,
+    "referee_yellow_bias": 0.0,
+    "referee_red_bias": 0.0,
+    "referee_penalty_bias": 0.0
   },
   {
     "id": "espn-760432",
@@ -630,7 +789,7 @@
     "weather_precipitation_pct": 34.0,
     "weather_wind_kmh": 13.0,
     "weather_wet_bulb_c": 22.0,
-    "source": "espn_scoreboard",
+    "source": "espn_scoreboard+open_news",
     "source_event_name": "Senegal at France",
     "raw_team_a": null,
     "raw_team_b": null,
@@ -643,7 +802,34 @@
     "rest_days_a": 5,
     "travel_km_a": 6400.0,
     "rest_days_b": 5,
-    "travel_km_b": 8600.0
+    "travel_km_b": 8600.0,
+    "open_news_provider": "gdelt",
+    "open_news_sources": [
+      "english.aawsat.com",
+      "gdnonline.com"
+    ],
+    "news_headlines": [
+      "english.aawsat.com: Saliba Ruled Out of France Squad , Lacroix Called up as Replacement",
+      "gdnonline.com: Football : Diop debut for Morocco a boost in PR battle with Senegal"
+    ],
+    "news_notes_a": [
+      "english.aawsat.com: Saliba Ruled Out of France Squad , Lacroix Called up as Replacement"
+    ],
+    "morale_a": -0.04,
+    "news_notes_b": [
+      "gdnonline.com: Football : Diop debut for Morocco a boost in PR battle with Senegal"
+    ],
+    "morale_b": 0.025,
+    "injuries_a": 0.05,
+    "goalkeeper_change_a": false,
+    "goalkeeper_change_b": false,
+    "market_move_a": 0.0,
+    "market_move_draw": 0.0,
+    "market_move_b": 0.0,
+    "referee_sample_matches": 0,
+    "referee_yellow_bias": 0.0,
+    "referee_red_bias": 0.0,
+    "referee_penalty_bias": 0.0
   },
   {
     "id": "espn-760430",
@@ -681,7 +867,16 @@
     "rest_days_a": 5,
     "travel_km_a": 10800.0,
     "rest_days_b": 5,
-    "travel_km_b": 6400.0
+    "travel_km_b": 6400.0,
+    "goalkeeper_change_a": false,
+    "goalkeeper_change_b": false,
+    "market_move_a": 0.0,
+    "market_move_draw": 0.0,
+    "market_move_b": 0.0,
+    "referee_sample_matches": 0,
+    "referee_yellow_bias": 0.0,
+    "referee_red_bias": 0.0,
+    "referee_penalty_bias": 0.0
   },
   {
     "id": "espn-760433",
@@ -706,7 +901,7 @@
     "weather_precipitation_pct": 32.0,
     "weather_wind_kmh": 14.0,
     "weather_wet_bulb_c": 22.0,
-    "source": "espn_scoreboard",
+    "source": "espn_scoreboard+open_news",
     "source_event_name": "Algeria at Argentina",
     "raw_team_a": null,
     "raw_team_b": null,
@@ -719,7 +914,28 @@
     "rest_days_a": 5,
     "travel_km_a": 5200.0,
     "rest_days_b": 5,
-    "travel_km_b": 8600.0
+    "travel_km_b": 8600.0,
+    "open_news_provider": "gdelt",
+    "open_news_sources": [
+      "newkerala.com"
+    ],
+    "news_headlines": [
+      "newkerala.com: Algeria Luca Zidane Doubtful for FIFA World Cup 2026"
+    ],
+    "news_notes_b": [
+      "newkerala.com: Algeria Luca Zidane Doubtful for FIFA World Cup 2026"
+    ],
+    "morale_b": -0.04,
+    "injuries_b": 0.05,
+    "goalkeeper_change_a": false,
+    "goalkeeper_change_b": false,
+    "market_move_a": 0.0,
+    "market_move_draw": 0.0,
+    "market_move_b": 0.0,
+    "referee_sample_matches": 0,
+    "referee_yellow_bias": 0.0,
+    "referee_red_bias": 0.0,
+    "referee_penalty_bias": 0.0
   },
   {
     "id": "espn-760431",
@@ -757,7 +973,16 @@
     "rest_days_a": 5,
     "travel_km_a": 6400.0,
     "rest_days_b": 5,
-    "travel_km_b": 10800.0
+    "travel_km_b": 10800.0,
+    "goalkeeper_change_a": false,
+    "goalkeeper_change_b": false,
+    "market_move_a": 0.0,
+    "market_move_draw": 0.0,
+    "market_move_b": 0.0,
+    "referee_sample_matches": 0,
+    "referee_yellow_bias": 0.0,
+    "referee_red_bias": 0.0,
+    "referee_penalty_bias": 0.0
   },
   {
     "id": "espn-760435",
@@ -795,7 +1020,16 @@
     "rest_days_a": 5,
     "travel_km_a": 6400.0,
     "rest_days_b": 5,
-    "travel_km_b": 8600.0
+    "travel_km_b": 8600.0,
+    "goalkeeper_change_a": false,
+    "goalkeeper_change_b": false,
+    "market_move_a": 0.0,
+    "market_move_draw": 0.0,
+    "market_move_b": 0.0,
+    "referee_sample_matches": 0,
+    "referee_yellow_bias": 0.0,
+    "referee_red_bias": 0.0,
+    "referee_penalty_bias": 0.0
   },
   {
     "id": "espn-760437",
@@ -833,7 +1067,16 @@
     "rest_days_a": 5,
     "travel_km_a": 6400.0,
     "rest_days_b": 5,
-    "travel_km_b": 6400.0
+    "travel_km_b": 6400.0,
+    "goalkeeper_change_a": false,
+    "goalkeeper_change_b": false,
+    "market_move_a": 0.0,
+    "market_move_draw": 0.0,
+    "market_move_b": 0.0,
+    "referee_sample_matches": 0,
+    "referee_yellow_bias": 0.0,
+    "referee_red_bias": 0.0,
+    "referee_penalty_bias": 0.0
   },
   {
     "id": "espn-760434",
@@ -871,7 +1114,16 @@
     "rest_days_a": 5,
     "travel_km_a": 8600.0,
     "rest_days_b": 5,
-    "travel_km_b": 1200.0
+    "travel_km_b": 1200.0,
+    "goalkeeper_change_a": false,
+    "goalkeeper_change_b": false,
+    "market_move_a": 0.0,
+    "market_move_draw": 0.0,
+    "market_move_b": 0.0,
+    "referee_sample_matches": 0,
+    "referee_yellow_bias": 0.0,
+    "referee_red_bias": 0.0,
+    "referee_penalty_bias": 0.0
   },
   {
     "id": "espn-760436",
@@ -909,7 +1161,16 @@
     "rest_days_a": 5,
     "travel_km_a": 10800.0,
     "rest_days_b": 5,
-    "travel_km_b": 5200.0
+    "travel_km_b": 5200.0,
+    "goalkeeper_change_a": false,
+    "goalkeeper_change_b": false,
+    "market_move_a": 0.0,
+    "market_move_draw": 0.0,
+    "market_move_b": 0.0,
+    "referee_sample_matches": 0,
+    "referee_yellow_bias": 0.0,
+    "referee_red_bias": 0.0,
+    "referee_penalty_bias": 0.0
   },
   {
     "id": "espn-760438",
@@ -947,7 +1208,16 @@
     "rest_days_a": 6,
     "travel_km_a": 2372.9,
     "rest_days_b": 6,
-    "travel_km_b": 2171.0
+    "travel_km_b": 2171.0,
+    "goalkeeper_change_a": false,
+    "goalkeeper_change_b": false,
+    "market_move_a": 0.0,
+    "market_move_draw": 0.0,
+    "market_move_b": 0.0,
+    "referee_sample_matches": 0,
+    "referee_yellow_bias": 0.0,
+    "referee_red_bias": 0.0,
+    "referee_penalty_bias": 0.0
   },
   {
     "id": "espn-760439",
@@ -973,7 +1243,7 @@
     "weather_wind_kmh": 11.0,
     "weather_wet_bulb_c": 20.0,
     "source": "espn_scoreboard",
-    "source_event_name": "Bosnia and Herzegovina at Switzerland",
+    "source_event_name": "Bosnia-Herzegovina at Switzerland",
     "raw_team_a": null,
     "raw_team_b": null,
     "placeholder_a": null,
@@ -985,7 +1255,16 @@
     "rest_days_a": 5,
     "travel_km_a": 504.6,
     "rest_days_b": 6,
-    "travel_km_b": 3504.4
+    "travel_km_b": 3504.4,
+    "goalkeeper_change_a": false,
+    "goalkeeper_change_b": false,
+    "market_move_a": 0.0,
+    "market_move_draw": 0.0,
+    "market_move_b": 0.0,
+    "referee_sample_matches": 0,
+    "referee_yellow_bias": 0.0,
+    "referee_red_bias": 0.0,
+    "referee_penalty_bias": 0.0
   },
   {
     "id": "espn-760440",
@@ -1023,7 +1302,16 @@
     "rest_days_a": 6,
     "travel_km_a": 3356.8,
     "rest_days_b": 5,
-    "travel_km_b": 1323.6
+    "travel_km_b": 1323.6,
+    "goalkeeper_change_a": false,
+    "goalkeeper_change_b": false,
+    "market_move_a": 0.0,
+    "market_move_draw": 0.0,
+    "market_move_b": 0.0,
+    "referee_sample_matches": 0,
+    "referee_yellow_bias": 0.0,
+    "referee_red_bias": 0.0,
+    "referee_penalty_bias": 0.0
   },
   {
     "id": "espn-760441",
@@ -1048,7 +1336,7 @@
     "weather_precipitation_pct": 35.0,
     "weather_wind_kmh": 11.0,
     "weather_wet_bulb_c": 17.0,
-    "source": "espn_scoreboard",
+    "source": "espn_scoreboard+open_news",
     "source_event_name": "South Korea at Mexico",
     "raw_team_a": null,
     "raw_team_b": null,
@@ -1061,7 +1349,35 @@
     "rest_days_a": 7,
     "travel_km_a": 475.9,
     "rest_days_b": 6,
-    "travel_km_b": 0.0
+    "travel_km_b": 0.0,
+    "open_news_provider": "gdelt",
+    "open_news_sources": [
+      "itnewsafrica.com",
+      "koreaherald.com"
+    ],
+    "news_headlines": [
+      "koreaherald.com: Son Heung - min off to 4th World Cup as South Korean squad released",
+      "itnewsafrica.com: South Africa Has FIFA World Cup Warm Up Match Against Mexico \u2013 IT News Africa \u2013 African Business Technology News"
+    ],
+    "news_notes_a": [
+      "itnewsafrica.com: South Africa Has FIFA World Cup Warm Up Match Against Mexico \u2013 IT News Africa \u2013 African Business Technology News"
+    ],
+    "morale_a": -0.04,
+    "news_notes_b": [
+      "koreaherald.com: Son Heung - min off to 4th World Cup as South Korean squad released"
+    ],
+    "morale_b": -0.04,
+    "injuries_a": 0.05,
+    "injuries_b": 0.05,
+    "goalkeeper_change_a": false,
+    "goalkeeper_change_b": false,
+    "market_move_a": 0.0,
+    "market_move_draw": 0.0,
+    "market_move_b": 0.0,
+    "referee_sample_matches": 0,
+    "referee_yellow_bias": 0.0,
+    "referee_red_bias": 0.0,
+    "referee_penalty_bias": 0.0
   },
   {
     "id": "espn-760442",
@@ -1099,7 +1415,16 @@
     "rest_days_a": 6,
     "travel_km_a": 1553.1,
     "rest_days_b": 5,
-    "travel_km_b": 195.7
+    "travel_km_b": 195.7,
+    "goalkeeper_change_a": false,
+    "goalkeeper_change_b": false,
+    "market_move_a": 0.0,
+    "market_move_draw": 0.0,
+    "market_move_b": 0.0,
+    "referee_sample_matches": 0,
+    "referee_yellow_bias": 0.0,
+    "referee_red_bias": 0.0,
+    "referee_penalty_bias": 0.0
   },
   {
     "id": "espn-760445",
@@ -1137,7 +1462,16 @@
     "rest_days_a": 5,
     "travel_km_a": 0.0,
     "rest_days_b": 6,
-    "travel_km_b": 273.9
+    "travel_km_b": 273.9,
+    "goalkeeper_change_a": false,
+    "goalkeeper_change_b": false,
+    "market_move_a": 0.0,
+    "market_move_draw": 0.0,
+    "market_move_b": 0.0,
+    "referee_sample_matches": 0,
+    "referee_yellow_bias": 0.0,
+    "referee_red_bias": 0.0,
+    "referee_penalty_bias": 0.0
   },
   {
     "id": "espn-760444",
@@ -1175,7 +1509,16 @@
     "rest_days_a": 6,
     "travel_km_a": 137.4,
     "rest_days_b": 5,
-    "travel_km_b": 408.1
+    "travel_km_b": 408.1,
+    "goalkeeper_change_a": false,
+    "goalkeeper_change_b": false,
+    "market_move_a": 0.0,
+    "market_move_draw": 0.0,
+    "market_move_b": 0.0,
+    "referee_sample_matches": 0,
+    "referee_yellow_bias": 0.0,
+    "referee_red_bias": 0.0,
+    "referee_penalty_bias": 0.0
   },
   {
     "id": "espn-760443",
@@ -1213,7 +1556,16 @@
     "rest_days_a": 5,
     "travel_km_a": 1323.6,
     "rest_days_b": 7,
-    "travel_km_b": 504.6
+    "travel_km_b": 504.6,
+    "goalkeeper_change_a": false,
+    "goalkeeper_change_b": false,
+    "market_move_a": 0.0,
+    "market_move_draw": 0.0,
+    "market_move_b": 0.0,
+    "referee_sample_matches": 0,
+    "referee_yellow_bias": 0.0,
+    "referee_red_bias": 0.0,
+    "referee_penalty_bias": 0.0
   },
   {
     "id": "espn-760447",
@@ -1251,7 +1603,16 @@
     "rest_days_a": 5,
     "travel_km_a": 376.3,
     "rest_days_b": 5,
-    "travel_km_b": 652.5
+    "travel_km_b": 652.5,
+    "goalkeeper_change_a": false,
+    "goalkeeper_change_b": false,
+    "market_move_a": 0.0,
+    "market_move_draw": 0.0,
+    "market_move_b": 0.0,
+    "referee_sample_matches": 0,
+    "referee_yellow_bias": 0.0,
+    "referee_red_bias": 0.0,
+    "referee_penalty_bias": 0.0
   },
   {
     "id": "espn-760448",
@@ -1289,7 +1650,16 @@
     "rest_days_a": 6,
     "travel_km_a": 2099.8,
     "rest_days_b": 5,
-    "travel_km_b": 544.4
+    "travel_km_b": 544.4,
+    "goalkeeper_change_a": false,
+    "goalkeeper_change_b": false,
+    "market_move_a": 0.0,
+    "market_move_draw": 0.0,
+    "market_move_b": 0.0,
+    "referee_sample_matches": 0,
+    "referee_yellow_bias": 0.0,
+    "referee_red_bias": 0.0,
+    "referee_penalty_bias": 0.0
   },
   {
     "id": "espn-760446",
@@ -1327,7 +1697,16 @@
     "rest_days_a": 6,
     "travel_km_a": 1657.4,
     "rest_days_b": 6,
-    "travel_km_b": 1044.7
+    "travel_km_b": 1044.7,
+    "goalkeeper_change_a": false,
+    "goalkeeper_change_b": false,
+    "market_move_a": 0.0,
+    "market_move_draw": 0.0,
+    "market_move_b": 0.0,
+    "referee_sample_matches": 0,
+    "referee_yellow_bias": 0.0,
+    "referee_red_bias": 0.0,
+    "referee_penalty_bias": 0.0
   },
   {
     "id": "espn-760449",
@@ -1365,7 +1744,16 @@
     "rest_days_a": 6,
     "travel_km_a": 0.0,
     "rest_days_b": 6,
-    "travel_km_b": 844.2
+    "travel_km_b": 844.2,
+    "goalkeeper_change_a": false,
+    "goalkeeper_change_b": false,
+    "market_move_a": 0.0,
+    "market_move_draw": 0.0,
+    "market_move_b": 0.0,
+    "referee_sample_matches": 0,
+    "referee_yellow_bias": 0.0,
+    "referee_red_bias": 0.0,
+    "referee_penalty_bias": 0.0
   },
   {
     "id": "espn-760453",
@@ -1403,7 +1791,16 @@
     "rest_days_a": 6,
     "travel_km_a": 0.0,
     "rest_days_b": 5,
-    "travel_km_b": 955.2
+    "travel_km_b": 955.2,
+    "goalkeeper_change_a": false,
+    "goalkeeper_change_b": false,
+    "market_move_a": 0.0,
+    "market_move_draw": 0.0,
+    "market_move_b": 0.0,
+    "referee_sample_matches": 0,
+    "referee_yellow_bias": 0.0,
+    "referee_red_bias": 0.0,
+    "referee_penalty_bias": 0.0
   },
   {
     "id": "espn-760451",
@@ -1429,7 +1826,7 @@
     "weather_wind_kmh": 11.0,
     "weather_wet_bulb_c": 20.0,
     "source": "espn_scoreboard",
-    "source_event_name": "IR Iran at Belgium",
+    "source_event_name": "Iran at Belgium",
     "raw_team_a": null,
     "raw_team_b": null,
     "placeholder_a": null,
@@ -1441,7 +1838,16 @@
     "rest_days_a": 6,
     "travel_km_a": 1553.1,
     "rest_days_b": 5,
-    "travel_km_b": 0.0
+    "travel_km_b": 0.0,
+    "goalkeeper_change_a": false,
+    "goalkeeper_change_b": false,
+    "market_move_a": 0.0,
+    "market_move_draw": 0.0,
+    "market_move_b": 0.0,
+    "referee_sample_matches": 0,
+    "referee_yellow_bias": 0.0,
+    "referee_red_bias": 0.0,
+    "referee_penalty_bias": 0.0
   },
   {
     "id": "espn-760450",
@@ -1479,7 +1885,16 @@
     "rest_days_a": 6,
     "travel_km_a": 0.0,
     "rest_days_b": 6,
-    "travel_km_b": 955.2
+    "travel_km_b": 955.2,
+    "goalkeeper_change_a": false,
+    "goalkeeper_change_b": false,
+    "market_move_a": 0.0,
+    "market_move_draw": 0.0,
+    "market_move_b": 0.0,
+    "referee_sample_matches": 0,
+    "referee_yellow_bias": 0.0,
+    "referee_red_bias": 0.0,
+    "referee_penalty_bias": 0.0
   },
   {
     "id": "espn-760452",
@@ -1517,7 +1932,16 @@
     "rest_days_a": 6,
     "travel_km_a": 1748.6,
     "rest_days_b": 6,
-    "travel_km_b": 195.7
+    "travel_km_b": 195.7,
+    "goalkeeper_change_a": false,
+    "goalkeeper_change_b": false,
+    "market_move_a": 0.0,
+    "market_move_draw": 0.0,
+    "market_move_b": 0.0,
+    "referee_sample_matches": 0,
+    "referee_yellow_bias": 0.0,
+    "referee_red_bias": 0.0,
+    "referee_penalty_bias": 0.0
   },
   {
     "id": "espn-760456",
@@ -1555,7 +1979,16 @@
     "rest_days_a": 5,
     "travel_km_a": 739.0,
     "rest_days_b": 5,
-    "travel_km_b": 2314.9
+    "travel_km_b": 2314.9,
+    "goalkeeper_change_a": false,
+    "goalkeeper_change_b": false,
+    "market_move_a": 0.0,
+    "market_move_draw": 0.0,
+    "market_move_b": 0.0,
+    "referee_sample_matches": 0,
+    "referee_yellow_bias": 0.0,
+    "referee_red_bias": 0.0,
+    "referee_penalty_bias": 0.0
   },
   {
     "id": "espn-760457",
@@ -1593,7 +2026,16 @@
     "rest_days_a": 6,
     "travel_km_a": 137.4,
     "rest_days_b": 5,
-    "travel_km_b": 408.1
+    "travel_km_b": 408.1,
+    "goalkeeper_change_a": false,
+    "goalkeeper_change_b": false,
+    "market_move_a": 0.0,
+    "market_move_draw": 0.0,
+    "market_move_b": 0.0,
+    "referee_sample_matches": 0,
+    "referee_yellow_bias": 0.0,
+    "referee_red_bias": 0.0,
+    "referee_penalty_bias": 0.0
   },
   {
     "id": "espn-760454",
@@ -1631,7 +2073,16 @@
     "rest_days_a": 6,
     "travel_km_a": 273.9,
     "rest_days_b": 6,
-    "travel_km_b": 0.0
+    "travel_km_b": 0.0,
+    "goalkeeper_change_a": false,
+    "goalkeeper_change_b": false,
+    "market_move_a": 0.0,
+    "market_move_draw": 0.0,
+    "market_move_b": 0.0,
+    "referee_sample_matches": 0,
+    "referee_yellow_bias": 0.0,
+    "referee_red_bias": 0.0,
+    "referee_penalty_bias": 0.0
   },
   {
     "id": "espn-760455",
@@ -1669,7 +2120,16 @@
     "rest_days_a": 5,
     "travel_km_a": 0.0,
     "rest_days_b": 6,
-    "travel_km_b": 2398.8
+    "travel_km_b": 2398.8,
+    "goalkeeper_change_a": false,
+    "goalkeeper_change_b": false,
+    "market_move_a": 0.0,
+    "market_move_draw": 0.0,
+    "market_move_b": 0.0,
+    "referee_sample_matches": 0,
+    "referee_yellow_bias": 0.0,
+    "referee_red_bias": 0.0,
+    "referee_penalty_bias": 0.0
   },
   {
     "id": "espn-760461",
@@ -1707,7 +2167,16 @@
     "rest_days_a": 6,
     "travel_km_a": 0.0,
     "rest_days_b": 5,
-    "travel_km_b": 1214.6
+    "travel_km_b": 1214.6,
+    "goalkeeper_change_a": false,
+    "goalkeeper_change_b": false,
+    "market_move_a": 0.0,
+    "market_move_draw": 0.0,
+    "market_move_b": 0.0,
+    "referee_sample_matches": 0,
+    "referee_yellow_bias": 0.0,
+    "referee_red_bias": 0.0,
+    "referee_penalty_bias": 0.0
   },
   {
     "id": "espn-760458",
@@ -1745,7 +2214,16 @@
     "rest_days_a": 6,
     "travel_km_a": 2493.6,
     "rest_days_b": 5,
-    "travel_km_b": 686.1
+    "travel_km_b": 686.1,
+    "goalkeeper_change_a": false,
+    "goalkeeper_change_b": false,
+    "market_move_a": 0.0,
+    "market_move_draw": 0.0,
+    "market_move_b": 0.0,
+    "referee_sample_matches": 0,
+    "referee_yellow_bias": 0.0,
+    "referee_red_bias": 0.0,
+    "referee_penalty_bias": 0.0
   },
   {
     "id": "espn-760460",
@@ -1783,7 +2261,16 @@
     "rest_days_a": 6,
     "travel_km_a": 0.0,
     "rest_days_b": 6,
-    "travel_km_b": 1955.4
+    "travel_km_b": 1955.4,
+    "goalkeeper_change_a": false,
+    "goalkeeper_change_b": false,
+    "market_move_a": 0.0,
+    "market_move_draw": 0.0,
+    "market_move_b": 0.0,
+    "referee_sample_matches": 0,
+    "referee_yellow_bias": 0.0,
+    "referee_red_bias": 0.0,
+    "referee_penalty_bias": 0.0
   },
   {
     "id": "espn-760459",
@@ -1821,7 +2308,16 @@
     "rest_days_a": 6,
     "travel_km_a": 475.9,
     "rest_days_b": 6,
-    "travel_km_b": 1286.8
+    "travel_km_b": 1286.8,
+    "goalkeeper_change_a": false,
+    "goalkeeper_change_b": false,
+    "market_move_a": 0.0,
+    "market_move_draw": 0.0,
+    "market_move_b": 0.0,
+    "referee_sample_matches": 0,
+    "referee_yellow_bias": 0.0,
+    "referee_red_bias": 0.0,
+    "referee_penalty_bias": 0.0
   },
   {
     "id": "espn-760462",
@@ -1847,7 +2343,7 @@
     "weather_wind_kmh": 10.0,
     "weather_wet_bulb_c": 17.0,
     "source": "espn_scoreboard",
-    "source_event_name": "Qatar at Bosnia and Herzegovina",
+    "source_event_name": "Qatar at Bosnia-Herzegovina",
     "raw_team_a": null,
     "raw_team_b": null,
     "placeholder_a": null,
@@ -1859,7 +2355,16 @@
     "rest_days_a": 6,
     "travel_km_a": 1553.1,
     "rest_days_b": 5,
-    "travel_km_b": 195.7
+    "travel_km_b": 195.7,
+    "goalkeeper_change_a": false,
+    "goalkeeper_change_b": false,
+    "market_move_a": 0.0,
+    "market_move_draw": 0.0,
+    "market_move_b": 0.0,
+    "referee_sample_matches": 0,
+    "referee_yellow_bias": 0.0,
+    "referee_red_bias": 0.0,
+    "referee_penalty_bias": 0.0
   },
   {
     "id": "espn-760463",
@@ -1897,7 +2402,16 @@
     "rest_days_a": 6,
     "travel_km_a": 1748.6,
     "rest_days_b": 5,
-    "travel_km_b": 0.0
+    "travel_km_b": 0.0,
+    "goalkeeper_change_a": false,
+    "goalkeeper_change_b": false,
+    "market_move_a": 0.0,
+    "market_move_draw": 0.0,
+    "market_move_b": 0.0,
+    "referee_sample_matches": 0,
+    "referee_yellow_bias": 0.0,
+    "referee_red_bias": 0.0,
+    "referee_penalty_bias": 0.0
   },
   {
     "id": "espn-760464",
@@ -1935,7 +2449,16 @@
     "rest_days_a": 5,
     "travel_km_a": 1475.8,
     "rest_days_b": 4,
-    "travel_km_b": 1067.7
+    "travel_km_b": 1067.7,
+    "goalkeeper_change_a": false,
+    "goalkeeper_change_b": false,
+    "market_move_a": 0.0,
+    "market_move_draw": 0.0,
+    "market_move_b": 0.0,
+    "referee_sample_matches": 0,
+    "referee_yellow_bias": 0.0,
+    "referee_red_bias": 0.0,
+    "referee_penalty_bias": 0.0
   },
   {
     "id": "espn-760465",
@@ -1973,7 +2496,16 @@
     "rest_days_a": 5,
     "travel_km_a": 1972.5,
     "rest_days_b": 4,
-    "travel_km_b": 1620.2
+    "travel_km_b": 1620.2,
+    "goalkeeper_change_a": false,
+    "goalkeeper_change_b": false,
+    "market_move_a": 0.0,
+    "market_move_draw": 0.0,
+    "market_move_b": 0.0,
+    "referee_sample_matches": 0,
+    "referee_yellow_bias": 0.0,
+    "referee_red_bias": 0.0,
+    "referee_penalty_bias": 0.0
   },
   {
     "id": "espn-760467",
@@ -2011,7 +2543,16 @@
     "rest_days_a": 6,
     "travel_km_a": 2171.0,
     "rest_days_b": 6,
-    "travel_km_b": 475.9
+    "travel_km_b": 475.9,
+    "goalkeeper_change_a": false,
+    "goalkeeper_change_b": false,
+    "market_move_a": 0.0,
+    "market_move_draw": 0.0,
+    "market_move_b": 0.0,
+    "referee_sample_matches": 0,
+    "referee_yellow_bias": 0.0,
+    "referee_red_bias": 0.0,
+    "referee_penalty_bias": 0.0
   },
   {
     "id": "espn-760466",
@@ -2049,7 +2590,16 @@
     "rest_days_a": 6,
     "travel_km_a": 1771.5,
     "rest_days_b": 6,
-    "travel_km_b": 644.6
+    "travel_km_b": 644.6,
+    "goalkeeper_change_a": false,
+    "goalkeeper_change_b": false,
+    "market_move_a": 0.0,
+    "market_move_draw": 0.0,
+    "market_move_b": 0.0,
+    "referee_sample_matches": 0,
+    "referee_yellow_bias": 0.0,
+    "referee_red_bias": 0.0,
+    "referee_penalty_bias": 0.0
   },
   {
     "id": "espn-760473",
@@ -2087,7 +2637,16 @@
     "rest_days_a": 4,
     "travel_km_a": 1657.4,
     "rest_days_b": 5,
-    "travel_km_b": 544.4
+    "travel_km_b": 544.4,
+    "goalkeeper_change_a": false,
+    "goalkeeper_change_b": false,
+    "market_move_a": 0.0,
+    "market_move_draw": 0.0,
+    "market_move_b": 0.0,
+    "referee_sample_matches": 0,
+    "referee_yellow_bias": 0.0,
+    "referee_red_bias": 0.0,
+    "referee_penalty_bias": 0.0
   },
   {
     "id": "espn-760468",
@@ -2125,7 +2684,16 @@
     "rest_days_a": 4,
     "travel_km_a": 1747.3,
     "rest_days_b": 5,
-    "travel_km_b": 540.1
+    "travel_km_b": 540.1,
+    "goalkeeper_change_a": false,
+    "goalkeeper_change_b": false,
+    "market_move_a": 0.0,
+    "market_move_draw": 0.0,
+    "market_move_b": 0.0,
+    "referee_sample_matches": 0,
+    "referee_yellow_bias": 0.0,
+    "referee_red_bias": 0.0,
+    "referee_penalty_bias": 0.0
   },
   {
     "id": "espn-760471",
@@ -2163,7 +2731,16 @@
     "rest_days_a": 4,
     "travel_km_a": 844.2,
     "rest_days_b": 5,
-    "travel_km_b": 376.3
+    "travel_km_b": 376.3,
+    "goalkeeper_change_a": false,
+    "goalkeeper_change_b": false,
+    "market_move_a": 0.0,
+    "market_move_draw": 0.0,
+    "market_move_b": 0.0,
+    "referee_sample_matches": 0,
+    "referee_yellow_bias": 0.0,
+    "referee_red_bias": 0.0,
+    "referee_penalty_bias": 0.0
   },
   {
     "id": "espn-760472",
@@ -2201,7 +2778,16 @@
     "rest_days_a": 4,
     "travel_km_a": 1582.1,
     "rest_days_b": 5,
-    "travel_km_b": 1044.7
+    "travel_km_b": 1044.7,
+    "goalkeeper_change_a": false,
+    "goalkeeper_change_b": false,
+    "market_move_a": 0.0,
+    "market_move_draw": 0.0,
+    "market_move_b": 0.0,
+    "referee_sample_matches": 0,
+    "referee_yellow_bias": 0.0,
+    "referee_red_bias": 0.0,
+    "referee_penalty_bias": 0.0
   },
   {
     "id": "espn-760469",
@@ -2239,7 +2825,16 @@
     "rest_days_a": 5,
     "travel_km_a": 0.0,
     "rest_days_b": 6,
-    "travel_km_b": 1133.7
+    "travel_km_b": 1133.7,
+    "goalkeeper_change_a": false,
+    "goalkeeper_change_b": false,
+    "market_move_a": 0.0,
+    "market_move_draw": 0.0,
+    "market_move_b": 0.0,
+    "referee_sample_matches": 0,
+    "referee_yellow_bias": 0.0,
+    "referee_red_bias": 0.0,
+    "referee_penalty_bias": 0.0
   },
   {
     "id": "espn-760470",
@@ -2277,7 +2872,16 @@
     "rest_days_a": 5,
     "travel_km_a": 504.6,
     "rest_days_b": 6,
-    "travel_km_b": 1553.1
+    "travel_km_b": 1553.1,
+    "goalkeeper_change_a": false,
+    "goalkeeper_change_b": false,
+    "market_move_a": 0.0,
+    "market_move_draw": 0.0,
+    "market_move_b": 0.0,
+    "referee_sample_matches": 0,
+    "referee_yellow_bias": 0.0,
+    "referee_red_bias": 0.0,
+    "referee_penalty_bias": 0.0
   },
   {
     "id": "espn-760475",
@@ -2315,7 +2919,16 @@
     "rest_days_a": 3,
     "travel_km_a": 273.9,
     "rest_days_b": 3,
-    "travel_km_b": 408.1
+    "travel_km_b": 408.1,
+    "goalkeeper_change_a": false,
+    "goalkeeper_change_b": false,
+    "market_move_a": 0.0,
+    "market_move_draw": 0.0,
+    "market_move_b": 0.0,
+    "referee_sample_matches": 0,
+    "referee_yellow_bias": 0.0,
+    "referee_red_bias": 0.0,
+    "referee_penalty_bias": 0.0
   },
   {
     "id": "espn-760474",
@@ -2353,7 +2966,16 @@
     "rest_days_a": 3,
     "travel_km_a": 540.1,
     "rest_days_b": 3,
-    "travel_km_b": 544.4
+    "travel_km_b": 544.4,
+    "goalkeeper_change_a": false,
+    "goalkeeper_change_b": false,
+    "market_move_a": 0.0,
+    "market_move_draw": 0.0,
+    "market_move_b": 0.0,
+    "referee_sample_matches": 0,
+    "referee_yellow_bias": 0.0,
+    "referee_red_bias": 0.0,
+    "referee_penalty_bias": 0.0
   },
   {
     "id": "espn-760478",
@@ -2391,7 +3013,16 @@
     "rest_days_a": 5,
     "travel_km_a": 1547.1,
     "rest_days_b": 5,
-    "travel_km_b": 1134.7
+    "travel_km_b": 1134.7,
+    "goalkeeper_change_a": false,
+    "goalkeeper_change_b": false,
+    "market_move_a": 0.0,
+    "market_move_draw": 0.0,
+    "market_move_b": 0.0,
+    "referee_sample_matches": 0,
+    "referee_yellow_bias": 0.0,
+    "referee_red_bias": 0.0,
+    "referee_penalty_bias": 0.0
   },
   {
     "id": "espn-760479",
@@ -2429,7 +3060,16 @@
     "rest_days_a": 5,
     "travel_km_a": 2439.1,
     "rest_days_b": 5,
-    "travel_km_b": 2372.9
+    "travel_km_b": 2372.9,
+    "goalkeeper_change_a": false,
+    "goalkeeper_change_b": false,
+    "market_move_a": 0.0,
+    "market_move_draw": 0.0,
+    "market_move_b": 0.0,
+    "referee_sample_matches": 0,
+    "referee_yellow_bias": 0.0,
+    "referee_red_bias": 0.0,
+    "referee_penalty_bias": 0.0
   },
   {
     "id": "espn-760476",
@@ -2455,7 +3095,7 @@
     "weather_wind_kmh": 10.0,
     "weather_wet_bulb_c": 17.0,
     "source": "espn_scoreboard",
-    "source_event_name": "IR Iran at Egypt",
+    "source_event_name": "Iran at Egypt",
     "raw_team_a": null,
     "raw_team_b": null,
     "placeholder_a": null,
@@ -2467,7 +3107,16 @@
     "rest_days_a": 5,
     "travel_km_a": 195.7,
     "rest_days_b": 5,
-    "travel_km_b": 1553.1
+    "travel_km_b": 1553.1,
+    "goalkeeper_change_a": false,
+    "goalkeeper_change_b": false,
+    "market_move_a": 0.0,
+    "market_move_draw": 0.0,
+    "market_move_b": 0.0,
+    "referee_sample_matches": 0,
+    "referee_yellow_bias": 0.0,
+    "referee_red_bias": 0.0,
+    "referee_penalty_bias": 0.0
   },
   {
     "id": "espn-760477",
@@ -2505,7 +3154,16 @@
     "rest_days_a": 5,
     "travel_km_a": 0.0,
     "rest_days_b": 5,
-    "travel_km_b": 1748.6
+    "travel_km_b": 1748.6,
+    "goalkeeper_change_a": false,
+    "goalkeeper_change_b": false,
+    "market_move_a": 0.0,
+    "market_move_draw": 0.0,
+    "market_move_b": 0.0,
+    "referee_sample_matches": 0,
+    "referee_yellow_bias": 0.0,
+    "referee_red_bias": 0.0,
+    "referee_penalty_bias": 0.0
   },
   {
     "id": "espn-760480",
@@ -2543,7 +3201,16 @@
     "rest_days_a": 3,
     "travel_km_a": 544.4,
     "rest_days_b": 4,
-    "travel_km_b": 408.1
+    "travel_km_b": 408.1,
+    "goalkeeper_change_a": false,
+    "goalkeeper_change_b": false,
+    "market_move_a": 0.0,
+    "market_move_draw": 0.0,
+    "market_move_b": 0.0,
+    "referee_sample_matches": 0,
+    "referee_yellow_bias": 0.0,
+    "referee_red_bias": 0.0,
+    "referee_penalty_bias": 0.0
   },
   {
     "id": "espn-760485",
@@ -2581,7 +3248,16 @@
     "rest_days_a": 3,
     "travel_km_a": 540.1,
     "rest_days_b": 4,
-    "travel_km_b": 273.9
+    "travel_km_b": 273.9,
+    "goalkeeper_change_a": false,
+    "goalkeeper_change_b": false,
+    "market_move_a": 0.0,
+    "market_move_draw": 0.0,
+    "market_move_b": 0.0,
+    "referee_sample_matches": 0,
+    "referee_yellow_bias": 0.0,
+    "referee_red_bias": 0.0,
+    "referee_penalty_bias": 0.0
   },
   {
     "id": "espn-760481",
@@ -2619,7 +3295,16 @@
     "rest_days_a": 3,
     "travel_km_a": 2439.1,
     "rest_days_b": 4,
-    "travel_km_b": 1547.1
+    "travel_km_b": 1547.1,
+    "goalkeeper_change_a": false,
+    "goalkeeper_change_b": false,
+    "market_move_a": 0.0,
+    "market_move_draw": 0.0,
+    "market_move_b": 0.0,
+    "referee_sample_matches": 0,
+    "referee_yellow_bias": 0.0,
+    "referee_red_bias": 0.0,
+    "referee_penalty_bias": 0.0
   },
   {
     "id": "espn-760482",
@@ -2657,7 +3342,16 @@
     "rest_days_a": 3,
     "travel_km_a": 2372.9,
     "rest_days_b": 4,
-    "travel_km_b": 1134.7
+    "travel_km_b": 1134.7,
+    "goalkeeper_change_a": false,
+    "goalkeeper_change_b": false,
+    "market_move_a": 0.0,
+    "market_move_draw": 0.0,
+    "market_move_b": 0.0,
+    "referee_sample_matches": 0,
+    "referee_yellow_bias": 0.0,
+    "referee_red_bias": 0.0,
+    "referee_penalty_bias": 0.0
   },
   {
     "id": "espn-760484",
@@ -2695,7 +3389,16 @@
     "rest_days_a": 4,
     "travel_km_a": 2398.8,
     "rest_days_b": 5,
-    "travel_km_b": 739.0
+    "travel_km_b": 739.0,
+    "goalkeeper_change_a": false,
+    "goalkeeper_change_b": false,
+    "market_move_a": 0.0,
+    "market_move_draw": 0.0,
+    "market_move_b": 0.0,
+    "referee_sample_matches": 0,
+    "referee_yellow_bias": 0.0,
+    "referee_red_bias": 0.0,
+    "referee_penalty_bias": 0.0
   },
   {
     "id": "espn-760483",
@@ -2733,7 +3436,16 @@
     "rest_days_a": 4,
     "travel_km_a": 2314.9,
     "rest_days_b": 5,
-    "travel_km_b": 0.0
+    "travel_km_b": 0.0,
+    "goalkeeper_change_a": false,
+    "goalkeeper_change_b": false,
+    "market_move_a": 0.0,
+    "market_move_draw": 0.0,
+    "market_move_b": 0.0,
+    "referee_sample_matches": 0,
+    "referee_yellow_bias": 0.0,
+    "referee_red_bias": 0.0,
+    "referee_penalty_bias": 0.0
   },
   {
     "id": "espn-760486",
@@ -2774,7 +3486,16 @@
     "rest_days_a": 5,
     "rest_days_b": 5,
     "travel_km_a": 0.0,
-    "travel_km_b": 0.0
+    "travel_km_b": 0.0,
+    "goalkeeper_change_a": false,
+    "goalkeeper_change_b": false,
+    "market_move_a": 0.0,
+    "market_move_draw": 0.0,
+    "market_move_b": 0.0,
+    "referee_sample_matches": 0,
+    "referee_yellow_bias": 0.0,
+    "referee_red_bias": 0.0,
+    "referee_penalty_bias": 0.0
   },
   {
     "id": "espn-760487",
@@ -2815,7 +3536,16 @@
     "rest_days_a": 5,
     "rest_days_b": 5,
     "travel_km_a": 0.0,
-    "travel_km_b": 0.0
+    "travel_km_b": 0.0,
+    "goalkeeper_change_a": false,
+    "goalkeeper_change_b": false,
+    "market_move_a": 0.0,
+    "market_move_draw": 0.0,
+    "market_move_b": 0.0,
+    "referee_sample_matches": 0,
+    "referee_yellow_bias": 0.0,
+    "referee_red_bias": 0.0,
+    "referee_penalty_bias": 0.0
   },
   {
     "id": "espn-760489",
@@ -2856,7 +3586,16 @@
     "rest_days_a": 5,
     "rest_days_b": 5,
     "travel_km_a": 0.0,
-    "travel_km_b": 0.0
+    "travel_km_b": 0.0,
+    "goalkeeper_change_a": false,
+    "goalkeeper_change_b": false,
+    "market_move_a": 0.0,
+    "market_move_draw": 0.0,
+    "market_move_b": 0.0,
+    "referee_sample_matches": 0,
+    "referee_yellow_bias": 0.0,
+    "referee_red_bias": 0.0,
+    "referee_penalty_bias": 0.0
   },
   {
     "id": "espn-760488",
@@ -2897,7 +3636,16 @@
     "rest_days_a": 5,
     "rest_days_b": 5,
     "travel_km_a": 0.0,
-    "travel_km_b": 0.0
+    "travel_km_b": 0.0,
+    "goalkeeper_change_a": false,
+    "goalkeeper_change_b": false,
+    "market_move_a": 0.0,
+    "market_move_draw": 0.0,
+    "market_move_b": 0.0,
+    "referee_sample_matches": 0,
+    "referee_yellow_bias": 0.0,
+    "referee_red_bias": 0.0,
+    "referee_penalty_bias": 0.0
   },
   {
     "id": "espn-760490",
@@ -2938,7 +3686,16 @@
     "rest_days_a": 5,
     "rest_days_b": 5,
     "travel_km_a": 0.0,
-    "travel_km_b": 0.0
+    "travel_km_b": 0.0,
+    "goalkeeper_change_a": false,
+    "goalkeeper_change_b": false,
+    "market_move_a": 0.0,
+    "market_move_draw": 0.0,
+    "market_move_b": 0.0,
+    "referee_sample_matches": 0,
+    "referee_yellow_bias": 0.0,
+    "referee_red_bias": 0.0,
+    "referee_penalty_bias": 0.0
   },
   {
     "id": "espn-760492",
@@ -2979,7 +3736,16 @@
     "rest_days_a": 5,
     "rest_days_b": 5,
     "travel_km_a": 0.0,
-    "travel_km_b": 0.0
+    "travel_km_b": 0.0,
+    "goalkeeper_change_a": false,
+    "goalkeeper_change_b": false,
+    "market_move_a": 0.0,
+    "market_move_draw": 0.0,
+    "market_move_b": 0.0,
+    "referee_sample_matches": 0,
+    "referee_yellow_bias": 0.0,
+    "referee_red_bias": 0.0,
+    "referee_penalty_bias": 0.0
   },
   {
     "id": "espn-760491",
@@ -3020,7 +3786,16 @@
     "rest_days_a": 5,
     "rest_days_b": 5,
     "travel_km_a": 0.0,
-    "travel_km_b": 0.0
+    "travel_km_b": 0.0,
+    "goalkeeper_change_a": false,
+    "goalkeeper_change_b": false,
+    "market_move_a": 0.0,
+    "market_move_draw": 0.0,
+    "market_move_b": 0.0,
+    "referee_sample_matches": 0,
+    "referee_yellow_bias": 0.0,
+    "referee_red_bias": 0.0,
+    "referee_penalty_bias": 0.0
   },
   {
     "id": "espn-760495",
@@ -3061,7 +3836,16 @@
     "rest_days_a": 5,
     "rest_days_b": 5,
     "travel_km_a": 0.0,
-    "travel_km_b": 0.0
+    "travel_km_b": 0.0,
+    "goalkeeper_change_a": false,
+    "goalkeeper_change_b": false,
+    "market_move_a": 0.0,
+    "market_move_draw": 0.0,
+    "market_move_b": 0.0,
+    "referee_sample_matches": 0,
+    "referee_yellow_bias": 0.0,
+    "referee_red_bias": 0.0,
+    "referee_penalty_bias": 0.0
   },
   {
     "id": "espn-760493",
@@ -3102,7 +3886,16 @@
     "rest_days_a": 5,
     "rest_days_b": 5,
     "travel_km_a": 0.0,
-    "travel_km_b": 0.0
+    "travel_km_b": 0.0,
+    "goalkeeper_change_a": false,
+    "goalkeeper_change_b": false,
+    "market_move_a": 0.0,
+    "market_move_draw": 0.0,
+    "market_move_b": 0.0,
+    "referee_sample_matches": 0,
+    "referee_yellow_bias": 0.0,
+    "referee_red_bias": 0.0,
+    "referee_penalty_bias": 0.0
   },
   {
     "id": "espn-760494",
@@ -3143,7 +3936,16 @@
     "rest_days_a": 5,
     "rest_days_b": 5,
     "travel_km_a": 0.0,
-    "travel_km_b": 0.0
+    "travel_km_b": 0.0,
+    "goalkeeper_change_a": false,
+    "goalkeeper_change_b": false,
+    "market_move_a": 0.0,
+    "market_move_draw": 0.0,
+    "market_move_b": 0.0,
+    "referee_sample_matches": 0,
+    "referee_yellow_bias": 0.0,
+    "referee_red_bias": 0.0,
+    "referee_penalty_bias": 0.0
   },
   {
     "id": "espn-760497",
@@ -3184,7 +3986,16 @@
     "rest_days_a": 5,
     "rest_days_b": 5,
     "travel_km_a": 0.0,
-    "travel_km_b": 0.0
+    "travel_km_b": 0.0,
+    "goalkeeper_change_a": false,
+    "goalkeeper_change_b": false,
+    "market_move_a": 0.0,
+    "market_move_draw": 0.0,
+    "market_move_b": 0.0,
+    "referee_sample_matches": 0,
+    "referee_yellow_bias": 0.0,
+    "referee_red_bias": 0.0,
+    "referee_penalty_bias": 0.0
   },
   {
     "id": "espn-760496",
@@ -3225,7 +4036,16 @@
     "rest_days_a": 5,
     "rest_days_b": 5,
     "travel_km_a": 0.0,
-    "travel_km_b": 0.0
+    "travel_km_b": 0.0,
+    "goalkeeper_change_a": false,
+    "goalkeeper_change_b": false,
+    "market_move_a": 0.0,
+    "market_move_draw": 0.0,
+    "market_move_b": 0.0,
+    "referee_sample_matches": 0,
+    "referee_yellow_bias": 0.0,
+    "referee_red_bias": 0.0,
+    "referee_penalty_bias": 0.0
   },
   {
     "id": "espn-760498",
@@ -3266,7 +4086,16 @@
     "rest_days_a": 5,
     "rest_days_b": 5,
     "travel_km_a": 0.0,
-    "travel_km_b": 0.0
+    "travel_km_b": 0.0,
+    "goalkeeper_change_a": false,
+    "goalkeeper_change_b": false,
+    "market_move_a": 0.0,
+    "market_move_draw": 0.0,
+    "market_move_b": 0.0,
+    "referee_sample_matches": 0,
+    "referee_yellow_bias": 0.0,
+    "referee_red_bias": 0.0,
+    "referee_penalty_bias": 0.0
   },
   {
     "id": "espn-760499",
@@ -3307,7 +4136,16 @@
     "rest_days_a": 5,
     "rest_days_b": 5,
     "travel_km_a": 0.0,
-    "travel_km_b": 0.0
+    "travel_km_b": 0.0,
+    "goalkeeper_change_a": false,
+    "goalkeeper_change_b": false,
+    "market_move_a": 0.0,
+    "market_move_draw": 0.0,
+    "market_move_b": 0.0,
+    "referee_sample_matches": 0,
+    "referee_yellow_bias": 0.0,
+    "referee_red_bias": 0.0,
+    "referee_penalty_bias": 0.0
   },
   {
     "id": "espn-760500",
@@ -3348,7 +4186,16 @@
     "rest_days_a": 5,
     "rest_days_b": 5,
     "travel_km_a": 0.0,
-    "travel_km_b": 0.0
+    "travel_km_b": 0.0,
+    "goalkeeper_change_a": false,
+    "goalkeeper_change_b": false,
+    "market_move_a": 0.0,
+    "market_move_draw": 0.0,
+    "market_move_b": 0.0,
+    "referee_sample_matches": 0,
+    "referee_yellow_bias": 0.0,
+    "referee_red_bias": 0.0,
+    "referee_penalty_bias": 0.0
   },
   {
     "id": "espn-760501",
@@ -3389,7 +4236,16 @@
     "rest_days_a": 5,
     "rest_days_b": 5,
     "travel_km_a": 0.0,
-    "travel_km_b": 0.0
+    "travel_km_b": 0.0,
+    "goalkeeper_change_a": false,
+    "goalkeeper_change_b": false,
+    "market_move_a": 0.0,
+    "market_move_draw": 0.0,
+    "market_move_b": 0.0,
+    "referee_sample_matches": 0,
+    "referee_yellow_bias": 0.0,
+    "referee_red_bias": 0.0,
+    "referee_penalty_bias": 0.0
   },
   {
     "id": "espn-760502",
@@ -3430,7 +4286,16 @@
     "rest_days_a": 5,
     "rest_days_b": 5,
     "travel_km_a": 0.0,
-    "travel_km_b": 0.0
+    "travel_km_b": 0.0,
+    "goalkeeper_change_a": false,
+    "goalkeeper_change_b": false,
+    "market_move_a": 0.0,
+    "market_move_draw": 0.0,
+    "market_move_b": 0.0,
+    "referee_sample_matches": 0,
+    "referee_yellow_bias": 0.0,
+    "referee_red_bias": 0.0,
+    "referee_penalty_bias": 0.0
   },
   {
     "id": "espn-760503",
@@ -3471,7 +4336,16 @@
     "rest_days_a": 5,
     "rest_days_b": 5,
     "travel_km_a": 0.0,
-    "travel_km_b": 0.0
+    "travel_km_b": 0.0,
+    "goalkeeper_change_a": false,
+    "goalkeeper_change_b": false,
+    "market_move_a": 0.0,
+    "market_move_draw": 0.0,
+    "market_move_b": 0.0,
+    "referee_sample_matches": 0,
+    "referee_yellow_bias": 0.0,
+    "referee_red_bias": 0.0,
+    "referee_penalty_bias": 0.0
   },
   {
     "id": "espn-760504",
@@ -3512,7 +4386,16 @@
     "rest_days_a": 5,
     "rest_days_b": 5,
     "travel_km_a": 0.0,
-    "travel_km_b": 0.0
+    "travel_km_b": 0.0,
+    "goalkeeper_change_a": false,
+    "goalkeeper_change_b": false,
+    "market_move_a": 0.0,
+    "market_move_draw": 0.0,
+    "market_move_b": 0.0,
+    "referee_sample_matches": 0,
+    "referee_yellow_bias": 0.0,
+    "referee_red_bias": 0.0,
+    "referee_penalty_bias": 0.0
   },
   {
     "id": "espn-760505",
@@ -3553,7 +4436,16 @@
     "rest_days_a": 5,
     "rest_days_b": 5,
     "travel_km_a": 0.0,
-    "travel_km_b": 0.0
+    "travel_km_b": 0.0,
+    "goalkeeper_change_a": false,
+    "goalkeeper_change_b": false,
+    "market_move_a": 0.0,
+    "market_move_draw": 0.0,
+    "market_move_b": 0.0,
+    "referee_sample_matches": 0,
+    "referee_yellow_bias": 0.0,
+    "referee_red_bias": 0.0,
+    "referee_penalty_bias": 0.0
   },
   {
     "id": "espn-760506",
@@ -3594,7 +4486,16 @@
     "rest_days_a": 5,
     "rest_days_b": 5,
     "travel_km_a": 0.0,
-    "travel_km_b": 0.0
+    "travel_km_b": 0.0,
+    "goalkeeper_change_a": false,
+    "goalkeeper_change_b": false,
+    "market_move_a": 0.0,
+    "market_move_draw": 0.0,
+    "market_move_b": 0.0,
+    "referee_sample_matches": 0,
+    "referee_yellow_bias": 0.0,
+    "referee_red_bias": 0.0,
+    "referee_penalty_bias": 0.0
   },
   {
     "id": "espn-760507",
@@ -3635,7 +4536,16 @@
     "rest_days_a": 5,
     "rest_days_b": 5,
     "travel_km_a": 0.0,
-    "travel_km_b": 0.0
+    "travel_km_b": 0.0,
+    "goalkeeper_change_a": false,
+    "goalkeeper_change_b": false,
+    "market_move_a": 0.0,
+    "market_move_draw": 0.0,
+    "market_move_b": 0.0,
+    "referee_sample_matches": 0,
+    "referee_yellow_bias": 0.0,
+    "referee_red_bias": 0.0,
+    "referee_penalty_bias": 0.0
   },
   {
     "id": "espn-760509",
@@ -3676,7 +4586,16 @@
     "rest_days_a": 5,
     "rest_days_b": 5,
     "travel_km_a": 0.0,
-    "travel_km_b": 0.0
+    "travel_km_b": 0.0,
+    "goalkeeper_change_a": false,
+    "goalkeeper_change_b": false,
+    "market_move_a": 0.0,
+    "market_move_draw": 0.0,
+    "market_move_b": 0.0,
+    "referee_sample_matches": 0,
+    "referee_yellow_bias": 0.0,
+    "referee_red_bias": 0.0,
+    "referee_penalty_bias": 0.0
   },
   {
     "id": "espn-760508",
@@ -3717,7 +4636,16 @@
     "rest_days_a": 5,
     "rest_days_b": 5,
     "travel_km_a": 0.0,
-    "travel_km_b": 0.0
+    "travel_km_b": 0.0,
+    "goalkeeper_change_a": false,
+    "goalkeeper_change_b": false,
+    "market_move_a": 0.0,
+    "market_move_draw": 0.0,
+    "market_move_b": 0.0,
+    "referee_sample_matches": 0,
+    "referee_yellow_bias": 0.0,
+    "referee_red_bias": 0.0,
+    "referee_penalty_bias": 0.0
   },
   {
     "id": "espn-760510",
@@ -3758,7 +4686,16 @@
     "rest_days_a": 5,
     "rest_days_b": 5,
     "travel_km_a": 0.0,
-    "travel_km_b": 0.0
+    "travel_km_b": 0.0,
+    "goalkeeper_change_a": false,
+    "goalkeeper_change_b": false,
+    "market_move_a": 0.0,
+    "market_move_draw": 0.0,
+    "market_move_b": 0.0,
+    "referee_sample_matches": 0,
+    "referee_yellow_bias": 0.0,
+    "referee_red_bias": 0.0,
+    "referee_penalty_bias": 0.0
   },
   {
     "id": "espn-760511",
@@ -3799,7 +4736,16 @@
     "rest_days_a": 5,
     "rest_days_b": 5,
     "travel_km_a": 0.0,
-    "travel_km_b": 0.0
+    "travel_km_b": 0.0,
+    "goalkeeper_change_a": false,
+    "goalkeeper_change_b": false,
+    "market_move_a": 0.0,
+    "market_move_draw": 0.0,
+    "market_move_b": 0.0,
+    "referee_sample_matches": 0,
+    "referee_yellow_bias": 0.0,
+    "referee_red_bias": 0.0,
+    "referee_penalty_bias": 0.0
   },
   {
     "id": "espn-760512",
@@ -3840,7 +4786,16 @@
     "rest_days_a": 5,
     "rest_days_b": 5,
     "travel_km_a": 0.0,
-    "travel_km_b": 0.0
+    "travel_km_b": 0.0,
+    "goalkeeper_change_a": false,
+    "goalkeeper_change_b": false,
+    "market_move_a": 0.0,
+    "market_move_draw": 0.0,
+    "market_move_b": 0.0,
+    "referee_sample_matches": 0,
+    "referee_yellow_bias": 0.0,
+    "referee_red_bias": 0.0,
+    "referee_penalty_bias": 0.0
   },
   {
     "id": "espn-760513",
@@ -3881,7 +4836,16 @@
     "rest_days_a": 5,
     "rest_days_b": 5,
     "travel_km_a": 0.0,
-    "travel_km_b": 0.0
+    "travel_km_b": 0.0,
+    "goalkeeper_change_a": false,
+    "goalkeeper_change_b": false,
+    "market_move_a": 0.0,
+    "market_move_draw": 0.0,
+    "market_move_b": 0.0,
+    "referee_sample_matches": 0,
+    "referee_yellow_bias": 0.0,
+    "referee_red_bias": 0.0,
+    "referee_penalty_bias": 0.0
   },
   {
     "id": "espn-760514",
@@ -3922,7 +4886,16 @@
     "rest_days_a": 5,
     "rest_days_b": 5,
     "travel_km_a": 0.0,
-    "travel_km_b": 0.0
+    "travel_km_b": 0.0,
+    "goalkeeper_change_a": false,
+    "goalkeeper_change_b": false,
+    "market_move_a": 0.0,
+    "market_move_draw": 0.0,
+    "market_move_b": 0.0,
+    "referee_sample_matches": 0,
+    "referee_yellow_bias": 0.0,
+    "referee_red_bias": 0.0,
+    "referee_penalty_bias": 0.0
   },
   {
     "id": "espn-760515",
@@ -3963,7 +4936,16 @@
     "rest_days_a": 5,
     "rest_days_b": 5,
     "travel_km_a": 0.0,
-    "travel_km_b": 0.0
+    "travel_km_b": 0.0,
+    "goalkeeper_change_a": false,
+    "goalkeeper_change_b": false,
+    "market_move_a": 0.0,
+    "market_move_draw": 0.0,
+    "market_move_b": 0.0,
+    "referee_sample_matches": 0,
+    "referee_yellow_bias": 0.0,
+    "referee_red_bias": 0.0,
+    "referee_penalty_bias": 0.0
   },
   {
     "id": "espn-760516",
@@ -4004,7 +4986,16 @@
     "rest_days_a": 5,
     "rest_days_b": 5,
     "travel_km_a": 0.0,
-    "travel_km_b": 0.0
+    "travel_km_b": 0.0,
+    "goalkeeper_change_a": false,
+    "goalkeeper_change_b": false,
+    "market_move_a": 0.0,
+    "market_move_draw": 0.0,
+    "market_move_b": 0.0,
+    "referee_sample_matches": 0,
+    "referee_yellow_bias": 0.0,
+    "referee_red_bias": 0.0,
+    "referee_penalty_bias": 0.0
   },
   {
     "id": "espn-760517",
@@ -4045,6 +5036,15 @@
     "rest_days_a": 5,
     "rest_days_b": 5,
     "travel_km_a": 0.0,
-    "travel_km_b": 0.0
+    "travel_km_b": 0.0,
+    "goalkeeper_change_a": false,
+    "goalkeeper_change_b": false,
+    "market_move_a": 0.0,
+    "market_move_draw": 0.0,
+    "market_move_b": 0.0,
+    "referee_sample_matches": 0,
+    "referee_yellow_bias": 0.0,
+    "referee_red_bias": 0.0,
+    "referee_penalty_bias": 0.0
   }
 ]

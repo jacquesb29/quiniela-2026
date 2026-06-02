@@ -125,6 +125,7 @@ from worldcup2026.models.expected_goals import (
 from worldcup2026.modeling import (
     dynamic_correlation,
 )
+from worldcup2026.profiles.lineup import lineup_intelligence
 from worldcup2026.parallel import (
     default_parallel_workers,
     empty_bracket_aggregate,
@@ -504,6 +505,20 @@ class MatchContext:
     lineup_confirmed_b: bool = False
     lineup_change_count_a: int = 0
     lineup_change_count_b: int = 0
+    starting_xi_a: Tuple[str, ...] = ()
+    starting_xi_b: Tuple[str, ...] = ()
+    lineup_strength_delta_a: float = 0.0
+    lineup_strength_delta_b: float = 0.0
+    lineup_attack_delta_a: float = 0.0
+    lineup_attack_delta_b: float = 0.0
+    lineup_defense_delta_a: float = 0.0
+    lineup_defense_delta_b: float = 0.0
+    lineup_goalkeeper_delta_a: float = 0.0
+    lineup_goalkeeper_delta_b: float = 0.0
+    lineup_coverage_a: float = 0.0
+    lineup_coverage_b: float = 0.0
+    lineup_intelligence_mode_a: str = "sin XI nominal"
+    lineup_intelligence_mode_b: str = "sin XI nominal"
     starting_goalkeeper_a: Optional[str] = None
     starting_goalkeeper_b: Optional[str] = None
     goalkeeper_confirmed_a: bool = False
@@ -791,6 +806,7 @@ def compute_statistical_depth(
                 str((model_stack or {}).get("low_score_name", "")),
                 str((model_stack or {}).get("overdispersed_name", "")),
                 str((model_stack or {}).get("ml_name", "")),
+                str((model_stack or {}).get("bayesian_name", "")),
                 str((model_stack or {}).get("final_name", "")),
             ]
             if model_stack
@@ -831,6 +847,10 @@ def top_factor_drivers(factors: Optional[Dict[str, float]], limit: int = 3) -> L
         "cards_diff": "Tarjetas y suspensiones",
         "group_pressure_diff": "Presión de grupo",
         "lineup_diff": "Alineaciones",
+        "lineup_strength_diff": "Calidad ponderada del XI",
+        "lineup_attack_diff": "Ataque del XI confirmado",
+        "lineup_defense_diff": "Defensa del XI confirmado",
+        "lineup_goalkeeper_diff": "Portero del XI confirmado",
         "market_prob_diff": "Mercado victoria/empate/derrota",
         "recent_form_diff": "Forma reciente",
         "attack_form_diff": "Forma ofensiva",
@@ -3699,6 +3719,9 @@ def command_project_bracket(args: argparse.Namespace, teams: Dict[str, Team]) ->
         "updated_at": iso_timestamp(),
         "iterations": args.iterations,
         "workers": workers,
+        "scoreline_engine": "ensamble_no_solo_poisson_bayes_dinamico_v2",
+        "bracket_recalculated_from_scoreline_ensemble": True,
+        "recalculation_policy": "La llave se reconstruye con 15.000 simulaciones después de cada actualización automática; si cambian marcadores, estados o señales relevantes, cambian también sus rutas simuladas.",
         "matches": {
             match_id: structured_match_projection(match_id, aggregate, args.iterations)
             for match_id, aggregate in match_aggregate.items()
@@ -4325,6 +4348,14 @@ def dashboard_fixture_entries(
                 "lineup_status_b": fixture.get("lineup_status_b"),
                 "lineup_change_count_a": int(fixture.get("lineup_change_count_a", 0)),
                 "lineup_change_count_b": int(fixture.get("lineup_change_count_b", 0)),
+                "starting_xi_a": list(ctx.starting_xi_a),
+                "starting_xi_b": list(ctx.starting_xi_b),
+                "lineup_strength_delta_a": ctx.lineup_strength_delta_a,
+                "lineup_strength_delta_b": ctx.lineup_strength_delta_b,
+                "lineup_coverage_a": ctx.lineup_coverage_a,
+                "lineup_coverage_b": ctx.lineup_coverage_b,
+                "lineup_intelligence_mode_a": ctx.lineup_intelligence_mode_a,
+                "lineup_intelligence_mode_b": ctx.lineup_intelligence_mode_b,
                 "starting_goalkeeper_a": fixture.get("starting_goalkeeper_a"),
                 "starting_goalkeeper_b": fixture.get("starting_goalkeeper_b"),
                 "goalkeeper_change_a": bool(fixture.get("goalkeeper_change_a", False)),
@@ -4341,6 +4372,8 @@ def dashboard_fixture_entries(
                 "questionable_count_b": int(fixture.get("questionable_count_b", 0)),
                 "unavailable_notes_a": fixture.get("unavailable_notes_a", []),
                 "unavailable_notes_b": fixture.get("unavailable_notes_b", []),
+                "unavailable_players_a": fixture.get("unavailable_players_a", []),
+                "unavailable_players_b": fixture.get("unavailable_players_b", []),
                 "news_headlines": fixture.get("news_headlines", []),
                 "news_notes_a": fixture.get("news_notes_a", []),
                 "news_notes_b": fixture.get("news_notes_b", []),
@@ -4866,6 +4899,13 @@ def dashboard_news_lines(entry: dict, team_a: str, team_b: str) -> List[str]:
             f"- Portero esperado: {team_a} {entry.get('starting_goalkeeper_a') or 'sin confirmar'} | "
             f"{team_b} {entry.get('starting_goalkeeper_b') or 'sin confirmar'}"
         )
+    if entry.get("starting_xi_a") or entry.get("starting_xi_b"):
+        lines.append(
+            f"- Lectura ponderada del XI: {team_a} {entry.get('lineup_intelligence_mode_a', 'sin XI nominal')} "
+            f"(cobertura {float(entry.get('lineup_coverage_a', 0.0)):.0%}, impacto {float(entry.get('lineup_strength_delta_a', 0.0)):+.3f}) | "
+            f"{team_b} {entry.get('lineup_intelligence_mode_b', 'sin XI nominal')} "
+            f"(cobertura {float(entry.get('lineup_coverage_b', 0.0)):.0%}, impacto {float(entry.get('lineup_strength_delta_b', 0.0)):+.3f})"
+        )
     if entry.get("goalkeeper_change_a") or entry.get("goalkeeper_change_b"):
         lines.append(
             f"- Cambio de portero respecto a la actualización anterior: {team_a} {'sí' if entry.get('goalkeeper_change_a') else 'no'} | "
@@ -4923,6 +4963,11 @@ def adjustment_reason_lines(entry: dict, prediction: MatchPrediction) -> List[st
     if entry.get("lineup_status_a") == "confirmada" or entry.get("lineup_status_b") == "confirmada":
         lines.append(
             f"- Cambio por alineaciones: {prediction.team_a} {entry.get('lineup_status_a', 'sin confirmar')} | {prediction.team_b} {entry.get('lineup_status_b', 'sin confirmar')}."
+        )
+    if abs(float(entry.get("lineup_strength_delta_a", 0.0) or 0.0)) >= 0.005 or abs(float(entry.get("lineup_strength_delta_b", 0.0) or 0.0)) >= 0.005:
+        lines.append(
+            f"- Cambio por calidad ponderada del XI: {prediction.team_a} {float(entry.get('lineup_strength_delta_a', 0.0)):+.3f} | "
+            f"{prediction.team_b} {float(entry.get('lineup_strength_delta_b', 0.0)):+.3f}."
         )
     if entry.get("lineup_change_count_a") or entry.get("lineup_change_count_b"):
         lines.append(
@@ -8586,7 +8631,7 @@ def agentic_learning_items() -> List[dict]:
         },
         {
             "agent": "Agente predictivo",
-            "job": "Combina Poisson/Dixon-Coles, overdispersión calibrada, ML ligero, Elo/FIFA, ensamble, consenso externo y Monte Carlo de torneo.",
+            "job": "Combina Poisson/Dixon-Coles, overdispersión calibrada, predictivo bayesiano dinámico, ML ligero, Elo/FIFA, ensamble, consenso externo y Monte Carlo de torneo.",
             "learns": "Cuando cambia un resultado, recalcula grupos, cruces, llave, campeón y boletos recomendados.",
         },
         {
@@ -9522,6 +9567,8 @@ def model_comparison_lines(prediction: MatchPrediction) -> List[str]:
             if name_key == "overdispersed_name"
             else "ml"
             if name_key == "ml_name"
+            else "bayesian"
+            if name_key == "bayesian_name"
             else None
         )
         weight_label = ""
@@ -9542,6 +9589,8 @@ def model_comparison_lines(prediction: MatchPrediction) -> List[str]:
         lines.append(row("overdispersed_name", "overdispersed_probs", "overdispersed_top_score"))
     if "ml_name" in stack:
         lines.append(row("ml_name", "ml_probs", "ml_top_score"))
+    if "bayesian_name" in stack:
+        lines.append(row("bayesian_name", "bayesian_probs", "bayesian_top_score"))
     lines.append(row("final_name", "ensemble_probs", "ensemble_top_score"))
     return lines
 
@@ -9566,6 +9615,8 @@ def model_comparison_html(prediction: MatchPrediction) -> str:
             if name_key == "overdispersed_name"
             else "ml"
             if name_key == "ml_name"
+            else "bayesian"
+            if name_key == "bayesian_name"
             else None
         )
         weight_html = ""
@@ -9584,13 +9635,14 @@ def model_comparison_html(prediction: MatchPrediction) -> str:
 
     inner = (
         "<div class=\"reason-block model-compare-block\">"
-        "<p class=\"meta\">Aquí se ven por separado el modelo principal, el contraste, el ajuste de baja anotación, la overdispersión calibrada y el calibrador ML ligero. El ensamble final repondera esos modelos según consenso, dispersión y cercanía al mercado cuando hay cuotas confiables.</p>"
+        "<p class=\"meta\">Aquí se ven por separado el modelo principal, el contraste, el ajuste de baja anotación, la overdispersión calibrada, el calibrador ML ligero y el predictivo bayesiano dinámico. El ensamble final repondera esos modelos según consenso, dispersión, evidencia del XI y cercanía al mercado cuando hay cuotas confiables.</p>"
         "<div class=\"model-compare-grid\">"
         f"{card('primary_name', 'primary_probs', 'primary_top_score', 'primary')}"
         f"{card('contrast_name', 'contrast_probs', 'contrast_top_score', 'contrast')}"
         f"{card('low_score_name', 'low_score_probs', 'low_score_top_score', 'low-score')}"
         f"{card('overdispersed_name', 'overdispersed_probs', 'overdispersed_top_score', 'overdispersed') if 'overdispersed_name' in stack else ''}"
         f"{card('ml_name', 'ml_probs', 'ml_top_score', 'ml') if 'ml_name' in stack else ''}"
+        f"{card('bayesian_name', 'bayesian_probs', 'bayesian_top_score', 'bayesian') if 'bayesian_name' in stack else ''}"
         f"{card('final_name', 'ensemble_probs', 'ensemble_top_score', 'ensemble')}"
         "</div>"
         "</div>"
@@ -10796,7 +10848,7 @@ def build_methodology_html(
         "</article>"
         "<article>"
         "<h3>Stack estadístico</h3>"
-        "<p>La capa prepartido mezcla el modelo principal Bivariante Poisson, un modelo de contraste Poisson independiente, un ajuste de baja anotación, una distribución de overdispersión calibrada, un calibrador ML ligero regularizado y un ensamble final. Para elegir el marcador que cargas en Penca añade una capa distinta: compara familias históricas específicas de ambas selecciones para no someter el exacto únicamente a Poisson. El ensamble repondera los modelos según consenso, dispersión y cercanía al mercado cuando hay cuotas confiables.</p>"
+        "<p>La capa prepartido mezcla el modelo principal Bivariante Poisson, un modelo de contraste Poisson independiente, un ajuste de baja anotación, una distribución de overdispersión calibrada, un calibrador ML ligero regularizado, un predictivo bayesiano dinámico y un ensamble final. Para elegir el marcador que cargas en Penca añade una capa distinta: compara familias históricas específicas de ambas selecciones para no someter el exacto únicamente a Poisson. El ensamble repondera los modelos según consenso, dispersión, evidencia del XI y cercanía al mercado cuando hay cuotas confiables.</p>"
         "</article>"
         "<article>"
         "<h3>Estrategia de datos</h3>"
@@ -10804,7 +10856,7 @@ def build_methodology_html(
         "</article>"
         "<article>"
         "<h3>Modelos visibles en la web</h3>"
-        "<p>En cada tarjeta de partido verás por separado qué dice Bivariante Poisson, qué dice Poisson independiente, qué dice el ajuste de baja anotación, qué dice la overdispersión calibrada, qué aporta el ML ligero y cuál es el ensamble final publicado. Así puedes comparar si coinciden o si hay dispersión entre modelos.</p>"
+        "<p>En cada tarjeta de partido verás por separado qué dice Bivariante Poisson, qué dice Poisson independiente, qué dice el ajuste de baja anotación, qué dice la overdispersión calibrada, qué aporta el ML ligero, qué aporta el predictivo bayesiano dinámico y cuál es el ensamble final publicado. Así puedes comparar si coinciden o si hay dispersión entre modelos.</p>"
         "</article>"
         "<article>"
         "<h3>Estado dinámico</h3>"
@@ -10820,7 +10872,7 @@ def build_methodology_html(
         "</article>"
         "<article>"
         "<h3>Noticias y bajas</h3>"
-        "<p>Si el feed publica ausencias, cambios de XI, movimiento de cuotas, árbitro o noticias relevantes del partido, esas señales entran como disponibilidad, moral o contexto adicional.</p>"
+        "<p>Si el feed publica ausencias, cambios de XI, movimiento de cuotas, árbitro o noticias relevantes del partido, esas señales entran como disponibilidad, moral o contexto adicional. El XI se pondera jugador por jugador cuando existe roster nominal; si faltan nombres locales, el ajuste se limita y la web lo declara para no inventar precisión.</p>"
         "</article>"
         "<article>"
         "<h3>Cómo validar el refresh</h3>"
@@ -11516,6 +11568,8 @@ def audit_bracket_payload(bracket_payload: dict, teams: Dict[str, Team], min_ite
     iterations = int(bracket_payload.get("iterations", 0) or 0)
     if iterations < min_iterations:
         errors.append(f"La llave usa {iterations} simulaciones; minimo requerido {min_iterations}.")
+    if bracket_payload.get("updated_at") and bracket_payload.get("scoreline_engine") != "ensamble_no_solo_poisson_bayes_dinamico_v2":
+        errors.append("La llave publicada no declara el motor de marcador Bayes dinámico vigente.")
     matches = bracket_payload.get("matches", {})
     missing_ids = sorted(expected_bracket_match_ids() - set(matches))
     if missing_ids:
@@ -11705,6 +11759,7 @@ def audit_dashboard_html(dashboard_html: str) -> List[str]:
         "Shrinkage bayesiano",
         "Desacuerdo entre modelos",
         "Overdispersión calibrada",
+        "Predictivo bayesiano dinámico",
         "Backtesting por buckets",
         "Límite de confianza operativa",
         "Predicción potenciada",
@@ -12094,6 +12149,22 @@ def context_from_fixture(
         substitution_impact_a = clamp((live_substitutions_a / 5.0) * (0.55 + 0.90 * profile_a.squad.bench_impact), 0.0, 1.0)
     if substitution_impact_b is None:
         substitution_impact_b = clamp((live_substitutions_b / 5.0) * (0.55 + 0.90 * profile_b.squad.bench_impact), 0.0, 1.0)
+    lineup_a = lineup_intelligence(
+        teams[team_a_name],
+        starting_xi=tuple(fixture.get("starting_xi_a", []) or ()),
+        unavailable_players=tuple(fixture.get("unavailable_players_a", []) or ()),
+        lineup_confirmed=bool(fixture.get("lineup_confirmed_a", False)),
+        lineup_changes=int(fixture.get("lineup_change_count_a", 0) or 0),
+        goalkeeper_change=bool(fixture.get("goalkeeper_change_a", False)),
+    )
+    lineup_b = lineup_intelligence(
+        teams[team_b_name],
+        starting_xi=tuple(fixture.get("starting_xi_b", []) or ()),
+        unavailable_players=tuple(fixture.get("unavailable_players_b", []) or ()),
+        lineup_confirmed=bool(fixture.get("lineup_confirmed_b", False)),
+        lineup_changes=int(fixture.get("lineup_change_count_b", 0) or 0),
+        goalkeeper_change=bool(fixture.get("goalkeeper_change_b", False)),
+    )
 
     return MatchContext(
         neutral=bool(fixture.get("neutral", fixture.get("home_team") is None)),
@@ -12136,6 +12207,20 @@ def context_from_fixture(
         lineup_confirmed_b=bool(fixture.get("lineup_confirmed_b", False)),
         lineup_change_count_a=int(fixture.get("lineup_change_count_a", 0)),
         lineup_change_count_b=int(fixture.get("lineup_change_count_b", 0)),
+        starting_xi_a=tuple(str(name) for name in fixture.get("starting_xi_a", []) or ()),
+        starting_xi_b=tuple(str(name) for name in fixture.get("starting_xi_b", []) or ()),
+        lineup_strength_delta_a=lineup_a.overall_delta,
+        lineup_strength_delta_b=lineup_b.overall_delta,
+        lineup_attack_delta_a=lineup_a.attack_delta,
+        lineup_attack_delta_b=lineup_b.attack_delta,
+        lineup_defense_delta_a=lineup_a.defense_delta,
+        lineup_defense_delta_b=lineup_b.defense_delta,
+        lineup_goalkeeper_delta_a=lineup_a.goalkeeper_delta,
+        lineup_goalkeeper_delta_b=lineup_b.goalkeeper_delta,
+        lineup_coverage_a=lineup_a.coverage,
+        lineup_coverage_b=lineup_b.coverage,
+        lineup_intelligence_mode_a=lineup_a.mode,
+        lineup_intelligence_mode_b=lineup_b.mode,
         starting_goalkeeper_a=fixture.get("starting_goalkeeper_a"),
         starting_goalkeeper_b=fixture.get("starting_goalkeeper_b"),
         goalkeeper_confirmed_a=bool(fixture.get("goalkeeper_confirmed_a", fixture.get("starting_goalkeeper_a"))),
@@ -12278,7 +12363,8 @@ def print_prediction(prediction: MatchPrediction, show_factors: bool = False) ->
             "  Stack estadistico: "
             f"{prediction.model_stack.get('primary_name')} + {prediction.model_stack.get('contrast_name')} + "
             f"{prediction.model_stack.get('low_score_name')} + {prediction.model_stack.get('overdispersed_name')} + "
-            f"{prediction.model_stack.get('ml_name')} + {prediction.model_stack.get('final_name')} "
+            f"{prediction.model_stack.get('bayesian_name')} + {prediction.model_stack.get('ml_name')} + "
+            f"{prediction.model_stack.get('final_name')} "
             f"| coincidencia entre modelos {agreement:.1%}"
         )
     print("  Marcadores finales más probables:" if prediction.advance_a is not None else "  Marcadores más probables:")

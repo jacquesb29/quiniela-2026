@@ -36,6 +36,17 @@ class ModelHyperparameters:
     model_ml_market_weight: float = 0.03
     model_ml_knockout_bonus: float = 0.02
     model_ml_max: float = 0.17
+    model_bayesian_base: float = 0.12
+    model_bayesian_uncertainty_weight: float = 0.04
+    model_bayesian_lineup_weight: float = 0.02
+    model_bayesian_max: float = 0.19
+    bayesian_prior_mean_goals: float = 1.22
+    bayesian_prior_strength: float = 4.5
+    bayesian_base_evidence: float = 8.0
+    bayesian_lineup_evidence: float = 4.0
+    bayesian_injury_uncertainty: float = 3.0
+    bayesian_overdispersion_floor: float = 0.10
+    bayesian_overdispersion_cap: float = 0.30
     ml_total_market_blend: float = 0.10
     ml_favorite_share_weight: float = 0.08
     ml_market_edge_weight: float = 0.12

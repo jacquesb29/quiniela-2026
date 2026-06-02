@@ -35,6 +35,11 @@ def context_components(
         group_matches_played = ctx.group_matches_played_a
         lineup_confirmed = ctx.lineup_confirmed_a
         lineup_changes = ctx.lineup_change_count_a
+        lineup_strength = float(getattr(ctx, "lineup_strength_delta_a", 0.0) or 0.0)
+        lineup_attack = float(getattr(ctx, "lineup_attack_delta_a", 0.0) or 0.0)
+        lineup_defense = float(getattr(ctx, "lineup_defense_delta_a", 0.0) or 0.0)
+        lineup_goalkeeper = float(getattr(ctx, "lineup_goalkeeper_delta_a", 0.0) or 0.0)
+        lineup_coverage = float(getattr(ctx, "lineup_coverage_a", 0.0) or 0.0)
         market_move = ctx.market_move_a
         goalkeeper_confirmed = ctx.goalkeeper_confirmed_a
         goalkeeper_change = ctx.goalkeeper_change_a
@@ -56,6 +61,11 @@ def context_components(
         group_matches_played = ctx.group_matches_played_b
         lineup_confirmed = ctx.lineup_confirmed_b
         lineup_changes = ctx.lineup_change_count_b
+        lineup_strength = float(getattr(ctx, "lineup_strength_delta_b", 0.0) or 0.0)
+        lineup_attack = float(getattr(ctx, "lineup_attack_delta_b", 0.0) or 0.0)
+        lineup_defense = float(getattr(ctx, "lineup_defense_delta_b", 0.0) or 0.0)
+        lineup_goalkeeper = float(getattr(ctx, "lineup_goalkeeper_delta_b", 0.0) or 0.0)
+        lineup_coverage = float(getattr(ctx, "lineup_coverage_b", 0.0) or 0.0)
         market_move = ctx.market_move_b
         goalkeeper_confirmed = ctx.goalkeeper_confirmed_b
         goalkeeper_change = ctx.goalkeeper_change_b
@@ -76,6 +86,10 @@ def context_components(
         "altitude": 0.0,
         "rivalry": rivalry_intensity(team, opponent),
         "lineup": (0.01 if lineup_confirmed else 0.0) - 0.018 * clamp(lineup_changes, 0, 6),
+        "lineup_strength": 0.20 * clamp(lineup_strength, -0.24, 0.18) * (0.45 + 0.55 * clamp(lineup_coverage, 0.0, 1.0)),
+        "lineup_attack": 0.12 * clamp(lineup_attack, -0.22, 0.18) * (0.45 + 0.55 * clamp(lineup_coverage, 0.0, 1.0)),
+        "lineup_defense": 0.10 * clamp(lineup_defense, -0.22, 0.18) * (0.45 + 0.55 * clamp(lineup_coverage, 0.0, 1.0)),
+        "lineup_goalkeeper": 0.12 * clamp(lineup_goalkeeper, -0.22, 0.18) * (0.45 + 0.55 * clamp(lineup_coverage, 0.0, 1.0)),
         "goalkeeper_context": (0.014 if goalkeeper_confirmed else 0.0) - (0.045 if goalkeeper_change else 0.0),
         "substitutions": (
             0.035 * clamp(substitution_impact - substitution_impact_other, -1.0, 1.0)
@@ -381,6 +395,10 @@ def factor_breakdown(
         "availability_diff": availability_level(state_a) - availability_level(state_b),
         "discipline_trend_diff": discipline_trend(state_a) - discipline_trend(state_b),
         "lineup_diff": context_a["lineup"] - context_b["lineup"],
+        "lineup_strength_diff": context_a["lineup_strength"] - context_b["lineup_strength"],
+        "lineup_attack_diff": context_a["lineup_attack"] - context_b["lineup_attack"],
+        "lineup_defense_diff": context_a["lineup_defense"] - context_b["lineup_defense"],
+        "lineup_goalkeeper_diff": context_a["lineup_goalkeeper"] - context_b["lineup_goalkeeper"],
         "tactical_attack_diff": tactical_attack_signal(state_a) - tactical_attack_signal(state_b),
         "tactical_defense_diff": tactical_defense_signal(state_a) - tactical_defense_signal(state_b),
         "tactical_tempo_diff": tactical_tempo_signal(state_a) - tactical_tempo_signal(state_b),

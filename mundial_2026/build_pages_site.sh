@@ -29,9 +29,11 @@ fixtures_path = script_dir / "fixtures_live_2026.json"
 teams_path = script_dir / "teams_2026.json"
 history_path = script_dir / "historical_features_1950.json"
 dashboard_path = script_dir / "dashboard_actual_2026.html"
+bracket_path = script_dir / "llave_actual_2026.json"
 fixtures_payload = []
 teams_payload = {}
 history_payload = {}
+bracket_payload = {}
 dashboard_updated_at = None
 if fixtures_path.exists():
     fixtures_payload = json.loads(fixtures_path.read_text())
@@ -39,6 +41,8 @@ if teams_path.exists():
     teams_payload = json.loads(teams_path.read_text())
 if history_path.exists():
     history_payload = json.loads(history_path.read_text())
+if bracket_path.exists():
+    bracket_payload = json.loads(bracket_path.read_text())
 if dashboard_path.exists():
     match = re.search(r'<meta name="dashboard-updated-at" content="([^"]+)"', dashboard_path.read_text())
     if match:
@@ -54,6 +58,9 @@ payload = {
     "refresh_interval_minutes": 5,
     "in_play_enabled": True,
     "delivery": "github_actions_pages",
+    "scoreline_engine": bracket_payload.get("scoreline_engine"),
+    "bracket_recalculated_from_scoreline_ensemble": bracket_payload.get("bracket_recalculated_from_scoreline_ensemble"),
+    "bracket_recalculation_policy": bracket_payload.get("recalculation_policy"),
     "live_feed_stack": live_sources or ["espn_scoreboard"],
     "live_feed_providers": live_providers,
     "official_fifa_rankings_as_of": (teams_payload.get("meta") or {}).get("fifa_rankings_as_of"),

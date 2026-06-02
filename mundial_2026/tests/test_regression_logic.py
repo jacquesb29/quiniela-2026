@@ -21,6 +21,8 @@ from worldcup2026.distributions import (
     ml_calibrated_score_distribution,
     overdispersed_score_distribution,
 )
+from worldcup2026.models.bayesian_dynamic import bayesian_dynamic_score_distribution
+from worldcup2026.profiles.lineup import lineup_intelligence
 from worldcup2026.live.adjustment import live_game_state_adjustment, live_stats_adjustment
 from worldcup2026.simulation.match import sample_knockout_resolution, simulate_match_sample
 from worldcup2026.types import KnockoutResolution
@@ -1257,8 +1259,10 @@ class RegressionLogicTest(unittest.TestCase):
 
         self.assertIn("overdispersed", meta["weights"])
         self.assertIn("ml", meta["weights"])
+        self.assertIn("bayesian", meta["weights"])
         self.assertEqual(meta["overdispersed_name"], "Overdispersión calibrada")
         self.assertEqual(meta["ml_name"], "ML ligero regularizado")
+        self.assertEqual(meta["bayesian_name"], "Predictivo bayesiano dinámico")
         self.assertIn("outcome_temperature", meta)
         self.assertAlmostEqual(sum(meta["weights"].values()), 1.0, places=6)
         self.assertAlmostEqual(sum(dist.values()), 1.0, places=6)
@@ -1266,6 +1270,69 @@ class RegressionLogicTest(unittest.TestCase):
         self.assertLessEqual(float(meta["outcome_temperature"]), 1.12)
         self.assertIn("ml_probs", meta)
         self.assertIn("ml_top_score", meta)
+        self.assertIn("bayesian_probs", meta)
+        self.assertIn("bayesian_top_score", meta)
+
+    def test_bayesian_dynamic_distribution_is_normalized_and_not_poisson_copy(self):
+        ctx = app.MatchContext(neutral=True, lineup_confirmed_a=True, lineup_coverage_a=0.9)
+        bayesian = bayesian_dynamic_score_distribution(1.85, 0.88, ctx, max_goals=8)
+        independent = independent_score_distribution(1.85, 0.88, max_goals=8)
+
+        self.assertAlmostEqual(sum(bayesian.values()), 1.0, places=6)
+        self.assertNotEqual(bayesian[(2, 0)], independent[(2, 0)])
+
+    def test_lineup_intelligence_uses_conservative_fallback_without_nominal_roster(self):
+        signal = lineup_intelligence(
+            SimpleNamespace(players=()),
+            starting_xi=["Player A", "Player B"],
+            lineup_confirmed=True,
+            lineup_changes=2,
+            goalkeeper_change=True,
+        )
+
+        self.assertEqual(signal.mode, "XI recibido; roster nominal pendiente")
+        self.assertLess(signal.overall_delta, 0.0)
+        self.assertLessEqual(signal.coverage, 0.20)
+
+    def test_lineup_intelligence_penalizes_weaker_confirmed_xi_with_nominal_roster(self):
+        def player(name, position, quality):
+            return SimpleNamespace(
+                name=name,
+                position=position,
+                quality=quality,
+                goalkeeping=quality if position == "GK" else 0.05,
+                defense=quality,
+                aerial=quality,
+                creation=quality,
+                attack=quality,
+            )
+
+        roster = [player("Goalkeeper One", "GK", 0.92), player("Goalkeeper Two", "GK", 0.55)]
+        roster += [player(f"Defender {index}", "DF", 0.90 - index * 0.02) for index in range(1, 7)]
+        roster += [player(f"Midfielder {index}", "MF", 0.91 - index * 0.02) for index in range(1, 6)]
+        roster += [player(f"Forward {index}", "FW", 0.93 - index * 0.03) for index in range(1, 6)]
+        weakened_xi = [
+            "Goalkeeper Two",
+            "Defender 1",
+            "Defender 2",
+            "Defender 5",
+            "Defender 6",
+            "Midfielder 1",
+            "Midfielder 4",
+            "Midfielder 5",
+            "Forward 1",
+            "Forward 4",
+            "Forward 5",
+        ]
+        signal = lineup_intelligence(
+            SimpleNamespace(players=tuple(roster)),
+            starting_xi=weakened_xi,
+            lineup_confirmed=True,
+        )
+
+        self.assertEqual(signal.mode, "XI ponderado jugador por jugador")
+        self.assertGreaterEqual(signal.coverage, 0.95)
+        self.assertLess(signal.overall_delta, 0.0)
 
     def test_ml_calibrated_distribution_is_normalized_and_visible(self):
         ctx = app.MatchContext(neutral=True, knockout=True, market_total_line=2.4)

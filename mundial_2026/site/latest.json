@@ -1,11 +1,14 @@
 {
-  "updated_at_utc": "2026-06-01T16:22:28+00:00",
-  "publication_updated_at_utc": "2026-06-01T16:22:28+00:00",
-  "dashboard_updated_at_utc": "2026-06-01T16:22:28+00:00",
+  "updated_at_utc": "2026-06-02T01:30:41+00:00",
+  "publication_updated_at_utc": "2026-06-02T01:30:41+00:00",
+  "dashboard_updated_at_utc": "2026-06-02T01:27:25+00:00",
   "timestamp_consistency_note": "latest.json se escribe despues de copiar el HTML; compara dashboard_updated_at_utc contra publication_updated_at_utc para detectar desfases reales de publicacion o cache.",
   "refresh_interval_minutes": 5,
   "in_play_enabled": true,
   "delivery": "github_actions_pages",
+  "scoreline_engine": "ensamble_no_solo_poisson_bayes_dinamico_v2",
+  "bracket_recalculated_from_scoreline_ensemble": true,
+  "bracket_recalculation_policy": "La llave se reconstruye con 15.000 simulaciones despu\u00e9s de cada actualizaci\u00f3n autom\u00e1tica; si cambian marcadores, estados o se\u00f1ales relevantes, cambian tambi\u00e9n sus rutas simuladas.",
   "live_feed_stack": [
     "espn_scoreboard",
     "espn_scoreboard+open_news"

@@ -13,6 +13,7 @@ from .modeling import (
     top_score_from_distribution,
 )
 from .types import ModelOutput
+from .models.bayesian_dynamic import bayesian_dynamic_score_distribution
 
 FACTORIALS = [math.factorial(i) for i in range(16)]
 
@@ -542,14 +543,28 @@ def model_blend_weights(mu_a: float, mu_b: float, ctx: object | None = None) -> 
         0.06,
         PARAMS.model_ml_max,
     )
-    primary = max(PARAMS.model_primary_min, 1.0 - contrast - low_score - overdispersed - ml)
-    total = primary + contrast + low_score + overdispersed + ml
+    lineup_coverage = 0.0
+    if ctx:
+        lineup_coverage = 0.5 * (
+            float(getattr(ctx, "lineup_coverage_a", 0.0) or 0.0)
+            + float(getattr(ctx, "lineup_coverage_b", 0.0) or 0.0)
+        )
+    bayesian = clamp(
+        PARAMS.model_bayesian_base
+        + PARAMS.model_bayesian_uncertainty_weight * closeness
+        + PARAMS.model_bayesian_lineup_weight * lineup_coverage,
+        0.08,
+        PARAMS.model_bayesian_max,
+    )
+    primary = max(PARAMS.model_primary_min, 1.0 - contrast - low_score - overdispersed - ml - bayesian)
+    total = primary + contrast + low_score + overdispersed + ml + bayesian
     return {
         "primary": primary / total,
         "contrast": contrast / total,
         "low_score": low_score / total,
         "overdispersed": overdispersed / total,
         "ml": ml / total,
+        "bayesian": bayesian / total,
     }
 
 
@@ -582,11 +597,13 @@ def build_model_stack(
     low_score = low_score_adjusted_distribution(mu_a, mu_b, ctx, max_goals=max_goals)
     overdispersed = overdispersed_score_distribution(mu_a, mu_b, ctx, max_goals=max_goals)
     ml_calibrated = ml_calibrated_score_distribution(mu_a, mu_b, ctx, max_goals=max_goals)
+    bayesian_dynamic = bayesian_dynamic_score_distribution(mu_a, mu_b, ctx, max_goals=max_goals)
     primary_probs = outcome_probabilities_from_distribution(primary)
     contrast_probs = outcome_probabilities_from_distribution(contrast)
     low_score_probs = outcome_probabilities_from_distribution(low_score)
     overdispersed_probs = outcome_probabilities_from_distribution(overdispersed)
     ml_probs = outcome_probabilities_from_distribution(ml_calibrated)
+    bayesian_probs = outcome_probabilities_from_distribution(bayesian_dynamic)
     base_weights = model_blend_weights(mu_a, mu_b, ctx)
     market_probs = None
     if ctx and getattr(ctx, "market_prob_a", None) is not None and getattr(ctx, "market_prob_draw", None) is not None and getattr(ctx, "market_prob_b", None) is not None:
@@ -601,6 +618,7 @@ def build_model_stack(
         ModelOutput("Ajuste de baja anotación", low_score, low_score_probs, base_weights["low_score"], top_score_from_distribution(low_score)),
         ModelOutput("Overdispersión calibrada", overdispersed, overdispersed_probs, base_weights["overdispersed"], top_score_from_distribution(overdispersed)),
         ModelOutput("ML ligero regularizado", ml_calibrated, ml_probs, base_weights["ml"], top_score_from_distribution(ml_calibrated)),
+        ModelOutput("Predictivo bayesiano dinámico", bayesian_dynamic, bayesian_probs, base_weights["bayesian"], top_score_from_distribution(bayesian_dynamic)),
     ]
     adaptive_weights = adaptive_ensemble_weights(models, market_probs=market_probs)
     ensemble = blend_distributions([(weight, model.dist) for weight, model in zip(adaptive_weights, models)])
@@ -638,6 +656,7 @@ def build_model_stack(
         "low_score_name": models[2].name,
         "overdispersed_name": models[3].name,
         "ml_name": models[4].name,
+        "bayesian_name": models[5].name,
         "final_name": "Ensamble ligero",
         "weights": {
             "primary": adaptive_weights[0],
@@ -645,6 +664,7 @@ def build_model_stack(
             "low_score": adaptive_weights[2],
             "overdispersed": adaptive_weights[3],
             "ml": adaptive_weights[4],
+            "bayesian": adaptive_weights[5],
         },
         "base_weights": base_weights,
         "agreement": agreement,
@@ -655,14 +675,17 @@ def build_model_stack(
         "low_score_probs": low_score_probs,
         "overdispersed_probs": overdispersed_probs,
         "ml_probs": ml_probs,
+        "bayesian_probs": bayesian_probs,
         "ensemble_probs": ensemble_probs,
         "primary_top_score": models[0].top_score,
         "contrast_top_score": models[1].top_score,
         "low_score_top_score": models[2].top_score,
         "overdispersed_top_score": models[3].top_score,
         "ml_top_score": models[4].top_score,
+        "bayesian_top_score": models[5].top_score,
         "ensemble_top_score": top_score_from_distribution(ensemble),
         "ml_note": "Calibrador ML ligero con features no lineales de total de goles, favoritismo, mercado, knockout y forma del marcador.",
+        "bayesian_note": "Predictivo Bayes empírico con pooling parcial y sobredispersión variable: reduce dependencia de un modo Poisson aislado.",
     }
     return ensemble, meta
 

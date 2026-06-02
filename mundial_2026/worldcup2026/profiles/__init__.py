@@ -12,14 +12,18 @@ from .indices import (
 )
 from .squad import aggregate_squad
 from .team import profile_for
+from .lineup import LineupIntelligence, lineup_intelligence, normalize_player_name
 
 __all__ = [
+    "LineupIntelligence",
     "aggregate_squad",
     "chemistry_index",
     "coach_index",
     "discipline_proxy",
     "heritage_index",
     "morale_base",
+    "lineup_intelligence",
+    "normalize_player_name",
     "profile_for",
     "resource_index",
     "tactical_flexibility",

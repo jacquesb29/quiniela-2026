@@ -635,6 +635,8 @@ def extract_absence_data(summary_payload: dict) -> Dict[str, dict]:
             continue
         hard_absences: List[str] = []
         soft_absences: List[str] = []
+        hard_names: List[str] = []
+        soft_names: List[str] = []
         seen = set()
         for obj in walk_objects(roster):
             classified = classify_absence(obj)
@@ -648,8 +650,10 @@ def extract_absence_data(summary_payload: dict) -> Dict[str, dict]:
             label = f"{player_name}: {note}" if note else player_name
             if severity >= 1.0:
                 hard_absences.append(label)
+                hard_names.append(str(player_name))
             else:
                 soft_absences.append(label)
+                soft_names.append(str(player_name))
 
         load = min(0.85, 0.18 * len(hard_absences) + 0.08 * len(soft_absences))
         absences[side] = {
@@ -657,6 +661,7 @@ def extract_absence_data(summary_payload: dict) -> Dict[str, dict]:
             "soft_count": len(soft_absences),
             "load": round(load, 3),
             "notes": (hard_absences + soft_absences)[:6],
+            "players": (hard_names + soft_names)[:12],
         }
     return absences
 
@@ -1635,6 +1640,7 @@ def summary_enrichment(event_id: str, kickoff: datetime, status_state: Optional[
         enrichment[f"unavailable_count_{prefix}"] = int(absence_data["hard_count"])
         enrichment[f"questionable_count_{prefix}"] = int(absence_data["soft_count"])
         enrichment[f"unavailable_notes_{prefix}"] = absence_data["notes"]
+        enrichment[f"unavailable_players_{prefix}"] = absence_data["players"]
 
     news = extract_news_enrichment(payload, team_a, team_b)
     enrichment.update(news)
@@ -2101,7 +2107,7 @@ def build_fixture_from_event(
     fixture.update(enrichment)
     if provider_enrichment:
         fixture.update(provider_enrichment)
-        fixture["source"] = "espn_scoreboard+api_football"
+        fixture["source"] = f"espn_scoreboard+{provider_enrichment.get('live_feed_provider', 'deep_live')}"
     if unresolved:
         fixture["projection_only"] = True
         fixture["slot_team_a"] = raw_team_a

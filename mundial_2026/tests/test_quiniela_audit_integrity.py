@@ -67,6 +67,8 @@ class QuinielaAuditIntegrityTest(unittest.TestCase):
     def test_public_bracket_output_is_not_a_smoke_run(self):
         bracket = json.loads((PACKAGE_ROOT / "llave_actual_2026.json").read_text())
         self.assertGreaterEqual(int(bracket.get("iterations", 0)), 15000)
+        self.assertEqual(bracket.get("scoreline_engine"), "ensamble_no_solo_poisson_bayes_dinamico_v2")
+        self.assertTrue(bracket.get("bracket_recalculated_from_scoreline_ensemble"))
         self.assertIn("M104", bracket.get("matches", {}))
         self.assertIn("M103", bracket.get("matches", {}))
 
@@ -283,7 +285,7 @@ class QuinielaAuditIntegrityTest(unittest.TestCase):
                 "<p>Mercado y consenso profesional</p>"
                 "<p>Calibración avanzada</p><p>Cómo evitamos que el modelo se sobreconfíe</p>"
                 "<p>Shrinkage bayesiano</p><p>Desacuerdo entre modelos</p>"
-                "<p>Overdispersión calibrada</p>"
+                "<p>Overdispersión calibrada</p><p>Predictivo bayesiano dinámico</p>"
                 "<p>Backtesting por buckets</p><p>Límite de confianza operativa</p>"
                 "<p>Predicción potenciada</p><p>Probabilidad pura vs índice de firmeza</p>"
                 "<p>Índice de firmeza medio</p><p>Fuerza estructural media</p><p>Watchlist de riesgo</p>"
