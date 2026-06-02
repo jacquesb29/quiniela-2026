@@ -1358,6 +1358,24 @@ class RegressionLogicTest(unittest.TestCase):
         self.assertAlmostEqual(fixtures[0]["market_move_draw"], -0.02, places=4)
         self.assertAlmostEqual(fixtures[0]["market_move_b"], -0.02, places=4)
 
+    def test_summarize_market_accepts_nested_espn_draw_odds(self):
+        market = sync.summarize_market(
+            {
+                "provider": {"name": "ESPN BET"},
+                "homeTeamOdds": {"moneyLine": -110},
+                "drawOdds": {"moneyLine": 240},
+                "awayTeamOdds": {"moneyLine": 285},
+                "overUnder": 2.5,
+            }
+        )
+
+        self.assertEqual(market["market_moneyline_draw"], 240.0)
+        self.assertAlmostEqual(
+            market["market_prob_a"] + market["market_prob_draw"] + market["market_prob_b"],
+            1.0,
+            places=6,
+        )
+
     def test_annotate_referee_profiles_uses_previous_samples(self):
         previous = {
             "1": {

@@ -414,10 +414,27 @@ def should_fetch_summary(kickoff: datetime, status_state: Optional[str]) -> bool
     return abs((kickoff - now).total_seconds()) <= SUMMARY_FETCH_WINDOW_DAYS * 86400
 
 
-def american_to_implied_prob(value: Optional[float]) -> Optional[float]:
+def american_odds_value(value) -> Optional[float]:
+    """Accept ESPN's scalar or nested American-odds payloads."""
     if value is None:
         return None
-    odds = float(value)
+    if isinstance(value, dict):
+        for key in ("moneyLine", "american", "value", "odds"):
+            if key in value:
+                return american_odds_value(value[key])
+        return None
+    try:
+        return float(value)
+    except (TypeError, ValueError):
+        return None
+
+
+def american_to_implied_prob(value) -> Optional[float]:
+    if value is None:
+        return None
+    odds = american_odds_value(value)
+    if odds is None:
+        return None
     if odds == 0:
         return None
     if odds > 0:
@@ -946,9 +963,9 @@ def annotate_open_news(fixtures: List[dict]) -> None:
 
 
 def summarize_market(odds_entry: dict) -> dict:
-    home_line = odds_entry.get("homeTeamOdds", {}).get("moneyLine")
-    away_line = odds_entry.get("awayTeamOdds", {}).get("moneyLine")
-    draw_line = odds_entry.get("drawOdds")
+    home_line = american_odds_value(odds_entry.get("homeTeamOdds", {}).get("moneyLine"))
+    away_line = american_odds_value(odds_entry.get("awayTeamOdds", {}).get("moneyLine"))
+    draw_line = american_odds_value(odds_entry.get("drawOdds"))
     prob_a, prob_draw, prob_b = normalize_probabilities(
         american_to_implied_prob(home_line),
         american_to_implied_prob(draw_line),

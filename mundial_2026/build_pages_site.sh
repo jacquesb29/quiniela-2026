@@ -58,6 +58,7 @@ payload = {
     "refresh_interval_minutes": 5,
     "in_play_enabled": True,
     "delivery": "github_actions_pages",
+    "monte_carlo_iterations": bracket_payload.get("iterations"),
     "scoreline_engine": bracket_payload.get("scoreline_engine"),
     "bracket_recalculated_from_scoreline_ensemble": bracket_payload.get("bracket_recalculated_from_scoreline_ensemble"),
     "bracket_recalculation_policy": bracket_payload.get("recalculation_policy"),
