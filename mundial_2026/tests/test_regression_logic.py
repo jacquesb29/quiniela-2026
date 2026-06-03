@@ -978,12 +978,65 @@ class RegressionLogicTest(unittest.TestCase):
         self.assertGreater(float(final_spain["adjusted_prob"]), float(pending_spain["adjusted_prob"]))
         self.assertGreater(float(final_spain["model_blend"]), float(pending_spain["model_blend"]))
 
-    def test_live_summary_fetch_accepts_live_and_final_synonyms(self):
+    def test_live_summary_fetch_keeps_live_and_bounds_finished_matches(self):
         far_kickoff = datetime.now(timezone.utc) + timedelta(days=90)
+        recent_final = datetime.now(timezone.utc) - timedelta(hours=6)
+        stale_final = datetime.now(timezone.utc) - timedelta(days=7)
         self.assertTrue(sync.should_fetch_summary(far_kickoff, "live"))
-        self.assertTrue(sync.should_fetch_summary(far_kickoff, "final"))
         self.assertTrue(sync.should_fetch_summary(far_kickoff, "in"))
-        self.assertTrue(sync.should_fetch_summary(far_kickoff, "post"))
+        self.assertTrue(sync.should_fetch_summary(recent_final, "final"))
+        self.assertTrue(sync.should_fetch_summary(recent_final, "post"))
+        self.assertFalse(sync.should_fetch_summary(stale_final, "final"))
+        self.assertFalse(sync.should_fetch_summary(stale_final, "post"))
+
+    def test_open_news_fetch_keeps_live_and_bounds_finished_matches(self):
+        recent_final = datetime.now(timezone.utc) - timedelta(hours=6)
+        stale_final = datetime.now(timezone.utc) - timedelta(days=7)
+        self.assertTrue(sync.fixture_should_fetch_open_news({"status_state": "live"}))
+        self.assertTrue(sync.fixture_should_fetch_open_news({"status_state": "in"}))
+        self.assertTrue(
+            sync.fixture_should_fetch_open_news(
+                {"status_state": "final", "kickoff_utc": recent_final.isoformat()}
+            )
+        )
+        self.assertFalse(
+            sync.fixture_should_fetch_open_news(
+                {"status_state": "post", "kickoff_utc": stale_final.isoformat()}
+            )
+        )
+
+    def test_fast_refresh_preserves_previous_enrichment(self):
+        fixtures = [
+            {
+                "id": "espn-1",
+                "source": "espn_scoreboard",
+                "team_a": "Mexico",
+                "team_b": "South Africa",
+                "market_provider": None,
+                "news_headlines": [],
+                "unavailable_players_a": [],
+            }
+        ]
+        previous_by_id = {
+            "espn-1": {
+                "source": "espn_scoreboard+open_news",
+                "market_provider": "DraftKings",
+                "market_prob_a": 0.62,
+                "news_headlines": ["Lineup watch: Mexico espera confirmar laterales"],
+                "unavailable_players_a": ["Jugador A"],
+                "open_news_provider": "gdelt",
+            }
+        }
+
+        sync.preserve_previous_enrichment(fixtures, previous_by_id)
+
+        fixture = fixtures[0]
+        self.assertEqual(fixture["market_provider"], "DraftKings")
+        self.assertEqual(fixture["market_prob_a"], 0.62)
+        self.assertEqual(fixture["news_headlines"], ["Lineup watch: Mexico espera confirmar laterales"])
+        self.assertEqual(fixture["unavailable_players_a"], ["Jugador A"])
+        self.assertEqual(fixture["open_news_provider"], "gdelt")
+        self.assertIn("open_news", fixture["source"])
 
     def test_quiniela_certainty_profile_prefers_clear_favorite(self):
         prediction = app.MatchPrediction(

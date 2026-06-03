@@ -21,7 +21,8 @@ SCOREBOARD_URL = (
     "?dates=20260611-20260719&limit=200"
 )
 SUMMARY_URL_TEMPLATE = "https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/summary?event={event_id}"
-SUMMARY_FETCH_WINDOW_DAYS = 10
+SUMMARY_FETCH_WINDOW_DAYS = int(os.environ.get("SUMMARY_FETCH_WINDOW_DAYS", "10") or "10")
+SUMMARY_POST_LOOKBACK_DAYS = int(os.environ.get("SUMMARY_POST_LOOKBACK_DAYS", "3") or "3")
 API_FOOTBALL_KEY = os.environ.get("API_FOOTBALL_KEY", "").strip()
 API_FOOTBALL_BASE_URL = (os.environ.get("API_FOOTBALL_BASE_URL") or "https://v3.football.api-sports.io").rstrip("/")
 API_FOOTBALL_HOST = os.environ.get("API_FOOTBALL_HOST", "v3.football.api-sports.io").strip()
@@ -45,6 +46,8 @@ NEWSAPI_BASE_URL = (os.environ.get("NEWSAPI_BASE_URL") or "https://newsapi.org/v
 GDELT_DOC_API = (os.environ.get("GDELT_DOC_API") or "https://api.gdeltproject.org/api/v2/doc/doc").strip()
 NEWS_LOOKAHEAD_DAYS = int(os.environ.get("NEWS_LOOKAHEAD_DAYS", "30") or "30")
 NEWS_MAX_FIXTURES = int(os.environ.get("NEWS_MAX_FIXTURES", "8") or "8")
+NEWS_POST_LOOKBACK_DAYS = int(os.environ.get("NEWS_POST_LOOKBACK_DAYS", "2") or "2")
+CURL_MAX_TIME_SECONDS = int(os.environ.get("CURL_MAX_TIME_SECONDS", "30") or "30")
 
 COUNTRY_MAP = {
     "USA": "United States",
@@ -299,8 +302,81 @@ def load_previous_fixtures() -> Dict[str, dict]:
     return {str(item.get("id")): item for item in payload if item.get("id")}
 
 
+PERSISTABLE_ENRICHMENT_KEYS = (
+    "market_provider",
+    "market_summary",
+    "market_prob_a",
+    "market_prob_draw",
+    "market_prob_b",
+    "market_total_line",
+    "market_moneyline_a",
+    "market_moneyline_draw",
+    "market_moneyline_b",
+    "starting_xi_a",
+    "starting_xi_b",
+    "starting_goalkeeper_a",
+    "starting_goalkeeper_b",
+    "lineup_status_a",
+    "lineup_status_b",
+    "lineup_confirmed_a",
+    "lineup_confirmed_b",
+    "lineup_change_count_a",
+    "lineup_change_count_b",
+    "injuries_a",
+    "injuries_b",
+    "unavailable_count_a",
+    "unavailable_count_b",
+    "questionable_count_a",
+    "questionable_count_b",
+    "unavailable_notes_a",
+    "unavailable_notes_b",
+    "unavailable_players_a",
+    "unavailable_players_b",
+    "news_headlines",
+    "news_notes_a",
+    "news_notes_b",
+    "open_news_provider",
+    "open_news_sources",
+    "morale_a",
+    "morale_b",
+)
+
+
+def empty_enrichment_value(value: object) -> bool:
+    if value is None:
+        return True
+    if value == "":
+        return True
+    if isinstance(value, (list, dict, tuple, set)) and not value:
+        return True
+    return False
+
+
+def preserve_previous_enrichment(fixtures: List[dict], previous_by_id: Dict[str, dict]) -> None:
+    """Keep the latest enriched signal when the fast refresh does not re-query it.
+
+    The five-minute workflow intentionally limits expensive news/summary calls.
+    Without this merge, a fast refresh can accidentally erase market odds, open
+    news, injuries, or lineup fields that were gathered by a deeper run.
+    """
+    for fixture in fixtures:
+        previous = previous_by_id.get(str(fixture.get("id"))) or {}
+        if not previous:
+            continue
+        for key in PERSISTABLE_ENRICHMENT_KEYS:
+            if key not in previous:
+                continue
+            if empty_enrichment_value(fixture.get(key)) and not empty_enrichment_value(previous.get(key)):
+                fixture[key] = previous[key]
+
+        previous_source = str(previous.get("source") or "")
+        current_source = str(fixture.get("source") or "espn_scoreboard")
+        if "open_news" in previous_source and "open_news" not in current_source:
+            fixture["source"] = f"{current_source}+open_news"
+
+
 def run_curl_json(url: str, headers: Optional[Dict[str, str]] = None) -> dict:
-    command = ["curl", "-sL", "--max-time", "30"]
+    command = ["curl", "-sL", "--max-time", str(CURL_MAX_TIME_SECONDS)]
     for key, value in (headers or {}).items():
         command.extend(["-H", f"{key}: {value}"])
     command.append(url)
@@ -402,15 +478,15 @@ def match_lookup_key(team_a: str, team_b: str) -> Tuple[str, str]:
 
 def should_fetch_summary(kickoff: datetime, status_state: Optional[str]) -> bool:
     now = datetime.now(timezone.utc)
-    if str(status_state or "").strip().lower() in {
+    status = str(status_state or "").strip().lower()
+    if status in {
         "in",
         "live",
         "in_progress",
-        "post",
-        "final",
-        "finished",
     }:
         return True
+    if status in {"post", "final", "finished"}:
+        return 0 <= (now - kickoff).total_seconds() <= SUMMARY_POST_LOOKBACK_DAYS * 86400
     return abs((kickoff - now).total_seconds()) <= SUMMARY_FETCH_WINDOW_DAYS * 86400
 
 
@@ -919,7 +995,7 @@ def merge_news_payload(base: dict, extra: dict) -> dict:
 
 def fixture_should_fetch_open_news(fixture: dict) -> bool:
     status = str(fixture.get("status_state") or "").lower()
-    if status in {"in", "live", "in_progress", "post", "final", "finished"}:
+    if status in {"in", "live", "in_progress"}:
         return True
     kickoff_text = fixture.get("kickoff_utc")
     if not kickoff_text:
@@ -929,6 +1005,8 @@ def fixture_should_fetch_open_news(fixture: dict) -> bool:
     except Exception:
         return False
     now = datetime.now(timezone.utc)
+    if status in {"post", "final", "finished"}:
+        return 0 <= (now - kickoff).total_seconds() <= NEWS_POST_LOOKBACK_DAYS * 86400
     return -2 <= (kickoff - now).days <= NEWS_LOOKAHEAD_DAYS
 
 
@@ -2204,6 +2282,7 @@ def build_live_fixtures(scoreboard_payload: dict) -> List[dict]:
 
     assign_group_letters(fixtures)
     attach_rest_and_travel(fixtures, teams)
+    preserve_previous_enrichment(fixtures, previous_by_id)
     annotate_open_news(fixtures)
     annotate_lineup_changes(fixtures, previous_by_id)
     annotate_market_moves(fixtures, previous_by_id)

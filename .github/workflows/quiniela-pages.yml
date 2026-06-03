@@ -49,6 +49,12 @@ jobs:
           GDELT_DOC_API: ${{ vars.GDELT_DOC_API }}
           SPORTRADAR_KEY: ${{ secrets.SPORTRADAR_KEY }}
           OPTA_KEY: ${{ secrets.OPTA_KEY }}
+          SUMMARY_FETCH_WINDOW_DAYS: "2"
+          SUMMARY_POST_LOOKBACK_DAYS: "1"
+          NEWS_LOOKAHEAD_DAYS: "3"
+          NEWS_POST_LOOKBACK_DAYS: "1"
+          NEWS_MAX_FIXTURES: "4"
+          CURL_MAX_TIME_SECONDS: "8"
         run: |
           python3 mundial_2026/sync_live_data_2026.py
           python3 mundial_2026/modelo_quiniela_2026.py state-reset
