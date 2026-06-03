@@ -9535,6 +9535,8 @@ def build_dashboard_markdown(
     lines.extend(build_full_scorecard_markdown(entries))
     lines.extend(["", "## Calibración avanzada y límites de confianza", ""])
     lines.extend(build_calibration_depth_markdown(entries, backtest))
+    lines.extend(["", "## Auditoría metodológica profunda", ""])
+    lines.extend(build_methodology_governance_markdown(entries, bracket_payload, backtest))
     lines.extend(["", "## Predicción potenciada", ""])
     lines.extend(build_prediction_power_markdown(entries))
     lines.extend(["", "## Agentes de aprendizaje y fuentes", ""])
@@ -11202,6 +11204,182 @@ def build_methodology_quality_html(
     )
 
 
+def methodology_governance_items(
+    entries: Optional[Sequence[dict]],
+    bracket_payload: dict,
+    backtest: dict,
+) -> List[dict]:
+    fixture_entries = [entry for entry in (entries or []) if not entry.get("projection")]
+    live_count = sum(1 for entry in fixture_entries if fixture_is_live(entry))
+    final_count = sum(1 for entry in fixture_entries if fixture_is_final(entry))
+    completed_matches = int(backtest.get("completed_matches", 0) or 0)
+    regular_samples = int(backtest.get("regular_time_samples", 0) or 0)
+    market_samples = sum(
+        1
+        for entry in fixture_entries
+        if entry.get("market_prob_a") is not None
+        and entry.get("market_prob_draw") is not None
+        and entry.get("market_prob_b") is not None
+    )
+    iterations = int(bracket_payload.get("iterations", 0) or 0)
+    history_meta = historical_features_payload().get("meta", {})
+    official_history_count = int(history_meta.get("official_matches_since_start", 0) or 0)
+    history_start_year = int(history_meta.get("start_year", 1950) or 1950)
+    has_brier = backtest.get("brier_result") is not None
+    has_temporal = backtest.get("temporal_cv_brier") is not None
+    has_market_logloss = backtest.get("market_logloss_result") is not None
+    history_count_text = f"{official_history_count:,}".replace(",", ".")
+    iteration_text = f"{iterations:,}".replace(",", ".") if iterations else "sin dato"
+
+    return [
+        {
+            "title": "Backtesting serio",
+            "status": "Activo 2026" if completed_matches else "Preparado; falta muestra 2026",
+            "tone": "ok" if completed_matches else "neutral",
+            "detail": (
+                f"{completed_matches} partidos cerrados y {regular_samples} muestras reglamentarias reconstruidas sin mirar el futuro."
+                if completed_matches
+                else "Arranca con el primer partido terminado: resultado, marcador, over/under, clasificación y eliminación se miden desde la muestra real disponible."
+            ),
+            "action": "Siguiente capa: cargar fixtures/resultados históricos curados de Mundiales 2010, 2014, 2018, 2022 y Euro/Copa América recientes para comparar torneos completos.",
+        },
+        {
+            "title": "Validación rolling / temporal",
+            "status": "Activa" if has_temporal else "Lista",
+            "tone": "ok" if has_temporal else "neutral",
+            "detail": (
+                f"Walk-forward ya calcula ventanas temporales: Brier {float(backtest['temporal_cv_brier']):.3f}, log-loss {float(backtest['temporal_cv_logloss']):.3f}."
+                if has_temporal
+                else "La lógica ya pronostica antes de actualizar estados; no entrena con información futura."
+            ),
+            "action": "Para simular 2018 o 2022, cada fold debe usar solo datos disponibles antes de ese torneo.",
+        },
+        {
+            "title": "Calibración probabilística",
+            "status": "Con Brier" if has_brier else "Arranca al primer final",
+            "tone": "ok" if has_brier else "neutral",
+            "detail": (
+                f"Brier actual {float(backtest['brier_result']):.3f}; log-loss {float(backtest.get('logloss_result', 0.0)):.3f}; buckets publicados cuando hay muestra."
+                if has_brier
+                else "No se inventa calibración. Cuando el modelo diga 70%, se medirá si resultados parecidos ganan cerca de 70%."
+            ),
+            "action": "Publicar reliability curves y buckets por tramo cuando haya suficientes partidos cerrados.",
+        },
+        {
+            "title": "Ablation tests",
+            "status": "Protocolo definido",
+            "tone": "warn",
+            "detail": "Comparar modelo completo contra versiones sin mercado, sin historia, sin Elo, sin plantilla, sin live y sin sesgo histórico.",
+            "action": "No publicar números de ablation hasta correrlos con dataset temporal cerrado; si una capa no mejora Brier/log-loss, se baja su peso.",
+        },
+        {
+            "title": "Benchmarks base",
+            "status": "Parcial" if has_market_logloss else "Preparado",
+            "tone": "ok" if has_market_logloss else "neutral",
+            "detail": (
+                "Mercado ya tiene log-loss comparable en esta muestra; faltan benchmarks puros Elo, FIFA y Poisson simple para el mismo corte."
+                if has_market_logloss
+                else "La web debe comparar contra Elo puro, FIFA puro, mercado puro, Poisson simple y modelo completo antes de decir que el modelo agrega valor."
+            ),
+            "action": "Si el modelo completo no supera benchmarks simples en validación temporal, está sobrecomplicado y debe simplificarse.",
+        },
+        {
+            "title": "Pesos aprendidos del ensamble",
+            "status": "Regularización pendiente",
+            "tone": "warn",
+            "detail": "Los pesos no deben elegirse por gusto: deben aprenderse con historial cerrado, regularización y walk-forward.",
+            "action": "Usar los pesos manuales solo como prior; migrar a stacking calibrado cuando la matriz histórica por partido esté limpia.",
+        },
+        {
+            "title": "Dependencia dinámica de partidos",
+            "status": "Activo en estado",
+            "tone": "ok",
+            "detail": f"El estado acumula fatiga, tarjetas, moral, forma, lesiones y disponibilidad; live actual {live_count}, finales {final_count}.",
+            "action": "Formalizar esta capa como modelo bayesiano dinámico: cada partido actualiza priors del siguiente y no trata los encuentros como independientes.",
+        },
+        {
+            "title": "Intervalos de incertidumbre",
+            "status": "Recomendado",
+            "tone": "warn",
+            "detail": f"La llave corre {iteration_text} simulaciones, suficiente para publicar rangos tipo España campeona 14%-19% en vez de un número aislado.",
+            "action": "Agregar intervalos por campeón, final, clasificación y marcador modal usando varianza Monte Carlo y bootstrap de parámetros.",
+        },
+        {
+            "title": "Stress testing",
+            "status": "Escenarios definidos",
+            "tone": "neutral",
+            "detail": "Baja de estrella, baja de mediocentro, roja temprana, calor extremo, descanso corto, viaje largo y tanda de penales ya tienen variables de entrada.",
+            "action": "Publicar sensibilidad por escenario: cuánto cambia pick, marcador Penca y llave si entra una noticia crítica.",
+        },
+        {
+            "title": "Explicabilidad por predicción",
+            "status": "Activa",
+            "tone": "ok",
+            "detail": "Cada partido ya puede mostrar drivers: fuerza, mercado, bajas, forma, clima, estilos, noticia/live y marcador recomendado.",
+            "action": "Mantener la explicación en lenguaje de quiniela: por qué jugar fijo, cubrir o buscar diferencial.",
+        },
+        {
+            "title": "Base histórica oficial",
+            "status": "Cargada como memoria",
+            "tone": "ok" if official_history_count else "warn",
+            "detail": f"{history_count_text} partidos oficiales desde {history_start_year} alimentan priors, familias de marcador y penales; no sustituyen el backtest rolling.",
+            "action": "Separar claramente memoria histórica de evaluación predictiva: una cosa entrena/regulariza, otra mide si acertamos.",
+        },
+        {
+            "title": "Feeds, noticias y mercado",
+            "status": "Activo" if market_samples else "Sin mercado profundo en este corte",
+            "tone": "ok" if market_samples else "neutral",
+            "detail": f"{market_samples} partidos tienen referencia de mercado; lesiones, alineaciones y noticias deben mover disponibilidad y marcador Penca cuando sean trazables.",
+            "action": "No depender de una sola fuente: ESPN es base, noticias abiertas y proveedores profundos validan señales críticas.",
+        },
+    ]
+
+
+def build_methodology_governance_markdown(
+    entries: Optional[Sequence[dict]],
+    bracket_payload: dict,
+    backtest: dict,
+) -> List[str]:
+    lines = [
+        "- Lectura: esta capa no promete que el modelo ya sea mejor que todos; define cómo se prueba si realmente agrega valor.",
+        "- Regla dura: no se publican métricas históricas, Brier o ablation si no hay muestra comparable y temporalmente correcta.",
+    ]
+    for item in methodology_governance_items(entries, bracket_payload, backtest):
+        lines.append(
+            f"- {item['title']} | {item['status']}: {item['detail']} Acción: {item['action']}"
+        )
+    return lines
+
+
+def build_methodology_governance_html(
+    entries: Optional[Sequence[dict]],
+    bracket_payload: dict,
+    backtest: dict,
+) -> str:
+    items = methodology_governance_items(entries, bracket_payload, backtest)
+    rows = []
+    for item in items:
+        rows.append(
+            "<article class=\"method-quality-card governance-card\">"
+            f"<span class=\"method-status {html.escape(str(item['tone']))}\">{html.escape(str(item['status']))}</span>"
+            f"<h3>{html.escape(str(item['title']))}</h3>"
+            f"<p>{html.escape(str(item['detail']))}</p>"
+            f"<small>{html.escape(str(item['action']))}</small>"
+            "</article>"
+        )
+    return (
+        "<section class=\"panel methodology-governance-panel\">"
+        "<div class=\"panel-head\"><div>"
+        "<p class=\"eyebrow\">Auditoría metodológica profunda</p>"
+        "<h2>Cómo probamos si el modelo realmente agrega valor</h2>"
+        "<p class=\"lede-tight\">La mejora del poder predictivo no sale de subir porcentajes a mano. Sale de backtesting serio, calibración, ablations, benchmarks, stress testing y validación temporal sin información futura.</p>"
+        "<p class=\"meta\">Si un bloque dice preparado o pendiente, significa que no se está maquillando una métrica: falta muestra real, proveedor activo o dataset histórico curado para publicarla.</p>"
+        "</div></div>"
+        f"<div class=\"method-quality-grid governance-grid\">{''.join(rows)}</div>"
+        "</section>"
+    )
+
+
 def build_methodology_html(
     bracket_payload: dict,
     backtest: dict,
@@ -11775,6 +11953,7 @@ def build_dashboard_html(
     score_dynamics_html = build_score_dynamics_html(entries)
     championship_penca_html = build_championship_penca_optimizer_html(entries)
     methodology_html = build_methodology_html(bracket_payload, backtest, entries)
+    methodology_governance_html = build_methodology_governance_html(entries, bracket_payload, backtest)
     calibration_depth_html = build_calibration_depth_html(entries, backtest)
     prediction_power_html = build_prediction_power_html(entries)
     agentic_learning_html = build_agentic_learning_html(entries, bracket_payload, backtest)
@@ -11807,6 +11986,7 @@ def build_dashboard_html(
             "score_dynamics_html": score_dynamics_html,
             "championship_penca_html": championship_penca_html,
             "methodology_html": methodology_html,
+            "methodology_governance_html": methodology_governance_html,
             "calibration_depth_html": calibration_depth_html,
             "prediction_power_html": prediction_power_html,
             "agentic_learning_html": agentic_learning_html,

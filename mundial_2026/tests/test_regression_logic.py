@@ -390,6 +390,7 @@ class RegressionLogicTest(unittest.TestCase):
         self.assertIn("no garantiza ganar", template)
         self.assertIn("score_dynamics_html", template)
         self.assertIn("championship_penca_html", template)
+        self.assertIn("methodology_governance_html", template)
         self.assertIn("dark_horses_html", template)
         self.assertIn("external_benchmarks_html", template)
         self.assertIn('href="#comparadores"', template)
@@ -1553,6 +1554,21 @@ class RegressionLogicTest(unittest.TestCase):
         html = app.build_backtesting_html({"completed_matches": 0})
         self.assertIn("desde el primer partido terminado", html)
         self.assertIn("Brier", html)
+
+    def test_methodology_governance_surfaces_validation_protocols_without_fake_metrics(self):
+        html = app.build_methodology_governance_html(
+            entries=[],
+            bracket_payload={"iterations": 15000},
+            backtest={"completed_matches": 0},
+        )
+        self.assertIn("Auditoría metodológica profunda", html)
+        self.assertIn("Backtesting serio", html)
+        self.assertIn("Ablation tests", html)
+        self.assertIn("Benchmarks base", html)
+        self.assertIn("Stress testing", html)
+        self.assertIn("Intervalos de incertidumbre", html)
+        self.assertIn("Validación rolling / temporal", html)
+        self.assertIn("no se está maquillando una métrica", html)
 
 
 if __name__ == "__main__":

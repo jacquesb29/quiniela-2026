@@ -23,6 +23,7 @@ def render_dashboard_html(context: Dict[str, Any]) -> str:
         "championship_penca_html",
         "landing_proof_html",
         "methodology_html",
+        "methodology_governance_html",
         "calibration_depth_html",
         "prediction_power_html",
         "agentic_learning_html",
