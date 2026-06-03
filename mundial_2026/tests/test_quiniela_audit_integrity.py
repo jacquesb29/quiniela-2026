@@ -12,6 +12,7 @@ if str(PACKAGE_ROOT) not in sys.path:
     sys.path.insert(0, str(PACKAGE_ROOT))
 
 import modelo_quiniela_2026 as app
+import modelo_quiniela_2026_v1_base as baseline
 
 
 class QuinielaAuditIntegrityTest(unittest.TestCase):
@@ -79,6 +80,50 @@ class QuinielaAuditIntegrityTest(unittest.TestCase):
         self.assertGreaterEqual(int(meta["official_matches_since_start"]), 25000)
         self.assertGreaterEqual(int(meta["minimum_official_matches_required"]), 25000)
         self.assertIn("Friendly", meta["official_match_definition"])
+
+    def test_frozen_v1_baseline_records_commit_hash_and_scope(self):
+        status = baseline.baseline_status()
+
+        self.assertEqual(status["baseline_version"], "v1_base")
+        self.assertEqual(status["baseline_commit"], "0370dfd")
+        self.assertEqual(
+            status["baseline_sha256"],
+            "e49da3c5dc296d85c6de46529686bde9e2f1e3fa965dba843cb10d2fa0b05ad0",
+        )
+        self.assertEqual(len(str(status["baseline_sha256"])), 64)
+        self.assertIn("Monte Carlo de 15.000 simulaciones", status["components"])
+        self.assertIn("Poisson, Dixon-Coles, overdispersion, bivariante y ensamble", status["components"])
+        self.assertIn("git checkout 0370dfd", baseline.restore_hint())
+
+    def test_historical_match_master_schema_blocks_data_leakage(self):
+        schema = json.loads((PACKAGE_ROOT / "data" / "historical_match_master_schema.json").read_text())
+        fields = {field["name"]: field for field in schema["fields"]}
+
+        self.assertEqual(schema["schema_version"], "historical_match_master_v1")
+        self.assertIn("No se permite", schema["anti_leakage_rule"])
+        for field_name in {
+            "match_id",
+            "elo_a_pre",
+            "fifa_rank_a_pre",
+            "market_prob_a_pre",
+            "squad_quality_a_pre",
+            "tactical_matchup_index_a",
+            "goals_a",
+            "result_a",
+        }:
+            self.assertIn(field_name, fields)
+        self.assertIn("pre_match", fields["elo_a_pre"]["leakage_policy"])
+        self.assertEqual(fields["goals_a"]["leakage_policy"], "target_only")
+        self.assertEqual(fields["result_a"]["leakage_policy"], "target_only")
+        self.assertIn("pre_tournament", schema["model_modes"])
+        self.assertIn("pre_match", schema["model_modes"])
+        self.assertIn("live", schema["model_modes"])
+        self.assertIn("elo_pure", schema["benchmark_models"])
+        self.assertIn("simple_poisson", schema["benchmark_models"])
+        self.assertIn("full_model", schema["benchmark_models"])
+        self.assertIn("without_market", schema["ablation_blocks"])
+        self.assertIn("without_elo", schema["ablation_blocks"])
+        self.assertIn("without_live", schema["ablation_blocks"])
 
     def test_github_pages_workflow_runs_full_auto_refresh(self):
         workflow = (REPO_ROOT / ".github" / "workflows" / "quiniela-pages.yml").read_text()
@@ -299,6 +344,8 @@ class QuinielaAuditIntegrityTest(unittest.TestCase):
                 "<p>Mapa de proveedores</p><p>API-Football</p><p>Sportmonks</p><p>Sportradar</p><p>Opta</p>"
                 "<p>The Odds API</p><p>NewsAPI</p><p>GDELT</p><p>StatsBomb</p><p>ScoreBat</p>"
                 "<p>Semáforo metodológico</p><p>Control de calidad del pronóstico</p>"
+                "<p>Baseline v1 congelado</p><p>Tabla maestra histórica anti-fuga</p>"
+                "<p>Tres modos separados</p><p>Predicción fútbol vs optimización Penca</p>"
                 "<p>Pronóstico de goles</p><p>15000</p></section></html>"
             )
             workflow_path.write_text(

@@ -11,6 +11,8 @@ Fecha de auditoria: 2026-05-15.
 - La llave publicada usa al menos 15000 simulaciones Monte Carlo.
 - GitHub Actions reconstruye el dashboard cada 5 minutos y tambien en cada push a `main`.
 - El dashboard acepta variantes de estado en vivo del proveedor (`in`, `live`, `in_progress`) y de partido final (`post`, `final`, `finished`).
+- El modelo v1 queda congelado como baseline verificable en `modelo_quiniela_2026_v1_base.py`: commit `0370dfd`, SHA-256 `e49da3c5dc296d85c6de46529686bde9e2f1e3fa965dba843cb10d2fa0b05ad0`.
+- El esquema `data/historical_match_master_schema.json` define la tabla maestra historica para backtesting sin fuga de informacion futura.
 
 ## Como usarlo para la quiniela
 
@@ -18,6 +20,7 @@ Fecha de auditoria: 2026-05-15.
 - Usa la llave proyectada como mapa de escenarios, no como verdad fija. El ganador de cada cruce puede cambiar si cambia el rival que llega.
 - Para picks de fase de grupos, separa partidos con favorito claro de partidos parejos. En partidos parejos conviene revisar empate, contexto de grupo y valor relativo de cuota/modelo.
 - Para knockout, revisa siempre probabilidad de avanzar, marcador probable, prorroga y penales. No basta con ver "favorito".
+- Si la web muestra "marcador del modelo" y "marcador Penca", usa el segundo para cargar la quiniela cuando difieran: el primero maximiza probabilidad futbolistica; el segundo maximiza puntos esperados bajo regla Penca.
 - Antes de cerrar la quiniela, revisa bajas, alineaciones probables, portero titular y noticias de ultima hora.
 
 ## Riesgos residuales
@@ -26,6 +29,7 @@ Fecha de auditoria: 2026-05-15.
 - Las probabilidades no deben forzarse artificialmente por encima de 90%. Una confianza alta solo es defendible si el partido realmente es desigual y los modelos coinciden.
 - El modelo reduce ruido con 15000 iteraciones, pero no elimina incertidumbre de lesiones, rotaciones, tarjetas tempranas o goles accidentales.
 - La mejor ventaja para la quiniela no es acertar todos los favoritos; es identificar donde el consenso esta sobrevalorando un favorito y donde conviene cubrir empate/upset.
+- No se debe afirmar 90%-95% de acierto de marcador exacto unico: eso seria maquillaje estadistico. La cobertura alta se logra con multiples escenarios o reglas de cobertura, no con un solo marcador.
 
 ## Guardrails agregados
 
@@ -33,3 +37,6 @@ Fecha de auditoria: 2026-05-15.
 - Tests para evitar volver a publicar una llave de smoke test con pocas iteraciones.
 - Tests del workflow de Pages: cron cada 5 minutos, 15000 simulaciones, `API_FOOTBALL_KEY` y deploy sin cancelar corridas previas.
 - Tests de estado live/final para que el in-play no falle por diferencias de nombre entre proveedores.
+- Tests del baseline v1 congelado y del esquema historico anti-fuga.
+- Separacion metodologica entre modelo pre-torneo, modelo pre-partido y modelo live.
+- Separacion entre prediccion futbolistica y optimizacion Penca.

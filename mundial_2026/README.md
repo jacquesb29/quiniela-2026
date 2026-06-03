@@ -24,7 +24,7 @@ La nueva version ya incorpora variables macro, historicas, tacticas, disciplinar
 - Viaje acumulado y resiliencia al viaje.
 - Altitud y estres climaticos.
 - Partido de grupo o de eliminacion directa.
-- Distribucion exacta de marcadores con Poisson bivariante.
+- Distribucion exacta de marcadores con ensamble de goles: Poisson simple, Dixon-Coles, sobredispersion, bivariante y optimizacion Penca. Poisson queda como benchmark, no como unica fuente del marcador.
 
 ## Cobertura inicial de datos
 
@@ -37,12 +37,24 @@ La nueva version ya incorpora variables macro, historicas, tacticas, disciplinar
 
 - `teams_2026.json`: dataset base de selecciones, Elo y ranking FIFA oficial.
 - `modelo_quiniela_2026.py`: CLI para prediccion, perfiles internos y simulacion Monte Carlo del torneo.
+- `modelo_quiniela_2026_v1_base.py`: checkpoint congelado del modelo v1 en commit `0370dfd` con SHA-256. Sirve como base fija para comparar mejoras futuras.
+- `data/historical_match_master_schema.json`: esquema de tabla maestra historica para backtesting temporal sin fuga de informacion futura.
 - `sync_fifa_rankings.py`: refresca `fifa_points` y `fifa_rank` desde el endpoint oficial de FIFA.
 - `fixtures_template.json`: ejemplo de formato para cargar partidos con estado dinamico.
 - `tournament_2026_draw.json`: draw oficial del Mundial 2026 con placeholders de repechaje.
 - `runtime/tournament_state_2026.json`: estado persistente que el modelo actualiza automaticamente entre ejecuciones.
 
 Solo se ejecuta `modelo_quiniela_2026.py`. Los archivos `.json` no se ejecutan: se usan como entradas o como estado guardado.
+
+## Validacion y no fuga de informacion
+
+La mejora predictiva no se mide subiendo porcentajes a mano. A partir de esta version, el proyecto deja tres candados metodologicos:
+
+- Baseline v1 congelado: `modelo_quiniela_2026_v1_base.py` fija commit, hash y componentes del modelo base. Si una mejora nueva no supera ese baseline en Brier, log-loss, calibracion y puntos esperados Penca, no debe considerarse mejora real.
+- Tabla maestra historica: `data/historical_match_master_schema.json` define los campos permitidos para Mundial, Euro, Copa America, Nations League y eliminatorias. Cada variable indica si es pre-torneo, pre-partido, live o target, para evitar usar informacion conocida despues del partido.
+- Tres modos separados: pre-torneo usa senales estructurales; pre-partido agrega lesiones, descanso, mercado y alineacion probable; live agrega minuto, marcador, eventos, tarjetas y momentum. Una variable live no puede contaminar un backtest pre-partido.
+
+La optimizacion Penca tambien queda separada de la prediccion futbolistica: el marcador mas probable del modelo puede no ser el marcador que maximiza puntos esperados bajo regla Penca. Por eso la web debe mostrar ambos cuando difieran.
 
 ## Uso rapido
 

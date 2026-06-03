@@ -11233,6 +11233,34 @@ def methodology_governance_items(
 
     return [
         {
+            "title": "Baseline v1 congelado",
+            "status": "Congelado en commit 0370dfd",
+            "tone": "ok",
+            "detail": "El modelo base queda fijado por commit y SHA-256 en modelo_quiniela_2026_v1_base.py; las mejoras futuras se comparan contra ese checkpoint, no contra una versión móvil.",
+            "action": "Antes de decir que una mejora sube el poder predictivo, debe superar este baseline en Brier, log-loss, calibración y puntos esperados Penca.",
+        },
+        {
+            "title": "Tabla maestra histórica anti-fuga",
+            "status": "Esquema creado",
+            "tone": "ok",
+            "detail": "data/historical_match_master_schema.json define partidos históricos con solo variables disponibles antes del juego: Elo, FIFA, plantilla, mercado, descanso, viajes, lesiones, táctica y contexto.",
+            "action": "Backtesting 2010-2022, Euro/Copa América y benchmarks deben leer esa tabla sin usar resultados futuros, valores posteriores ni rankings posteriores.",
+        },
+        {
+            "title": "Tres modos separados",
+            "status": "Definido",
+            "tone": "ok",
+            "detail": "Pre-torneo estima campeón/llave con señales estructurales; pre-partido añade bajas, mercado y alineación probable; live añade minuto, marcador, eventos, tarjetas y momentum.",
+            "action": "No mezclar capas: una variable live nunca puede entrar en la predicción pre-torneo ni en un backtest de partido previo.",
+        },
+        {
+            "title": "Predicción fútbol vs optimización Penca",
+            "status": "Separado",
+            "tone": "ok",
+            "detail": "El marcador más probable no siempre maximiza puntos Penca. Por eso el sistema distingue probabilidad futbolística, puntos esperados, diferencial y cobertura.",
+            "action": "Publicar siempre marcador probable del modelo y marcador recomendado para cargar en Penca cuando difieran por estrategia.",
+        },
+        {
             "title": "Backtesting serio",
             "status": "Activo 2026" if completed_matches else "Preparado; falta muestra 2026",
             "tone": "ok" if completed_matches else "neutral",
@@ -12355,6 +12383,10 @@ def audit_dashboard_html(dashboard_html: str) -> List[str]:
         "ScoreBat",
         "Semáforo metodológico",
         "Control de calidad del pronóstico",
+        "Baseline v1 congelado",
+        "Tabla maestra histórica anti-fuga",
+        "Tres modos separados",
+        "Predicción fútbol vs optimización Penca",
         "Pronóstico de goles",
         "15000",
     ]
