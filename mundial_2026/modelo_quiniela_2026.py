@@ -325,6 +325,26 @@ EXTERNAL_FORECAST_BENCHMARKS = (
         "methodology": "Modelo macro-futbolístico alternativo con población, clima, PIB per cápita, localía y puntos FIFA. Útil como alerta de tapados, no como ancla principal.",
         "source_url": "https://assets.sbs.com.au/07/69/796b14374c579c3eae5db7ed4a6d/2026-wc-prediction.pdf",
     },
+    {
+        "name": "Oddschecker / mercado público",
+        "published_at": "jun 2026",
+        "snapshot": "Outrights de mercado",
+        "champion": "Spain",
+        "champion_prob": None,
+        "final": "No publica llave; ordena candidatos por cuota",
+        "methodology": "Consenso de cuotas públicas. Se usa como lectura de sabiduría de mercado y liquidez, no como verdad ni como sustituto del modelo.",
+        "source_url": "https://www.oddschecker.com/insight/football/20260603-who-is-favourite-to-win-the-world-cup-2026-latest-team-odds",
+    },
+    {
+        "name": "Covers / mercado de outrights",
+        "published_at": "jun 2026",
+        "snapshot": "Outrights de mercado",
+        "champion": "France",
+        "champion_prob": None,
+        "final": "No publica llave; muestra bloque de favoritos",
+        "methodology": "Lectura de cuotas y movimiento de favoritos. Sirve para detectar si Francia, Portugal o Brasil ganan fuerza frente al prior del modelo.",
+        "source_url": "https://www.covers.com/world-cup/odds",
+    },
 )
 DARK_HORSE_STAGE_MATCH_IDS = {
     "reach_round16": tuple(f"M{match_id}" for match_id in range(73, 89)),
@@ -7943,7 +7963,114 @@ def external_estimator_methodology_items() -> List[dict]:
             "signal": "Miles de rutas completas para grupos, cruces, prorroga, penales y dependencias de llave.",
             "usage": "15.000 simulaciones por corrida para que una victoria real recalcule cruces y probabilidades posteriores.",
         },
+        {
+            "name": "Bradley-Terry jerárquico dinámico",
+            "signal": "Probabilidad relativa de que un equipo supere a otro, con regularización por confederación, ranking, Elo y fuerza de plantilla.",
+            "usage": "Modelo estadístico adicional recomendado como contraste: mejora lectura de favoritos/tapados sin depender de marcadores Poisson.",
+        },
+        {
+            "name": "Glicko / TrueSkill de incertidumbre",
+            "signal": "No solo mide fuerza: mide cuánta incertidumbre hay sobre esa fuerza cuando faltan partidos comparables.",
+            "usage": "Útil para no sobreconfiar en selecciones con poca muestra reciente y para ajustar la agresividad del boleto.",
+        },
+        {
+            "name": "Skellam / margen calibrado",
+            "signal": "Distribución de diferencia de goles y no solo marcador exacto crudo.",
+            "usage": "Ayuda a optimizar Penca porque 5 puntos por diferencia pueden valer más que perseguir un exacto frágil.",
+        },
     ]
+
+
+def statistical_upgrade_recommendations() -> List[dict]:
+    return [
+        {
+            "name": "Agregar Bradley-Terry jerárquico dinámico",
+            "status": "Recomendado",
+            "why": "Es el mejor siguiente modelo estadístico porque estima fuerza relativa partido a partido y se integra bien con Elo, FIFA, plantilla, mercado y ruta Monte Carlo.",
+            "impact": "Debería mejorar la separación entre favorito real, tapado vigilado y falso positivo de una rama fácil.",
+        },
+        {
+            "name": "Agregar Glicko/TrueSkill para incertidumbre",
+            "status": "Recomendado",
+            "why": "Dos equipos pueden tener fuerza parecida, pero distinta incertidumbre. Esa incertidumbre debe decidir si se juega fijo, cobertura o diferencial.",
+            "impact": "Reduce sobreconfianza y mejora la estrategia de cobertura en Penca.",
+        },
+        {
+            "name": "Refinar margen con Skellam/ordinal calibrado",
+            "status": "Recomendado para marcadores",
+            "why": "El marcador exacto no debe salir de Poisson puro. El margen optimizado para regla 8/5/3 necesita otra capa.",
+            "impact": "Mejora puntos esperados cuando no entra el exacto pero sí entra la diferencia de goles.",
+        },
+        {
+            "name": "ML regularizado solo con dataset limpio",
+            "status": "Agregar con cautela",
+            "why": "Un gradient boosting puede aportar, pero solo si se entrena con partidos históricos limpios y validación temporal. Sin eso memoriza ruido.",
+            "impact": "Buen miembro de ensamble cuando haya matriz histórica oficial, features estables y backtesting walk-forward.",
+        },
+        {
+            "name": "Variables macro como prior débil",
+            "status": "Usar, no duplicar",
+            "why": "PIB, población, valor de liga y recursos explican infraestructura, pero muchas veces ya están absorbidos por Elo, FIFA, plantilla y mercado.",
+            "impact": "Sirven para desempatar priors pretorneo; no deben mover en vivo un partido por sí solas.",
+        },
+    ]
+
+
+def external_scenario_stress_tests(bracket_payload: dict, entries: Optional[Sequence[dict]] = None) -> List[dict]:
+    adjusted_rows = consensus_adjusted_champion_probabilities(bracket_payload, entries)
+    if not adjusted_rows:
+        return []
+    leader = adjusted_rows[0]
+    consensus_leader = max(adjusted_rows, key=lambda row: float(row.get("consensus_prob", 0.0) or 0.0))
+    model_leader = max(adjusted_rows, key=lambda row: float(row.get("model_prob", 0.0) or 0.0))
+    dark_candidates = dark_horse_candidates(bracket_payload, entries)
+    top_dark = dark_candidates[0] if dark_candidates else None
+    benchmark_comparison = external_forecast_comparison(bracket_payload, entries)
+    divergent = [
+        item for item in benchmark_comparison["benchmarks"]
+        if str(item["champion"]) != str(leader["team"])
+    ]
+    top_divergent = max(divergent, key=lambda item: float(item.get("ours_prob", 0.0) or 0.0), default=None)
+
+    scenarios = [
+        {
+            "name": "Escenario modelo propio",
+            "team": str(model_leader["team"]),
+            "value": format_pct(float(model_leader.get("model_prob", 0.0) or 0.0)),
+            "action": "Si coincide con el calibrado, mantener la llave base.",
+        },
+        {
+            "name": "Escenario calibrado para boleto",
+            "team": str(leader["team"]),
+            "value": format_pct(float(leader.get("adjusted_prob", 0.0) or 0.0)),
+            "action": "Este es el campeón que guía el boleto salvo noticias, lesiones o mercado fuerte en contra.",
+        },
+        {
+            "name": "Escenario consenso externo",
+            "team": str(consensus_leader["team"]),
+            "value": format_pct(float(consensus_leader.get("consensus_prob", 0.0) or 0.0)),
+            "action": "Si difiere del modelo, revisar ruta y no sobrecargar el favorito propio.",
+        },
+    ]
+    if top_dark:
+        scenarios.append(
+            {
+                "name": "Escenario tapado vigilado",
+                "team": str(top_dark["team"]),
+                "value": f"{float(top_dark['watch_index']):.0f}/100",
+                "action": "No cambia el campeón base; activa vigilancia de rama y posibles diferenciales.",
+            }
+        )
+    if top_divergent:
+        scenarios.append(
+            {
+                "name": "Escenario externo disidente",
+                "team": str(top_divergent["champion"]),
+                "value": str(top_divergent["name"]),
+                "action": "No copiar: usarlo como alarma para auditar variables y evitar ceguera de confirmación.",
+            }
+        )
+    return scenarios
 
 
 def build_consensus_guardrail_html(bracket_payload: dict, entries: Optional[Sequence[dict]] = None) -> str:
@@ -8079,6 +8206,8 @@ def build_external_forecast_benchmarks_markdown(
     entries: Optional[Sequence[dict]] = None,
 ) -> List[str]:
     comparison = external_forecast_comparison(bracket_payload, entries)
+    scenarios = external_scenario_stress_tests(bracket_payload, entries)
+    upgrades = statistical_upgrade_recommendations()
     leader = comparison["leader"]
     if not leader:
         return ["_Sin llave generada para comparar contra modelos externos publicados._"]
@@ -8094,6 +8223,13 @@ def build_external_forecast_benchmarks_markdown(
             f"- {item['name']} ({item['published_at']}): campeón {item['champion']} | externo {external_text} | "
             f"nuestro modelo hoy {format_pct(float(item['ours_prob']))} | final {item['final']} | {item['reading']}"
         )
+    if scenarios:
+        lines.append("- Escenarios de estrés para no casarnos con un solo relato:")
+        for scenario in scenarios:
+            lines.append(f"  - {scenario['name']}: {scenario['team']} | {scenario['value']} | {scenario['action']}")
+    lines.append("- Modelos/variables que sí conviene agregar o reforzar:")
+    for upgrade in upgrades:
+        lines.append(f"  - {upgrade['name']} ({upgrade['status']}): {upgrade['why']} Impacto: {upgrade['impact']}")
     return lines
 
 
@@ -8102,6 +8238,8 @@ def build_external_forecast_benchmarks_html(
     entries: Optional[Sequence[dict]] = None,
 ) -> str:
     comparison = external_forecast_comparison(bracket_payload, entries)
+    scenarios = external_scenario_stress_tests(bracket_payload, entries)
+    upgrades = statistical_upgrade_recommendations()
     leader = comparison["leader"]
     if not leader:
         return ""
@@ -8131,12 +8269,30 @@ def build_external_forecast_benchmarks_html(
             f"<p class=\"benchmark-source\"><a href=\"{html.escape(str(item['source_url']), quote=True)}\" target=\"_blank\" rel=\"noopener noreferrer\">Abrir fuente publicada</a><em>{html.escape(agreement)}</em></p>"
             "</article>"
         )
+    scenario_rows = []
+    for scenario in scenarios:
+        scenario_rows.append(
+            "<li>"
+            f"<strong>{html.escape(str(scenario['name']))}: {html.escape(str(scenario['team']))}</strong>"
+            f"<span>{html.escape(str(scenario['value']))}</span>"
+            f"<em>{html.escape(str(scenario['action']))}</em>"
+            "</li>"
+        )
+    upgrade_rows = []
+    for item in upgrades:
+        upgrade_rows.append(
+            "<li>"
+            f"<strong>{html.escape(str(item['name']))}</strong>"
+            f"<span>{html.escape(str(item['why']))}</span>"
+            f"<em>{html.escape(str(item['status']))}: {html.escape(str(item['impact']))}</em>"
+            "</li>"
+        )
     return (
         "<section class=\"panel benchmark-panel\" id=\"comparadores\">"
         "<div class=\"panel-head\"><div>"
         "<p class=\"eyebrow\">Comparadores externos</p>"
         "<h2>Qué dicen otros modelos y dónde debemos desconfiar</h2>"
-        "<p class=\"lede-tight\">Esta mesa compara nuestra llave vigente contra cortes publicados por Goldman Sachs, Opta, PwC, FairCast y Panmure Liberum/Klement. No se promedian a ciegas ni se usan para maquillar probabilidades: sirven para detectar divergencias, revisar supuestos y vigilar tapados.</p>"
+        "<p class=\"lede-tight\">Esta mesa compara nuestra llave vigente contra cortes publicados por Goldman Sachs, Opta, PwC, FairCast, Panmure Liberum/Klement y mercado público. No se promedian a ciegas ni se usan para maquillar probabilidades: sirven para detectar divergencias, revisar supuestos y vigilar tapados.</p>"
         "</div></div>"
         "<div class=\"confidence-tiles\">"
         f"<div class=\"summary-tile\"><span>Nuestro líder vigente</span><strong>{html.escape(str(leader['team']))}</strong><small>{format_pct(float(leader['adjusted_prob']))} campeón calibrado en esta corrida.</small></div>"
@@ -8145,9 +8301,23 @@ def build_external_forecast_benchmarks_html(
         f"<div class=\"summary-tile\"><span>Campeones externos distintos</span><strong>{len(comparison['distinct_champions'])}</strong><small>{html.escape(', '.join(comparison['distinct_champions']))}</small></div>"
         "</div>"
         f"<div class=\"benchmark-grid\">{''.join(cards)}</div>"
+        "<div class=\"scenario-table-card benchmark-stress-card\">"
+        "<h3>Escenarios de estrés: qué pasa si otro relato tiene razón</h3>"
+        "<p>No cambiaremos la llave por una opinión externa aislada. Sí usamos estos escenarios para auditar si el modelo está ignorando a Portugal, Netherlands, France u otro tapado serio.</p>"
+        "<ul class=\"scenario-decision-list\">"
+        f"{''.join(scenario_rows)}"
+        "</ul>"
+        "</div>"
+        "<div class=\"scenario-table-card benchmark-upgrade-card\">"
+        "<h3>Modelos y variables que sí conviene reforzar</h3>"
+        "<p>La mejora real no es subir simulaciones sin fin ni inflar certezas: es añadir capas que expliquen fuerza relativa, incertidumbre, margen y variables live trazables.</p>"
+        "<ul class=\"scenario-decision-list\">"
+        f"{''.join(upgrade_rows)}"
+        "</ul>"
+        "</div>"
         "<div class=\"benchmark-next-step\">"
         "<h3>Qué agregaría después</h3>"
-        "<p><strong>Sí:</strong> calibración walk-forward apenas haya resultados reales, tracking de error por ventanas y mercado live verificable si se conecta un proveedor. <strong>No:</strong> sumar PIB, población o clima dos veces si ya están absorbidos por recursos, FIFA, Elo y contexto; eso crea falsa precisión.</p>"
+        "<p><strong>Sí:</strong> Bradley-Terry jerárquico dinámico, Glicko/TrueSkill de incertidumbre, margen Skellam/ordinal calibrado, calibración walk-forward apenas haya resultados reales y mercado live verificable. <strong>No:</strong> sumar PIB, población o clima dos veces si ya están absorbidos por recursos, FIFA, Elo y contexto; eso crea falsa precisión.</p>"
         "</div>"
         "</section>"
     )

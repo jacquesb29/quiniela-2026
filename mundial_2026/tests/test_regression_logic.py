@@ -376,14 +376,20 @@ class RegressionLogicTest(unittest.TestCase):
         entries = [{"projection": False, "status_state": "pre"} for _ in range(4)]
         comparison = app.external_forecast_comparison(bracket_payload, entries)
         self.assertEqual(comparison["leader"]["team"], "Spain")
-        self.assertEqual(len(comparison["benchmarks"]), 5)
+        self.assertGreaterEqual(len(comparison["benchmarks"]), 7)
         self.assertGreaterEqual(comparison["agreement_count"], 3)
         html = app.build_external_forecast_benchmarks_html(bracket_payload, entries)
         self.assertIn('id="comparadores"', html)
         self.assertIn("Goldman Sachs GIR", html)
         self.assertIn("FairCast / University of Portsmouth", html)
         self.assertIn("Panmure Liberum / Joachim Klement", html)
+        self.assertIn("Oddschecker / mercado público", html)
+        self.assertIn("Covers / mercado de outrights", html)
         self.assertIn("No se promedian a ciegas", html)
+        self.assertIn("Escenarios de estrés", html)
+        self.assertIn("Bradley-Terry jerárquico dinámico", html)
+        self.assertIn("Glicko/TrueSkill", html)
+        self.assertIn("Skellam/ordinal", html)
 
     def test_dark_horse_module_derives_secondary_candidates_from_bracket_route(self):
         bracket_payload = {

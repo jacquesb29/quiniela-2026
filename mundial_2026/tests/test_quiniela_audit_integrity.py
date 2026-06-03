@@ -282,6 +282,8 @@ class QuinielaAuditIntegrityTest(unittest.TestCase):
                 "<p>Comparadores externos</p><p>Qué dicen otros modelos y dónde debemos desconfiar</p>"
                 "<p>No se promedian a ciegas</p><p>Goldman Sachs GIR</p>"
                 "<p>FairCast / University of Portsmouth</p><p>Panmure Liberum / Joachim Klement</p>"
+                "<p>Escenarios de estrés</p><p>Bradley-Terry jerárquico dinámico</p>"
+                "<p>Glicko/TrueSkill</p><p>Skellam/ordinal</p>"
                 "<p>Radar de tapados</p><p>Tapados con ruta realista</p>"
                 "<p>índice de vigilancia</p><p>no reemplaza la llave base</p>"
                 "<p>Metodología de estimadores externos</p><p>Ratings tipo Elo / ClubElo</p>"
