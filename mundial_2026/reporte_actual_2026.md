@@ -1,21 +1,20 @@
 # Reporte actual del Mundial 2026
 
-Actualizado: 2026-06-02T17:03:45+00:00
+Actualizado: 2026-06-03T18:32:20+00:00
 Estado usado: /Users/jacquesbentata/Documents/New project/mundial_2026/runtime/tournament_state_2026.json
 Fixtures leidos: mundial_2026/fixtures_live_2026.json
 
 ## Resumen rápido del torneo
 
 - Qué significa esta sección: resume si hoy el torneo se ve más claro o más incierto. No es una nota del modelo; es una foto de qué tan firmes o parejos salen los partidos publicados.
-- Qué tan claro sale, en promedio, el pick principal: 70.2%
-- Cuánta probabilidad concentran, en promedio, los 3 marcadores más probables: 44.3%
+- Qué tan claro sale, en promedio, el pick principal: 71.8%
+- Cuánta probabilidad concentran, en promedio, los 3 marcadores más probables: 43.0%
 - Partidos en vivo ahora mismo: 0
 - Cómo validar la actualización en vivo: revisa la hora de publicación de la portada, el badge 'En vivo', el minuto modelado y el archivo latest.json del sitio.
-- Partidos con favorito más claro: Spain vs Saudi Arabia 98.4%; Spain vs Cape Verde 98.0%; England vs Ghana 97.7%
-- Partidos más cerrados o parejos: Octavos 5: Turkey vs Belgium 39.4%; Dieciseisavos 1: South Korea vs Canada 39.8%; Dieciseisavos 6: Ecuador vs Norway 41.0%
-- Grupos más parejos hasta ahora: Grupo C | equilibrio 43.3% | empate medio 30.0% | partidos 6; Grupo H | equilibrio 30.7% | empate medio 25.1% | partidos 6; Grupo A | equilibrio 29.9% | empate medio 24.3% | partidos 6; Grupo F | equilibrio 25.0% | empate medio 22.1% | partidos 6; Grupo K | equilibrio 24.4% | empate medio 21.5% | partidos 6; Grupo J | equilibrio 24.3% | empate medio 21.3% | partidos 6; Grupo D | equilibrio 22.6% | empate medio 20.8% | partidos 6; Grupo I | equilibrio 22.3% | empate medio 20.7% | partidos 6; Grupo B | equilibrio 21.1% | empate medio 20.1% | partidos 6; Grupo E | equilibrio 19.2% | empate medio 18.9% | partidos 6; Grupo L | equilibrio 18.0% | empate medio 18.5% | partidos 6; Grupo G | equilibrio 16.4% | empate medio 17.4% | partidos 6
-- Grupos con favoritos más claros hasta ahora: Grupo G | firmeza media 84.2% | empate medio 17.4% | partidos 6; Grupo L | firmeza media 82.3% | empate medio 18.5% | partidos 6; Grupo E | firmeza media 80.7% | empate medio 18.9% | partidos 6; Grupo B | firmeza media 78.3% | empate medio 20.1% | partidos 6; Grupo I | firmeza media 76.9% | empate medio 20.7% | partidos 6; Grupo D | firmeza media 76.4% | empate medio 20.8% | partidos 6; Grupo K | firmeza media 74.1% | empate medio 21.5% | partidos 6; Grupo J | firmeza media 74.0% | empate medio 21.3% | partidos 6; Grupo F | firmeza media 73.5% | empate medio 22.1% | partidos 6; Grupo A | firmeza media 67.0% | empate medio 24.3% | partidos 6; Grupo H | firmeza media 66.2% | empate medio 25.1% | partidos 6; Grupo C | firmeza media 49.5% | empate medio 30.0% | partidos 6
-- Partidos donde más se separan modelo y cuotas: Mexico vs South Africa 7.6%; South Korea vs Czech Republic 3.1%
+- Partidos con favorito más claro: Spain vs Cape Verde 99.0%; Spain vs Saudi Arabia 99.0%; England vs Ghana 99.0%
+- Partidos más cerrados o parejos: Octavos 5: Turkey vs Belgium 39.5%; Dieciseisavos 6: Ecuador vs Norway 40.0%; United States vs Australia 40.2%
+- Grupos más parejos hasta ahora: Grupo C | equilibrio 42.8% | empate medio 29.0% | partidos 6; Grupo H | equilibrio 29.4% | empate medio 24.0% | partidos 6; Grupo A | equilibrio 27.8% | empate medio 22.8% | partidos 6; Grupo F | equilibrio 23.6% | empate medio 21.0% | partidos 6; Grupo K | equilibrio 22.7% | empate medio 20.2% | partidos 6; Grupo J | equilibrio 22.6% | empate medio 20.1% | partidos 6; Grupo D | equilibrio 20.7% | empate medio 19.4% | partidos 6; Grupo I | equilibrio 20.6% | empate medio 19.4% | partidos 6; Grupo B | equilibrio 19.9% | empate medio 19.1% | partidos 6; Grupo E | equilibrio 17.8% | empate medio 17.8% | partidos 6; Grupo L | equilibrio 16.2% | empate medio 17.2% | partidos 6; Grupo G | equilibrio 15.3% | empate medio 16.5% | partidos 6
+- Grupos con favoritos más claros hasta ahora: Grupo G | firmeza media 85.4% | empate medio 16.5% | partidos 6; Grupo L | firmeza media 84.3% | empate medio 17.2% | partidos 6; Grupo E | firmeza media 82.3% | empate medio 17.8% | partidos 6; Grupo B | firmeza media 79.7% | empate medio 19.1% | partidos 6; Grupo I | firmeza media 78.8% | empate medio 19.4% | partidos 6; Grupo D | firmeza media 78.6% | empate medio 19.4% | partidos 6; Grupo J | firmeza media 76.0% | empate medio 20.1% | partidos 6; Grupo K | firmeza media 75.9% | empate medio 20.2% | partidos 6; Grupo F | firmeza media 75.0% | empate medio 21.0% | partidos 6; Grupo A | firmeza media 69.6% | empate medio 22.8% | partidos 6; Grupo H | firmeza media 67.8% | empate medio 24.0% | partidos 6; Grupo C | firmeza media 49.8% | empate medio 29.0% | partidos 6
 
 ## Hoja de máxima firmeza para quiniela
 
@@ -28,186 +27,186 @@ Fixtures leidos: mundial_2026/fixtures_live_2026.json
 - Picks base o principales: 49
 - Partidos cerrados o de riesgo alto: 23
 - Marcadores exactos defendibles: 38 | frágiles: 34
-- Brecha mínima contra la segunda opción: 2.7%
-- Firmeza de picks base: 89.5% como índice operativo; no es probabilidad garantizada.
-- Firmeza con estrategia aplicada: 92.6%; mide pick base o cobertura según lo que convenga.
-- Firmeza si fuerzas pick único: 66.1%; incluye partidos cerrados como si fueran fijos.
+- Brecha mínima contra la segunda opción: 0.9%
+- Firmeza de picks base: 90.9% como índice operativo; no es probabilidad garantizada.
+- Firmeza con estrategia aplicada: 93.0%; mide pick base o cobertura según lo que convenga.
+- Firmeza si fuerzas pick único: 67.6%; incluye partidos cerrados como si fueran fijos.
 - Checklist de auditoría: revisar bajas confirmadas, once inicial, mercado de última hora, clima y estado live antes de cerrar el boleto.
 - Alertas: 6 partidos tienen brecha menor a 10 puntos porcentuales contra la segunda opción. 23 partidos deben tratarse con cobertura o cautela. La firmeza operativa media no es alta; conviene priorizar picks base y evitar jugadas heroicas.
 
 ### Picks más defendibles
-- Spain vs Saudi Arabia: Gana Spain (87.4%) | índice de firmeza 87.2% | marcador 3-0 (19.3%) | Pick base claro: jugar el resultado principal sin cubrir, salvo noticia fuerte de última hora
-- Spain vs Cape Verde: Gana Spain (87.0%) | índice de firmeza 86.9% | marcador 3-0 (19.4%) | Pick base claro: jugar el resultado principal sin cubrir, salvo noticia fuerte de última hora
-- England vs Ghana: Gana England (86.8%) | índice de firmeza 86.9% | marcador 2-0 (21.7%) | Pick base claro: jugar el resultado principal sin cubrir, salvo noticia fuerte de última hora
-- France vs Iraq: Gana France (85.9%) | índice de firmeza 86.0% | marcador 2-0 (21.2%) | Pick base claro: jugar el resultado principal sin cubrir, salvo noticia fuerte de última hora
-- Germany vs Curacao: Gana Germany (86.2%) | índice de firmeza 86.0% | marcador 3-0 (19.0%) | Pick base claro: jugar el resultado principal sin cubrir, salvo noticia fuerte de última hora
-- Brazil vs Haiti: Gana Brazil (86.1%) | índice de firmeza 85.9% | marcador 3-0 (18.9%) | Pick base claro: jugar el resultado principal sin cubrir, salvo noticia fuerte de última hora
-- Jordan vs Argentina: Gana Argentina (84.7%) | índice de firmeza 84.7% | marcador 0-2 (21.1%) | Pick base claro: jugar el resultado principal sin cubrir, salvo noticia fuerte de última hora
-- Ecuador vs Curacao: Gana Ecuador (84.6%) | índice de firmeza 84.5% | marcador 2-0 (21.2%) | Pick base claro: jugar el resultado principal sin cubrir, salvo noticia fuerte de última hora
-- Croatia vs Ghana: Gana Croatia (84.3%) | índice de firmeza 84.2% | marcador 2-0 (20.6%) | Pick base claro: jugar el resultado principal sin cubrir, salvo noticia fuerte de última hora
-- Qatar vs Switzerland: Gana Switzerland (84.5%) | índice de firmeza 84.0% | marcador 0-3 (17.3%) | Pick base claro: jugar el resultado principal sin cubrir, salvo noticia fuerte de última hora
-- Argentina vs Algeria: Gana Argentina (83.9%) | índice de firmeza 83.8% | marcador 2-0 (21.0%) | Pick base claro: jugar el resultado principal sin cubrir, salvo noticia fuerte de última hora
-- Tunisia vs Netherlands: Gana Netherlands (81.6%) | índice de firmeza 81.3% | marcador 0-2 (20.1%) | Pick base claro: jugar el resultado principal sin cubrir, salvo noticia fuerte de última hora
+- Spain vs Saudi Arabia: Gana Spain (88.3%) | índice de firmeza 88.0% | marcador 3-0 (19.6%) | Pick base claro: jugar el resultado principal sin cubrir, salvo noticia fuerte de última hora
+- Spain vs Cape Verde: Gana Spain (88.0%) | índice de firmeza 87.9% | marcador 3-0 (19.7%) | Pick base claro: jugar el resultado principal sin cubrir, salvo noticia fuerte de última hora
+- England vs Ghana: Gana England (88.0%) | índice de firmeza 87.8% | marcador 3-0 (19.4%) | Pick base claro: jugar el resultado principal sin cubrir, salvo noticia fuerte de última hora
+- Brazil vs Haiti: Gana Brazil (87.5%) | índice de firmeza 87.3% | marcador 3-0 (19.5%) | Pick base claro: jugar el resultado principal sin cubrir, salvo noticia fuerte de última hora
+- France vs Iraq: Gana France (87.3%) | índice de firmeza 87.1% | marcador 3-0 (18.8%) | Pick base claro: jugar el resultado principal sin cubrir, salvo noticia fuerte de última hora
+- Germany vs Curacao: Gana Germany (87.3%) | índice de firmeza 87.0% | marcador 3-0 (19.3%) | Pick base claro: jugar el resultado principal sin cubrir, salvo noticia fuerte de última hora
+- Ecuador vs Curacao: Gana Ecuador (86.0%) | índice de firmeza 86.0% | marcador 2-0 (21.0%) | Pick base claro: jugar el resultado principal sin cubrir, salvo noticia fuerte de última hora
+- Jordan vs Argentina: Gana Argentina (86.0%) | índice de firmeza 85.7% | marcador 0-3 (18.2%) | Pick base claro: jugar el resultado principal sin cubrir, salvo noticia fuerte de última hora
+- Argentina vs Algeria: Gana Argentina (85.6%) | índice de firmeza 85.6% | marcador 2-0 (20.9%) | Pick base claro: jugar el resultado principal sin cubrir, salvo noticia fuerte de última hora
+- Qatar vs Switzerland: Gana Switzerland (85.4%) | índice de firmeza 85.0% | marcador 0-3 (17.6%) | Pick base claro: jugar el resultado principal sin cubrir, salvo noticia fuerte de última hora
+- Croatia vs Ghana: Gana Croatia (85.3%) | índice de firmeza 84.8% | marcador 3-0 (17.6%) | Pick base claro: jugar el resultado principal sin cubrir, salvo noticia fuerte de última hora
+- Colombia vs Dem. Rep. of Congo: Gana Colombia (83.5%) | índice de firmeza 83.0% | marcador 2-0 (19.0%) | Pick base claro: jugar el resultado principal sin cubrir, salvo noticia fuerte de última hora
 
 ### Partidos que no conviene jugar con exceso de confianza
-- Jordan vs Algeria: pick principal Gana Algeria 35.5%, marcador sugerido 1-1 13.8%, segunda opción Gana Jordan 32.8% | brecha 2.7% | no venderlo como fijo: el empate está cerca y conviene cubrir si las reglas lo permiten
-- United States vs Australia: pick principal Gana Australia 36.6%, marcador sugerido 1-1 13.9%, segunda opción Gana United States 32.1% | brecha 4.5% | no venderlo como fijo: el empate está cerca y conviene cubrir si las reglas lo permiten
-- Colombia vs Portugal: pick principal Gana Portugal 37.4%, marcador sugerido 1-1 13.7%, segunda opción Empate 31.6% | brecha 5.8% | no venderlo como fijo: el empate está cerca y conviene cubrir si las reglas lo permiten
-- Paraguay vs Australia: pick principal Gana Paraguay 38.1%, marcador sugerido 1-1 13.6%, segunda opción Empate 31.0% | brecha 7.1% | no venderlo como fijo: el empate está cerca y conviene cubrir si las reglas lo permiten
-- Scotland vs Morocco: pick principal Gana Morocco 39.9%, marcador sugerido 1-1 13.5%, segunda opción Empate 31.1% | brecha 8.8% | no venderlo como fijo: el empate está cerca y conviene cubrir si las reglas lo permiten
-- United States vs Paraguay: pick principal Gana Paraguay 40.6%, marcador sugerido 1-1 13.6%, segunda opción Empate 30.8% | brecha 9.7% | no venderlo como fijo: el empate está cerca y conviene cubrir si las reglas lo permiten
-- South Korea vs Czech Republic: pick principal Gana South Korea 40.6%, marcador sugerido 1-1 13.6%, segunda opción Empate 30.5% | brecha 10.0% | no venderlo como fijo: el empate está cerca y conviene cubrir si las reglas lo permiten
-- Norway vs Senegal: pick principal Gana Norway 43.0%, marcador sugerido 1-1 13.6%, segunda opción Empate 30.6% | brecha 12.3% | cubrir o evitar como fijo; marcador exacto solo si la quiniela lo exige
+- United States vs Australia: pick principal Gana Australia 35.1%, marcador sugerido 1-1 13.7%, segunda opción Gana United States 34.3% | brecha 0.9% | no venderlo como fijo: el empate está cerca y conviene cubrir si las reglas lo permiten
+- Jordan vs Algeria: pick principal Gana Algeria 36.7%, marcador sugerido 1-1 13.7%, segunda opción Gana Jordan 32.3% | brecha 4.4% | no venderlo como fijo: el empate está cerca y conviene cubrir si las reglas lo permiten
+- Colombia vs Portugal: pick principal Gana Portugal 38.0%, marcador sugerido 1-1 13.5%, segunda opción Gana Colombia 31.5% | brecha 6.5% | no venderlo como fijo: el empate está cerca y conviene cubrir si las reglas lo permiten
+- Paraguay vs Australia: pick principal Gana Paraguay 39.3%, marcador sugerido 1-1 13.3%, segunda opción Gana Australia 30.4% | brecha 8.9% | no venderlo como fijo: el empate está cerca y conviene cubrir si las reglas lo permiten
+- Scotland vs Morocco: pick principal Gana Morocco 39.8%, marcador sugerido 1-1 13.3%, segunda opción Empate 30.4% | brecha 9.4% | no venderlo como fijo: el empate está cerca y conviene cubrir si las reglas lo permiten
+- United States vs Paraguay: pick principal Gana Paraguay 39.9%, marcador sugerido 1-1 13.4%, segunda opción Gana United States 30.1% | brecha 9.8% | no venderlo como fijo: el empate está cerca y conviene cubrir si las reglas lo permiten
+- South Korea vs Czech Republic: pick principal Gana South Korea 43.3%, marcador sugerido 1-1 13.3%, segunda opción Empate 29.7% | brecha 13.6% | cubrir o evitar como fijo; marcador exacto solo si la quiniela lo exige
+- Norway vs Senegal: pick principal Gana Norway 44.6%, marcador sugerido 1-1 13.3%, segunda opción Empate 29.6% | brecha 15.0% | cubrir o evitar como fijo; marcador exacto solo si la quiniela lo exige
 
 ### Marcadores exactos más defendibles
-- England vs Ghana: 2-0 (21.7%) | cobertura con tres marcadores 58.2% | marcador optimizado para puntos de Penca Ovación
-- France vs Iraq: 2-0 (21.2%) | cobertura con tres marcadores 56.7% | marcador optimizado para puntos de Penca Ovación
-- Ecuador vs Curacao: 2-0 (21.2%) | cobertura con tres marcadores 55.8% | marcador optimizado para puntos de Penca Ovación
-- Jordan vs Argentina: 0-2 (21.1%) | cobertura con tres marcadores 56.5% | marcador optimizado para puntos de Penca Ovación
-- Argentina vs Algeria: 2-0 (21.0%) | cobertura con tres marcadores 55.9% | marcador optimizado para puntos de Penca Ovación
-- Croatia vs Ghana: 2-0 (20.6%) | cobertura con tres marcadores 55.5% | marcador optimizado para puntos de Penca Ovación
-- Tunisia vs Netherlands: 0-2 (20.1%) | cobertura con tres marcadores 53.7% | marcador jugable, pero no venderlo como fijo
-- Portugal vs Dem. Rep. of Congo: 2-0 (20.0%) | cobertura con tres marcadores 54.0% | marcador jugable, pero no venderlo como fijo
+- Ecuador vs Curacao: 2-0 (21.0%) | cobertura con tres marcadores 55.5% | marcador optimizado para puntos de Penca Ovación
+- Argentina vs Algeria: 2-0 (20.9%) | cobertura con tres marcadores 55.6% | marcador optimizado para puntos de Penca Ovación
+- Portugal vs Dem. Rep. of Congo: 2-0 (20.1%) | cobertura con tres marcadores 54.1% | marcador jugable, pero no venderlo como fijo
+- Uruguay vs Cape Verde: 2-0 (19.8%) | cobertura con tres marcadores 53.3% | marcador jugable, pero no venderlo como fijo
+- Spain vs Cape Verde: 3-0 (19.7%) | cobertura con tres marcadores 56.9% | marcador optimizado para puntos de Penca Ovación
+- Tunisia vs Netherlands: 0-2 (19.7%) | cobertura con tres marcadores 52.7% | marcador jugable, pero no venderlo como fijo
+- Canada vs Qatar: 2-0 (19.7%) | cobertura con tres marcadores 53.0% | marcador jugable, pero no venderlo como fijo
+- Spain vs Saudi Arabia: 3-0 (19.6%) | cobertura con tres marcadores 55.9% | marcador optimizado para puntos de Penca Ovación
 
 ## Estrategia para ganar la quiniela
 
 ### Estrategia para ganar la quiniela
 - Objetivo: aumentar expectativa y ventaja relativa frente a un boleto popular, no inflar porcentajes.
 - Reglas Penca Ovación usadas para optimizar marcador: 8 puntos por resultado exacto, 5 por diferencia de goles y 3 por ganador.
-- Aciertos esperados del boleto modelo: 65.9/104.
-- Puntos esperados por marcadores recomendados para la app: 292.0/832 (2.81 por partido).
-- Boleto popular por nombre estimado: 65.7/104. Ventaja esperada del modelo: +0.2 picks.
-- Marcador exacto recomendado esperado: 15.6/104. Esto NO mide acierto de ganador; mide cuántas veces esperarías acertar el marcador optimizado para puntos.
-- Diferencia de goles esperada con el marcador recomendado: 25.4/104.
-- Rango realista 90% del marcador exacto principal: 10-22 aciertos.
-- Si la quiniela permite poner 3 marcadores alternativos por partido, la cobertura esperada sube a 46.1/104.
-- Rango estadístico aproximado de resultados principales: 58-74 aciertos.
-- Cobertura mínima/recomendada/agresiva: 22/46/59 partidos.
+- Aciertos esperados del boleto modelo: 67.5/104.
+- Puntos esperados por marcadores recomendados para la app: 293.4/832 (2.82 por partido).
+- Boleto popular por nombre estimado: 67.4/104. Ventaja esperada del modelo: +0.1 picks.
+- Marcador exacto recomendado esperado: 15.1/104. Esto NO mide acierto de ganador; mide cuántas veces esperarías acertar el marcador optimizado para puntos.
+- Diferencia de goles esperada con el marcador recomendado: 25.0/104.
+- Rango realista 90% del marcador exacto principal: 9-21 aciertos.
+- Si la quiniela permite poner 3 marcadores alternativos por partido, la cobertura esperada sube a 44.7/104.
+- Rango estadístico aproximado de resultados principales: 60-75 aciertos.
+- Cobertura mínima/recomendada/agresiva: 22/44/58 partidos.
 
 ### Diferenciales positivos
-- Ghana vs Panama: Gana Panama 65.8%; boleto popular por nombre Gana Panama 57.8%; edge de seleccion +8.0%; ganancia esperada +0.0%.
+- Octavos 4: Mexico vs England: Gana England 65.8%; boleto popular por nombre Gana England 59.6%; edge de seleccion +6.3%; ganancia esperada +0.0%.
 
 ### Partidos para cubrir o no sobrearriesgar
-- Octavos 5: Turkey vs Belgium: Gana Turkey 33.5%; marcador Penca 1-1 | 2.10 pts esp. | exacto 14.7% | diferencia 33.1%; segunda opción Gana Belgium 33.4%; No gastes aquí un diferencial heroico: cubre o acepta el riesgo con marcador sugerido.
-- Dieciseisavos 1: South Korea vs Canada: Gana Canada 33.8%; marcador Penca 1-1 | 2.09 pts esp. | exacto 14.3% | diferencia 33.2%; segunda opción Empate 33.2%; Pick base: Gana Canada. Si tu quiniela permite marcar dos resultados, agrega también Empate. Si solo permite uno, usa el pick base pero no lo trates como fijo.
-- Dieciseisavos 6: Ecuador vs Norway: Gana Norway 35.2%; marcador Penca 1-1 | 2.11 pts esp. | exacto 14.8% | diferencia 33.3%; segunda opción Empate 33.3%; Pick base: Gana Norway. Si tu quiniela permite marcar dos resultados, agrega también Empate. Si solo permite uno, usa el pick base pero no lo trates como fijo.
-- Jordan vs Algeria: Gana Algeria 35.5%; marcador Penca 1-1 | 2.00 pts esp. | exacto 13.8% | diferencia 31.8%; segunda opción Gana Jordan 32.8%; No gastes aquí un diferencial heroico: cubre o acepta el riesgo con marcador sugerido.
-- United States vs Australia: Gana Australia 36.6%; marcador Penca 1-1 | 1.98 pts esp. | exacto 13.9% | diferencia 31.3%; segunda opción Gana United States 32.1%; No gastes aquí un diferencial heroico: cubre o acepta el riesgo con marcador sugerido.
-- Cuartos 2: France vs England: Gana France 37.8%; marcador Penca 1-1 | 2.07 pts esp. | exacto 14.5% | diferencia 32.8%; segunda opción Empate 32.8%; Pick base: Gana France. Si tu quiniela permite marcar dos resultados, agrega también Empate. Si solo permite uno, usa el pick base pero no lo trates como fijo.
-- Dieciseisavos 11: Colombia vs Croatia: Gana Colombia 37.8%; marcador Penca 1-1 | 2.06 pts esp. | exacto 14.3% | diferencia 32.5%; segunda opción Empate 32.5%; Pick base: Gana Colombia. Si tu quiniela permite marcar dos resultados, agrega también Empate. Si solo permite uno, usa el pick base pero no lo trates como fijo.
-- Colombia vs Portugal: Gana Portugal 37.4%; marcador Penca 1-1 | 1.99 pts esp. | exacto 13.7% | diferencia 31.6%; segunda opción Empate 31.6%; Pick base: Gana Portugal. Si tu quiniela permite marcar dos resultados, agrega también Empate. Si solo permite uno, usa el pick base pero no lo trates como fijo.
-- Paraguay vs Australia: Gana Paraguay 38.1%; marcador Penca 1-1 | 1.96 pts esp. | exacto 13.6% | diferencia 31.0%; segunda opción Empate 31.0%; Pick base: Gana Paraguay. Si tu quiniela permite marcar dos resultados, agrega también Empate. Si solo permite uno, usa el pick base pero no lo trates como fijo.
-- Octavos 2: Netherlands vs Brazil: Gana Brazil 40.4%; marcador Penca 1-1 | 2.05 pts esp. | exacto 14.4% | diferencia 32.2%; segunda opción Empate 32.2%; Pick base: Gana Brazil. Si tu quiniela permite marcar dos resultados, agrega también Empate. Si solo permite uno, usa el pick base pero no lo trates como fijo.
+- Octavos 5: Turkey vs Belgium: Gana Turkey 34.0%; marcador Penca 1-1 | 2.04 pts esp. | exacto 14.5% | diferencia 32.1%; segunda opción Gana Belgium 33.9%; No gastes aquí un diferencial heroico: cubre o acepta el riesgo con marcador sugerido.
+- United States vs Australia: Gana Australia 35.1%; marcador Penca 1-1 | 1.94 pts esp. | exacto 13.7% | diferencia 30.6%; segunda opción Gana United States 34.3%; No gastes aquí un diferencial heroico: cubre o acepta el riesgo con marcador sugerido.
+- Dieciseisavos 6: Ecuador vs Norway: Gana Norway 34.3%; marcador Penca 1-1 | 2.05 pts esp. | exacto 14.6% | diferencia 32.3%; segunda opción Gana Ecuador 33.4%; No gastes aquí un diferencial heroico: cubre o acepta el riesgo con marcador sugerido.
+- Dieciseisavos 1: South Korea vs Canada: Gana Canada 36.3%; marcador Penca 1-1 | 2.03 pts esp. | exacto 14.1% | diferencia 32.1%; segunda opción Empate 32.1%; Pick base: Gana Canada. Si tu quiniela permite marcar dos resultados, agrega también Empate. Si solo permite uno, usa el pick base pero no lo trates como fijo.
+- Jordan vs Algeria: Gana Algeria 36.7%; marcador Penca 1-1 | 1.96 pts esp. | exacto 13.7% | diferencia 31.0%; segunda opción Gana Jordan 32.3%; No gastes aquí un diferencial heroico: cubre o acepta el riesgo con marcador sugerido.
+- Dieciseisavos 11: Colombia vs Croatia: Gana Colombia 37.8%; marcador Penca 1-1 | 2.01 pts esp. | exacto 14.2% | diferencia 31.7%; segunda opción Empate 31.7%; Pick base: Gana Colombia. Si tu quiniela permite marcar dos resultados, agrega también Empate. Si solo permite uno, usa el pick base pero no lo trates como fijo.
+- Colombia vs Portugal: Gana Portugal 38.0%; marcador Penca 1-1 | 1.93 pts esp. | exacto 13.5% | diferencia 30.6%; segunda opción Gana Colombia 31.5%; No gastes aquí un diferencial heroico: cubre o acepta el riesgo con marcador sugerido.
+- Cuartos 2: France vs England: Gana France 38.3%; marcador Penca 1-1 | 2.00 pts esp. | exacto 14.2% | diferencia 31.5%; segunda opción Empate 31.5%; Pick base: Gana France. Si tu quiniela permite marcar dos resultados, agrega también Empate. Si solo permite uno, usa el pick base pero no lo trates como fijo.
+- Paraguay vs Australia: Gana Paraguay 39.3%; marcador Penca 1-1 | 1.91 pts esp. | exacto 13.3% | diferencia 30.3%; segunda opción Gana Australia 30.4%; No gastes aquí un diferencial heroico: cubre o acepta el riesgo con marcador sugerido.
+- Scotland vs Morocco: Gana Morocco 39.8%; marcador Penca 1-1 | 1.92 pts esp. | exacto 13.3% | diferencia 30.4%; segunda opción Empate 30.4%; Pick base: Gana Morocco. Si tu quiniela permite marcar dos resultados, agrega también Empate. Si solo permite uno, usa el pick base pero no lo trates como fijo.
 
 ## Marcadores para cargar en Penca
 
 ### Marcadores para cargar en Penca
 - Orden del marcador: equipo A - equipo B, exactamente como aparece en el partido.
 - Total modelado: 104 partidos/cruces.
-- Grupo A | Mexico vs South Africa: 2-0 (Mexico - South Africa) | pick Victoria Mexico 76.9% | exacto 18.9% | puntos esp. 3.32/8 | exacto más probable 2-0
-- Grupo A | South Korea vs Czech Republic: 1-1 (South Korea - Czech Republic) | pick Victoria South Korea 40.6% | exacto 13.6% | puntos esp. 1.93/8 | exacto más probable 1-1
-- Grupo B | Canada vs Bosnia and Herzegovina: 2-0 (Canada - Bosnia and Herzegovina) | pick Victoria Canada 71.4% | exacto 16.2% | puntos esp. 3.07/8 | exacto más probable 1-0
-- Grupo C | United States vs Paraguay: 1-1 (United States - Paraguay) | pick Victoria Paraguay 40.6% | exacto 13.6% | puntos esp. 1.95/8 | exacto más probable 1-1
-- Grupo B | Qatar vs Switzerland: 0-3 (Qatar - Switzerland) | pick Victoria Switzerland 84.5% | exacto 17.3% | puntos esp. 3.43/8 | exacto más probable 0-2
-- Grupo D | Brazil vs Morocco: 2-0 (Brazil - Morocco) | pick Victoria Brazil 67.9% | exacto 15.5% | puntos esp. 2.92/8 | exacto más probable 1-0
-- Grupo D | Haiti vs Scotland: 0-2 (Haiti - Scotland) | pick Victoria Scotland 72.8% | exacto 16.5% | puntos esp. 3.13/8 | exacto más probable 0-1
-- Grupo C | Australia vs Turkey: 1-2 (Australia - Turkey) | pick Victoria Turkey 50.8% | exacto 8.5% | puntos esp. 2.27/8 | exacto más probable 0-1
-- Grupo E | Germany vs Curacao: 3-0 (Germany - Curacao) | pick Victoria Germany 86.2% | exacto 19.0% | puntos esp. 3.57/8 | exacto más probable 2-0
-- Grupo F | Netherlands vs Japan: 2-1 (Netherlands - Japan) | pick Victoria Netherlands 51.0% | exacto 8.3% | puntos esp. 2.26/8 | exacto más probable 1-0
-- Grupo E | Ivory Coast vs Ecuador: 0-2 (Ivory Coast - Ecuador) | pick Victoria Ecuador 73.7% | exacto 17.2% | puntos esp. 3.18/8 | exacto más probable 0-1
-- Grupo F | Sweden vs Tunisia: 1-0 (Sweden - Tunisia) | pick Victoria Sweden 45.3% | exacto 13.7% | puntos esp. 2.23/8 | exacto más probable 1-0
-- Grupo G | Spain vs Cape Verde: 3-0 (Spain - Cape Verde) | pick Victoria Spain 87.0% | exacto 19.4% | puntos esp. 3.61/8 | exacto más probable 2-0
-- Grupo H | Belgium vs Egypt: 2-0 (Belgium - Egypt) | pick Victoria Belgium 68.3% | exacto 15.2% | puntos esp. 2.93/8 | exacto más probable 1-0
-- Grupo G | Saudi Arabia vs Uruguay: 0-2 (Saudi Arabia - Uruguay) | pick Victoria Uruguay 76.0% | exacto 18.2% | puntos esp. 3.28/8 | exacto más probable 0-1
-- Grupo H | Iran vs New Zealand: 2-0 (Iran - New Zealand) | pick Victoria Iran 63.0% | exacto 14.2% | puntos esp. 2.71/8 | exacto más probable 1-0
-- Grupo I | France vs Senegal: 2-0 (France - Senegal) | pick Victoria France 70.2% | exacto 16.2% | puntos esp. 3.02/8 | exacto más probable 1-0
-- Grupo I | Iraq vs Norway: 0-2 (Iraq - Norway) | pick Victoria Norway 78.4% | exacto 18.9% | puntos esp. 3.39/8 | exacto más probable 0-2
-- Grupo J | Argentina vs Algeria: 2-0 (Argentina - Algeria) | pick Victoria Argentina 83.9% | exacto 21.0% | puntos esp. 3.63/8 | exacto más probable 2-0
-- Grupo J | Austria vs Jordan: 1-0 (Austria - Jordan) | pick Victoria Austria 59.4% | exacto 15.4% | puntos esp. 2.76/8 | exacto más probable 1-0
-- Grupo K | Portugal vs Dem. Rep. of Congo: 2-0 (Portugal - Dem. Rep. of Congo) | pick Victoria Portugal 80.8% | exacto 20.0% | puntos esp. 3.50/8 | exacto más probable 2-0
-- Grupo L | England vs Croatia: 2-1 (England - Croatia) | pick Victoria England 54.6% | exacto 8.3% | puntos esp. 2.38/8 | exacto más probable 1-0
-- Grupo L | Ghana vs Panama: 0-2 (Ghana - Panama) | pick Victoria Panama 65.8% | exacto 14.5% | puntos esp. 2.82/8 | exacto más probable 0-1
-- Grupo K | Uzbekistan vs Colombia: 0-2 (Uzbekistan - Colombia) | pick Victoria Colombia 73.9% | exacto 16.8% | puntos esp. 3.16/8 | exacto más probable 0-1
-- Grupo A | Czech Republic vs South Africa: 2-0 (Czech Republic - South Africa) | pick Victoria Czech Republic 67.1% | exacto 15.2% | puntos esp. 2.88/8 | exacto más probable 1-0
-- Grupo B | Switzerland vs Bosnia and Herzegovina: 2-0 (Switzerland - Bosnia and Herzegovina) | pick Victoria Switzerland 79.6% | exacto 18.8% | puntos esp. 3.42/8 | exacto más probable 2-0
-- Grupo B | Canada vs Qatar: 2-0 (Canada - Qatar) | pick Victoria Canada 81.2% | exacto 19.6% | puntos esp. 3.50/8 | exacto más probable 2-0
-- Grupo A | Mexico vs South Korea: 2-1 (Mexico - South Korea) | pick Victoria Mexico 49.9% | exacto 8.4% | puntos esp. 2.21/8 | exacto más probable 1-0
-- Grupo C | United States vs Australia: 1-1 (United States - Australia) | pick Victoria Australia 36.6% | exacto 13.9% | puntos esp. 1.98/8 | exacto más probable 1-1
-- Grupo D | Scotland vs Morocco: 1-1 (Scotland - Morocco) | pick Victoria Morocco 39.9% | exacto 13.5% | puntos esp. 1.96/8 | exacto más probable 1-1
-- Grupo D | Brazil vs Haiti: 3-0 (Brazil - Haiti) | pick Victoria Brazil 86.1% | exacto 18.9% | puntos esp. 3.56/8 | exacto más probable 2-0
-- Grupo C | Turkey vs Paraguay: 2-1 (Turkey - Paraguay) | pick Victoria Turkey 45.5% | exacto 8.1% | puntos esp. 2.06/8 | exacto más probable 1-1
-- Grupo F | Netherlands vs Sweden: 2-0 (Netherlands - Sweden) | pick Victoria Netherlands 77.8% | exacto 18.2% | puntos esp. 3.35/8 | exacto más probable 2-0
-- Grupo E | Germany vs Ivory Coast: 2-0 (Germany - Ivory Coast) | pick Victoria Germany 79.5% | exacto 18.6% | puntos esp. 3.41/8 | exacto más probable 2-0
-- Grupo E | Ecuador vs Curacao: 2-0 (Ecuador - Curacao) | pick Victoria Ecuador 84.6% | exacto 21.2% | puntos esp. 3.66/8 | exacto más probable 2-0
-- Grupo F | Tunisia vs Japan: 0-2 (Tunisia - Japan) | pick Victoria Japan 75.0% | exacto 17.4% | puntos esp. 3.22/8 | exacto más probable 0-1
-- Grupo G | Spain vs Saudi Arabia: 3-0 (Spain - Saudi Arabia) | pick Victoria Spain 87.4% | exacto 19.3% | puntos esp. 3.61/8 | exacto más probable 2-0
-- Grupo H | Belgium vs Iran: 2-1 (Belgium - Iran) | pick Victoria Belgium 55.1% | exacto 8.5% | puntos esp. 2.40/8 | exacto más probable 1-0
-- Grupo G | Uruguay vs Cape Verde: 2-0 (Uruguay - Cape Verde) | pick Victoria Uruguay 80.6% | exacto 20.0% | puntos esp. 3.49/8 | exacto más probable 2-0
-- Grupo H | New Zealand vs Egypt: 1-2 (New Zealand - Egypt) | pick Victoria Egypt 48.9% | exacto 8.0% | puntos esp. 2.17/8 | exacto más probable 0-1
-- Grupo J | Argentina vs Austria: 2-0 (Argentina - Austria) | pick Victoria Argentina 77.4% | exacto 18.1% | puntos esp. 3.33/8 | exacto más probable 2-0
-- Grupo I | France vs Iraq: 2-0 (France - Iraq) | pick Victoria France 85.9% | exacto 21.2% | puntos esp. 3.69/8 | exacto más probable 2-0
-- Grupo I | Norway vs Senegal: 1-1 (Norway - Senegal) | pick Victoria Norway 43.0% | exacto 13.6% | puntos esp. 1.94/8 | exacto más probable 1-1
-- Grupo J | Jordan vs Algeria: 1-1 (Jordan - Algeria) | pick Victoria Algeria 35.5% | exacto 13.8% | puntos esp. 2.00/8 | exacto más probable 1-1
-- Grupo K | Portugal vs Uzbekistan: 2-0 (Portugal - Uzbekistan) | pick Victoria Portugal 74.8% | exacto 17.3% | puntos esp. 3.21/8 | exacto más probable 2-0
-- Grupo L | England vs Ghana: 2-0 (England - Ghana) | pick Victoria England 86.8% | exacto 21.7% | puntos esp. 3.73/8 | exacto más probable 2-0
-- Grupo L | Panama vs Croatia: 0-2 (Panama - Croatia) | pick Victoria Croatia 72.3% | exacto 16.3% | puntos esp. 3.10/8 | exacto más probable 0-2
-- Grupo K | Colombia vs Dem. Rep. of Congo: 2-0 (Colombia - Dem. Rep. of Congo) | pick Victoria Colombia 81.5% | exacto 19.2% | puntos esp. 3.49/8 | exacto más probable 2-0
-- Grupo B | Bosnia and Herzegovina vs Qatar: 2-1 (Bosnia and Herzegovina - Qatar) | pick Victoria Bosnia and Herzegovina 56.2% | exacto 8.6% | puntos esp. 2.45/8 | exacto más probable 1-0
-- Grupo B | Switzerland vs Canada: 2-1 (Switzerland - Canada) | pick Victoria Switzerland 51.9% | exacto 8.4% | puntos esp. 2.29/8 | exacto más probable 1-0
-- Grupo D | Morocco vs Haiti: 2-0 (Morocco - Haiti) | pick Victoria Morocco 75.8% | exacto 17.9% | puntos esp. 3.27/8 | exacto más probable 2-0
-- Grupo D | Scotland vs Brazil: 0-2 (Scotland - Brazil) | pick Victoria Brazil 71.5% | exacto 16.7% | puntos esp. 3.09/8 | exacto más probable 0-2
-- Grupo A | Czech Republic vs Mexico: 1-2 (Czech Republic - Mexico) | pick Victoria Mexico 58.1% | exacto 8.6% | puntos esp. 2.49/8 | exacto más probable 0-1
-- Grupo A | South Africa vs South Korea: 0-2 (South Africa - South Korea) | pick Victoria South Korea 72.5% | exacto 17.1% | puntos esp. 3.13/8 | exacto más probable 0-1
-- Grupo E | Curacao vs Ivory Coast: 0-2 (Curacao - Ivory Coast) | pick Victoria Ivory Coast 65.3% | exacto 14.1% | puntos esp. 2.79/8 | exacto más probable 0-1
-- Grupo E | Ecuador vs Germany: 1-2 (Ecuador - Germany) | pick Victoria Germany 47.1% | exacto 8.2% | puntos esp. 2.11/8 | exacto más probable 1-1
-- Grupo F | Japan vs Sweden: 2-0 (Japan - Sweden) | pick Victoria Japan 68.6% | exacto 15.0% | puntos esp. 2.93/8 | exacto más probable 1-0
-- Grupo F | Tunisia vs Netherlands: 0-2 (Tunisia - Netherlands) | pick Victoria Netherlands 81.6% | exacto 20.1% | puntos esp. 3.53/8 | exacto más probable 0-2
-- Grupo C | Paraguay vs Australia: 1-1 (Paraguay - Australia) | pick Victoria Paraguay 38.1% | exacto 13.6% | puntos esp. 1.96/8 | exacto más probable 1-1
-- Grupo C | Turkey vs United States: 2-1 (Turkey - United States) | pick Victoria Turkey 53.2% | exacto 8.7% | puntos esp. 2.34/8 | exacto más probable 1-0
-- Grupo I | Norway vs France: 0-2 (Norway - France) | pick Victoria France 64.7% | exacto 14.0% | puntos esp. 2.77/8 | exacto más probable 0-1
-- Grupo I | Senegal vs Iraq: 2-0 (Senegal - Iraq) | pick Victoria Senegal 74.6% | exacto 18.0% | puntos esp. 3.24/8 | exacto más probable 2-0
-- Grupo G | Cape Verde vs Saudi Arabia: 0-1 (Cape Verde - Saudi Arabia) | pick Victoria Saudi Arabia 45.3% | exacto 13.6% | puntos esp. 2.23/8 | exacto más probable 0-1
-- Grupo G | Uruguay vs Spain: 0-2 (Uruguay - Spain) | pick Victoria Spain 76.6% | exacto 17.2% | puntos esp. 3.27/8 | exacto más probable 0-2
-- Grupo H | Egypt vs Iran: 1-2 (Egypt - Iran) | pick Victoria Iran 50.0% | exacto 8.0% | puntos esp. 2.22/8 | exacto más probable 0-1
-- Grupo H | New Zealand vs Belgium: 0-2 (New Zealand - Belgium) | pick Victoria Belgium 76.9% | exacto 17.3% | puntos esp. 3.28/8 | exacto más probable 0-2
-- Grupo L | Croatia vs Ghana: 2-0 (Croatia - Ghana) | pick Victoria Croatia 84.3% | exacto 20.6% | puntos esp. 3.62/8 | exacto más probable 2-0
-- Grupo L | Panama vs England: 0-2 (Panama - England) | pick Victoria England 81.4% | exacto 19.7% | puntos esp. 3.51/8 | exacto más probable 0-2
-- Grupo K | Colombia vs Portugal: 1-1 (Colombia - Portugal) | pick Victoria Portugal 37.4% | exacto 13.7% | puntos esp. 1.99/8 | exacto más probable 1-1
-- Grupo K | Dem. Rep. of Congo vs Uzbekistan: 1-2 (Dem. Rep. of Congo - Uzbekistan) | pick Victoria Uzbekistan 51.9% | exacto 8.1% | puntos esp. 2.29/8 | exacto más probable 0-1
-- Grupo J | Algeria vs Austria: 1-2 (Algeria - Austria) | pick Victoria Austria 58.8% | exacto 8.7% | puntos esp. 2.53/8 | exacto más probable 0-1
-- Grupo J | Jordan vs Argentina: 0-2 (Jordan - Argentina) | pick Victoria Argentina 84.7% | exacto 21.1% | puntos esp. 3.65/8 | exacto más probable 0-2
-- Dieciseisavos de final | Dieciseisavos 1: South Korea vs Canada: 1-1 (South Korea - Canada) | pick Victoria Canada 33.8% | exacto 14.3% | puntos esp. 2.09/8 | exacto más probable 0-0 | cruce proyectado
-- Dieciseisavos de final | Dieciseisavos 2: Germany vs Bosnia and Herzegovina: 2-0 (Germany - Bosnia and Herzegovina) | pick Victoria Germany 79.3% | exacto 19.3% | puntos esp. 3.43/8 | exacto más probable 2-0 | cruce proyectado
-- Dieciseisavos de final | Dieciseisavos 3: Netherlands vs Morocco: 1-0 (Netherlands - Morocco) | pick Victoria Netherlands 60.7% | exacto 16.2% | puntos esp. 2.83/8 | exacto más probable 1-0 | cruce proyectado
-- Dieciseisavos de final | Dieciseisavos 4: Brazil vs Japan: 1-0 (Brazil - Japan) | pick Victoria Brazil 56.4% | exacto 15.0% | puntos esp. 2.64/8 | exacto más probable 1-0 | cruce proyectado
-- Dieciseisavos de final | Dieciseisavos 5: France vs Egypt: 2-0 (France - Egypt) | pick Victoria France 80.0% | exacto 20.2% | puntos esp. 3.49/8 | exacto más probable 2-0 | cruce proyectado
-- Dieciseisavos de final | Dieciseisavos 6: Ecuador vs Norway: 1-1 (Ecuador - Norway) | pick Victoria Norway 35.2% | exacto 14.8% | puntos esp. 2.11/8 | exacto más probable 1-1 | cruce proyectado
-- Dieciseisavos de final | Dieciseisavos 7: Mexico vs Scotland: 2-1 (Mexico - Scotland) | pick Victoria Mexico 48.5% | exacto 8.1% | puntos esp. 2.16/8 | exacto más probable 1-1 | cruce proyectado
-- Dieciseisavos de final | Dieciseisavos 8: England vs Uzbekistan: 2-0 (England - Uzbekistan) | pick Victoria England 76.5% | exacto 18.8% | puntos esp. 3.33/8 | exacto más probable 2-0 | cruce proyectado
-- Dieciseisavos de final | Dieciseisavos 9: Turkey vs Bosnia and Herzegovina: 2-0 (Turkey - Bosnia and Herzegovina) | pick Victoria Turkey 73.9% | exacto 17.8% | puntos esp. 3.21/8 | exacto más probable 2-0 | cruce proyectado
-- Dieciseisavos de final | Dieciseisavos 10: Belgium vs Czech Republic: 2-1 (Belgium - Czech Republic) | pick Victoria Belgium 54.2% | exacto 8.5% | puntos esp. 2.37/8 | exacto más probable 1-0 | cruce proyectado
-- Dieciseisavos de final | Dieciseisavos 11: Colombia vs Croatia: 1-1 (Colombia - Croatia) | pick Victoria Colombia 37.8% | exacto 14.3% | puntos esp. 2.06/8 | exacto más probable 1-1 | cruce proyectado
-- Dieciseisavos de final | Dieciseisavos 12: Spain vs Austria: 2-0 (Spain - Austria) | pick Victoria Spain 77.5% | exacto 18.4% | puntos esp. 3.35/8 | exacto más probable 2-0 | cruce proyectado
-- Dieciseisavos de final | Dieciseisavos 13: Switzerland vs Egypt: 2-0 (Switzerland - Egypt) | pick Victoria Switzerland 66.7% | exacto 15.3% | puntos esp. 2.87/8 | exacto más probable 1-0 | cruce proyectado
-- Dieciseisavos de final | Dieciseisavos 14: Argentina vs Uruguay: 2-0 (Argentina - Uruguay) | pick Victoria Argentina 66.8% | exacto 15.7% | puntos esp. 2.89/8 | exacto más probable 1-0 | cruce proyectado
-- Dieciseisavos de final | Dieciseisavos 15: Portugal vs Panama: 2-0 (Portugal - Panama) | pick Victoria Portugal 72.7% | exacto 17.6% | puntos esp. 3.16/8 | exacto más probable 1-0 | cruce proyectado
-- Dieciseisavos de final | Dieciseisavos 16: Turkey vs Iran: 2-1 (Turkey - Iran) | pick Victoria Turkey 52.6% | exacto 8.4% | puntos esp. 2.34/8 | exacto más probable 1-0 | cruce proyectado
-- Octavos de final | Octavos 1: Canada vs Germany: 0-1 (Canada - Germany) | pick Victoria Germany 61.8% | exacto 15.7% | puntos esp. 2.83/8 | exacto más probable 0-1 | cruce proyectado
-- Octavos de final | Octavos 2: Netherlands vs Brazil: 1-1 (Netherlands - Brazil) | pick Victoria Brazil 40.4% | exacto 14.4% | puntos esp. 2.05/8 | exacto más probable 1-1 | cruce proyectado
-- Octavos de final | Octavos 3: France vs Norway: 1-0 (France - Norway) | pick Victoria France 61.7% | exacto 15.7% | puntos esp. 2.83/8 | exacto más probable 1-0 | cruce proyectado
-- Octavos de final | Octavos 4: Mexico vs England: 0-2 (Mexico - England) | pick Victoria England 63.6% | exacto 13.9% | puntos esp. 2.72/8 | exacto más probable 0-1 | cruce proyectado
-- Octavos de final | Octavos 5: Turkey vs Belgium: 1-1 (Turkey - Belgium) | pick Victoria Turkey 33.5% | exacto 14.7% | puntos esp. 2.10/8 | exacto más probable 1-1 | cruce proyectado
-- Octavos de final | Octavos 6: Croatia vs Spain: 0-2 (Croatia - Spain) | pick Victoria Spain 68.1% | exacto 15.3% | puntos esp. 2.92/8 | exacto más probable 0-1 | cruce proyectado
-- Octavos de final | Octavos 7: Switzerland vs Argentina: 0-2 (Switzerland - Argentina) | pick Victoria Argentina 67.2% | exacto 15.6% | puntos esp. 2.91/8 | exacto más probable 0-1 | cruce proyectado
-- Octavos de final | Octavos 8: Portugal vs Turkey: 2-1 (Portugal - Turkey) | pick Victoria Portugal 51.7% | exacto 8.1% | puntos esp. 2.27/8 | exacto más probable 1-0 | cruce proyectado
-- Cuartos de final | Cuartos 1: Germany vs Brazil: 1-1 (Germany - Brazil) | pick Victoria Brazil 42.4% | exacto 14.3% | puntos esp. 2.01/8 | exacto más probable 1-1 | cruce proyectado
-- Cuartos de final | Cuartos 2: France vs England: 1-1 (France - England) | pick Victoria France 37.8% | exacto 14.5% | puntos esp. 2.07/8 | exacto más probable 1-1 | cruce proyectado
-- Cuartos de final | Cuartos 3: Belgium vs Spain: 0-2 (Belgium - Spain) | pick Victoria Spain 73.9% | exacto 17.3% | puntos esp. 3.19/8 | exacto más probable 0-1 | cruce proyectado
-- Cuartos de final | Cuartos 4: Argentina vs Portugal: 1-0 (Argentina - Portugal) | pick Victoria Argentina 54.8% | exacto 15.0% | puntos esp. 2.60/8 | exacto más probable 1-0 | cruce proyectado
-- Semifinal | Semifinal 1: Brazil vs France: 1-1 (Brazil - France) | pick Victoria France 42.4% | exacto 14.1% | puntos esp. 2.02/8 | exacto más probable 1-1 | cruce proyectado
-- Semifinal | Semifinal 2: Spain vs Argentina: 1-1 (Spain - Argentina) | pick Victoria Spain 41.2% | exacto 14.3% | puntos esp. 2.05/8 | exacto más probable 1-1 | cruce proyectado
-- Final | Final: France vs Spain: 1-2 (France - Spain) | pick Victoria Spain 47.0% | exacto 8.2% | puntos esp. 2.12/8 | exacto más probable 1-1 | cruce proyectado
-- Tercer puesto | Tercer puesto: Brazil vs Argentina: 1-2 (Brazil - Argentina) | pick Victoria Argentina 48.4% | exacto 8.2% | puntos esp. 2.18/8 | exacto más probable 0-1 | cruce proyectado
+- Grupo A | Mexico vs South Africa: 2-0 (Mexico - South Africa) | pick Victoria Mexico 81.8% | exacto 19.3% | puntos esp. 3.51/8 | exacto más probable 2-0
+- Grupo A | South Korea vs Czech Republic: 1-1 (South Korea - Czech Republic) | pick Victoria South Korea 43.3% | exacto 13.3% | puntos esp. 1.88/8 | exacto más probable 1-1
+- Grupo B | Canada vs Bosnia and Herzegovina: 2-0 (Canada - Bosnia and Herzegovina) | pick Victoria Canada 73.8% | exacto 16.5% | puntos esp. 3.16/8 | exacto más probable 2-0
+- Grupo C | United States vs Paraguay: 1-1 (United States - Paraguay) | pick Victoria Paraguay 39.9% | exacto 13.4% | puntos esp. 1.90/8 | exacto más probable 1-1
+- Grupo B | Qatar vs Switzerland: 0-3 (Qatar - Switzerland) | pick Victoria Switzerland 85.4% | exacto 17.6% | puntos esp. 3.48/8 | exacto más probable 0-2
+- Grupo D | Brazil vs Morocco: 2-0 (Brazil - Morocco) | pick Victoria Brazil 70.8% | exacto 15.7% | puntos esp. 3.03/8 | exacto más probable 1-0
+- Grupo D | Haiti vs Scotland: 0-2 (Haiti - Scotland) | pick Victoria Scotland 75.2% | exacto 17.1% | puntos esp. 3.23/8 | exacto más probable 0-2
+- Grupo C | Australia vs Turkey: 1-2 (Australia - Turkey) | pick Victoria Turkey 53.0% | exacto 8.7% | puntos esp. 2.34/8 | exacto más probable 0-1
+- Grupo E | Germany vs Curacao: 3-0 (Germany - Curacao) | pick Victoria Germany 87.3% | exacto 19.3% | puntos esp. 3.62/8 | exacto más probable 2-0
+- Grupo F | Netherlands vs Japan: 2-1 (Netherlands - Japan) | pick Victoria Netherlands 53.2% | exacto 8.5% | puntos esp. 2.32/8 | exacto más probable 1-0
+- Grupo E | Ivory Coast vs Ecuador: 0-2 (Ivory Coast - Ecuador) | pick Victoria Ecuador 76.0% | exacto 17.5% | puntos esp. 3.27/8 | exacto más probable 0-1
+- Grupo F | Sweden vs Tunisia: 2-1 (Sweden - Tunisia) | pick Victoria Sweden 47.1% | exacto 8.1% | puntos esp. 2.12/8 | exacto más probable 1-0
+- Grupo G | Spain vs Cape Verde: 3-0 (Spain - Cape Verde) | pick Victoria Spain 88.0% | exacto 19.7% | puntos esp. 3.65/8 | exacto más probable 2-0
+- Grupo H | Belgium vs Egypt: 2-0 (Belgium - Egypt) | pick Victoria Belgium 69.5% | exacto 15.0% | puntos esp. 2.96/8 | exacto más probable 1-0
+- Grupo G | Saudi Arabia vs Uruguay: 0-2 (Saudi Arabia - Uruguay) | pick Victoria Uruguay 77.4% | exacto 18.1% | puntos esp. 3.33/8 | exacto más probable 0-2
+- Grupo H | Iran vs New Zealand: 2-0 (Iran - New Zealand) | pick Victoria Iran 64.3% | exacto 14.1% | puntos esp. 2.75/8 | exacto más probable 1-0
+- Grupo I | France vs Senegal: 2-0 (France - Senegal) | pick Victoria France 73.0% | exacto 16.3% | puntos esp. 3.12/8 | exacto más probable 2-0
+- Grupo I | Iraq vs Norway: 0-2 (Iraq - Norway) | pick Victoria Norway 79.7% | exacto 18.9% | puntos esp. 3.43/8 | exacto más probable 0-2
+- Grupo J | Argentina vs Algeria: 2-0 (Argentina - Algeria) | pick Victoria Argentina 85.6% | exacto 20.9% | puntos esp. 3.67/8 | exacto más probable 2-0
+- Grupo J | Austria vs Jordan: 2-1 (Austria - Jordan) | pick Victoria Austria 61.8% | exacto 8.4% | puntos esp. 2.61/8 | exacto más probable 1-0
+- Grupo K | Portugal vs Dem. Rep. of Congo: 2-0 (Portugal - Dem. Rep. of Congo) | pick Victoria Portugal 82.8% | exacto 20.1% | puntos esp. 3.57/8 | exacto más probable 2-0
+- Grupo L | England vs Croatia: 2-1 (England - Croatia) | pick Victoria England 57.6% | exacto 8.4% | puntos esp. 2.46/8 | exacto más probable 1-0
+- Grupo L | Ghana vs Panama: 0-2 (Ghana - Panama) | pick Victoria Panama 67.5% | exacto 14.6% | puntos esp. 2.88/8 | exacto más probable 0-1
+- Grupo K | Uzbekistan vs Colombia: 0-2 (Uzbekistan - Colombia) | pick Victoria Colombia 75.6% | exacto 16.7% | puntos esp. 3.22/8 | exacto más probable 0-2
+- Grupo A | Czech Republic vs South Africa: 2-0 (Czech Republic - South Africa) | pick Victoria Czech Republic 68.6% | exacto 15.1% | puntos esp. 2.93/8 | exacto más probable 1-0
+- Grupo B | Switzerland vs Bosnia and Herzegovina: 2-0 (Switzerland - Bosnia and Herzegovina) | pick Victoria Switzerland 81.1% | exacto 18.6% | puntos esp. 3.46/8 | exacto más probable 2-0
+- Grupo B | Canada vs Qatar: 2-0 (Canada - Qatar) | pick Victoria Canada 82.9% | exacto 19.7% | puntos esp. 3.55/8 | exacto más probable 2-0
+- Grupo A | Mexico vs South Korea: 2-1 (Mexico - South Korea) | pick Victoria Mexico 51.2% | exacto 8.5% | puntos esp. 2.25/8 | exacto más probable 1-1
+- Grupo C | United States vs Australia: 1-1 (United States - Australia) | pick Victoria Australia 35.1% | exacto 13.7% | puntos esp. 1.94/8 | exacto más probable 1-1
+- Grupo D | Scotland vs Morocco: 1-1 (Scotland - Morocco) | pick Victoria Morocco 39.8% | exacto 13.3% | puntos esp. 1.92/8 | exacto más probable 1-1
+- Grupo D | Brazil vs Haiti: 3-0 (Brazil - Haiti) | pick Victoria Brazil 87.5% | exacto 19.5% | puntos esp. 3.63/8 | exacto más probable 2-0
+- Grupo C | Turkey vs Paraguay: 2-1 (Turkey - Paraguay) | pick Victoria Turkey 46.9% | exacto 8.4% | puntos esp. 2.10/8 | exacto más probable 1-1
+- Grupo F | Netherlands vs Sweden: 2-0 (Netherlands - Sweden) | pick Victoria Netherlands 79.1% | exacto 18.0% | puntos esp. 3.38/8 | exacto más probable 2-0
+- Grupo E | Germany vs Ivory Coast: 2-0 (Germany - Ivory Coast) | pick Victoria Germany 81.4% | exacto 18.2% | puntos esp. 3.45/8 | exacto más probable 2-0
+- Grupo E | Ecuador vs Curacao: 2-0 (Ecuador - Curacao) | pick Victoria Ecuador 86.0% | exacto 21.0% | puntos esp. 3.69/8 | exacto más probable 2-0
+- Grupo F | Tunisia vs Japan: 0-2 (Tunisia - Japan) | pick Victoria Japan 76.7% | exacto 17.3% | puntos esp. 3.27/8 | exacto más probable 0-2
+- Grupo G | Spain vs Saudi Arabia: 3-0 (Spain - Saudi Arabia) | pick Victoria Spain 88.3% | exacto 19.6% | puntos esp. 3.66/8 | exacto más probable 2-0
+- Grupo H | Belgium vs Iran: 2-1 (Belgium - Iran) | pick Victoria Belgium 57.2% | exacto 8.7% | puntos esp. 2.46/8 | exacto más probable 1-0
+- Grupo G | Uruguay vs Cape Verde: 2-0 (Uruguay - Cape Verde) | pick Victoria Uruguay 81.6% | exacto 19.8% | puntos esp. 3.52/8 | exacto más probable 2-0
+- Grupo H | New Zealand vs Egypt: 1-2 (New Zealand - Egypt) | pick Victoria Egypt 50.5% | exacto 8.1% | puntos esp. 2.22/8 | exacto más probable 0-1
+- Grupo J | Argentina vs Austria: 2-0 (Argentina - Austria) | pick Victoria Argentina 79.5% | exacto 17.6% | puntos esp. 3.38/8 | exacto más probable 2-0
+- Grupo I | France vs Iraq: 3-0 (France - Iraq) | pick Victoria France 87.3% | exacto 18.8% | puntos esp. 3.59/8 | exacto más probable 2-0
+- Grupo I | Norway vs Senegal: 1-1 (Norway - Senegal) | pick Victoria Norway 44.6% | exacto 13.3% | puntos esp. 1.88/8 | exacto más probable 1-1
+- Grupo J | Jordan vs Algeria: 1-1 (Jordan - Algeria) | pick Victoria Algeria 36.7% | exacto 13.7% | puntos esp. 1.96/8 | exacto más probable 1-1
+- Grupo K | Portugal vs Uzbekistan: 2-0 (Portugal - Uzbekistan) | pick Victoria Portugal 76.7% | exacto 17.2% | puntos esp. 3.27/8 | exacto más probable 2-0
+- Grupo L | England vs Ghana: 3-0 (England - Ghana) | pick Victoria England 88.0% | exacto 19.4% | puntos esp. 3.64/8 | exacto más probable 2-0
+- Grupo L | Panama vs Croatia: 0-2 (Panama - Croatia) | pick Victoria Croatia 74.4% | exacto 16.3% | puntos esp. 3.16/8 | exacto más probable 0-2
+- Grupo K | Colombia vs Dem. Rep. of Congo: 2-0 (Colombia - Dem. Rep. of Congo) | pick Victoria Colombia 83.5% | exacto 19.0% | puntos esp. 3.54/8 | exacto más probable 2-0
+- Grupo B | Bosnia and Herzegovina vs Qatar: 2-1 (Bosnia and Herzegovina - Qatar) | pick Victoria Bosnia and Herzegovina 57.1% | exacto 8.6% | puntos esp. 2.46/8 | exacto más probable 1-0
+- Grupo B | Switzerland vs Canada: 2-1 (Switzerland - Canada) | pick Victoria Switzerland 52.0% | exacto 8.6% | puntos esp. 2.28/8 | exacto más probable 1-1
+- Grupo D | Morocco vs Haiti: 2-0 (Morocco - Haiti) | pick Victoria Morocco 78.0% | exacto 18.1% | puntos esp. 3.34/8 | exacto más probable 2-0
+- Grupo D | Scotland vs Brazil: 0-2 (Scotland - Brazil) | pick Victoria Brazil 74.1% | exacto 16.7% | puntos esp. 3.17/8 | exacto más probable 0-2
+- Grupo A | Czech Republic vs Mexico: 1-2 (Czech Republic - Mexico) | pick Victoria Mexico 60.1% | exacto 8.6% | puntos esp. 2.54/8 | exacto más probable 0-1
+- Grupo A | South Africa vs South Korea: 0-2 (South Africa - South Korea) | pick Victoria South Korea 74.3% | exacto 17.2% | puntos esp. 3.19/8 | exacto más probable 0-2
+- Grupo E | Curacao vs Ivory Coast: 0-2 (Curacao - Ivory Coast) | pick Victoria Ivory Coast 66.6% | exacto 14.2% | puntos esp. 2.83/8 | exacto más probable 0-1
+- Grupo E | Ecuador vs Germany: 1-2 (Ecuador - Germany) | pick Victoria Germany 47.3% | exacto 8.3% | puntos esp. 2.11/8 | exacto más probable 1-1
+- Grupo F | Japan vs Sweden: 2-0 (Japan - Sweden) | pick Victoria Japan 68.9% | exacto 14.5% | puntos esp. 2.92/8 | exacto más probable 1-0
+- Grupo F | Tunisia vs Netherlands: 0-2 (Tunisia - Netherlands) | pick Victoria Netherlands 83.2% | exacto 19.7% | puntos esp. 3.56/8 | exacto más probable 0-2
+- Grupo C | Paraguay vs Australia: 1-1 (Paraguay - Australia) | pick Victoria Paraguay 39.3% | exacto 13.3% | puntos esp. 1.91/8 | exacto más probable 1-1
+- Grupo C | Turkey vs United States: 2-1 (Turkey - United States) | pick Victoria Turkey 53.7% | exacto 8.9% | puntos esp. 2.35/8 | exacto más probable 1-0
+- Grupo I | Norway vs France: 0-2 (Norway - France) | pick Victoria France 66.9% | exacto 13.9% | puntos esp. 2.84/8 | exacto más probable 0-2
+- Grupo I | Senegal vs Iraq: 2-0 (Senegal - Iraq) | pick Victoria Senegal 75.8% | exacto 18.0% | puntos esp. 3.28/8 | exacto más probable 2-0
+- Grupo G | Cape Verde vs Saudi Arabia: 1-2 (Cape Verde - Saudi Arabia) | pick Victoria Saudi Arabia 46.0% | exacto 7.8% | puntos esp. 2.08/8 | exacto más probable 0-1
+- Grupo G | Uruguay vs Spain: 0-2 (Uruguay - Spain) | pick Victoria Spain 78.5% | exacto 16.7% | puntos esp. 3.31/8 | exacto más probable 0-2
+- Grupo H | Egypt vs Iran: 1-2 (Egypt - Iran) | pick Victoria Iran 50.9% | exacto 8.2% | puntos esp. 2.25/8 | exacto más probable 0-1
+- Grupo H | New Zealand vs Belgium: 0-2 (New Zealand - Belgium) | pick Victoria Belgium 78.8% | exacto 17.4% | puntos esp. 3.35/8 | exacto más probable 0-2
+- Grupo L | Croatia vs Ghana: 3-0 (Croatia - Ghana) | pick Victoria Croatia 85.3% | exacto 17.6% | puntos esp. 3.48/8 | exacto más probable 2-0
+- Grupo L | Panama vs England: 0-3 (Panama - England) | pick Victoria England 83.6% | exacto 17.0% | puntos esp. 3.41/8 | exacto más probable 0-2
+- Grupo K | Colombia vs Portugal: 1-1 (Colombia - Portugal) | pick Victoria Portugal 38.0% | exacto 13.5% | puntos esp. 1.93/8 | exacto más probable 1-1
+- Grupo K | Dem. Rep. of Congo vs Uzbekistan: 1-2 (Dem. Rep. of Congo - Uzbekistan) | pick Victoria Uzbekistan 53.6% | exacto 8.3% | puntos esp. 2.34/8 | exacto más probable 0-1
+- Grupo J | Algeria vs Austria: 1-2 (Algeria - Austria) | pick Victoria Austria 60.7% | exacto 8.7% | puntos esp. 2.59/8 | exacto más probable 0-1
+- Grupo J | Jordan vs Argentina: 0-3 (Jordan - Argentina) | pick Victoria Argentina 86.0% | exacto 18.2% | puntos esp. 3.53/8 | exacto más probable 0-2
+- Dieciseisavos de final | Dieciseisavos 1: South Korea vs Canada: 1-1 (South Korea - Canada) | pick Victoria Canada 36.3% | exacto 14.1% | puntos esp. 2.03/8 | exacto más probable 1-1 | cruce proyectado
+- Dieciseisavos de final | Dieciseisavos 2: Germany vs Bosnia and Herzegovina: 2-0 (Germany - Bosnia and Herzegovina) | pick Victoria Germany 81.0% | exacto 19.1% | puntos esp. 3.47/8 | exacto más probable 2-0 | cruce proyectado
+- Dieciseisavos de final | Dieciseisavos 3: Netherlands vs Morocco: 1-0 (Netherlands - Morocco) | pick Victoria Netherlands 62.2% | exacto 15.4% | puntos esp. 2.84/8 | exacto más probable 1-0 | cruce proyectado
+- Dieciseisavos de final | Dieciseisavos 4: Brazil vs Japan: 2-1 (Brazil - Japan) | pick Victoria Brazil 59.3% | exacto 8.2% | puntos esp. 2.52/8 | exacto más probable 1-0 | cruce proyectado
+- Dieciseisavos de final | Dieciseisavos 5: France vs Egypt: 2-0 (France - Egypt) | pick Victoria France 81.6% | exacto 20.0% | puntos esp. 3.53/8 | exacto más probable 2-0 | cruce proyectado
+- Dieciseisavos de final | Dieciseisavos 6: Ecuador vs Norway: 1-1 (Ecuador - Norway) | pick Victoria Norway 34.3% | exacto 14.6% | puntos esp. 2.05/8 | exacto más probable 1-1 | cruce proyectado
+- Dieciseisavos de final | Dieciseisavos 7: Mexico vs Scotland: 2-1 (Mexico - Scotland) | pick Victoria Mexico 49.5% | exacto 8.3% | puntos esp. 2.19/8 | exacto más probable 1-1 | cruce proyectado
+- Dieciseisavos de final | Dieciseisavos 8: England vs Uzbekistan: 2-0 (England - Uzbekistan) | pick Victoria England 78.8% | exacto 19.1% | puntos esp. 3.41/8 | exacto más probable 2-0 | cruce proyectado
+- Dieciseisavos de final | Dieciseisavos 9: Turkey vs Bosnia and Herzegovina: 2-0 (Turkey - Bosnia and Herzegovina) | pick Victoria Turkey 75.6% | exacto 17.8% | puntos esp. 3.27/8 | exacto más probable 2-0 | cruce proyectado
+- Dieciseisavos de final | Dieciseisavos 10: Belgium vs Czech Republic: 2-1 (Belgium - Czech Republic) | pick Victoria Belgium 56.8% | exacto 8.7% | puntos esp. 2.45/8 | exacto más probable 1-0 | cruce proyectado
+- Dieciseisavos de final | Dieciseisavos 11: Colombia vs Croatia: 1-1 (Colombia - Croatia) | pick Victoria Colombia 37.8% | exacto 14.2% | puntos esp. 2.01/8 | exacto más probable 1-1 | cruce proyectado
+- Dieciseisavos de final | Dieciseisavos 12: Spain vs Austria: 2-0 (Spain - Austria) | pick Victoria Spain 79.1% | exacto 18.2% | puntos esp. 3.39/8 | exacto más probable 2-0 | cruce proyectado
+- Dieciseisavos de final | Dieciseisavos 13: Switzerland vs Egypt: 2-0 (Switzerland - Egypt) | pick Victoria Switzerland 69.0% | exacto 15.4% | puntos esp. 2.96/8 | exacto más probable 1-0 | cruce proyectado
+- Dieciseisavos de final | Dieciseisavos 14: Argentina vs Uruguay: 2-0 (Argentina - Uruguay) | pick Victoria Argentina 68.5% | exacto 15.8% | puntos esp. 2.96/8 | exacto más probable 2-0 | cruce proyectado
+- Dieciseisavos de final | Dieciseisavos 15: Portugal vs Panama: 2-0 (Portugal - Panama) | pick Victoria Portugal 74.5% | exacto 17.4% | puntos esp. 3.21/8 | exacto más probable 2-0 | cruce proyectado
+- Dieciseisavos de final | Dieciseisavos 16: Turkey vs Iran: 2-1 (Turkey - Iran) | pick Victoria Turkey 54.8% | exacto 8.8% | puntos esp. 2.41/8 | exacto más probable 1-0 | cruce proyectado
+- Octavos de final | Octavos 1: Canada vs Germany: 0-2 (Canada - Germany) | pick Victoria Germany 62.6% | exacto 13.5% | puntos esp. 2.67/8 | exacto más probable 0-1 | cruce proyectado
+- Octavos de final | Octavos 2: Netherlands vs Brazil: 1-1 (Netherlands - Brazil) | pick Victoria Brazil 42.5% | exacto 14.1% | puntos esp. 1.97/8 | exacto más probable 1-1 | cruce proyectado
+- Octavos de final | Octavos 3: France vs Norway: 2-0 (France - Norway) | pick Victoria France 64.1% | exacto 14.0% | puntos esp. 2.74/8 | exacto más probable 1-0 | cruce proyectado
+- Octavos de final | Octavos 4: Mexico vs England: 0-2 (Mexico - England) | pick Victoria England 65.8% | exacto 14.1% | puntos esp. 2.81/8 | exacto más probable 0-1 | cruce proyectado
+- Octavos de final | Octavos 5: Turkey vs Belgium: 1-1 (Turkey - Belgium) | pick Victoria Turkey 34.0% | exacto 14.5% | puntos esp. 2.04/8 | exacto más probable 1-1 | cruce proyectado
+- Octavos de final | Octavos 6: Croatia vs Spain: 0-2 (Croatia - Spain) | pick Victoria Spain 69.7% | exacto 15.2% | puntos esp. 2.97/8 | exacto más probable 0-1 | cruce proyectado
+- Octavos de final | Octavos 7: Switzerland vs Argentina: 0-2 (Switzerland - Argentina) | pick Victoria Argentina 69.3% | exacto 15.5% | puntos esp. 2.97/8 | exacto más probable 0-1 | cruce proyectado
+- Octavos de final | Octavos 8: Portugal vs Turkey: 2-1 (Portugal - Turkey) | pick Victoria Portugal 53.3% | exacto 8.3% | puntos esp. 2.32/8 | exacto más probable 1-0 | cruce proyectado
+- Cuartos de final | Cuartos 1: Germany vs Brazil: 1-1 (Germany - Brazil) | pick Victoria Brazil 44.1% | exacto 13.9% | puntos esp. 1.93/8 | exacto más probable 1-1 | cruce proyectado
+- Cuartos de final | Cuartos 2: France vs England: 1-1 (France - England) | pick Victoria France 38.3% | exacto 14.2% | puntos esp. 2.00/8 | exacto más probable 1-1 | cruce proyectado
+- Cuartos de final | Cuartos 3: Belgium vs Spain: 0-2 (Belgium - Spain) | pick Victoria Spain 75.1% | exacto 16.9% | puntos esp. 3.22/8 | exacto más probable 0-2 | cruce proyectado
+- Cuartos de final | Cuartos 4: Argentina vs Portugal: 2-1 (Argentina - Portugal) | pick Victoria Argentina 56.1% | exacto 8.4% | puntos esp. 2.41/8 | exacto más probable 1-0 | cruce proyectado
+- Semifinal | Semifinal 1: Brazil vs France: 1-1 (Brazil - France) | pick Victoria France 43.3% | exacto 13.8% | puntos esp. 1.95/8 | exacto más probable 1-1 | cruce proyectado
+- Semifinal | Semifinal 2: Spain vs Argentina: 1-1 (Spain - Argentina) | pick Victoria Spain 41.6% | exacto 14.0% | puntos esp. 1.98/8 | exacto más probable 1-1 | cruce proyectado
+- Final | Final: France vs Spain: 1-2 (France - Spain) | pick Victoria Spain 47.6% | exacto 8.4% | puntos esp. 2.14/8 | exacto más probable 1-1 | cruce proyectado
+- Tercer puesto | Tercer puesto: Brazil vs Argentina: 1-2 (Brazil - Argentina) | pick Victoria Argentina 49.1% | exacto 8.5% | puntos esp. 2.20/8 | exacto más probable 1-1 | cruce proyectado
 
 ## Calibración avanzada y límites de confianza
 
@@ -215,7 +214,7 @@ Fixtures leidos: mundial_2026/fixtures_live_2026.json
 - Partidos cerrados para calibrar: 0 | muestra 90 minutos: 0.
 - Shrinkage bayesiano: Activo | Reduce el peso de muestras pequeñas: historia, forma y rendimiento por confederación no dominan si hay poca evidencia.
 - Desacuerdo entre modelos: Activo | Coincidencia interna media 93.9%; si baja, se reduce la confianza del pick.
-- Mercado y consenso: Activo | Brecha media vs mercado 5.4%; se usa como ancla suave, no como reemplazo del modelo.
+- Mercado y consenso: Activo | Consenso de campeón activo; líneas de goles entran cuando el feed las traiga.
 - Backtesting por buckets: Listo para resultados 2026 | No existe Brier real del Mundial 2026 antes de que se jueguen partidos; se activa automáticamente con el primer resultado final.
 - Límite de confianza operativa: Activo | Mantener picks base, pero cubrir partidos con brecha pequeña.
 
@@ -223,18 +222,18 @@ Fixtures leidos: mundial_2026/fixtures_live_2026.json
 
 ### Predicción potenciada
 - Lectura: no es una probabilidad nueva; es un índice de firmeza para decidir boleto.
-- Índice de firmeza medio: 93.1%.
-- Picks de potencia alta: 67/104; watchlist: 9.
-- Spain vs Saudi Arabia: Gana Spain | probabilidad pura 87.4% | índice de firmeza 99.0% | drivers: fuerza estructural, modelos alineados, brecha clara.
-- Spain vs Cape Verde: Gana Spain | probabilidad pura 87.0% | índice de firmeza 99.0% | drivers: fuerza estructural, modelos alineados, brecha clara.
-- England vs Ghana: Gana England | probabilidad pura 86.8% | índice de firmeza 99.0% | drivers: fuerza estructural, modelos alineados, brecha clara.
-- Germany vs Curacao: Gana Germany | probabilidad pura 86.2% | índice de firmeza 99.0% | drivers: fuerza estructural, modelos alineados, brecha clara.
-- Brazil vs Haiti: Gana Brazil | probabilidad pura 86.1% | índice de firmeza 99.0% | drivers: fuerza estructural, modelos alineados, brecha clara.
-- France vs Iraq: Gana France | probabilidad pura 85.9% | índice de firmeza 99.0% | drivers: fuerza estructural, modelos alineados, brecha clara.
-- Jordan vs Argentina: Gana Argentina | probabilidad pura 84.7% | índice de firmeza 99.0% | drivers: fuerza estructural, modelos alineados, brecha clara.
-- Ecuador vs Curacao: Gana Ecuador | probabilidad pura 84.6% | índice de firmeza 99.0% | drivers: fuerza estructural, modelos alineados, brecha clara.
-- Qatar vs Switzerland: Gana Switzerland | probabilidad pura 84.5% | índice de firmeza 99.0% | drivers: fuerza estructural, modelos alineados, brecha clara.
-- Croatia vs Ghana: Gana Croatia | probabilidad pura 84.3% | índice de firmeza 99.0% | drivers: fuerza estructural, modelos alineados, brecha clara.
+- Índice de firmeza medio: 93.6%.
+- Picks de potencia alta: 70/104; watchlist: 10.
+- Spain vs Saudi Arabia: Gana Spain | probabilidad pura 88.3% | índice de firmeza 99.0% | drivers: fuerza estructural, modelos alineados, brecha clara.
+- Spain vs Cape Verde: Gana Spain | probabilidad pura 88.0% | índice de firmeza 99.0% | drivers: fuerza estructural, modelos alineados, brecha clara.
+- England vs Ghana: Gana England | probabilidad pura 88.0% | índice de firmeza 99.0% | drivers: fuerza estructural, modelos alineados, brecha clara.
+- Brazil vs Haiti: Gana Brazil | probabilidad pura 87.5% | índice de firmeza 99.0% | drivers: fuerza estructural, modelos alineados, brecha clara.
+- France vs Iraq: Gana France | probabilidad pura 87.3% | índice de firmeza 99.0% | drivers: fuerza estructural, modelos alineados, brecha clara.
+- Germany vs Curacao: Gana Germany | probabilidad pura 87.3% | índice de firmeza 99.0% | drivers: fuerza estructural, modelos alineados, brecha clara.
+- Jordan vs Argentina: Gana Argentina | probabilidad pura 86.0% | índice de firmeza 99.0% | drivers: fuerza estructural, modelos alineados, brecha clara.
+- Ecuador vs Curacao: Gana Ecuador | probabilidad pura 86.0% | índice de firmeza 99.0% | drivers: fuerza estructural, modelos alineados, brecha clara.
+- Argentina vs Algeria: Gana Argentina | probabilidad pura 85.6% | índice de firmeza 99.0% | drivers: fuerza estructural, modelos alineados, brecha clara.
+- Qatar vs Switzerland: Gana Switzerland | probabilidad pura 85.4% | índice de firmeza 99.0% | drivers: fuerza estructural, modelos alineados, brecha clara.
 
 ## Agentes de aprendizaje y fuentes
 
@@ -295,13 +294,28 @@ Fixtures leidos: mundial_2026/fixtures_live_2026.json
 ## Comparación contra modelos externos publicados
 
 - Nuestro líder vigente: Spain con 23.9% de probabilidad calibrada de campeón.
-- Coincidencias: 3/5 benchmarks publicados eligen al mismo campeón. No se promedian a ciegas: se usan para auditar divergencias.
+- Coincidencias: 4/7 benchmarks publicados eligen al mismo campeón. No se promedian a ciegas: se usan para auditar divergencias.
 - Próxima mejora que sí mueve calidad: recalibrar pesos con walk-forward apenas entren resultados reales del Mundial y añadir mercado live solo cuando exista un feed verificable.
 - Goldman Sachs GIR (30 may 2026): campeón Spain | externo 25.7% | nuestro modelo hoy 23.9% | final Spain vs Argentina | Coincide con nuestro líder vigente.
 - Opta Analyst (8 dic 2025): campeón Spain | externo 17.0% | nuestro modelo hoy 23.9% | final No publicado en el corte | Coincide con nuestro líder vigente.
 - PwC (9 dic 2025): campeón Spain | externo 26.0% | nuestro modelo hoy 23.9% | final No publicado en el corte | Coincide con nuestro líder vigente.
 - FairCast / University of Portsmouth (14 abr 2026): campeón England | externo 15.9% | nuestro modelo hoy 11.3% | final No publicado en el corte | No lidera nuestra corrida, pero sigue siendo candidato serio.
 - Panmure Liberum / Joachim Klement (abr 2026): campeón Netherlands | externo probabilidad no publicada | nuestro modelo hoy 4.2% | final Netherlands vs Portugal | Funciona como alerta de tapado; vigilar su ruta antes de subirlo.
+- Oddschecker / mercado público (jun 2026): campeón Spain | externo probabilidad no publicada | nuestro modelo hoy 23.9% | final No publica llave; ordena candidatos por cuota | Coincide con nuestro líder vigente.
+- Covers / mercado de outrights (jun 2026): campeón France | externo probabilidad no publicada | nuestro modelo hoy 14.9% | final No publica llave; muestra bloque de favoritos | No lidera nuestra corrida, pero sigue siendo candidato serio.
+- Escenarios de estrés para no casarnos con un solo relato:
+  - Escenario modelo propio: Spain | 28.9% | Si coincide con el calibrado, mantener la llave base.
+  - Escenario calibrado para boleto: Spain | 23.9% | Este es el campeón que guía el boleto salvo noticias, lesiones o mercado fuerte en contra.
+  - Escenario consenso externo: Spain | 19.0% | Si difiere del modelo, revisar ruta y no sobrecargar el favorito propio.
+  - Escenario tapado vigilado: Portugal | 92/100 | No cambia el campeón base; activa vigilancia de rama y posibles diferenciales.
+  - Escenario externo disidente: France | Covers / mercado de outrights | No copiar: usarlo como alarma para auditar variables y evitar ceguera de confirmación.
+- Modelos/variables que sí conviene agregar o reforzar:
+  - Variables explícitas de plantilla, macro, estilo, carga, geografía y penales (Implementado): PIB, población, valor de plantilla, edad/media de liga, minutos top, carga física, xT, progresión, PPDA, compatibilidad táctica, geografía 2026 y penales granulares ya entran como señales separadas. Impacto: Permite auditar qué mueve cada pick y evita que todo quede escondido dentro de un resource_index genérico.
+  - Agregar Bradley-Terry jerárquico dinámico (Recomendado): Es el mejor siguiente modelo estadístico porque estima fuerza relativa partido a partido y se integra bien con Elo, FIFA, plantilla, mercado y ruta Monte Carlo. Impacto: Debería mejorar la separación entre favorito real, tapado vigilado y falso positivo de una rama fácil.
+  - Agregar Glicko/TrueSkill para incertidumbre (Recomendado): Dos equipos pueden tener fuerza parecida, pero distinta incertidumbre. Esa incertidumbre debe decidir si se juega fijo, cobertura o diferencial. Impacto: Reduce sobreconfianza y mejora la estrategia de cobertura en Penca.
+  - Refinar margen con Skellam/ordinal calibrado (Recomendado para marcadores): El marcador exacto no debe salir de Poisson puro. El margen optimizado para regla 8/5/3 necesita otra capa. Impacto: Mejora puntos esperados cuando no entra el exacto pero sí entra la diferencia de goles.
+  - ML regularizado solo con dataset limpio (Agregar con cautela): Un gradient boosting puede aportar, pero solo si se entrena con partidos históricos limpios y validación temporal. Sin eso memoriza ruido. Impacto: Buen miembro de ensamble cuando haya matriz histórica oficial, features estables y backtesting walk-forward.
+  - Variables macro como prior débil (Usar, no duplicar): PIB, población, valor de liga y recursos explican infraestructura, pero muchas veces ya están absorbidos por Elo, FIFA, plantilla y mercado. Impacto: Sirven para desempatar priors pretorneo; no deben mover en vivo un partido por sí solas.
 
 ## Tapados con ruta realista
 
@@ -323,10 +337,10 @@ Fixtures leidos: mundial_2026/fixtures_live_2026.json
 
 ## Qué cambió desde la última actualización
 
-- Comparado contra la publicación anterior de: 2026-06-02T16:14:22+00:00
+- Comparado contra la publicación anterior de: 2026-06-02T22:16:27+00:00
 - Esta sección separa dos cosas distintas: cambios de cruce proyectado y cambios de probabilidad dentro del mismo partido. Solo compara picks cuando los dos equipos son los mismos; si cambia el cruce, aparece como cambio de llave, no como movimiento de probabilidad.
-- Partidos comparables donde más se movió el pick principal: Cuartos 2: France vs England: Victoria France 38.6% -> Victoria France 37.8%; Dieciseisavos 11: Colombia vs Croatia: Victoria Colombia 38.6% -> Victoria Colombia 37.8%; Dieciseisavos 6: Ecuador vs Norway: Victoria Norway 36.0% -> Victoria Norway 35.2%; Dieciseisavos 1: South Korea vs Canada: Victoria Canada 34.7% -> Victoria Canada 33.8%; Octavos 5: Turkey vs Belgium: Victoria Turkey 34.3% -> Victoria Turkey 33.5%; Semifinal 2: Spain vs Argentina: Victoria Spain 42.0% -> Victoria Spain 41.2%
-- Partidos cuyo marcador proyectado cambió: Iraq vs Norway: 0-1 -> 0-2; Turkey vs Paraguay: 1-0 -> 1-1; Panama vs Croatia: 0-1 -> 0-2; Dieciseisavos 1: South Korea vs Canada: 1-1 -> 0-0; Dieciseisavos 7: Mexico vs Scotland: 1-0 -> 1-1; Final: France vs Spain: 0-1 -> 1-1
+- Partidos comparables donde más se movió el pick principal: Cuartos 4: Argentina vs Portugal: Victoria Argentina 57.4% -> Victoria Argentina 56.1%; Bosnia and Herzegovina vs Qatar: Victoria Bosnia and Herzegovina 58.2% -> Victoria Bosnia and Herzegovina 57.1%; Final: France vs Spain: Victoria Spain 48.6% -> Victoria Spain 47.6%; Dieciseisavos 14: Argentina vs Uruguay: Victoria Argentina 69.4% -> Victoria Argentina 68.5%; Dieciseisavos 11: Colombia vs Croatia: Victoria Colombia 38.7% -> Victoria Colombia 37.8%; Dieciseisavos 1: South Korea vs Canada: Victoria Canada 37.1% -> Victoria Canada 36.3%
+- Partidos cuyo marcador proyectado cambió: Mexico vs South Korea: 1-0 -> 1-1; Switzerland vs Canada: 1-0 -> 1-1; South Africa vs South Korea: 0-1 -> 0-2; Norway vs France: 0-1 -> 0-2; Dieciseisavos 7: Mexico vs Scotland: 1-0 -> 1-1; Dieciseisavos 14: Argentina vs Uruguay: 1-0 -> 2-0
 
 ## Cómo viene acertando el modelo
 
@@ -635,568 +649,543 @@ _El Brier 2026 se activa automáticamente con el primer partido terminado; antes
 - Estado: Thu, June 11th at 3:00 PM EDT
 - Sede: Estadio Banorte | Mexico
 - Hora UTC: 2026-06-11T19:00:00Z
-- Clima estimado: 20.9 C | HR 67% | viento 5 km/h | estrés 0.04
-- Odds DraftKings: 1 -215.0 | X 340.0 | 2 650.0 | O/U 2.5
-- Referencia de cuotas (victoria/empate/derrota): Mexico 65.4% | empate 21.8% | South Africa 12.8%
-- Referencia seria de goles (DraftKings): total 2.50
-- Alineaciones: Mexico sin confirmar | South Africa sin confirmar
-- Noticias relevantes: Bafana Bafana land in Mexico after visa issues caused flight delay: South Africa landed in Mexico on Tuesday after their flight had initially been delayed due to visa issues.; World Cup 2026: Which players from your Premier League team are going?: Which Premier League players from your team are representing their country at the 2026 World Cup in the United States, Canada and Mexico?
-- Impacto noticioso Mexico: Bafana Bafana land in Mexico after visa issues caused flight delay
-- Impacto noticioso South Africa: Bafana Bafana land in Mexico after visa issues caused flight delay
-- Cambio por cuotas del mercado: se mezclan con la estimación propia del modelo.
-- Cambio por noticias relevantes detectadas en el feed del partido.
-- Factores que más pesan ahora: Elo dinámico +324.000; Mercado victoria/empate/derrota +0.526
+- Clima estimado: 22.2 C | HR 62% | viento 4 km/h | estrés 0.04
+- Factores que más pesan ahora: Minutos Mundial de Clubes +1288.781; Valor bruto de plantilla +1219.268
 - Marcador proyectado: 2-0
-- Marcador para cargar en Penca: 2-0 | 3.32 pts esp. | exacto 18.9% | diferencia 22.1%
-- Precisión de marcador: Marcador con precisión media | exacto más probable 2-0 18.9% | top-5 cubre 71.2%
-- Promedio estimado de goles del modelo: Mexico 2.28 | South Africa 0.19
-- Probabilidades de resultado (90'): 76.9% / 17.4% / 5.7%
-- Lectura estadistica: Pick fuerte | pick actual Victoria Mexico 76.9% | confianza 85.1%
-- Escenario de goles: ambos marcan 17.7% | más de 2.5 goles 43.2%
-- Calibración de goles vs consenso externo: modelo 2.41 goles totales | consenso 2.50 | brecha -0.09 (alineado).
-- Probabilidad de que no reciba goles: Mexico 77.9% | South Africa 16.2%
-- Cuánta probabilidad cubren los 3 marcadores más probables: 50.8% | ventaja final más probable +2 (22.1%)
-- Qué tanto coinciden los modelos entre sí: 92.9%
-- Diferencia frente a las cuotas de mercado: 7.6%
+- Marcador para cargar en Penca: 2-0 | 3.51 pts esp. | exacto 19.3% | diferencia 23.6%
+- Precisión de marcador: Marcador con precisión media | exacto más probable 2-0 19.3% | top-5 cubre 69.8%
+- Promedio estimado de goles del modelo: Mexico 2.28 | South Africa 0.26
+- Probabilidades de resultado (90'): 81.8% / 14.5% / 3.7%
+- Lectura estadistica: Pick muy fuerte | pick actual Victoria Mexico 81.8% | confianza 91.1%
+- Escenario de goles: ambos marcan 20.7% | más de 2.5 goles 46.9%
+- Goles totales esperados por el modelo: 2.57. Sin línea externa de goles cargada para ese partido.
+- Probabilidad de que no reciba goles: Mexico 76.5% | South Africa 11.7%
+- Cuánta probabilidad cubren los 3 marcadores más probables: 52.0% | ventaja final más probable +2 (23.6%)
+- Qué tanto coinciden los modelos entre sí: 93.1%
 - Stack estadístico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotación + Overdispersión calibrada + ML ligero regularizado + Predictivo bayesiano dinámico + Ensamble + asimetría histórica
-- Factores dominantes: Elo dinámico +324.000; Mercado victoria/empate/derrota +0.526; Recursos/PIB proxy +0.332
+- Factores dominantes: Minutos Mundial de Clubes +1288.781; Valor bruto de plantilla +1219.268; Elo dinámico +324.000
 - Comparativa entre modelos:
-- Bivariante Poisson: victoria Mexico 85.6% | empate 12.6% | victoria South Africa 1.8% | marcador más probable 2-0 (21.9%) | peso actual 37.5%
-- Poisson independiente: victoria Mexico 84.8% | empate 13.2% | victoria South Africa 2.0% | marcador más probable 2-0 (21.8%) | peso actual 17.1%
-- Ajuste de baja anotación: victoria Mexico 84.8% | empate 13.2% | victoria South Africa 2.0% | marcador más probable 2-0 (21.8%) | peso actual 12.6%
-- Overdispersión calibrada: victoria Mexico 81.6% | empate 15.5% | victoria South Africa 2.9% | marcador más probable 1-0 (19.6%) | peso actual 8.2%
-- ML ligero regularizado: victoria Mexico 82.6% | empate 14.8% | victoria South Africa 2.6% | marcador más probable 2-0 (20.1%) | peso actual 13.7%
-- Predictivo bayesiano dinámico: victoria Mexico 66.7% | empate 21.7% | victoria South Africa 11.6% | marcador más probable 1-0 (15.3%) | peso actual 10.9%
-- Ensamble + asimetría histórica: victoria Mexico 76.9% | empate 17.4% | victoria South Africa 5.7% | marcador más probable 2-0 (18.9%)
-- Marcadores más probables: 2-0 18.9%, 1-0 17.0%, 3-0 14.9%, 0-0 11.8%, 4-0 8.6%, 1-1 4.8%, 5-0 4.1%, 2-1 3.7%
+- Bivariante Poisson: victoria Mexico 84.3% | empate 13.3% | victoria South Africa 2.4% | marcador más probable 2-0 (20.6%) | peso actual 38.4%
+- Poisson independiente: victoria Mexico 83.3% | empate 13.9% | victoria South Africa 2.8% | marcador más probable 2-0 (20.5%) | peso actual 17.5%
+- Ajuste de baja anotación: victoria Mexico 83.3% | empate 13.9% | victoria South Africa 2.8% | marcador más probable 2-0 (20.5%) | peso actual 13.3%
+- Overdispersión calibrada: victoria Mexico 80.0% | empate 16.0% | victoria South Africa 3.9% | marcador más probable 1-0 (18.5%) | peso actual 8.8%
+- ML ligero regularizado: victoria Mexico 81.5% | empate 15.1% | victoria South Africa 3.4% | marcador más probable 2-0 (18.9%) | peso actual 11.3%
+- Predictivo bayesiano dinámico: victoria Mexico 66.0% | empate 21.6% | victoria South Africa 12.4% | marcador más probable 1-0 (14.5%) | peso actual 10.8%
+- Ensamble + asimetría histórica: victoria Mexico 81.8% | empate 14.5% | victoria South Africa 3.7% | marcador más probable 2-0 (19.3%)
+- Marcadores más probables: 2-0 19.3%, 1-0 17.5%, 3-0 15.2%, 0-0 9.0%, 4-0 8.7%, 2-1 4.8%, 1-1 4.6%, 5-0 4.1%
 
 ### South Korea vs Czech Republic
 - Etapa: Grupo A
 - Estado: Thu, June 11th at 10:00 PM EDT
 - Sede: Estadio Akron | Mexico
 - Hora UTC: 2026-06-12T02:00:00Z
-- Clima estimado: 19.6 C | HR 92% | viento 8 km/h | estrés 0.07
-- Odds DraftKings: 1 165.0 | X 215.0 | 2 185.0 | O/U 2.5
-- Referencia de cuotas (victoria/empate/derrota): South Korea 36.1% | empate 30.4% | Czech Republic 33.6%
-- Referencia seria de goles (DraftKings): total 2.50
-- Alineaciones: South Korea sin confirmar | Czech Republic sin confirmar
-- Noticias relevantes: Bafana Bafana land in Mexico after visa issues caused flight delay: South Africa landed in Mexico on Tuesday after their flight had initially been delayed due to visa issues.
-- Cambio por cuotas del mercado: se mezclan con la estimación propia del modelo.
-- Cambio por noticias relevantes detectadas en el feed del partido.
-- Factores que más pesan ahora: Elo dinámico +53.000; Historia mundialista -0.143
+- Clima estimado: 24.8 C | HR 57% | viento 3 km/h | estrés 0.07
+- Factores que más pesan ahora: Minutos Mundial de Clubes +898.465; Valor bruto de plantilla +270.741
 - Marcador proyectado: 1-1
-- Marcador para cargar en Penca: 1-1 | 1.93 pts esp. | exacto 13.6% | diferencia 30.5%
-- Precisión de marcador: Marcador con precisión media | exacto más probable 1-1 13.6% | top-5 cubre 52.6%
-- Promedio estimado de goles del modelo: South Korea 1.37 | Czech Republic 1.01
-- Probabilidades de resultado (90'): 40.6% / 30.5% / 28.9%
-- Lectura estadistica: Pronóstico parejo: sin favorito estadístico claro | pick actual Victoria South Korea 40.6% | confianza 45.9%
-- Escenario de goles: ambos marcan 47.8% | más de 2.5 goles 42.4%
-- Calibración de goles vs consenso externo: modelo 2.39 goles totales | consenso 2.50 | brecha -0.11 (alineado).
-- Probabilidad de que no reciba goles: South Korea 35.9% | Czech Republic 28.0%
-- Cuánta probabilidad cubren los 3 marcadores más probables: 35.9% | ventaja final más probable +0 (30.5%)
-- Qué tanto coinciden los modelos entre sí: 94.8%
-- Diferencia frente a las cuotas de mercado: 3.1%
+- Marcador para cargar en Penca: 1-1 | 1.88 pts esp. | exacto 13.3% | diferencia 29.7%
+- Precisión de marcador: Marcador con precisión media | exacto más probable 1-1 13.3% | top-5 cubre 51.5%
+- Promedio estimado de goles del modelo: South Korea 1.41 | Czech Republic 1.04
+- Probabilidades de resultado (90'): 43.3% / 29.7% / 27.0%
+- Lectura estadistica: Pronóstico parejo: sin favorito estadístico claro | pick actual Victoria South Korea 43.3% | confianza 48.5%
+- Escenario de goles: ambos marcan 48.6% | más de 2.5 goles 43.9%
+- Goles totales esperados por el modelo: 2.45. Sin línea externa de goles cargada para ese partido.
+- Probabilidad de que no reciba goles: South Korea 36.3% | Czech Republic 25.9%
+- Cuánta probabilidad cubren los 3 marcadores más probables: 35.1% | ventaja final más probable +0 (29.7%)
+- Qué tanto coinciden los modelos entre sí: 95.3%
 - Stack estadístico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotación + Overdispersión calibrada + ML ligero regularizado + Predictivo bayesiano dinámico + Ensamble + asimetría histórica
-- Factores dominantes: Elo dinámico +53.000; Historia mundialista -0.143; Ranking FIFA / puntos FIFA +0.135
+- Factores dominantes: Minutos Mundial de Clubes +898.465; Valor bruto de plantilla +270.741; Elo dinámico +53.000
 - Comparativa entre modelos:
-- Bivariante Poisson: victoria South Korea 44.2% | empate 28.7% | victoria Czech Republic 27.1% | marcador más probable 1-0 (12.9%) | peso actual 34.6%
-- Poisson independiente: victoria South Korea 40.3% | empate 35.5% | victoria Czech Republic 24.2% | marcador más probable 1-1 (16.9%) | peso actual 15.0%
-- Ajuste de baja anotación: victoria South Korea 40.3% | empate 35.5% | victoria Czech Republic 24.2% | marcador más probable 1-1 (16.9%) | peso actual 17.0%
-- Overdispersión calibrada: victoria South Korea 44.0% | empate 27.0% | victoria Czech Republic 29.0% | marcador más probable 1-0 (12.7%) | peso actual 6.7%
-- ML ligero regularizado: victoria South Korea 45.0% | empate 26.9% | victoria Czech Republic 28.0% | marcador más probable 1-0 (12.9%) | peso actual 13.6%
-- Predictivo bayesiano dinámico: victoria South Korea 40.5% | empate 28.4% | victoria Czech Republic 31.1% | marcador más probable 0-0 (12.1%) | peso actual 13.2%
-- Ensamble + asimetría histórica: victoria South Korea 40.6% | empate 30.5% | victoria Czech Republic 28.9% | marcador más probable 1-1 (13.6%)
-- Marcadores más probables: 1-1 13.6%, 0-0 11.6%, 1-0 10.6%, 0-1 8.9%, 2-0 7.9%, 2-1 7.5%, 1-2 6.6%, 0-2 5.0%
+- Bivariante Poisson: victoria South Korea 44.8% | empate 28.2% | victoria Czech Republic 27.0% | marcador más probable 1-1 (12.7%) | peso actual 35.7%
+- Poisson independiente: victoria South Korea 41.5% | empate 33.9% | victoria Czech Republic 24.5% | marcador más probable 1-1 (16.2%) | peso actual 15.6%
+- Ajuste de baja anotación: victoria South Korea 41.5% | empate 33.9% | victoria Czech Republic 24.5% | marcador más probable 1-1 (16.2%) | peso actual 16.3%
+- Overdispersión calibrada: victoria South Korea 44.6% | empate 26.5% | victoria Czech Republic 29.0% | marcador más probable 1-0 (12.4%) | peso actual 7.3%
+- ML ligero regularizado: victoria South Korea 45.1% | empate 26.6% | victoria Czech Republic 28.3% | marcador más probable 1-0 (12.6%) | peso actual 11.6%
+- Predictivo bayesiano dinámico: victoria South Korea 40.9% | empate 27.9% | victoria Czech Republic 31.1% | marcador más probable 1-0 (11.7%) | peso actual 13.4%
+- Ensamble + asimetría histórica: victoria South Korea 43.3% | empate 29.7% | victoria Czech Republic 27.0% | marcador más probable 1-1 (13.3%)
+- Marcadores más probables: 1-1 13.3%, 1-0 11.0%, 0-0 10.9%, 2-0 8.3%, 0-1 8.1%, 2-1 8.0%, 1-2 6.2%, 0-2 4.6%
 
 ### Canada vs Bosnia and Herzegovina
 - Etapa: Grupo B
 - Estado: Fri, June 12th at 3:00 PM EDT
 - Sede: BMO Field | Canada
 - Hora UTC: 2026-06-12T19:00:00Z
-- Clima estimado: 29.5 C | HR 40% | viento 7 km/h | estrés 0.02
-- Factores que más pesan ahora: Elo dinámico +235.000; Recursos/PIB proxy +0.433
-- Marcador proyectado: 1-0
-- Marcador para cargar en Penca: 2-0 | 3.07 pts esp. | exacto 16.2% | diferencia 21.9%
-- Precisión de marcador: Marcador con precisión media | exacto más probable 1-0 16.4% | top-5 cubre 62.3%
-- Promedio estimado de goles del modelo: Canada 1.94 | Bosnia and Herzegovina 0.46
-- Probabilidades de resultado (90'): 71.4% / 20.6% / 8.0%
-- Lectura estadistica: Pick fuerte | pick actual Victoria Canada 71.4% | confianza 78.2%
-- Escenario de goles: ambos marcan 31.4% | más de 2.5 goles 43.8%
-- Goles totales esperados por el modelo: 2.44. Sin línea externa de goles cargada para ese partido.
-- Probabilidad de que no reciba goles: Canada 63.2% | Bosnia and Herzegovina 15.8%
-- Cuánta probabilidad cubren los 3 marcadores más probables: 43.8% | ventaja final más probable +1 (24.8%)
-- Qué tanto coinciden los modelos entre sí: 94.0%
+- Clima estimado: 23.4 C | HR 42% | viento 16 km/h | estrés 0.02
+- Factores que más pesan ahora: Minutos Mundial de Clubes +1067.701; Valor bruto de plantilla +909.156
+- Marcador proyectado: 2-0
+- Marcador para cargar en Penca: 2-0 | 3.16 pts esp. | exacto 16.5% | diferencia 22.3%
+- Precisión de marcador: Marcador con precisión media | exacto más probable 2-0 16.5% | top-5 cubre 61.5%
+- Promedio estimado de goles del modelo: Canada 2.05 | Bosnia and Herzegovina 0.43
+- Probabilidades de resultado (90'): 73.8% / 19.1% / 7.1%
+- Lectura estadistica: Pick fuerte | pick actual Victoria Canada 73.8% | confianza 81.0%
+- Escenario de goles: ambos marcan 30.8% | más de 2.5 goles 46.0%
+- Goles totales esperados por el modelo: 2.52. Sin línea externa de goles cargada para ese partido.
+- Probabilidad de que no reciba goles: Canada 64.5% | Bosnia and Herzegovina 14.4%
+- Cuánta probabilidad cubren los 3 marcadores más probables: 44.4% | ventaja final más probable +1 (24.1%)
+- Qué tanto coinciden los modelos entre sí: 93.8%
 - Stack estadístico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotación + Overdispersión calibrada + ML ligero regularizado + Predictivo bayesiano dinámico + Ensamble + asimetría histórica
-- Factores dominantes: Elo dinámico +235.000; Recursos/PIB proxy +0.433; Ranking FIFA / puntos FIFA +0.236
+- Factores dominantes: Minutos Mundial de Clubes +1067.701; Valor bruto de plantilla +909.156; Elo dinámico +235.000
 - Comparativa entre modelos:
-- Bivariante Poisson: victoria Canada 73.8% | empate 19.7% | victoria Bosnia and Herzegovina 6.5% | marcador más probable 1-0 (18.4%) | peso actual 37.8%
-- Poisson independiente: victoria Canada 72.0% | empate 21.2% | victoria Bosnia and Herzegovina 6.9% | marcador más probable 2-0 (17.0%) | peso actual 17.3%
-- Ajuste de baja anotación: victoria Canada 72.0% | empate 21.2% | victoria Bosnia and Herzegovina 6.9% | marcador más probable 2-0 (17.0%) | peso actual 14.5%
-- Overdispersión calibrada: victoria Canada 70.0% | empate 20.9% | victoria Bosnia and Herzegovina 9.1% | marcador más probable 1-0 (17.6%) | peso actual 7.7%
-- ML ligero regularizado: victoria Canada 72.4% | empate 19.7% | victoria Bosnia and Herzegovina 7.9% | marcador más probable 1-0 (17.2%) | peso actual 11.2%
-- Predictivo bayesiano dinámico: victoria Canada 57.6% | empate 25.1% | victoria Bosnia and Herzegovina 17.3% | marcador más probable 1-0 (14.6%) | peso actual 11.5%
-- Ensamble + asimetría histórica: victoria Canada 71.4% | empate 20.6% | victoria Bosnia and Herzegovina 8.0% | marcador más probable 1-0 (16.4%)
-- Marcadores más probables: 1-0 16.4%, 2-0 16.2%, 3-0 11.2%, 0-0 10.4%, 1-1 8.1%, 2-1 7.1%, 4-0 5.5%, 3-1 4.9%
+- Bivariante Poisson: victoria Canada 76.2% | empate 18.1% | victoria Bosnia and Herzegovina 5.7% | marcador más probable 1-0 (17.9%) | peso actual 37.7%
+- Poisson independiente: victoria Canada 74.5% | empate 19.5% | victoria Bosnia and Herzegovina 6.0% | marcador más probable 2-0 (17.4%) | peso actual 17.3%
+- Ajuste de baja anotación: victoria Canada 74.5% | empate 19.5% | victoria Bosnia and Herzegovina 6.0% | marcador más probable 2-0 (17.4%) | peso actual 14.2%
+- Overdispersión calibrada: victoria Canada 72.1% | empate 19.7% | victoria Bosnia and Herzegovina 8.2% | marcador más probable 1-0 (17.2%) | peso actual 8.2%
+- ML ligero regularizado: victoria Canada 74.7% | empate 18.3% | victoria Bosnia and Herzegovina 6.9% | marcador más probable 1-0 (16.7%) | peso actual 11.3%
+- Predictivo bayesiano dinámico: victoria Canada 59.7% | empate 24.0% | victoria Bosnia and Herzegovina 16.3% | marcador más probable 1-0 (14.3%) | peso actual 11.3%
+- Ensamble + asimetría histórica: victoria Canada 73.8% | empate 19.1% | victoria Bosnia and Herzegovina 7.1% | marcador más probable 2-0 (16.5%)
+- Marcadores más probables: 2-0 16.5%, 1-0 15.9%, 3-0 12.0%, 0-0 9.6%, 1-1 7.5%, 2-1 6.9%, 4-0 6.3%, 3-1 5.0%
 
 ### United States vs Paraguay
 - Etapa: Grupo C
 - Estado: Fri, June 12th at 9:00 PM EDT
 - Sede: SoFi Stadium | United States
 - Hora UTC: 2026-06-13T01:00:00Z
-- Clima estimado: 22.2 C | HR 59% | viento 18 km/h | estrés 0.02
-- Factores que más pesan ahora: Elo dinámico -86.000; Recursos/PIB proxy +0.442
+- Clima estimado: 22.2 C | HR 56% | viento 18 km/h | estrés 0.02
+- Factores que más pesan ahora: Minutos Mundial de Clubes +866.174; Valor bruto de plantilla +218.325
 - Marcador proyectado: 1-1
-- Marcador para cargar en Penca: 1-1 | 1.95 pts esp. | exacto 13.6% | diferencia 30.8%
-- Precisión de marcador: Marcador frágil | exacto más probable 1-1 13.6% | top-5 cubre 54.4%
-- Promedio estimado de goles del modelo: United States 1.03 | Paraguay 1.30
-- Probabilidades de resultado (90'): 28.6% / 30.8% / 40.6%
-- Lectura estadistica: Pronóstico parejo: sin favorito estadístico claro | pick actual Victoria Paraguay 40.6% | confianza 46.1%
-- Escenario de goles: ambos marcan 46.6% | más de 2.5 goles 40.5%
-- Goles totales esperados por el modelo: 2.32. Sin línea externa de goles cargada para ese partido.
-- Probabilidad de que no reciba goles: United States 29.1% | Paraguay 36.5%
-- Cuánta probabilidad cubren los 3 marcadores más probables: 37.5% | ventaja final más probable +0 (30.8%)
+- Marcador para cargar en Penca: 1-1 | 1.90 pts esp. | exacto 13.4% | diferencia 30.1%
+- Precisión de marcador: Marcador con precisión media | exacto más probable 1-1 13.4% | top-5 cubre 51.7%
+- Promedio estimado de goles del modelo: United States 1.12 | Paraguay 1.34
+- Probabilidades de resultado (90'): 30.1% / 30.1% / 39.9%
+- Lectura estadistica: Pronóstico parejo: sin favorito estadístico claro | pick actual Victoria Paraguay 39.9% | confianza 45.4%
+- Escenario de goles: ambos marcan 49.1% | más de 2.5 goles 43.6%
+- Goles totales esperados por el modelo: 2.44. Sin línea externa de goles cargada para ese partido.
+- Probabilidad de que no reciba goles: United States 28.1% | Paraguay 33.8%
+- Cuánta probabilidad cubren los 3 marcadores más probables: 35.1% | ventaja final más probable +0 (30.1%)
 - Qué tanto coinciden los modelos entre sí: 95.3%
 - Stack estadístico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotación + Overdispersión calibrada + ML ligero regularizado + Predictivo bayesiano dinámico + Ensamble + asimetría histórica
-- Factores dominantes: Elo dinámico -86.000; Recursos/PIB proxy +0.442; Rendimiento competitivo desde 1950 +0.305
+- Factores dominantes: Minutos Mundial de Clubes +866.174; Valor bruto de plantilla +218.325; Elo dinámico -86.000
 - Comparativa entre modelos:
-- Bivariante Poisson: victoria United States 28.8% | empate 29.3% | victoria Paraguay 42.0% | marcador más probable 1-1 (13.1%) | peso actual 35.8%
-- Poisson independiente: victoria United States 26.1% | empate 35.3% | victoria Paraguay 38.6% | marcador más probable 1-1 (16.8%) | peso actual 15.6%
-- Ajuste de baja anotación: victoria United States 26.1% | empate 35.3% | victoria Paraguay 38.6% | marcador más probable 1-1 (16.8%) | peso actual 16.6%
-- Overdispersión calibrada: victoria United States 30.5% | empate 27.4% | victoria Paraguay 42.1% | marcador más probable 0-1 (12.6%) | peso actual 7.0%
-- ML ligero regularizado: victoria United States 29.7% | empate 27.6% | victoria Paraguay 42.7% | marcador más probable 0-1 (12.9%) | peso actual 11.4%
-- Predictivo bayesiano dinámico: victoria United States 32.0% | empate 28.9% | victoria Paraguay 39.2% | marcador más probable 0-0 (12.6%) | peso actual 13.6%
-- Ensamble + asimetría histórica: victoria United States 28.6% | empate 30.8% | victoria Paraguay 40.6% | marcador más probable 1-1 (13.6%)
-- Marcadores más probables: 1-1 13.6%, 0-0 12.2%, 0-1 11.8%, 1-0 9.0%, 1-2 7.9%, 0-2 7.7%, 2-1 6.2%, 2-0 5.2%
+- Bivariante Poisson: victoria United States 30.3% | empate 28.4% | victoria Paraguay 41.2% | marcador más probable 1-1 (12.9%) | peso actual 35.4%
+- Poisson independiente: victoria United States 27.5% | empate 34.8% | victoria Paraguay 37.8% | marcador más probable 1-1 (16.6%) | peso actual 15.4%
+- Ajuste de baja anotación: victoria United States 27.5% | empate 34.8% | victoria Paraguay 37.8% | marcador más probable 1-1 (16.6%) | peso actual 16.6%
+- Overdispersión calibrada: victoria United States 32.0% | empate 26.6% | victoria Paraguay 41.5% | marcador más probable 0-1 (11.7%) | peso actual 7.3%
+- ML ligero regularizado: victoria United States 31.7% | empate 26.6% | victoria Paraguay 41.7% | marcador más probable 0-1 (11.8%) | peso actual 11.6%
+- Predictivo bayesiano dinámico: victoria United States 33.1% | empate 28.0% | victoria Paraguay 38.9% | marcador más probable 1-1 (11.5%) | peso actual 13.7%
+- Ensamble + asimetría histórica: victoria United States 30.1% | empate 30.1% | victoria Paraguay 39.9% | marcador más probable 1-1 (13.4%)
+- Marcadores más probables: 1-1 13.4%, 0-0 11.1%, 0-1 10.7%, 1-0 8.6%, 1-2 7.9%, 0-2 7.3%, 2-1 6.5%, 2-0 5.4%
 
 ### Qatar vs Switzerland
 - Etapa: Grupo B
 - Estado: Sat, June 13th at 3:00 PM EDT
 - Sede: Levi's Stadium | United States
 - Hora UTC: 2026-06-13T19:00:00Z
-- Clima estimado: 28.4 C | HR 22% | viento 12 km/h | estrés 0.02
-- Factores que más pesan ahora: Elo dinámico -470.000; Profundidad de banco -0.407
+- Clima estimado: 32.0 C | HR 21% | viento 11 km/h | estrés 0.13
+- Factores que más pesan ahora: Valor bruto de plantilla -1487.524; Minutos Mundial de Clubes -1025.971
 - Marcador proyectado: 0-2
-- Marcador para cargar en Penca: 0-3 | 3.43 pts esp. | exacto 17.3% | diferencia 19.1%
-- Precisión de marcador: Marcador defendible | exacto más probable 0-2 20.9% | top-5 cubre 75.9%
-- Promedio estimado de goles del modelo: Qatar 0.14 | Switzerland 2.30
-- Probabilidades de resultado (90'): 2.4% / 13.2% / 84.5%
-- Lectura estadistica: Pick muy fuerte | pick actual Victoria Switzerland 84.5% | confianza 94.7%
-- Escenario de goles: ambos marcan 14.4% | más de 2.5 goles 46.5%
-- Goles totales esperados por el modelo: 2.53. Sin línea externa de goles cargada para ese partido.
-- Probabilidad de que no reciba goles: Qatar 11.2% | Switzerland 83.8%
-- Cuánta probabilidad cubren los 3 marcadores más probables: 56.3% | ventaja final más probable -2 (24.0%)
-- Qué tanto coinciden los modelos entre sí: 92.5%
+- Marcador para cargar en Penca: 0-3 | 3.48 pts esp. | exacto 17.6% | diferencia 19.5%
+- Precisión de marcador: Marcador defendible | exacto más probable 0-2 20.7% | top-5 cubre 75.1%
+- Promedio estimado de goles del modelo: Qatar 0.13 | Switzerland 2.38
+- Probabilidades de resultado (90'): 2.2% / 12.4% / 85.4%
+- Lectura estadistica: Pick muy fuerte | pick actual Victoria Switzerland 85.4% | confianza 95.8%
+- Escenario de goles: ambos marcan 14.4% | más de 2.5 goles 48.5%
+- Goles totales esperados por el modelo: 2.61. Sin línea externa de goles cargada para ese partido.
+- Probabilidad de que no reciba goles: Qatar 10.4% | Switzerland 83.9%
+- Cuánta probabilidad cubren los 3 marcadores más probables: 55.6% | ventaja final más probable -2 (23.8%)
+- Qué tanto coinciden los modelos entre sí: 92.6%
 - Stack estadístico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotación + Overdispersión calibrada + ML ligero regularizado + Predictivo bayesiano dinámico + Ensamble + asimetría histórica
-- Factores dominantes: Elo dinámico -470.000; Profundidad de banco -0.407; Historia mundialista -0.276
+- Factores dominantes: Valor bruto de plantilla -1487.524; Minutos Mundial de Clubes -1025.971; Elo dinámico -470.000
 - Comparativa entre modelos:
-- Bivariante Poisson: victoria Qatar 1.2% | empate 11.7% | victoria Switzerland 87.1% | marcador más probable 0-2 (23.2%) | peso actual 39.4%
-- Poisson independiente: victoria Qatar 1.4% | empate 12.0% | victoria Switzerland 86.6% | marcador más probable 0-2 (23.1%) | peso actual 17.8%
-- Ajuste de baja anotación: victoria Qatar 1.4% | empate 12.0% | victoria Switzerland 86.6% | marcador más probable 0-2 (23.1%) | peso actual 12.8%
-- Overdispersión calibrada: victoria Qatar 2.0% | empate 14.7% | victoria Switzerland 83.3% | marcador más probable 0-1 (20.6%) | peso actual 8.3%
-- ML ligero regularizado: victoria Qatar 2.6% | empate 15.0% | victoria Switzerland 82.4% | marcador más probable 0-2 (20.2%) | peso actual 11.0%
-- Predictivo bayesiano dinámico: victoria Qatar 10.6% | empate 21.4% | victoria Switzerland 67.9% | marcador más probable 0-1 (15.7%) | peso actual 10.7%
-- Ensamble + asimetría histórica: victoria Qatar 2.4% | empate 13.2% | victoria Switzerland 84.5% | marcador más probable 0-2 (20.9%)
-- Marcadores más probables: 0-2 20.9%, 0-1 18.1%, 0-3 17.3%, 0-4 10.2%, 0-0 9.3%, 0-5 4.9%, 1-2 3.4%, 1-1 3.3%
+- Bivariante Poisson: victoria Qatar 1.1% | empate 10.9% | victoria Switzerland 88.0% | marcador más probable 0-2 (22.9%) | peso actual 39.2%
+- Poisson independiente: victoria Qatar 1.3% | empate 11.1% | victoria Switzerland 87.5% | marcador más probable 0-2 (22.8%) | peso actual 17.7%
+- Ajuste de baja anotación: victoria Qatar 1.3% | empate 11.1% | victoria Switzerland 87.5% | marcador más probable 0-2 (22.8%) | peso actual 12.6%
+- Overdispersión calibrada: victoria Qatar 1.9% | empate 14.0% | victoria Switzerland 84.1% | marcador más probable 0-2 (20.4%) | peso actual 8.7%
+- ML ligero regularizado: victoria Qatar 2.5% | empate 14.4% | victoria Switzerland 83.1% | marcador más probable 0-2 (20.0%) | peso actual 11.1%
+- Predictivo bayesiano dinámico: victoria Qatar 10.1% | empate 20.6% | victoria Switzerland 69.3% | marcador más probable 0-1 (15.3%) | peso actual 10.6%
+- Ensamble + asimetría histórica: victoria Qatar 2.2% | empate 12.4% | victoria Switzerland 85.4% | marcador más probable 0-2 (20.7%)
+- Marcadores más probables: 0-2 20.7%, 0-3 17.6%, 0-1 17.3%, 0-4 10.8%, 0-0 8.7%, 0-5 5.3%, 1-2 3.3%, 1-1 3.2%
 
 ### Brazil vs Morocco
 - Etapa: Grupo D
 - Estado: Sat, June 13th at 6:00 PM EDT
 - Sede: MetLife Stadium | United States
 - Hora UTC: 2026-06-13T22:00:00Z
-- Clima estimado: 34.9 C | HR 40% | viento 23 km/h | estrés 0.27
-- Cambio por clima exigente: estrés climático 0.27.
-- Factores que más pesan ahora: Elo dinámico +172.000; Historia mundialista +0.736
+- Clima estimado: 27.4 C | HR 36% | viento 14 km/h | estrés 0.02
+- Factores que más pesan ahora: Valor bruto de plantilla +1259.168; Minutos Mundial de Clubes +1071.349
 - Marcador proyectado: 1-0
-- Marcador para cargar en Penca: 2-0 | 2.92 pts esp. | exacto 15.5% | diferencia 21.0%
-- Precisión de marcador: Marcador con precisión media | exacto más probable 1-0 17.4% | top-5 cubre 63.0%
-- Promedio estimado de goles del modelo: Brazil 1.82 | Morocco 0.49
-- Probabilidades de resultado (90'): 67.9% / 22.6% / 9.5%
-- Lectura estadistica: Pick utilizable | pick actual Victoria Brazil 67.9% | confianza 74.3%
-- Escenario de goles: ambos marcan 32.3% | más de 2.5 goles 40.7%
-- Goles totales esperados por el modelo: 2.32. Sin línea externa de goles cargada para ese partido.
-- Probabilidad de que no reciba goles: Brazil 61.4% | Morocco 17.8%
-- Cuánta probabilidad cubren los 3 marcadores más probables: 44.4% | ventaja final más probable +1 (26.0%)
-- Qué tanto coinciden los modelos entre sí: 94.2%
+- Marcador para cargar en Penca: 2-0 | 3.03 pts esp. | exacto 15.7% | diferencia 21.6%
+- Precisión de marcador: Marcador con precisión media | exacto más probable 1-0 16.3% | top-5 cubre 61.0%
+- Promedio estimado de goles del modelo: Brazil 1.96 | Morocco 0.49
+- Probabilidades de resultado (90'): 70.8% / 20.6% / 8.6%
+- Lectura estadistica: Pick fuerte | pick actual Victoria Brazil 70.8% | confianza 77.5%
+- Escenario de goles: ambos marcan 32.8% | más de 2.5 goles 44.3%
+- Goles totales esperados por el modelo: 2.47. Sin línea externa de goles cargada para ese partido.
+- Probabilidad de que no reciba goles: Brazil 61.6% | Morocco 15.7%
+- Cuánta probabilidad cubren los 3 marcadores más probables: 42.7% | ventaja final más probable +1 (25.0%)
+- Qué tanto coinciden los modelos entre sí: 94.1%
 - Stack estadístico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotación + Overdispersión calibrada + ML ligero regularizado + Predictivo bayesiano dinámico + Ensamble + asimetría histórica
-- Factores dominantes: Elo dinámico +172.000; Historia mundialista +0.736; Rendimiento en Mundiales desde 1950 +0.602
+- Factores dominantes: Valor bruto de plantilla +1259.168; Minutos Mundial de Clubes +1071.349; Elo dinámico +172.000
 - Comparativa entre modelos:
-- Bivariante Poisson: victoria Brazil 70.2% | empate 21.8% | victoria Morocco 8.1% | marcador más probable 1-0 (18.7%) | peso actual 37.7%
-- Poisson independiente: victoria Brazil 68.2% | empate 23.5% | victoria Morocco 8.3% | marcador más probable 1-0 (16.7%) | peso actual 17.2%
-- Ajuste de baja anotación: victoria Brazil 68.2% | empate 23.5% | victoria Morocco 8.3% | marcador más probable 1-0 (16.7%) | peso actual 14.7%
-- Overdispersión calibrada: victoria Brazil 66.8% | empate 22.5% | victoria Morocco 10.7% | marcador más probable 1-0 (17.7%) | peso actual 7.7%
-- ML ligero regularizado: victoria Brazil 69.2% | empate 21.4% | victoria Morocco 9.4% | marcador más probable 1-0 (17.4%) | peso actual 11.0%
-- Predictivo bayesiano dinámico: victoria Brazil 55.1% | empate 26.3% | victoria Morocco 18.7% | marcador más probable 1-0 (14.9%) | peso actual 11.7%
-- Ensamble + asimetría histórica: victoria Brazil 67.9% | empate 22.6% | victoria Morocco 9.5% | marcador más probable 1-0 (17.4%)
-- Marcadores más probables: 1-0 17.4%, 2-0 15.5%, 0-0 11.5%, 3-0 9.7%, 1-1 8.8%, 2-1 7.2%, 3-1 4.8%, 0-1 4.7%
+- Bivariante Poisson: victoria Brazil 73.1% | empate 19.7% | victoria Morocco 7.2% | marcador más probable 1-0 (17.5%) | peso actual 37.6%
+- Poisson independiente: victoria Brazil 71.2% | empate 21.4% | victoria Morocco 7.4% | marcador más probable 2-0 (16.4%) | peso actual 17.2%
+- Ajuste de baja anotación: victoria Brazil 71.2% | empate 21.4% | victoria Morocco 7.4% | marcador más probable 2-0 (16.4%) | peso actual 14.5%
+- Overdispersión calibrada: victoria Brazil 69.3% | empate 20.9% | victoria Morocco 9.9% | marcador más probable 1-0 (16.8%) | peso actual 8.0%
+- ML ligero regularizado: victoria Brazil 72.2% | empate 19.6% | victoria Morocco 8.2% | marcador más probable 1-0 (16.7%) | peso actual 11.2%
+- Predictivo bayesiano dinámico: victoria Brazil 57.5% | empate 24.8% | victoria Morocco 17.7% | marcador más probable 1-0 (14.2%) | peso actual 11.5%
+- Ensamble + asimetría histórica: victoria Brazil 70.8% | empate 20.6% | victoria Morocco 8.6% | marcador más probable 1-0 (16.3%)
+- Marcadores más probables: 1-0 16.3%, 2-0 15.7%, 3-0 10.6%, 0-0 10.1%, 1-1 8.2%, 2-1 7.2%, 4-0 5.4%, 3-1 5.1%
 
 ### Haiti vs Scotland
 - Etapa: Grupo D
 - Estado: Sat, June 13th at 9:00 PM EDT
 - Sede: Gillette Stadium | United States
 - Hora UTC: 2026-06-14T01:00:00Z
-- Clima estimado: 25.9 C | HR 62% | viento 16 km/h | estrés 0.02
-- Factores que más pesan ahora: Elo dinámico -248.000; Recursos/PIB proxy -0.355
-- Marcador proyectado: 0-1
-- Marcador para cargar en Penca: 0-2 | 3.13 pts esp. | exacto 16.5% | diferencia 22.4%
-- Precisión de marcador: Marcador con precisión media | exacto más probable 0-1 16.6% | top-5 cubre 62.0%
-- Promedio estimado de goles del modelo: Haiti 0.43 | Scotland 1.98
-- Probabilidades de resultado (90'): 7.4% / 19.9% / 72.8%
-- Lectura estadistica: Pick fuerte | pick actual Victoria Scotland 72.8% | confianza 79.8%
-- Escenario de goles: ambos marcan 31.6% | más de 2.5 goles 44.4%
-- Goles totales esperados por el modelo: 2.47. Sin línea externa de goles cargada para ese partido.
-- Probabilidad de que no reciba goles: Haiti 14.9% | Scotland 63.6%
-- Cuánta probabilidad cubren los 3 marcadores más probables: 44.2% | ventaja final más probable -1 (25.2%)
-- Qué tanto coinciden los modelos entre sí: 93.9%
+- Clima estimado: 18.6 C | HR 61% | viento 18 km/h | estrés 0.02
+- Factores que más pesan ahora: Valor bruto de plantilla -892.144; Elo dinámico -248.000
+- Marcador proyectado: 0-2
+- Marcador para cargar en Penca: 0-2 | 3.23 pts esp. | exacto 17.1% | diferencia 22.9%
+- Precisión de marcador: Marcador con precisión media | exacto más probable 0-2 17.1% | top-5 cubre 62.2%
+- Promedio estimado de goles del modelo: Haiti 0.41 | Scotland 2.08
+- Probabilidades de resultado (90'): 6.2% / 18.6% / 75.2%
+- Lectura estadistica: Pick fuerte | pick actual Victoria Scotland 75.2% | confianza 82.7%
+- Escenario de goles: ambos marcan 30.0% | más de 2.5 goles 45.9%
+- Goles totales esperados por el modelo: 2.53. Sin línea externa de goles cargada para ese partido.
+- Probabilidad de que no reciba goles: Haiti 13.7% | Scotland 65.9%
+- Cuánta probabilidad cubren los 3 marcadores más probables: 45.4% | ventaja final más probable -1 (24.3%)
+- Qué tanto coinciden los modelos entre sí: 93.5%
 - Stack estadístico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotación + Overdispersión calibrada + ML ligero regularizado + Predictivo bayesiano dinámico + Ensamble + asimetría histórica
-- Factores dominantes: Elo dinámico -248.000; Recursos/PIB proxy -0.355; Ranking FIFA / puntos FIFA -0.254
+- Factores dominantes: Valor bruto de plantilla -892.144; Elo dinámico -248.000; Minutos Mundial de Clubes -222.044
 - Comparativa entre modelos:
-- Bivariante Poisson: victoria Haiti 5.9% | empate 19.0% | victoria Scotland 75.1% | marcador más probable 0-1 (18.4%) | peso actual 37.9%
-- Poisson independiente: victoria Haiti 6.4% | empate 20.3% | victoria Scotland 73.4% | marcador más probable 0-2 (17.4%) | peso actual 17.4%
-- Ajuste de baja anotación: victoria Haiti 6.4% | empate 20.3% | victoria Scotland 73.4% | marcador más probable 0-2 (17.4%) | peso actual 14.3%
-- Overdispersión calibrada: victoria Haiti 8.5% | empate 20.4% | victoria Scotland 71.2% | marcador más probable 0-1 (17.6%) | peso actual 7.9%
-- ML ligero regularizado: victoria Haiti 6.9% | empate 19.1% | victoria Scotland 74.0% | marcador más probable 0-1 (17.5%) | peso actual 11.1%
-- Predictivo bayesiano dinámico: victoria Haiti 16.7% | empate 24.7% | victoria Scotland 58.7% | marcador más probable 0-1 (14.7%) | peso actual 11.4%
-- Ensamble + asimetría histórica: victoria Haiti 7.4% | empate 19.9% | victoria Scotland 72.8% | marcador más probable 0-1 (16.6%)
-- Marcadores más probables: 0-1 16.6%, 0-2 16.5%, 0-3 11.1%, 0-0 10.0%, 1-1 7.7%, 1-2 7.2%, 0-4 5.7%, 1-3 5.1%
+- Bivariante Poisson: victoria Haiti 4.8% | empate 17.2% | victoria Scotland 78.0% | marcador más probable 0-1 (18.3%) | peso actual 37.8%
+- Poisson independiente: victoria Haiti 4.9% | empate 19.5% | victoria Scotland 75.7% | marcador más probable 0-2 (18.1%) | peso actual 17.3%
+- Ajuste de baja anotación: victoria Haiti 4.9% | empate 19.5% | victoria Scotland 75.7% | marcador más probable 0-2 (18.1%) | peso actual 14.1%
+- Overdispersión calibrada: victoria Haiti 7.2% | empate 19.1% | victoria Scotland 73.8% | marcador más probable 0-1 (17.6%) | peso actual 8.3%
+- ML ligero regularizado: victoria Haiti 6.1% | empate 17.9% | victoria Scotland 76.0% | marcador más probable 0-2 (17.2%) | peso actual 11.3%
+- Predictivo bayesiano dinámico: victoria Haiti 15.7% | empate 23.7% | victoria Scotland 60.6% | marcador más probable 0-1 (14.4%) | peso actual 11.2%
+- Ensamble + asimetría histórica: victoria Haiti 6.2% | empate 18.6% | victoria Scotland 75.2% | marcador más probable 0-2 (17.1%)
+- Marcadores más probables: 0-2 17.1%, 0-1 16.3%, 0-3 12.0%, 0-0 9.6%, 1-1 7.1%, 1-2 6.8%, 0-4 6.4%, 1-3 5.1%
 
 ### Australia vs Turkey
 - Etapa: Grupo C
 - Estado: Sun, June 13th at 12:00 AM EDT
 - Sede: BC Place | Canada
 - Hora UTC: 2026-06-14T04:00:00Z
-- Clima estimado: 18.2 C | HR 58% | viento 9 km/h | estrés 0.02
-- Factores que más pesan ahora: Elo dinámico -106.000; Rendimiento competitivo desde 1950 +0.409
+- Clima estimado: 16.2 C | HR 68% | viento 12 km/h | estrés 0.02
+- Factores que más pesan ahora: Valor bruto de plantilla -619.557; Minutos Mundial de Clubes +193.490
 - Marcador proyectado: 0-1
-- Marcador para cargar en Penca: 1-2 | 2.27 pts esp. | exacto 8.5% | diferencia 24.4%
-- Precisión de marcador: Marcador con precisión media | exacto más probable 0-1 13.7% | top-5 cubre 56.9%
-- Promedio estimado de goles del modelo: Australia 0.83 | Turkey 1.48
-- Probabilidades de resultado (90'): 20.2% / 28.9% / 50.8%
-- Lectura estadistica: Pronóstico parejo: sin favorito estadístico claro | pick actual Victoria Turkey 50.8% | confianza 55.8%
-- Escenario de goles: ambos marcan 43.8% | más de 2.5 goles 40.7%
-- Goles totales esperados por el modelo: 2.32. Sin línea externa de goles cargada para ese partido.
-- Probabilidad de que no reciba goles: Australia 24.3% | Turkey 44.0%
-- Cuánta probabilidad cubren los 3 marcadores más probables: 38.2% | ventaja final más probable +0 (28.9%)
-- Qué tanto coinciden los modelos entre sí: 94.8%
+- Marcador para cargar en Penca: 1-2 | 2.34 pts esp. | exacto 8.7% | diferencia 24.2%
+- Precisión de marcador: Marcador frágil | exacto más probable 0-1 13.0% | top-5 cubre 54.9%
+- Promedio estimado de goles del modelo: Australia 0.84 | Turkey 1.57
+- Probabilidades de resultado (90'): 19.4% / 27.5% / 53.0%
+- Lectura estadistica: Pronóstico parejo: sin favorito estadístico claro | pick actual Victoria Turkey 53.0% | confianza 58.0%
+- Escenario de goles: ambos marcan 45.5% | más de 2.5 goles 43.8%
+- Goles totales esperados por el modelo: 2.45. Sin línea externa de goles cargada para ese partido.
+- Probabilidad de que no reciba goles: Australia 22.1% | Turkey 43.1%
+- Cuánta probabilidad cubren los 3 marcadores más probables: 35.8% | ventaja final más probable +0 (27.5%)
+- Qué tanto coinciden los modelos entre sí: 94.9%
 - Stack estadístico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotación + Overdispersión calibrada + ML ligero regularizado + Predictivo bayesiano dinámico + Ensamble + asimetría histórica
-- Factores dominantes: Elo dinámico -106.000; Rendimiento competitivo desde 1950 +0.409; Defensa histórica desde 1950 +0.208
+- Factores dominantes: Valor bruto de plantilla -619.557; Minutos Mundial de Clubes +193.490; Elo dinámico -106.000
 - Comparativa entre modelos:
-- Bivariante Poisson: victoria Australia 19.5% | empate 27.8% | victoria Turkey 52.7% | marcador más probable 0-1 (15.3%) | peso actual 36.4%
-- Poisson independiente: victoria Australia 18.1% | empate 32.2% | victoria Turkey 49.7% | marcador más probable 1-1 (15.0%) | peso actual 16.2%
-- Ajuste de baja anotación: victoria Australia 18.1% | empate 32.2% | victoria Turkey 49.7% | marcador más probable 1-1 (15.0%) | peso actual 16.0%
-- Overdispersión calibrada: victoria Australia 22.1% | empate 26.6% | victoria Turkey 51.4% | marcador más probable 0-1 (14.7%) | peso actual 7.3%
-- ML ligero regularizado: victoria Australia 21.3% | empate 26.4% | victoria Turkey 52.4% | marcador más probable 0-1 (14.8%) | peso actual 11.2%
-- Predictivo bayesiano dinámico: victoria Australia 27.1% | empate 28.6% | victoria Turkey 44.4% | marcador más probable 0-1 (13.3%) | peso actual 12.9%
-- Ensamble + asimetría histórica: victoria Australia 20.2% | empate 28.9% | victoria Turkey 50.8% | marcador más probable 0-1 (13.7%)
-- Marcadores más probables: 0-1 13.7%, 1-1 12.4%, 0-0 12.0%, 0-2 10.2%, 1-2 8.5%, 1-0 7.4%, 0-3 5.1%, 2-1 4.6%
+- Bivariante Poisson: victoria Australia 18.7% | empate 26.4% | victoria Turkey 54.9% | marcador más probable 0-1 (14.5%) | peso actual 36.3%
+- Poisson independiente: victoria Australia 17.4% | empate 30.6% | victoria Turkey 52.0% | marcador más probable 1-1 (14.5%) | peso actual 16.2%
+- Ajuste de baja anotación: victoria Australia 17.4% | empate 30.6% | victoria Turkey 52.0% | marcador más probable 1-1 (14.5%) | peso actual 15.8%
+- Overdispersión calibrada: victoria Australia 21.3% | empate 25.4% | victoria Turkey 53.2% | marcador más probable 0-1 (14.0%) | peso actual 7.4%
+- ML ligero regularizado: victoria Australia 20.6% | empate 25.2% | victoria Turkey 54.2% | marcador más probable 0-1 (14.1%) | peso actual 11.4%
+- Predictivo bayesiano dinámico: victoria Australia 26.3% | empate 27.4% | victoria Turkey 46.4% | marcador más probable 0-1 (12.7%) | peso actual 12.8%
+- Ensamble + asimetría histórica: victoria Australia 19.4% | empate 27.5% | victoria Turkey 53.0% | marcador más probable 0-1 (13.0%)
+- Marcadores más probables: 0-1 13.0%, 1-1 12.0%, 0-0 10.8%, 0-2 10.4%, 1-2 8.7%, 1-0 6.8%, 0-3 5.5%, 1-3 4.9%
 
 ### Germany vs Curacao
 - Etapa: Grupo E
 - Estado: Sun, June 14th at 1:00 PM EDT
 - Sede: NRG Stadium | United States
 - Hora UTC: 2026-06-14T17:00:00Z
-- Clima estimado: 30.6 C | HR 64% | viento 4 km/h | estrés 0.22
-- Cambio por clima exigente: estrés climático 0.22.
-- Factores que más pesan ahora: Elo dinámico +443.000; Historia mundialista +0.822
+- Clima estimado: 24.6 C | HR 96% | viento 16 km/h | estrés 0.20
+- Cambio por clima exigente: estrés climático 0.20.
+- Factores que más pesan ahora: Valor bruto de plantilla +2033.680; Minutos Mundial de Clubes +1310.929
 - Marcador proyectado: 2-0
-- Marcador para cargar en Penca: 3-0 | 3.57 pts esp. | exacto 19.0% | diferencia 20.6%
-- Precisión de marcador: Marcador defendible | exacto más probable 2-0 21.0% | top-5 cubre 76.9%
-- Promedio estimado de goles del modelo: Germany 2.39 | Curacao 0.10
-- Probabilidades de resultado (90'): 86.2% / 11.9% / 1.9%
-- Lectura estadistica: Pick muy fuerte | pick actual Victoria Germany 86.2% | confianza 96.9%
-- Escenario de goles: ambos marcan 12.1% | más de 2.5 goles 49.7%
-- Goles totales esperados por el modelo: 2.64. Sin línea externa de goles cargada para ese partido.
-- Probabilidad de que no reciba goles: Germany 86.5% | Curacao 10.2%
-- Cuánta probabilidad cubren los 3 marcadores más probables: 56.4% | ventaja final más probable +2 (23.7%)
-- Qué tanto coinciden los modelos entre sí: 92.2%
+- Marcador para cargar en Penca: 3-0 | 3.62 pts esp. | exacto 19.3% | diferencia 21.0%
+- Precisión de marcador: Marcador con precisión media | exacto más probable 2-0 20.6% | top-5 cubre 75.7%
+- Promedio estimado de goles del modelo: Germany 2.50 | Curacao 0.10
+- Probabilidades de resultado (90'): 87.3% / 11.0% / 1.8%
+- Lectura estadistica: Pick muy fuerte | pick actual Victoria Germany 87.3% | confianza 98.1%
+- Escenario de goles: ambos marcan 12.2% | más de 2.5 goles 52.1%
+- Goles totales esperados por el modelo: 2.74. Sin línea externa de goles cargada para ese partido.
+- Probabilidad de que no reciba goles: Germany 86.5% | Curacao 9.3%
+- Cuánta probabilidad cubren los 3 marcadores más probables: 55.3% | ventaja final más probable +2 (23.3%)
+- Qué tanto coinciden los modelos entre sí: 92.4%
 - Stack estadístico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotación + Overdispersión calibrada + ML ligero regularizado + Predictivo bayesiano dinámico + Ensamble + asimetría histórica
-- Factores dominantes: Elo dinámico +443.000; Historia mundialista +0.822; Rendimiento competitivo desde 1950 +0.686
+- Factores dominantes: Valor bruto de plantilla +2033.680; Minutos Mundial de Clubes +1310.929; Elo dinámico +443.000
 - Comparativa entre modelos:
-- Bivariante Poisson: victoria Germany 89.0% | empate 10.2% | victoria Curacao 0.7% | marcador más probable 2-0 (23.7%) | peso actual 39.5%
-- Poisson independiente: victoria Germany 88.7% | empate 10.4% | victoria Curacao 0.9% | marcador más probable 2-0 (23.6%) | peso actual 17.8%
-- Ajuste de baja anotación: victoria Germany 88.7% | empate 10.4% | victoria Curacao 0.9% | marcador más probable 2-0 (23.6%) | peso actual 12.5%
-- Overdispersión calibrada: victoria Germany 85.3% | empate 13.4% | victoria Curacao 1.3% | marcador más probable 2-0 (21.2%) | peso actual 8.7%
-- ML ligero regularizado: victoria Germany 82.8% | empate 14.6% | victoria Curacao 2.5% | marcador más probable 2-0 (20.1%) | peso actual 10.9%
-- Predictivo bayesiano dinámico: victoria Germany 69.8% | empate 20.5% | victoria Curacao 9.7% | marcador más probable 1-0 (15.6%) | peso actual 10.6%
-- Ensamble + asimetría histórica: victoria Germany 86.2% | empate 11.9% | victoria Curacao 1.9% | marcador más probable 2-0 (21.0%)
-- Marcadores más probables: 2-0 21.0%, 3-0 19.0%, 1-0 16.4%, 4-0 11.7%, 0-0 8.8%, 5-0 5.8%, 1-1 2.7%, 2-1 2.6%
+- Bivariante Poisson: victoria Germany 90.0% | empate 9.3% | victoria Curacao 0.7% | marcador más probable 2-0 (23.3%) | peso actual 39.1%
+- Poisson independiente: victoria Germany 89.6% | empate 9.5% | victoria Curacao 0.8% | marcador más probable 2-0 (23.2%) | peso actual 17.7%
+- Ajuste de baja anotación: victoria Germany 89.6% | empate 9.5% | victoria Curacao 0.8% | marcador más probable 2-0 (23.2%) | peso actual 12.4%
+- Overdispersión calibrada: victoria Germany 86.2% | empate 12.6% | victoria Curacao 1.2% | marcador más probable 2-0 (20.8%) | peso actual 9.2%
+- ML ligero regularizado: victoria Germany 83.9% | empate 13.7% | victoria Curacao 2.4% | marcador más probable 2-0 (19.7%) | peso actual 11.0%
+- Predictivo bayesiano dinámico: victoria Germany 71.3% | empate 19.5% | victoria Curacao 9.2% | marcador más probable 1-0 (15.0%) | peso actual 10.5%
+- Ensamble + asimetría histórica: victoria Germany 87.3% | empate 11.0% | victoria Curacao 1.8% | marcador más probable 2-0 (20.6%)
+- Marcadores más probables: 2-0 20.6%, 3-0 19.3%, 1-0 15.4%, 4-0 12.3%, 0-0 8.0%, 5-0 6.3%, 6-0 2.8%, 2-1 2.6%
 
 ### Netherlands vs Japan
 - Etapa: Grupo F
 - Estado: Sun, June 14th at 4:00 PM EDT
 - Sede: AT&T Stadium | United States
 - Hora UTC: 2026-06-14T20:00:00Z
-- Clima estimado: 34.0 C | HR 37% | viento 5 km/h | estrés 0.24
-- Cambio por clima exigente: estrés climático 0.24.
-- Factores que más pesan ahora: Elo dinámico +81.000; Rendimiento en Mundiales desde 1950 +0.393
+- Clima estimado: 33.8 C | HR 45% | viento 16 km/h | estrés 0.25
+- Cambio por clima exigente: estrés climático 0.25.
+- Factores que más pesan ahora: Valor bruto de plantilla +145.906; Minutos Mundial de Clubes -91.719
 - Marcador proyectado: 1-0
-- Marcador para cargar en Penca: 2-1 | 2.26 pts esp. | exacto 8.3% | diferencia 23.9%
-- Precisión de marcador: Marcador frágil | exacto más probable 1-0 13.4% | top-5 cubre 56.3%
-- Promedio estimado de goles del modelo: Netherlands 1.48 | Japan 0.81
-- Probabilidades de resultado (90'): 51.0% / 28.9% / 20.1%
-- Lectura estadistica: Pronóstico parejo: sin favorito estadístico claro | pick actual Victoria Netherlands 51.0% | confianza 56.0%
-- Escenario de goles: ambos marcan 44.3% | más de 2.5 goles 41.4%
-- Goles totales esperados por el modelo: 2.35. Sin línea externa de goles cargada para ese partido.
-- Probabilidad de que no reciba goles: Netherlands 43.8% | Japan 23.5%
-- Cuánta probabilidad cubren los 3 marcadores más probables: 37.7% | ventaja final más probable +0 (28.9%)
-- Qué tanto coinciden los modelos entre sí: 94.8%
+- Marcador para cargar en Penca: 2-1 | 2.32 pts esp. | exacto 8.5% | diferencia 23.6%
+- Precisión de marcador: Marcador frágil | exacto más probable 1-0 12.7% | top-5 cubre 54.2%
+- Promedio estimado de goles del modelo: Netherlands 1.58 | Japan 0.83
+- Probabilidades de resultado (90'): 53.2% / 27.5% / 19.3%
+- Lectura estadistica: Pronóstico parejo: sin favorito estadístico claro | pick actual Victoria Netherlands 53.2% | confianza 58.1%
+- Escenario de goles: ambos marcan 46.0% | más de 2.5 goles 44.5%
+- Goles totales esperados por el modelo: 2.48. Sin línea externa de goles cargada para ese partido.
+- Probabilidad de que no reciba goles: Netherlands 43.1% | Japan 21.4%
+- Cuánta probabilidad cubren los 3 marcadores más probables: 35.4% | ventaja final más probable +0 (27.5%)
+- Qué tanto coinciden los modelos entre sí: 94.9%
 - Stack estadístico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotación + Overdispersión calibrada + ML ligero regularizado + Predictivo bayesiano dinámico + Ensamble + asimetría histórica
-- Factores dominantes: Elo dinámico +81.000; Rendimiento en Mundiales desde 1950 +0.393; Historia mundialista +0.340
+- Factores dominantes: Valor bruto de plantilla +145.906; Minutos Mundial de Clubes -91.719; Elo dinámico +81.000
 - Comparativa entre modelos:
-- Bivariante Poisson: victoria Netherlands 52.7% | empate 27.8% | victoria Japan 19.5% | marcador más probable 1-0 (15.3%) | peso actual 36.5%
-- Poisson independiente: victoria Netherlands 49.8% | empate 32.0% | victoria Japan 18.1% | marcador más probable 1-1 (15.0%) | peso actual 16.2%
-- Ajuste de baja anotación: victoria Netherlands 49.8% | empate 32.0% | victoria Japan 18.1% | marcador más probable 1-1 (15.0%) | peso actual 15.9%
-- Overdispersión calibrada: victoria Netherlands 51.4% | empate 26.6% | victoria Japan 22.0% | marcador más probable 1-0 (14.7%) | peso actual 7.3%
-- ML ligero regularizado: victoria Netherlands 53.3% | empate 26.2% | victoria Japan 20.5% | marcador más probable 1-0 (15.0%) | peso actual 11.2%
-- Predictivo bayesiano dinámico: victoria Netherlands 44.7% | empate 28.6% | victoria Japan 26.7% | marcador más probable 1-0 (13.4%) | peso actual 12.9%
-- Ensamble + asimetría histórica: victoria Netherlands 51.0% | empate 28.9% | victoria Japan 20.1% | marcador más probable 1-0 (13.4%)
-- Marcadores más probables: 1-0 13.4%, 1-1 12.7%, 0-0 11.6%, 2-0 10.3%, 2-1 8.3%, 0-1 7.3%, 3-0 5.4%, 1-2 4.7%
+- Bivariante Poisson: victoria Netherlands 54.9% | empate 26.4% | victoria Japan 18.7% | marcador más probable 1-0 (14.5%) | peso actual 36.4%
+- Poisson independiente: victoria Netherlands 52.0% | empate 30.6% | victoria Japan 17.4% | marcador más probable 1-1 (14.5%) | peso actual 16.2%
+- Ajuste de baja anotación: victoria Netherlands 52.0% | empate 30.6% | victoria Japan 17.4% | marcador más probable 1-1 (14.5%) | peso actual 15.8%
+- Overdispersión calibrada: victoria Netherlands 53.2% | empate 25.4% | victoria Japan 21.3% | marcador más probable 1-0 (14.0%) | peso actual 7.3%
+- ML ligero regularizado: victoria Netherlands 55.1% | empate 25.0% | victoria Japan 19.9% | marcador más probable 1-0 (14.3%) | peso actual 11.4%
+- Predictivo bayesiano dinámico: victoria Netherlands 46.6% | empate 27.4% | victoria Japan 26.0% | marcador más probable 1-0 (12.8%) | peso actual 12.8%
+- Ensamble + asimetría histórica: victoria Netherlands 53.2% | empate 27.5% | victoria Japan 19.3% | marcador más probable 1-0 (12.7%)
+- Marcadores más probables: 1-0 12.7%, 1-1 12.2%, 2-0 10.5%, 0-0 10.4%, 2-1 8.5%, 0-1 6.6%, 3-0 5.8%, 3-1 5.0%
 
 ### Ivory Coast vs Ecuador
 - Etapa: Grupo E
 - Estado: Sun, June 14th at 7:00 PM EDT
 - Sede: Lincoln Financial Field | United States
 - Hora UTC: 2026-06-14T23:00:00Z
-- Clima estimado: 29.4 C | HR 39% | viento 16 km/h | estrés 0.02
-- Noticias relevantes: theshillongtimes.com: Diomande injury blow for Ivory Coast | The Shillong Times
-- Impacto noticioso Ivory Coast: theshillongtimes.com: Diomande injury blow for Ivory Coast | The Shillong Times
-- Cambio por noticias relevantes detectadas en el feed del partido.
-- Factores que más pesan ahora: Elo dinámico -296.000; Rendimiento competitivo desde 1950 +0.462
+- Clima estimado: 31.9 C | HR 39% | viento 13 km/h | estrés 0.13
+- Factores que más pesan ahora: Valor bruto de plantilla -993.582; Minutos Mundial de Clubes -315.532
 - Marcador proyectado: 0-1
-- Marcador para cargar en Penca: 0-2 | 3.18 pts esp. | exacto 17.2% | diferencia 22.7%
-- Precisión de marcador: Marcador con precisión media | exacto más probable 0-1 18.3% | top-5 cubre 64.3%
-- Promedio estimado de goles del modelo: Ivory Coast 0.40 | Ecuador 1.97
-- Probabilidades de resultado (90'): 6.7% / 19.6% / 73.7%
-- Lectura estadistica: Pick fuerte | pick actual Victoria Ecuador 73.7% | confianza 81.0%
-- Escenario de goles: ambos marcan 29.5% | más de 2.5 goles 42.2%
-- Goles totales esperados por el modelo: 2.39. Sin línea externa de goles cargada para ese partido.
-- Probabilidad de que no reciba goles: Ivory Coast 15.1% | Ecuador 65.8%
-- Cuánta probabilidad cubren los 3 marcadores más probables: 46.4% | ventaja final más probable -1 (26.5%)
+- Marcador para cargar en Penca: 0-2 | 3.27 pts esp. | exacto 17.5% | diferencia 23.1%
+- Precisión de marcador: Marcador con precisión media | exacto más probable 0-1 17.8% | top-5 cubre 63.6%
+- Promedio estimado de goles del modelo: Ivory Coast 0.38 | Ecuador 2.08
+- Probabilidades de resultado (90'): 5.9% / 18.1% / 76.0%
+- Lectura estadistica: Pick fuerte | pick actual Victoria Ecuador 76.0% | confianza 83.8%
+- Escenario de goles: ambos marcan 28.8% | más de 2.5 goles 44.3%
+- Goles totales esperados por el modelo: 2.47. Sin línea externa de goles cargada para ese partido.
+- Probabilidad de que no reciba goles: Ivory Coast 13.8% | Ecuador 67.1%
+- Cuánta probabilidad cubren los 3 marcadores más probables: 47.1% | ventaja final más probable -1 (25.7%)
 - Qué tanto coinciden los modelos entre sí: 93.6%
 - Stack estadístico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotación + Overdispersión calibrada + ML ligero regularizado + Predictivo bayesiano dinámico + Ensamble + asimetría histórica
-- Factores dominantes: Elo dinámico -296.000; Rendimiento competitivo desde 1950 +0.462; Historia competitiva desde 1950 +0.247
+- Factores dominantes: Valor bruto de plantilla -993.582; Minutos Mundial de Clubes -315.532; Elo dinámico -296.000
 - Comparativa entre modelos:
-- Bivariante Poisson: victoria Ivory Coast 5.2% | empate 18.6% | victoria Ecuador 76.2% | marcador más probable 0-1 (19.2%) | peso actual 38.1%
-- Poisson independiente: victoria Ivory Coast 5.7% | empate 19.8% | victoria Ecuador 74.5% | marcador más probable 0-2 (18.1%) | peso actual 17.5%
-- Ajuste de baja anotación: victoria Ivory Coast 5.7% | empate 19.8% | victoria Ecuador 74.5% | marcador más probable 0-2 (18.1%) | peso actual 14.2%
-- Overdispersión calibrada: victoria Ivory Coast 7.6% | empate 20.1% | victoria Ecuador 72.2% | marcador más probable 0-1 (18.3%) | peso actual 7.8%
-- ML ligero regularizado: victoria Ivory Coast 6.5% | empate 18.9% | victoria Ecuador 74.5% | marcador más probable 0-1 (17.9%) | peso actual 11.1%
-- Predictivo bayesiano dinámico: victoria Ivory Coast 16.3% | empate 24.9% | victoria Ecuador 58.8% | marcador más probable 0-1 (15.1%) | peso actual 11.3%
-- Ensamble + asimetría histórica: victoria Ivory Coast 6.7% | empate 19.6% | victoria Ecuador 73.7% | marcador más probable 0-1 (18.3%)
-- Marcadores más probables: 0-1 18.3%, 0-2 17.2%, 0-3 11.0%, 0-0 10.5%, 1-1 7.4%, 1-2 7.1%, 0-4 5.5%, 1-3 4.9%
+- Bivariante Poisson: victoria Ivory Coast 4.4% | empate 17.0% | victoria Ecuador 78.5% | marcador más probable 0-1 (18.6%) | peso actual 38.1%
+- Poisson independiente: victoria Ivory Coast 5.0% | empate 18.1% | victoria Ecuador 76.9% | marcador más probable 0-2 (18.5%) | peso actual 17.4%
+- Ajuste de baja anotación: victoria Ivory Coast 5.0% | empate 18.1% | victoria Ecuador 76.9% | marcador más probable 0-2 (18.5%) | peso actual 14.0%
+- Overdispersión calibrada: victoria Ivory Coast 6.8% | empate 18.9% | victoria Ecuador 74.3% | marcador más probable 0-1 (17.9%) | peso actual 8.1%
+- ML ligero regularizado: victoria Ivory Coast 5.7% | empate 17.8% | victoria Ecuador 76.5% | marcador más probable 0-2 (17.6%) | peso actual 11.2%
+- Predictivo bayesiano dinámico: victoria Ivory Coast 15.2% | empate 23.8% | victoria Ecuador 61.0% | marcador más probable 0-1 (14.7%) | peso actual 11.1%
+- Ensamble + asimetría histórica: victoria Ivory Coast 5.9% | empate 18.1% | victoria Ecuador 76.0% | marcador más probable 0-1 (17.8%)
+- Marcadores más probables: 0-1 17.8%, 0-2 17.5%, 0-3 11.8%, 0-0 9.7%, 1-2 6.8%, 1-1 6.8%, 0-4 6.2%, 1-3 4.9%
 
 ### Sweden vs Tunisia
 - Etapa: Grupo F
 - Estado: Sun, June 14th at 10:00 PM EDT
 - Sede: Estadio BBVA | Mexico
 - Hora UTC: 2026-06-15T02:00:00Z
-- Clima estimado: 29.0 C | HR 58% | viento 7 km/h | estrés 0.09
-- Factores que más pesan ahora: Elo dinámico +46.000; Historia mundialista +0.300
+- Clima estimado: 28.2 C | HR 63% | viento 3 km/h | estrés 0.09
+- Factores que más pesan ahora: Minutos Mundial de Clubes +1153.925; Valor bruto de plantilla +309.633
 - Marcador proyectado: 1-0
-- Marcador para cargar en Penca: 1-0 | 2.23 pts esp. | exacto 13.7% | diferencia 23.4%
-- Precisión de marcador: Marcador frágil | exacto más probable 1-0 13.7% | top-5 cubre 58.3%
-- Promedio estimado de goles del modelo: Sweden 1.34 | Tunisia 0.89
-- Probabilidades de resultado (90'): 45.3% / 30.9% / 23.8%
-- Lectura estadistica: Pronóstico parejo: sin favorito estadístico claro | pick actual Victoria Sweden 45.3% | confianza 50.5%
-- Escenario de goles: ambos marcan 42.7% | más de 2.5 goles 37.5%
-- Goles totales esperados por el modelo: 2.20. Sin línea externa de goles cargada para ese partido.
-- Probabilidad de que no reciba goles: Sweden 42.6% | Tunisia 28.1%
-- Cuánta probabilidad cubren los 3 marcadores más probables: 40.3% | ventaja final más probable +0 (30.9%)
+- Marcador para cargar en Penca: 2-1 | 2.12 pts esp. | exacto 8.1% | diferencia 23.3%
+- Precisión de marcador: Marcador frágil | exacto más probable 1-0 13.1% | top-5 cubre 55.9%
+- Promedio estimado de goles del modelo: Sweden 1.42 | Tunisia 0.89
+- Probabilidades de resultado (90'): 47.1% / 29.8% / 23.2%
+- Lectura estadistica: Pronóstico parejo: sin favorito estadístico claro | pick actual Victoria Sweden 47.1% | confianza 52.2%
+- Escenario de goles: ambos marcan 44.3% | más de 2.5 goles 40.1%
+- Goles totales esperados por el modelo: 2.30. Sin línea externa de goles cargada para ese partido.
+- Probabilidad de que no reciba goles: Sweden 41.8% | Tunisia 26.0%
+- Cuánta probabilidad cubren los 3 marcadores más probables: 38.3% | ventaja final más probable +0 (29.8%)
 - Qué tanto coinciden los modelos entre sí: 95.1%
 - Stack estadístico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotación + Overdispersión calibrada + ML ligero regularizado + Predictivo bayesiano dinámico + Ensamble + asimetría histórica
-- Factores dominantes: Elo dinámico +46.000; Historia mundialista +0.300; Rendimiento en Mundiales desde 1950 +0.254
+- Factores dominantes: Minutos Mundial de Clubes +1153.925; Valor bruto de plantilla +309.633; Elo dinámico +46.000
 - Comparativa entre modelos:
-- Bivariante Poisson: victoria Sweden 47.1% | empate 29.6% | victoria Tunisia 23.3% | marcador más probable 1-0 (14.9%) | peso actual 36.2%
-- Poisson independiente: victoria Sweden 43.9% | empate 34.7% | victoria Tunisia 21.4% | marcador más probable 1-1 (16.1%) | peso actual 16.0%
-- Ajuste de baja anotación: victoria Sweden 43.9% | empate 34.7% | victoria Tunisia 21.4% | marcador más probable 1-1 (16.1%) | peso actual 16.3%
-- Overdispersión calibrada: victoria Sweden 46.5% | empate 27.9% | victoria Tunisia 25.6% | marcador más probable 1-0 (14.4%) | peso actual 7.1%
-- ML ligero regularizado: victoria Sweden 47.1% | empate 28.0% | victoria Tunisia 24.9% | marcador más probable 1-0 (14.7%) | peso actual 11.1%
-- Predictivo bayesiano dinámico: victoria Sweden 41.3% | empate 29.5% | victoria Tunisia 29.2% | marcador más probable 0-0 (13.7%) | peso actual 13.3%
-- Ensamble + asimetría histórica: victoria Sweden 45.3% | empate 30.9% | victoria Tunisia 23.8% | marcador más probable 1-0 (13.7%)
-- Marcadores más probables: 1-0 13.7%, 0-0 13.4%, 1-1 13.3%, 2-0 9.2%, 0-1 8.8%, 2-1 7.8%, 1-2 5.3%, 3-0 4.3%
+- Bivariante Poisson: victoria Sweden 48.9% | empate 28.4% | victoria Tunisia 22.7% | marcador más probable 1-0 (14.3%) | peso actual 36.2%
+- Poisson independiente: victoria Sweden 45.8% | empate 33.3% | victoria Tunisia 20.8% | marcador más probable 1-1 (15.7%) | peso actual 16.0%
+- Ajuste de baja anotación: victoria Sweden 45.8% | empate 33.3% | victoria Tunisia 20.8% | marcador más probable 1-1 (15.7%) | peso actual 16.2%
+- Overdispersión calibrada: victoria Sweden 48.1% | empate 26.9% | victoria Tunisia 25.0% | marcador más probable 1-0 (13.9%) | peso actual 7.2%
+- ML ligero regularizado: victoria Sweden 49.0% | empate 26.8% | victoria Tunisia 24.2% | marcador más probable 1-0 (14.1%) | peso actual 11.3%
+- Predictivo bayesiano dinámico: victoria Sweden 42.8% | empate 28.7% | victoria Tunisia 28.6% | marcador más probable 1-0 (12.9%) | peso actual 13.2%
+- Ensamble + asimetría histórica: victoria Sweden 47.1% | empate 29.8% | victoria Tunisia 23.2% | marcador más probable 1-0 (13.1%)
+- Marcadores más probables: 1-0 13.1%, 1-1 13.0%, 0-0 12.2%, 2-0 9.4%, 0-1 8.2%, 2-1 8.1%, 1-2 5.3%, 3-0 4.6%
 
 ### Spain vs Cape Verde
 - Etapa: Grupo G
 - Estado: Mon, June 15th at 12:00 PM EDT
 - Sede: Mercedes-Benz Stadium | United States
 - Hora UTC: 2026-06-15T16:00:00Z
-- Clima estimado: 31.1 C | HR 47% | viento 12 km/h | estrés 0.19
-- Noticias relevantes: prokerala.com: Spain Fermin Lopez ruled out of World Cup with broken foot; ianslive.in: Spain Fermin Lopez ruled out of World Cup with broken foot
-- Impacto noticioso Spain: prokerala.com: Spain Fermin Lopez ruled out of World Cup with broken foot; ianslive.in: Spain Fermin Lopez ruled out of World Cup with broken foot
-- Cambio por clima exigente: estrés climático 0.19.
-- Cambio por noticias relevantes detectadas en el feed del partido.
-- Factores que más pesan ahora: Elo dinámico +610.000; Ataque histórico desde 1950 +0.678
+- Clima estimado: 33.3 C | HR 37% | viento 5 km/h | estrés 0.22
+- Cambio por clima exigente: estrés climático 0.22.
+- Factores que más pesan ahora: Valor bruto de plantilla +1735.959; Minutos Mundial de Clubes +909.694
 - Marcador proyectado: 2-0
-- Marcador para cargar en Penca: 3-0 | 3.61 pts esp. | exacto 19.4% | diferencia 20.7%
-- Precisión de marcador: Marcador defendible | exacto más probable 2-0 21.5% | top-5 cubre 79.0%
-- Promedio estimado de goles del modelo: Spain 2.44 | Cape Verde 0.07
-- Probabilidades de resultado (90'): 87.0% / 11.3% / 1.7%
-- Lectura estadistica: Pick muy fuerte | pick actual Victoria Spain 87.0% | confianza 98.0%
-- Escenario de goles: ambos marcan 9.6% | más de 2.5 goles 49.1%
-- Goles totales esperados por el modelo: 2.62. Sin línea externa de goles cargada para ese partido.
-- Probabilidad de que no reciba goles: Spain 89.1% | Cape Verde 10.2%
-- Cuánta probabilidad cubren los 3 marcadores más probables: 58.1% | ventaja final más probable +2 (23.6%)
-- Qué tanto coinciden los modelos entre sí: 92.1%
+- Marcador para cargar en Penca: 3-0 | 3.65 pts esp. | exacto 19.7% | diferencia 21.1%
+- Precisión de marcador: Marcador defendible | exacto más probable 2-0 21.0% | top-5 cubre 77.7%
+- Promedio estimado de goles del modelo: Spain 2.54 | Cape Verde 0.07
+- Probabilidades de resultado (90'): 88.0% / 10.5% / 1.6%
+- Lectura estadistica: Pick muy fuerte | pick actual Victoria Spain 88.0% | confianza 99.0%
+- Escenario de goles: ambos marcan 9.7% | más de 2.5 goles 51.5%
+- Goles totales esperados por el modelo: 2.72. Sin línea externa de goles cargada para ese partido.
+- Probabilidad de que no reciba goles: Spain 89.1% | Cape Verde 9.3%
+- Cuánta probabilidad cubren los 3 marcadores más probables: 56.9% | ventaja final más probable +2 (23.1%)
+- Qué tanto coinciden los modelos entre sí: 92.3%
 - Stack estadístico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotación + Overdispersión calibrada + ML ligero regularizado + Predictivo bayesiano dinámico + Ensamble + asimetría histórica
-- Factores dominantes: Elo dinámico +610.000; Ataque histórico desde 1950 +0.678; Recursos/PIB proxy +0.641
+- Factores dominantes: Valor bruto de plantilla +1735.959; Minutos Mundial de Clubes +909.694; Elo dinámico +610.000
 - Comparativa entre modelos:
-- Bivariante Poisson: victoria Spain 89.8% | empate 9.6% | victoria Cape Verde 0.6% | marcador más probable 2-0 (24.0%) | peso actual 39.6%
-- Poisson independiente: victoria Spain 89.5% | empate 9.7% | victoria Cape Verde 0.7% | marcador más probable 2-0 (24.0%) | peso actual 17.9%
-- Ajuste de baja anotación: victoria Spain 89.5% | empate 9.7% | victoria Cape Verde 0.7% | marcador más probable 2-0 (24.0%) | peso actual 12.3%
-- Overdispersión calibrada: victoria Spain 86.1% | empate 12.9% | victoria Cape Verde 1.0% | marcador más probable 2-0 (21.5%) | peso actual 8.8%
-- ML ligero regularizado: victoria Spain 83.1% | empate 14.4% | victoria Cape Verde 2.5% | marcador más probable 2-0 (20.0%) | peso actual 10.8%
-- Predictivo bayesiano dinámico: victoria Spain 70.8% | empate 20.1% | victoria Cape Verde 9.2% | marcador más probable 1-0 (15.6%) | peso actual 10.6%
-- Ensamble + asimetría histórica: victoria Spain 87.0% | empate 11.3% | victoria Cape Verde 1.7% | marcador más probable 2-0 (21.5%)
-- Marcadores más probables: 2-0 21.5%, 3-0 19.4%, 1-0 17.1%, 4-0 12.0%, 0-0 8.9%, 5-0 6.0%, 6-0 2.6%, 1-1 2.2%
+- Bivariante Poisson: victoria Spain 90.7% | empate 8.8% | victoria Cape Verde 0.5% | marcador más probable 2-0 (23.6%) | peso actual 39.2%
+- Poisson independiente: victoria Spain 90.5% | empate 8.9% | victoria Cape Verde 0.6% | marcador más probable 2-0 (23.5%) | peso actual 17.7%
+- Ajuste de baja anotación: victoria Spain 90.5% | empate 8.9% | victoria Cape Verde 0.6% | marcador más probable 2-0 (23.5%) | peso actual 12.2%
+- Overdispersión calibrada: victoria Spain 87.0% | empate 12.1% | victoria Cape Verde 0.9% | marcador más probable 2-0 (21.1%) | peso actual 9.4%
+- ML ligero regularizado: victoria Spain 84.1% | empate 13.6% | victoria Cape Verde 2.3% | marcador más probable 2-0 (19.6%) | peso actual 11.0%
+- Predictivo bayesiano dinámico: victoria Spain 72.2% | empate 19.1% | victoria Cape Verde 8.7% | marcador más probable 2-0 (15.2%) | peso actual 10.5%
+- Ensamble + asimetría histórica: victoria Spain 88.0% | empate 10.5% | victoria Cape Verde 1.6% | marcador más probable 2-0 (21.0%)
+- Marcadores más probables: 2-0 21.0%, 3-0 19.7%, 1-0 16.1%, 4-0 12.7%, 0-0 8.1%, 5-0 6.6%, 6-0 3.0%, 2-1 2.1%
 
 ### Belgium vs Egypt
 - Etapa: Grupo H
 - Estado: Mon, June 15th at 3:00 PM EDT
 - Sede: Lumen Field | United States
 - Hora UTC: 2026-06-15T19:00:00Z
-- Clima estimado: 20.5 C | HR 44% | viento 3 km/h | estrés 0.02
-- Factores que más pesan ahora: Elo dinámico +189.000; Rendimiento en Mundiales desde 1950 +0.364
+- Clima estimado: 16.1 C | HR 73% | viento 2 km/h | estrés 0.02
+- Factores que más pesan ahora: Minutos Mundial de Clubes +1049.622; Valor bruto de plantilla +998.467
 - Marcador proyectado: 1-0
-- Marcador para cargar en Penca: 2-0 | 2.93 pts esp. | exacto 15.2% | diferencia 21.0%
-- Precisión de marcador: Marcador con precisión media | exacto más probable 1-0 16.8% | top-5 cubre 61.8%
-- Promedio estimado de goles del modelo: Belgium 1.83 | Egypt 0.51
-- Probabilidades de resultado (90'): 68.3% / 22.3% / 9.4%
-- Lectura estadistica: Pick utilizable | pick actual Victoria Belgium 68.3% | confianza 74.6%
-- Escenario de goles: ambos marcan 33.6% | más de 2.5 goles 42.2%
-- Goles totales esperados por el modelo: 2.38. Sin línea externa de goles cargada para ese partido.
-- Probabilidad de que no reciba goles: Belgium 60.2% | Egypt 17.2%
-- Cuánta probabilidad cubren los 3 marcadores más probables: 43.0% | ventaja final más probable +1 (25.7%)
-- Qué tanto coinciden los modelos entre sí: 94.0%
+- Marcador para cargar en Penca: 2-0 | 2.96 pts esp. | exacto 15.0% | diferencia 21.2%
+- Precisión de marcador: Marcador con precisión media | exacto más probable 1-0 15.8% | top-5 cubre 59.8%
+- Promedio estimado de goles del modelo: Belgium 1.93 | Egypt 0.51
+- Probabilidades de resultado (90'): 69.5% / 21.3% / 9.2%
+- Lectura estadistica: Pick fuerte | pick actual Victoria Belgium 69.5% | confianza 75.8%
+- Escenario de goles: ambos marcan 34.9% | más de 2.5 goles 44.8%
+- Goles totales esperados por el modelo: 2.48. Sin línea externa de goles cargada para ese partido.
+- Probabilidad de que no reciba goles: Belgium 59.1% | Egypt 15.9%
+- Cuánta probabilidad cubren los 3 marcadores más probables: 41.0% | ventaja final más probable +1 (25.1%)
+- Qué tanto coinciden los modelos entre sí: 94.1%
 - Stack estadístico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotación + Overdispersión calibrada + ML ligero regularizado + Predictivo bayesiano dinámico + Ensamble + asimetría histórica
-- Factores dominantes: Elo dinámico +189.000; Rendimiento en Mundiales desde 1950 +0.364; Historia mundialista +0.313
+- Factores dominantes: Minutos Mundial de Clubes +1049.622; Valor bruto de plantilla +998.467; Elo dinámico +189.000
 - Comparativa entre modelos:
-- Bivariante Poisson: victoria Belgium 70.6% | empate 21.5% | victoria Egypt 7.9% | marcador más probable 1-0 (18.5%) | peso actual 37.6%
-- Poisson independiente: victoria Belgium 68.6% | empate 23.3% | victoria Egypt 8.1% | marcador más probable 1-0 (16.5%) | peso actual 17.2%
-- Ajuste de baja anotación: victoria Belgium 68.6% | empate 23.3% | victoria Egypt 8.1% | marcador más probable 1-0 (16.5%) | peso actual 14.8%
-- Overdispersión calibrada: victoria Belgium 67.1% | empate 22.2% | victoria Egypt 10.6% | marcador más probable 1-0 (17.6%) | peso actual 7.7%
-- ML ligero regularizado: victoria Belgium 69.5% | empate 21.1% | victoria Egypt 9.3% | marcador más probable 1-0 (17.3%) | peso actual 11.1%
-- Predictivo bayesiano dinámico: victoria Belgium 55.1% | empate 26.1% | victoria Egypt 18.8% | marcador más probable 1-0 (14.7%) | peso actual 11.7%
-- Ensamble + asimetría histórica: victoria Belgium 68.3% | empate 22.3% | victoria Egypt 9.4% | marcador más probable 1-0 (16.8%)
-- Marcadores más probables: 1-0 16.8%, 2-0 15.2%, 0-0 11.0%, 3-0 9.8%, 1-1 9.0%, 2-1 7.5%, 3-1 5.0%, 4-0 4.7%
+- Bivariante Poisson: victoria Belgium 71.7% | empate 20.5% | victoria Egypt 7.8% | marcador más probable 1-0 (17.5%) | peso actual 37.5%
+- Poisson independiente: victoria Belgium 69.8% | empate 22.2% | victoria Egypt 8.0% | marcador más probable 2-0 (16.0%) | peso actual 17.1%
+- Ajuste de baja anotación: victoria Belgium 69.8% | empate 22.2% | victoria Egypt 8.0% | marcador más probable 2-0 (16.0%) | peso actual 14.6%
+- Overdispersión calibrada: victoria Belgium 68.1% | empate 21.4% | victoria Egypt 10.6% | marcador más probable 1-0 (16.7%) | peso actual 7.9%
+- ML ligero regularizado: victoria Belgium 70.8% | empate 20.0% | victoria Egypt 9.2% | marcador más probable 1-0 (16.3%) | peso actual 11.2%
+- Predictivo bayesiano dinámico: victoria Belgium 56.6% | empate 25.1% | victoria Egypt 18.3% | marcador más probable 1-0 (14.1%) | peso actual 11.6%
+- Ensamble + asimetría histórica: victoria Belgium 69.5% | empate 21.3% | victoria Egypt 9.2% | marcador más probable 1-0 (15.8%)
+- Marcadores más probables: 1-0 15.8%, 2-0 15.0%, 3-0 10.1%, 0-0 10.0%, 1-1 8.8%, 2-1 7.6%, 3-1 5.3%, 4-0 5.0%
 
 ### Saudi Arabia vs Uruguay
 - Etapa: Grupo G
 - Estado: Mon, June 15th at 6:00 PM EDT
 - Sede: Hard Rock Stadium | United States
 - Hora UTC: 2026-06-15T22:00:00Z
-- Clima estimado: 25.9 C | HR 76% | viento 11 km/h | estrés 0.14
-- Factores que más pesan ahora: Elo dinámico -297.000; Historia mundialista -0.498
-- Marcador proyectado: 0-1
-- Marcador para cargar en Penca: 0-2 | 3.28 pts esp. | exacto 18.2% | diferencia 23.0%
-- Precisión de marcador: Marcador con precisión media | exacto más probable 0-1 18.5% | top-5 cubre 66.6%
-- Promedio estimado de goles del modelo: Saudi Arabia 0.34 | Uruguay 2.01
-- Probabilidades de resultado (90'): 5.6% / 18.4% / 76.0%
-- Lectura estadistica: Pick fuerte | pick actual Victoria Uruguay 76.0% | confianza 83.9%
-- Escenario de goles: ambos marcan 25.2% | más de 2.5 goles 42.3%
-- Goles totales esperados por el modelo: 2.38. Sin línea externa de goles cargada para ese partido.
-- Probabilidad de que no reciba goles: Saudi Arabia 14.8% | Uruguay 70.8%
-- Cuánta probabilidad cubren los 3 marcadores más probables: 49.4% | ventaja final más probable -1 (25.5%)
-- Qué tanto coinciden los modelos entre sí: 93.4%
+- Clima estimado: 29.2 C | HR 58% | viento 13 km/h | estrés 0.10
+- Factores que más pesan ahora: Minutos Mundial de Clubes +919.892; Valor bruto de plantilla -801.191
+- Marcador proyectado: 0-2
+- Marcador para cargar en Penca: 0-2 | 3.33 pts esp. | exacto 18.1% | diferencia 23.1%
+- Precisión de marcador: Marcador con precisión media | exacto más probable 0-2 18.1% | top-5 cubre 66.0%
+- Promedio estimado de goles del modelo: Saudi Arabia 0.34 | Uruguay 2.10
+- Probabilidades de resultado (90'): 5.3% / 17.4% / 77.4%
+- Lectura estadistica: Pick fuerte | pick actual Victoria Uruguay 77.4% | confianza 85.5%
+- Escenario de goles: ambos marcan 25.4% | más de 2.5 goles 44.4%
+- Goles totales esperados por el modelo: 2.46. Sin línea externa de goles cargada para ese partido.
+- Probabilidad de que no reciba goles: Saudi Arabia 13.7% | Uruguay 70.8%
+- Cuánta probabilidad cubren los 3 marcadores más probables: 49.0% | ventaja final más probable -1 (24.7%)
+- Qué tanto coinciden los modelos entre sí: 93.5%
 - Stack estadístico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotación + Overdispersión calibrada + ML ligero regularizado + Predictivo bayesiano dinámico + Ensamble + asimetría histórica
-- Factores dominantes: Elo dinámico -297.000; Historia mundialista -0.498; Rendimiento en Mundiales desde 1950 -0.340
+- Factores dominantes: Minutos Mundial de Clubes +919.892; Valor bruto de plantilla -801.191; Elo dinámico -297.000
 - Comparativa entre modelos:
-- Bivariante Poisson: victoria Saudi Arabia 4.1% | empate 17.4% | victoria Uruguay 78.5% | marcador más probable 0-1 (19.9%) | peso actual 38.5%
-- Poisson independiente: victoria Saudi Arabia 4.6% | empate 18.3% | victoria Uruguay 77.0% | marcador más probable 0-2 (19.3%) | peso actual 17.6%
-- Ajuste de baja anotación: victoria Saudi Arabia 4.6% | empate 18.3% | victoria Uruguay 77.0% | marcador más probable 0-2 (19.3%) | peso actual 14.0%
-- Overdispersión calibrada: victoria Saudi Arabia 6.2% | empate 19.3% | victoria Uruguay 74.5% | marcador más probable 0-1 (19.1%) | peso actual 7.9%
-- ML ligero regularizado: victoria Saudi Arabia 5.2% | empate 18.1% | victoria Uruguay 76.7% | marcador más probable 0-1 (18.6%) | peso actual 11.0%
-- Predictivo bayesiano dinámico: victoria Saudi Arabia 15.0% | empate 24.5% | victoria Uruguay 60.4% | marcador más probable 0-1 (15.5%) | peso actual 11.1%
-- Ensamble + asimetría histórica: victoria Saudi Arabia 5.6% | empate 18.4% | victoria Uruguay 76.0% | marcador más probable 0-1 (18.5%)
-- Marcadores más probables: 0-1 18.5%, 0-2 18.2%, 0-3 12.7%, 0-0 10.7%, 0-4 6.5%, 1-1 6.4%, 1-2 6.1%, 1-3 4.3%
+- Bivariante Poisson: victoria Saudi Arabia 3.8% | empate 16.4% | victoria Uruguay 79.8% | marcador más probable 0-2 (19.3%) | peso actual 38.3%
+- Poisson independiente: victoria Saudi Arabia 4.3% | empate 17.2% | victoria Uruguay 78.4% | marcador más probable 0-2 (19.2%) | peso actual 17.5%
+- Ajuste de baja anotación: victoria Saudi Arabia 4.3% | empate 17.2% | victoria Uruguay 78.4% | marcador más probable 0-2 (19.2%) | peso actual 13.8%
+- Overdispersión calibrada: victoria Saudi Arabia 5.9% | empate 18.4% | victoria Uruguay 75.6% | marcador más probable 0-1 (18.5%) | peso actual 8.1%
+- ML ligero regularizado: victoria Saudi Arabia 4.9% | empate 17.3% | victoria Uruguay 77.8% | marcador más probable 0-2 (18.2%) | peso actual 11.2%
+- Predictivo bayesiano dinámico: victoria Saudi Arabia 14.4% | empate 23.4% | victoria Uruguay 62.2% | marcador más probable 0-1 (14.9%) | peso actual 11.1%
+- Ensamble + asimetría histórica: victoria Saudi Arabia 5.3% | empate 17.4% | victoria Uruguay 77.4% | marcador más probable 0-2 (18.1%)
+- Marcadores más probables: 0-2 18.1%, 0-1 17.8%, 0-3 13.2%, 0-0 10.0%, 0-4 7.0%, 1-1 6.1%, 1-2 6.0%, 1-3 4.5%
 
 ### Iran vs New Zealand
 - Etapa: Grupo H
 - Estado: Mon, June 15th at 9:00 PM EDT
 - Sede: SoFi Stadium | United States
 - Hora UTC: 2026-06-16T01:00:00Z
-- Clima estimado: 22.9 C | HR 51% | viento 17 km/h | estrés 0.02
-- Factores que más pesan ahora: Elo dinámico +168.000; Ranking FIFA / puntos FIFA +0.405
+- Clima estimado: 23.3 C | HR 59% | viento 14 km/h | estrés 0.02
+- Factores que más pesan ahora: Valor bruto de plantilla +336.804; Elo dinámico +168.000
 - Marcador proyectado: 1-0
-- Marcador para cargar en Penca: 2-0 | 2.71 pts esp. | exacto 14.2% | diferencia 19.6%
-- Precisión de marcador: Marcador con precisión media | exacto más probable 1-0 16.2% | top-5 cubre 61.1%
-- Promedio estimado de goles del modelo: Iran 1.69 | New Zealand 0.58
-- Probabilidades de resultado (90'): 63.0% / 24.9% / 12.1%
-- Lectura estadistica: Pick utilizable | pick actual Victoria Iran 63.0% | confianza 68.8%
-- Escenario de goles: ambos marcan 35.3% | más de 2.5 goles 40.2%
-- Goles totales esperados por el modelo: 2.30. Sin línea externa de goles cargada para ese partido.
-- Probabilidad de que no reciba goles: Iran 56.9% | New Zealand 19.8%
-- Cuánta probabilidad cubren los 3 marcadores más probables: 42.4% | ventaja final más probable +1 (25.3%)
+- Marcador para cargar en Penca: 2-0 | 2.75 pts esp. | exacto 14.1% | diferencia 19.9%
+- Precisión de marcador: Marcador con precisión media | exacto más probable 1-0 15.2% | top-5 cubre 59.2%
+- Promedio estimado de goles del modelo: Iran 1.78 | New Zealand 0.60
+- Probabilidades de resultado (90'): 64.3% / 23.8% / 11.8%
+- Lectura estadistica: Pick utilizable | pick actual Victoria Iran 64.3% | confianza 70.1%
+- Escenario de goles: ambos marcan 36.7% | más de 2.5 goles 42.9%
+- Goles totales esperados por el modelo: 2.41. Sin línea externa de goles cargada para ese partido.
+- Probabilidad de que no reciba goles: Iran 55.9% | New Zealand 18.4%
+- Cuánta probabilidad cubren los 3 marcadores más probables: 40.2% | ventaja final más probable +1 (24.6%)
 - Qué tanto coinciden los modelos entre sí: 94.5%
 - Stack estadístico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotación + Overdispersión calibrada + ML ligero regularizado + Predictivo bayesiano dinámico + Ensamble + asimetría histórica
-- Factores dominantes: Elo dinámico +168.000; Ranking FIFA / puntos FIFA +0.405; Defensa histórica desde 1950 +0.375
+- Factores dominantes: Valor bruto de plantilla +336.804; Elo dinámico +168.000; Minutos Mundial de Clubes +92.986
 - Comparativa entre modelos:
-- Bivariante Poisson: victoria Iran 65.1% | empate 24.1% | victoria New Zealand 10.8% | marcador más probable 1-0 (18.1%) | peso actual 37.3%
-- Poisson independiente: victoria Iran 62.9% | empate 26.4% | victoria New Zealand 10.7% | marcador más probable 1-0 (15.7%) | peso actual 17.0%
-- Ajuste de baja anotación: victoria Iran 62.9% | empate 26.4% | victoria New Zealand 10.7% | marcador más probable 1-0 (15.7%) | peso actual 15.1%
-- Overdispersión calibrada: victoria Iran 62.3% | empate 24.1% | victoria New Zealand 13.6% | marcador más probable 1-0 (17.1%) | peso actual 7.6%
-- ML ligero regularizado: victoria Iran 64.7% | empate 23.2% | victoria New Zealand 12.1% | marcador más probable 1-0 (17.0%) | peso actual 11.0%
-- Predictivo bayesiano dinámico: victoria Iran 51.8% | empate 27.3% | victoria New Zealand 20.9% | marcador más probable 1-0 (14.6%) | peso actual 12.0%
-- Ensamble + asimetría histórica: victoria Iran 63.0% | empate 24.9% | victoria New Zealand 12.1% | marcador más probable 1-0 (16.2%)
-- Marcadores más probables: 1-0 16.2%, 2-0 14.2%, 0-0 12.0%, 1-1 10.1%, 3-0 8.7%, 2-1 7.5%, 0-1 5.6%, 3-1 4.7%
+- Bivariante Poisson: victoria Iran 66.4% | empate 23.0% | victoria New Zealand 10.6% | marcador más probable 1-0 (17.2%) | peso actual 37.2%
+- Poisson independiente: victoria Iran 64.2% | empate 25.4% | victoria New Zealand 10.4% | marcador más probable 1-0 (14.9%) | peso actual 16.9%
+- Ajuste de baja anotación: victoria Iran 64.2% | empate 25.4% | victoria New Zealand 10.4% | marcador más probable 1-0 (14.9%) | peso actual 15.1%
+- Overdispersión calibrada: victoria Iran 63.4% | empate 23.2% | victoria New Zealand 13.4% | marcador más probable 1-0 (16.3%) | peso actual 7.6%
+- ML ligero regularizado: victoria Iran 65.8% | empate 22.2% | victoria New Zealand 12.0% | marcador más probable 1-0 (16.2%) | peso actual 11.2%
+- Predictivo bayesiano dinámico: victoria Iran 53.1% | empate 26.3% | victoria New Zealand 20.6% | marcador más probable 1-0 (14.0%) | peso actual 12.0%
+- Ensamble + asimetría histórica: victoria Iran 64.3% | empate 23.8% | victoria New Zealand 11.8% | marcador más probable 1-0 (15.2%)
+- Marcadores más probables: 1-0 15.2%, 2-0 14.1%, 0-0 10.9%, 1-1 9.9%, 3-0 9.1%, 2-1 7.7%, 0-1 5.3%, 3-1 5.0%
 
 ### France vs Senegal
 - Etapa: Grupo I
 - Estado: Tue, June 16th at 3:00 PM EDT
 - Sede: MetLife Stadium | United States
 - Hora UTC: 2026-06-16T19:00:00Z
-- Clima estimado: 29.0 C | HR 68% | viento 13 km/h | estrés 0.08
-- Factores que más pesan ahora: Elo dinámico +194.000; Recursos/PIB proxy +0.509
-- Marcador proyectado: 1-0
-- Marcador para cargar en Penca: 2-0 | 3.02 pts esp. | exacto 16.2% | diferencia 21.7%
-- Precisión de marcador: Marcador con precisión media | exacto más probable 1-0 17.2% | top-5 cubre 63.2%
-- Promedio estimado de goles del modelo: France 1.87 | Senegal 0.46
-- Probabilidades de resultado (90'): 70.2% / 21.5% / 8.4%
-- Lectura estadistica: Pick fuerte | pick actual Victoria France 70.2% | confianza 76.8%
-- Escenario de goles: ambos marcan 31.4% | más de 2.5 goles 41.9%
-- Goles totales esperados por el modelo: 2.37. Sin línea externa de goles cargada para ese partido.
-- Probabilidad de que no reciba goles: France 62.9% | Senegal 16.7%
-- Cuánta probabilidad cubren los 3 marcadores más probables: 44.4% | ventaja final más probable +1 (25.7%)
+- Clima estimado: 27.2 C | HR 52% | viento 19 km/h | estrés 0.02
+- Factores que más pesan ahora: Minutos Mundial de Clubes +1174.055; Valor bruto de plantilla +1172.870
+- Marcador proyectado: 2-0
+- Marcador para cargar en Penca: 2-0 | 3.12 pts esp. | exacto 16.3% | diferencia 22.2%
+- Precisión de marcador: Marcador con precisión media | exacto más probable 2-0 16.3% | top-5 cubre 61.2%
+- Promedio estimado de goles del modelo: France 2.02 | Senegal 0.45
+- Probabilidades de resultado (90'): 73.0% / 19.5% / 7.5%
+- Lectura estadistica: Pick fuerte | pick actual Victoria France 73.0% | confianza 80.0%
+- Escenario de goles: ambos marcan 31.9% | más de 2.5 goles 45.4%
+- Goles totales esperados por el modelo: 2.51. Sin línea externa de goles cargada para ese partido.
+- Probabilidad de que no reciba goles: France 63.2% | Senegal 14.7%
+- Cuánta probabilidad cubren los 3 marcadores más probables: 43.7% | ventaja final más probable +1 (24.6%)
 - Qué tanto coinciden los modelos entre sí: 93.9%
 - Stack estadístico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotación + Overdispersión calibrada + ML ligero regularizado + Predictivo bayesiano dinámico + Ensamble + asimetría histórica
-- Factores dominantes: Elo dinámico +194.000; Recursos/PIB proxy +0.509; Historia mundialista +0.494
+- Factores dominantes: Minutos Mundial de Clubes +1174.055; Valor bruto de plantilla +1172.870; Elo dinámico +194.000
 - Comparativa entre modelos:
-- Bivariante Poisson: victoria France 72.6% | empate 20.6% | victoria Senegal 6.9% | marcador más probable 1-0 (18.9%) | peso actual 37.8%
-- Poisson independiente: victoria France 70.7% | empate 22.1% | victoria Senegal 7.2% | marcador más probable 1-0 (17.0%) | peso actual 17.3%
-- Ajuste de baja anotación: victoria France 70.7% | empate 22.1% | victoria Senegal 7.2% | marcador más probable 1-0 (17.0%) | peso actual 14.6%
-- Overdispersión calibrada: victoria France 68.9% | empate 21.6% | victoria Senegal 9.5% | marcador más probable 1-0 (18.0%) | peso actual 7.7%
-- ML ligero regularizado: victoria France 71.3% | empate 20.4% | victoria Senegal 8.2% | marcador más probable 1-0 (17.6%) | peso actual 11.0%
-- Predictivo bayesiano dinámico: victoria France 56.4% | empate 25.8% | victoria Senegal 17.9% | marcador más probable 1-0 (14.9%) | peso actual 11.5%
-- Ensamble + asimetría histórica: victoria France 70.2% | empate 21.5% | victoria Senegal 8.4% | marcador más probable 1-0 (17.2%)
-- Marcadores más probables: 1-0 17.2%, 2-0 16.2%, 0-0 11.0%, 3-0 10.5%, 1-1 8.4%, 2-1 7.1%, 4-0 5.1%, 3-1 4.9%
+- Bivariante Poisson: victoria France 75.3% | empate 18.6% | victoria Senegal 6.1% | marcador más probable 1-0 (17.7%) | peso actual 37.7%
+- Poisson independiente: victoria France 73.5% | empate 20.0% | victoria Senegal 6.5% | marcador más probable 2-0 (17.1%) | peso actual 17.2%
+- Ajuste de baja anotación: victoria France 73.5% | empate 20.0% | victoria Senegal 6.5% | marcador más probable 2-0 (17.1%) | peso actual 14.3%
+- Overdispersión calibrada: victoria France 71.3% | empate 20.0% | victoria Senegal 8.7% | marcador más probable 1-0 (17.0%) | peso actual 8.2%
+- ML ligero regularizado: victoria France 74.1% | empate 18.8% | victoria Senegal 7.1% | marcador más probable 1-0 (16.9%) | peso actual 11.2%
+- Predictivo bayesiano dinámico: victoria France 59.0% | empate 24.3% | victoria Senegal 16.7% | marcador más probable 1-0 (14.3%) | peso actual 11.4%
+- Ensamble + asimetría histórica: victoria France 73.0% | empate 19.5% | victoria Senegal 7.5% | marcador más probable 2-0 (16.3%)
+- Marcadores más probables: 2-0 16.3%, 1-0 16.1%, 3-0 11.3%, 0-0 9.7%, 1-1 7.8%, 2-1 7.1%, 4-0 5.9%, 3-1 5.2%
 
 ### Iraq vs Norway
 - Etapa: Grupo I
 - Estado: Tue, June 16th at 6:00 PM EDT
 - Sede: Gillette Stadium | United States
 - Hora UTC: 2026-06-16T22:00:00Z
-- Clima estimado: 26.0 C | HR 67% | viento 12 km/h | estrés 0.02
-- Factores que más pesan ahora: Elo dinámico -339.000; Historia mundialista -0.248
+- Clima estimado: 25.4 C | HR 51% | viento 19 km/h | estrés 0.02
+- Factores que más pesan ahora: Valor bruto de plantilla -1171.177; Minutos Mundial de Clubes -929.897
 - Marcador proyectado: 0-2
-- Marcador para cargar en Penca: 0-2 | 3.39 pts esp. | exacto 18.9% | diferencia 23.3%
-- Precisión de marcador: Marcador con precisión media | exacto más probable 0-2 18.9% | top-5 cubre 69.5%
-- Promedio estimado de goles del modelo: Iraq 0.28 | Norway 2.08
-- Probabilidades de resultado (90'): 4.5% / 17.1% / 78.4%
-- Lectura estadistica: Pick fuerte | pick actual Victoria Norway 78.4% | confianza 87.0%
-- Escenario de goles: ambos marcan 22.2% | más de 2.5 goles 42.8%
-- Goles totales esperados por el modelo: 2.39. Sin línea externa de goles cargada para ese partido.
-- Probabilidad de que no reciba goles: Iraq 13.9% | Norway 74.5%
-- Cuánta probabilidad cubren los 3 marcadores más probables: 51.7% | ventaja final más probable -1 (25.0%)
+- Marcador para cargar en Penca: 0-2 | 3.43 pts esp. | exacto 18.9% | diferencia 23.4%
+- Precisión de marcador: Marcador con precisión media | exacto más probable 0-2 18.9% | top-5 cubre 69.1%
+- Promedio estimado de goles del modelo: Iraq 0.27 | Norway 2.16
+- Probabilidades de resultado (90'): 4.2% / 16.1% / 79.7%
+- Lectura estadistica: Pick fuerte | pick actual Victoria Norway 79.7% | confianza 88.5%
+- Escenario de goles: ambos marcan 22.2% | más de 2.5 goles 44.8%
+- Goles totales esperados por el modelo: 2.47. Sin línea externa de goles cargada para ese partido.
+- Probabilidad de que no reciba goles: Iraq 12.9% | Norway 74.7%
+- Cuánta probabilidad cubren los 3 marcadores más probables: 51.4% | ventaja final más probable -1 (24.2%)
 - Qué tanto coinciden los modelos entre sí: 93.2%
 - Stack estadístico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotación + Overdispersión calibrada + ML ligero regularizado + Predictivo bayesiano dinámico + Ensamble + asimetría histórica
-- Factores dominantes: Elo dinámico -339.000; Historia mundialista -0.248; Rendimiento competitivo desde 1950 +0.225
+- Factores dominantes: Valor bruto de plantilla -1171.177; Minutos Mundial de Clubes -929.897; Elo dinámico -339.000
 - Comparativa entre modelos:
-- Bivariante Poisson: victoria Iraq 3.1% | empate 16.0% | victoria Norway 81.0% | marcador más probable 0-2 (20.5%) | peso actual 38.7%
-- Poisson independiente: victoria Iraq 3.6% | empate 16.6% | victoria Norway 79.8% | marcador más probable 0-2 (20.4%) | peso actual 17.6%
-- Ajuste de baja anotación: victoria Iraq 3.6% | empate 16.6% | victoria Norway 79.8% | marcador más probable 0-2 (20.4%) | peso actual 13.6%
-- Overdispersión calibrada: victoria Iraq 4.8% | empate 18.2% | victoria Norway 76.9% | marcador más probable 0-1 (19.7%) | peso actual 7.9%
-- ML ligero regularizado: victoria Iraq 4.3% | empate 17.4% | victoria Norway 78.2% | marcador más probable 0-2 (19.0%) | peso actual 11.1%
-- Predictivo bayesiano dinámico: victoria Iraq 13.8% | empate 23.8% | victoria Norway 62.5% | marcador más probable 0-1 (15.6%) | peso actual 11.0%
-- Ensamble + asimetría histórica: victoria Iraq 4.5% | empate 17.1% | victoria Norway 78.4% | marcador más probable 0-2 (18.9%)
-- Marcadores más probables: 0-2 18.9%, 0-1 18.9%, 0-3 13.8%, 0-0 10.5%, 0-4 7.3%, 1-1 5.5%, 1-2 5.4%, 1-3 4.0%
+- Bivariante Poisson: victoria Iraq 2.9% | empate 14.9% | victoria Norway 82.2% | marcador más probable 0-2 (20.4%) | peso actual 38.7%
+- Poisson independiente: victoria Iraq 3.3% | empate 15.6% | victoria Norway 81.1% | marcador más probable 0-2 (20.3%) | peso actual 17.6%
+- Ajuste de baja anotación: victoria Iraq 3.3% | empate 15.6% | victoria Norway 81.1% | marcador más probable 0-2 (20.3%) | peso actual 13.5%
+- Overdispersión calibrada: victoria Iraq 4.6% | empate 17.4% | victoria Norway 78.0% | marcador más probable 0-1 (19.1%) | peso actual 8.1%
+- ML ligero regularizado: victoria Iraq 3.8% | empate 16.5% | victoria Norway 79.7% | marcador más probable 0-2 (19.2%) | peso actual 11.2%
+- Predictivo bayesiano dinámico: victoria Iraq 13.2% | empate 22.9% | victoria Norway 63.9% | marcador más probable 0-1 (15.2%) | peso actual 10.9%
+- Ensamble + asimetría histórica: victoria Iraq 4.2% | empate 16.1% | victoria Norway 79.7% | marcador más probable 0-2 (18.9%)
+- Marcadores más probables: 0-2 18.9%, 0-1 18.2%, 0-3 14.3%, 0-0 9.8%, 0-4 7.8%, 1-2 5.3%, 1-1 5.3%, 1-3 4.1%
 
 ### Argentina vs Algeria
 - Etapa: Grupo J
@@ -1204,29 +1193,29 @@ _El Brier 2026 se activa automáticamente con el primer partido terminado; antes
 - Sede: GEHA Field at Arrowhead Stadium | United States
 - Hora UTC: 2026-06-17T01:00:00Z
 - Clima estimado: 30.0 C | HR 63% | viento 14 km/h | estrés 0.16
-- Factores que más pesan ahora: Elo dinámico +439.000; Historia mundialista +0.615
+- Factores que más pesan ahora: Valor bruto de plantilla +1219.777; Minutos Mundial de Clubes +1167.680
 - Marcador proyectado: 2-0
-- Marcador para cargar en Penca: 2-0 | 3.63 pts esp. | exacto 21.0% | diferencia 24.2%
-- Precisión de marcador: Marcador defendible | exacto más probable 2-0 21.0% | top-5 cubre 75.3%
-- Promedio estimado de goles del modelo: Argentina 2.28 | Algeria 0.15
-- Probabilidades de resultado (90'): 83.9% / 13.5% / 2.6%
-- Lectura estadistica: Pick muy fuerte | pick actual Victoria Argentina 83.9% | confianza 94.0%
-- Escenario de goles: ambos marcan 15.1% | más de 2.5 goles 45.7%
-- Goles totales esperados por el modelo: 2.51. Sin línea externa de goles cargada para ese partido.
-- Probabilidad de que no reciba goles: Argentina 82.9% | Algeria 11.5%
-- Cuánta probabilidad cubren los 3 marcadores más probables: 55.9% | ventaja final más probable +2 (24.2%)
-- Qué tanto coinciden los modelos entre sí: 92.7%
+- Marcador para cargar en Penca: 2-0 | 3.67 pts esp. | exacto 20.9% | diferencia 23.9%
+- Precisión de marcador: Marcador defendible | exacto más probable 2-0 20.9% | top-5 cubre 75.2%
+- Promedio estimado de goles del modelo: Argentina 2.40 | Algeria 0.15
+- Probabilidades de resultado (90'): 85.6% / 12.2% / 2.2%
+- Lectura estadistica: Pick muy fuerte | pick actual Victoria Argentina 85.6% | confianza 96.1%
+- Escenario de goles: ambos marcan 14.0% | más de 2.5 goles 48.4%
+- Goles totales esperados por el modelo: 2.62. Sin línea externa de goles cargada para ese partido.
+- Probabilidad de que no reciba goles: Argentina 84.3% | Algeria 10.3%
+- Cuánta probabilidad cubren los 3 marcadores más probables: 55.6% | ventaja final más probable +2 (23.9%)
+- Qué tanto coinciden los modelos entre sí: 92.6%
 - Stack estadístico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotación + Overdispersión calibrada + ML ligero regularizado + Predictivo bayesiano dinámico + Ensamble + asimetría histórica
-- Factores dominantes: Elo dinámico +439.000; Historia mundialista +0.615; Rendimiento en Mundiales desde 1950 +0.426
+- Factores dominantes: Valor bruto de plantilla +1219.777; Minutos Mundial de Clubes +1167.680; Elo dinámico +439.000
 - Comparativa entre modelos:
-- Bivariante Poisson: victoria Argentina 86.5% | empate 12.2% | victoria Algeria 1.4% | marcador más probable 2-0 (22.8%) | peso actual 39.3%
-- Poisson independiente: victoria Argentina 85.9% | empate 12.5% | victoria Algeria 1.7% | marcador más probable 2-0 (22.7%) | peso actual 17.8%
-- Ajuste de baja anotación: victoria Argentina 85.9% | empate 12.5% | victoria Algeria 1.7% | marcador más probable 2-0 (22.7%) | peso actual 12.9%
-- Overdispersión calibrada: victoria Argentina 82.6% | empate 15.1% | victoria Algeria 2.3% | marcador más probable 1-0 (20.4%) | peso actual 8.3%
-- ML ligero regularizado: victoria Argentina 82.2% | empate 15.2% | victoria Algeria 2.6% | marcador más probable 2-0 (20.3%) | peso actual 11.0%
-- Predictivo bayesiano dinámico: victoria Argentina 67.5% | empate 21.6% | victoria Algeria 10.9% | marcador más probable 1-0 (15.7%) | peso actual 10.7%
-- Ensamble + asimetría histórica: victoria Argentina 83.9% | empate 13.5% | victoria Algeria 2.6% | marcador más probable 2-0 (21.0%)
-- Marcadores más probables: 2-0 21.0%, 1-0 18.3%, 3-0 16.6%, 4-0 9.9%, 0-0 9.5%, 5-0 4.7%, 1-1 3.5%, 2-1 3.5%
+- Bivariante Poisson: victoria Argentina 88.3% | empate 10.7% | victoria Algeria 1.1% | marcador más probable 2-0 (22.8%) | peso actual 39.0%
+- Poisson independiente: victoria Argentina 87.7% | empate 11.0% | victoria Algeria 1.3% | marcador más probable 2-0 (22.7%) | peso actual 17.6%
+- Ajuste de baja anotación: victoria Argentina 87.7% | empate 11.0% | victoria Algeria 1.3% | marcador más probable 2-0 (22.7%) | peso actual 12.7%
+- Overdispersión calibrada: victoria Argentina 84.3% | empate 13.9% | victoria Algeria 1.9% | marcador más probable 2-0 (20.3%) | peso actual 8.9%
+- ML ligero regularizado: victoria Argentina 83.5% | empate 14.1% | victoria Algeria 2.4% | marcador más probable 2-0 (19.8%) | peso actual 11.1%
+- Predictivo bayesiano dinámico: victoria Argentina 69.4% | empate 20.4% | victoria Algeria 10.2% | marcador más probable 1-0 (15.0%) | peso actual 10.6%
+- Ensamble + asimetría histórica: victoria Argentina 85.6% | empate 12.2% | victoria Algeria 2.2% | marcador más probable 2-0 (20.9%)
+- Marcadores más probables: 2-0 20.9%, 3-0 17.4%, 1-0 17.3%, 4-0 10.9%, 0-0 8.6%, 5-0 5.4%, 2-1 3.2%, 1-1 3.1%
 
 ### Austria vs Jordan
 - Etapa: Grupo J
@@ -1234,29 +1223,29 @@ _El Brier 2026 se activa automáticamente con el primer partido terminado; antes
 - Sede: Levi's Stadium | United States
 - Hora UTC: 2026-06-17T04:00:00Z
 - Clima estimado: 24.0 C | HR 60% | viento 12 km/h | estrés 0.02
-- Factores que más pesan ahora: Elo dinámico +127.000; Historia mundialista +0.280
+- Factores que más pesan ahora: Minutos Mundial de Clubes +1198.744; Valor bruto de plantilla +651.347
 - Marcador proyectado: 1-0
-- Marcador para cargar en Penca: 1-0 | 2.76 pts esp. | exacto 15.4% | diferencia 25.6%
-- Precisión de marcador: Marcador con precisión media | exacto más probable 1-0 15.4% | top-5 cubre 59.3%
-- Promedio estimado de goles del modelo: Austria 1.64 | Jordan 0.66
-- Probabilidades de resultado (90'): 59.4% / 26.2% / 14.4%
-- Lectura estadistica: Pick utilizable | pick actual Victoria Austria 59.4% | confianza 64.7%
-- Escenario de goles: ambos marcan 39.4% | más de 2.5 goles 40.6%
-- Goles totales esperados por el modelo: 2.32. Sin línea externa de goles cargada para ese partido.
-- Probabilidad de que no reciba goles: Austria 51.6% | Jordan 20.7%
-- Cuánta probabilidad cubren los 3 marcadores más probables: 39.9% | ventaja final más probable +0 (26.2%)
+- Marcador para cargar en Penca: 2-1 | 2.61 pts esp. | exacto 8.4% | diferencia 25.3%
+- Precisión de marcador: Marcador con precisión media | exacto más probable 1-0 14.8% | top-5 cubre 57.6%
+- Promedio estimado de goles del modelo: Austria 1.75 | Jordan 0.66
+- Probabilidades de resultado (90'): 61.8% / 24.7% / 13.5%
+- Lectura estadistica: Pick utilizable | pick actual Victoria Austria 61.8% | confianza 67.3%
+- Escenario de goles: ambos marcan 40.1% | más de 2.5 goles 43.2%
+- Goles totales esperados por el modelo: 2.43. Sin línea externa de goles cargada para ese partido.
+- Probabilidad de que no reciba goles: Austria 51.7% | Jordan 18.9%
+- Cuánta probabilidad cubren los 3 marcadores más probables: 38.6% | ventaja final más probable +1 (25.3%)
 - Qué tanto coinciden los modelos entre sí: 94.7%
 - Stack estadístico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotación + Overdispersión calibrada + ML ligero regularizado + Predictivo bayesiano dinámico + Ensamble + asimetría histórica
-- Factores dominantes: Elo dinámico +127.000; Historia mundialista +0.280; Rendimiento en Mundiales desde 1950 +0.240
+- Factores dominantes: Minutos Mundial de Clubes +1198.744; Valor bruto de plantilla +651.347; Elo dinámico +127.000
 - Comparativa entre modelos:
-- Bivariante Poisson: victoria Austria 61.4% | empate 25.3% | victoria Jordan 13.3% | marcador más probable 1-0 (17.1%) | peso actual 37.0%
-- Poisson independiente: victoria Austria 58.9% | empate 28.3% | victoria Jordan 12.8% | marcador más probable 1-0 (14.4%) | peso actual 16.7%
-- Ajuste de baja anotación: victoria Austria 58.9% | empate 28.3% | victoria Jordan 12.8% | marcador más probable 1-0 (14.4%) | peso actual 15.4%
-- Overdispersión calibrada: victoria Austria 59.0% | empate 24.9% | victoria Jordan 16.1% | marcador más probable 1-0 (16.2%) | peso actual 7.5%
-- ML ligero regularizado: victoria Austria 61.3% | empate 24.1% | victoria Jordan 14.6% | marcador más probable 1-0 (16.2%) | peso actual 11.1%
-- Predictivo bayesiano dinámico: victoria Austria 49.7% | empate 27.5% | victoria Jordan 22.8% | marcador más probable 1-0 (14.0%) | peso actual 12.3%
-- Ensamble + asimetría histórica: victoria Austria 59.4% | empate 26.2% | victoria Jordan 14.4% | marcador más probable 1-0 (15.4%)
-- Marcadores más probables: 1-0 15.4%, 2-0 12.8%, 0-0 11.7%, 1-1 11.1%, 2-1 8.3%, 3-0 7.2%, 0-1 6.1%, 3-1 4.8%
+- Bivariante Poisson: victoria Austria 63.8% | empate 23.8% | victoria Jordan 12.3% | marcador más probable 1-0 (16.4%) | peso actual 37.0%
+- Poisson independiente: victoria Austria 61.5% | empate 26.6% | victoria Jordan 11.9% | marcador más probable 1-0 (14.0%) | peso actual 16.8%
+- Ajuste de baja anotación: victoria Austria 61.5% | empate 26.6% | victoria Jordan 11.9% | marcador más probable 1-0 (14.0%) | peso actual 15.3%
+- Overdispersión calibrada: victoria Austria 61.1% | empate 23.8% | victoria Jordan 15.2% | marcador más probable 1-0 (15.7%) | peso actual 7.5%
+- ML ligero regularizado: victoria Austria 63.4% | empate 22.8% | victoria Jordan 13.7% | marcador más probable 1-0 (15.6%) | peso actual 11.3%
+- Predictivo bayesiano dinámico: victoria Austria 51.7% | empate 26.5% | victoria Jordan 21.8% | marcador más probable 1-0 (13.6%) | peso actual 12.2%
+- Ensamble + asimetría histórica: victoria Austria 61.8% | empate 24.7% | victoria Jordan 13.5% | marcador más probable 1-0 (14.8%)
+- Marcadores más probables: 1-0 14.8%, 2-0 13.1%, 1-1 10.6%, 0-0 10.6%, 2-1 8.4%, 3-0 7.7%, 0-1 5.6%, 3-1 5.2%
 
 ### Portugal vs Dem. Rep. of Congo
 - Etapa: Grupo K
@@ -1265,29 +1254,29 @@ _El Brier 2026 se activa automáticamente con el primer partido terminado; antes
 - Hora UTC: 2026-06-17T17:00:00Z
 - Clima estimado: 33.0 C | HR 73% | viento 12 km/h | estrés 0.33
 - Cambio por clima exigente: estrés climático 0.33.
-- Factores que más pesan ahora: Elo dinámico +337.000; Rendimiento en Mundiales desde 1950 +0.481
+- Factores que más pesan ahora: Valor bruto de plantilla +1114.552; Minutos Mundial de Clubes +840.483
 - Marcador proyectado: 2-0
-- Marcador para cargar en Penca: 2-0 | 3.50 pts esp. | exacto 20.0% | diferencia 23.8%
-- Precisión de marcador: Marcador con precisión media | exacto más probable 2-0 20.0% | top-5 cubre 72.8%
-- Promedio estimado de goles del modelo: Portugal 2.14 | Dem. Rep. of Congo 0.22
-- Probabilidades de resultado (90'): 80.8% / 15.7% / 3.5%
-- Lectura estadistica: Pick muy fuerte | pick actual Victoria Portugal 80.8% | confianza 90.0%
-- Escenario de goles: ambos marcan 18.6% | más de 2.5 goles 43.7%
-- Goles totales esperados por el modelo: 2.43. Sin línea externa de goles cargada para ese partido.
-- Probabilidad de que no reciba goles: Portugal 78.7% | Dem. Rep. of Congo 13.0%
-- Cuánta probabilidad cubren los 3 marcadores más probables: 54.0% | ventaja final más probable +2 (23.8%)
-- Qué tanto coinciden los modelos entre sí: 93.0%
+- Marcador para cargar en Penca: 2-0 | 3.57 pts esp. | exacto 20.1% | diferencia 23.8%
+- Precisión de marcador: Marcador defendible | exacto más probable 2-0 20.1% | top-5 cubre 73.0%
+- Promedio estimado de goles del modelo: Portugal 2.26 | Dem. Rep. of Congo 0.21
+- Probabilidades de resultado (90'): 82.8% / 14.1% / 3.0%
+- Lectura estadistica: Pick muy fuerte | pick actual Victoria Portugal 82.8% | confianza 92.5%
+- Escenario de goles: ambos marcan 17.5% | más de 2.5 goles 46.5%
+- Goles totales esperados por el modelo: 2.54. Sin línea externa de goles cargada para ese partido.
+- Probabilidad de que no reciba goles: Portugal 80.2% | Dem. Rep. of Congo 11.6%
+- Cuánta probabilidad cubren los 3 marcadores más probables: 54.1% | ventaja final más probable +2 (23.8%)
+- Qué tanto coinciden los modelos entre sí: 92.9%
 - Stack estadístico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotación + Overdispersión calibrada + ML ligero regularizado + Predictivo bayesiano dinámico + Ensamble + asimetría histórica
-- Factores dominantes: Elo dinámico +337.000; Rendimiento en Mundiales desde 1950 +0.481; Ataque histórico desde 1950 +0.470
+- Factores dominantes: Valor bruto de plantilla +1114.552; Minutos Mundial de Clubes +840.483; Elo dinámico +337.000
 - Comparativa entre modelos:
-- Bivariante Poisson: victoria Portugal 83.3% | empate 14.5% | victoria Dem. Rep. of Congo 2.2% | marcador más probable 2-0 (21.7%) | peso actual 39.1%
-- Poisson independiente: victoria Portugal 82.4% | empate 15.0% | victoria Dem. Rep. of Congo 2.6% | marcador más probable 2-0 (21.6%) | peso actual 17.8%
-- Ajuste de baja anotación: victoria Portugal 82.4% | empate 15.0% | victoria Dem. Rep. of Congo 2.6% | marcador más probable 2-0 (21.6%) | peso actual 13.3%
-- Overdispersión calibrada: victoria Portugal 79.3% | empate 17.1% | victoria Dem. Rep. of Congo 3.6% | marcador más probable 1-0 (20.4%) | peso actual 8.0%
-- ML ligero regularizado: victoria Portugal 80.5% | empate 16.3% | victoria Dem. Rep. of Congo 3.1% | marcador más probable 2-0 (20.1%) | peso actual 11.0%
-- Predictivo bayesiano dinámico: victoria Portugal 64.4% | empate 23.1% | victoria Dem. Rep. of Congo 12.5% | marcador más probable 1-0 (15.8%) | peso actual 10.9%
-- Ensamble + asimetría histórica: victoria Portugal 80.8% | empate 15.7% | victoria Dem. Rep. of Congo 3.5% | marcador más probable 2-0 (20.0%)
-- Marcadores más probables: 2-0 20.0%, 1-0 18.6%, 3-0 15.3%, 0-0 10.3%, 4-0 8.5%, 1-1 4.7%, 2-1 4.4%, 5-0 3.8%
+- Bivariante Poisson: victoria Portugal 85.4% | empate 12.8% | victoria Dem. Rep. of Congo 1.8% | marcador más probable 2-0 (21.9%) | peso actual 38.9%
+- Poisson independiente: victoria Portugal 84.6% | empate 13.3% | victoria Dem. Rep. of Congo 2.1% | marcador más probable 2-0 (21.8%) | peso actual 17.7%
+- Ajuste de baja anotación: victoria Portugal 84.6% | empate 13.3% | victoria Dem. Rep. of Congo 2.1% | marcador más probable 2-0 (21.8%) | peso actual 13.1%
+- Overdispersión calibrada: victoria Portugal 81.3% | empate 15.7% | victoria Dem. Rep. of Congo 3.0% | marcador más probable 1-0 (19.8%) | peso actual 8.4%
+- ML ligero regularizado: victoria Portugal 82.4% | empate 15.0% | victoria Dem. Rep. of Congo 2.6% | marcador más probable 2-0 (20.2%) | peso actual 11.2%
+- Predictivo bayesiano dinámico: victoria Portugal 66.5% | empate 21.8% | victoria Dem. Rep. of Congo 11.7% | marcador más probable 1-0 (15.2%) | peso actual 10.7%
+- Ensamble + asimetría histórica: victoria Portugal 82.8% | empate 14.1% | victoria Dem. Rep. of Congo 3.0% | marcador más probable 2-0 (20.1%)
+- Marcadores más probables: 2-0 20.1%, 1-0 17.7%, 3-0 16.3%, 4-0 9.5%, 0-0 9.4%, 5-0 4.4%, 1-1 4.1%, 2-1 4.0%
 
 ### England vs Croatia
 - Etapa: Grupo L
@@ -1296,29 +1285,29 @@ _El Brier 2026 se activa automáticamente con el primer partido terminado; antes
 - Hora UTC: 2026-06-17T20:00:00Z
 - Clima estimado: 32.0 C | HR 55% | viento 15 km/h | estrés 0.20
 - Cambio por clima exigente: estrés climático 0.20.
-- Factores que más pesan ahora: Elo dinámico +110.000; Recursos/PIB proxy +0.241
+- Factores que más pesan ahora: Valor bruto de plantilla +402.129; Minutos Mundial de Clubes -142.287
 - Marcador proyectado: 1-0
-- Marcador para cargar en Penca: 2-1 | 2.38 pts esp. | exacto 8.3% | diferencia 24.4%
-- Precisión de marcador: Marcador con precisión media | exacto más probable 1-0 14.0% | top-5 cubre 57.2%
-- Promedio estimado de goles del modelo: England 1.56 | Croatia 0.76
-- Probabilidades de resultado (90'): 54.6% / 27.7% / 17.7%
-- Lectura estadistica: Pronóstico parejo: sin favorito estadístico claro | pick actual Victoria England 54.6% | confianza 59.6%
-- Escenario de goles: ambos marcan 42.6% | más de 2.5 goles 41.5%
-- Goles totales esperados por el modelo: 2.36. Sin línea externa de goles cargada para ese partido.
-- Probabilidad de que no reciba goles: England 46.8% | Croatia 22.0%
-- Cuánta probabilidad cubren los 3 marcadores más probables: 37.5% | ventaja final más probable +0 (27.7%)
+- Marcador para cargar en Penca: 2-1 | 2.46 pts esp. | exacto 8.4% | diferencia 24.1%
+- Precisión de marcador: Marcador con precisión media | exacto más probable 1-0 13.4% | top-5 cubre 55.3%
+- Promedio estimado de goles del modelo: England 1.68 | Croatia 0.77
+- Probabilidades de resultado (90'): 57.6% / 26.0% / 16.4%
+- Lectura estadistica: Pick utilizable | pick actual Victoria England 57.6% | confianza 62.7%
+- Escenario de goles: ambos marcan 43.6% | más de 2.5 goles 44.6%
+- Goles totales esperados por el modelo: 2.48. Sin línea externa de goles cargada para ese partido.
+- Probabilidad de que no reciba goles: England 46.9% | Croatia 19.7%
+- Cuánta probabilidad cubren los 3 marcadores más probables: 36.6% | ventaja final más probable +0 (26.0%)
 - Qué tanto coinciden los modelos entre sí: 94.8%
 - Stack estadístico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotación + Overdispersión calibrada + ML ligero regularizado + Predictivo bayesiano dinámico + Ensamble + asimetría histórica
-- Factores dominantes: Elo dinámico +110.000; Recursos/PIB proxy +0.241; Defensa histórica desde 1950 +0.166
+- Factores dominantes: Valor bruto de plantilla +402.129; Minutos Mundial de Clubes -142.287; Elo dinámico +110.000
 - Comparativa entre modelos:
-- Bivariante Poisson: victoria England 56.5% | empate 26.7% | victoria Croatia 16.8% | marcador más probable 1-0 (15.9%) | peso actual 36.6%
-- Poisson independiente: victoria England 53.7% | empate 30.4% | victoria Croatia 15.8% | marcador más probable 1-1 (14.1%) | peso actual 16.4%
-- Ajuste de baja anotación: victoria England 53.7% | empate 30.4% | victoria Croatia 15.8% | marcador más probable 1-1 (14.1%) | peso actual 15.7%
-- Overdispersión calibrada: victoria England 54.7% | empate 25.8% | victoria Croatia 19.5% | marcador más probable 1-0 (15.2%) | peso actual 7.3%
-- ML ligero regularizado: victoria England 56.2% | empate 25.3% | victoria Croatia 18.5% | marcador más probable 1-0 (15.1%) | peso actual 11.2%
-- Predictivo bayesiano dinámico: victoria England 47.1% | empate 27.8% | victoria Croatia 25.0% | marcador más probable 1-0 (13.4%) | peso actual 12.7%
-- Ensamble + asimetría histórica: victoria England 54.6% | empate 27.7% | victoria Croatia 17.7% | marcador más probable 1-0 (14.0%)
-- Marcadores más probables: 1-0 14.0%, 1-1 12.1%, 0-0 11.4%, 2-0 11.4%, 2-1 8.3%, 0-1 6.8%, 3-0 6.2%, 3-1 4.7%
+- Bivariante Poisson: victoria England 59.6% | empate 25.0% | victoria Croatia 15.4% | marcador más probable 1-0 (15.2%) | peso actual 36.5%
+- Poisson independiente: victoria England 56.9% | empate 28.5% | victoria Croatia 14.6% | marcador más probable 1-1 (13.4%) | peso actual 16.4%
+- Ajuste de baja anotación: victoria England 56.9% | empate 28.5% | victoria Croatia 14.6% | marcador más probable 1-1 (13.4%) | peso actual 15.5%
+- Overdispersión calibrada: victoria England 57.3% | empate 24.4% | victoria Croatia 18.2% | marcador más probable 1-0 (14.6%) | peso actual 7.6%
+- ML ligero regularizado: victoria England 58.8% | empate 23.9% | victoria Croatia 17.3% | marcador más probable 1-0 (14.5%) | peso actual 11.4%
+- Predictivo bayesiano dinámico: victoria England 49.1% | empate 26.7% | victoria Croatia 24.2% | marcador más probable 1-0 (12.9%) | peso actual 12.5%
+- Ensamble + asimetría histórica: victoria England 57.6% | empate 26.0% | victoria Croatia 16.4% | marcador más probable 1-0 (13.4%)
+- Marcadores más probables: 1-0 13.4%, 2-0 11.7%, 1-1 11.5%, 0-0 10.2%, 2-1 8.4%, 3-0 6.9%, 0-1 6.1%, 3-1 5.2%
 
 ### Ghana vs Panama
 - Etapa: Grupo L
@@ -1326,29 +1315,29 @@ _El Brier 2026 se activa automáticamente con el primer partido terminado; antes
 - Sede: BMO Field | Canada
 - Hora UTC: 2026-06-17T23:00:00Z
 - Clima estimado: 25.0 C | HR 63% | viento 14 km/h | estrés 0.02
-- Factores que más pesan ahora: Elo dinámico -224.000; Rendimiento competitivo desde 1950 +0.313
+- Factores que más pesan ahora: Valor bruto de plantilla -356.140; Elo dinámico -224.000
 - Marcador proyectado: 0-1
-- Marcador para cargar en Penca: 0-2 | 2.82 pts esp. | exacto 14.5% | diferencia 20.3%
-- Precisión de marcador: Marcador con precisión media | exacto más probable 0-1 16.6% | top-5 cubre 60.4%
-- Promedio estimado de goles del modelo: Ghana 0.55 | Panama 1.79
-- Probabilidades de resultado (90'): 10.9% / 23.3% / 65.8%
-- Lectura estadistica: Pick utilizable | pick actual Victoria Panama 65.8% | confianza 71.9%
-- Escenario de goles: ambos marcan 36.0% | más de 2.5 goles 41.8%
-- Goles totales esperados por el modelo: 2.37. Sin línea externa de goles cargada para ese partido.
-- Probabilidad de que no reciba goles: Ghana 18.0% | Panama 57.0%
-- Cuánta probabilidad cubren los 3 marcadores más probables: 41.9% | ventaja final más probable -1 (26.3%)
-- Qué tanto coinciden los modelos entre sí: 94.3%
+- Marcador para cargar en Penca: 0-2 | 2.88 pts esp. | exacto 14.6% | diferencia 20.7%
+- Precisión de marcador: Marcador con precisión media | exacto más probable 0-1 16.0% | top-5 cubre 59.2%
+- Promedio estimado de goles del modelo: Ghana 0.56 | Panama 1.87
+- Probabilidades de resultado (90'): 10.3% / 22.2% / 67.5%
+- Lectura estadistica: Pick utilizable | pick actual Victoria Panama 67.5% | confianza 73.6%
+- Escenario de goles: ambos marcan 36.5% | más de 2.5 goles 43.8%
+- Goles totales esperados por el modelo: 2.45. Sin línea externa de goles cargada para ese partido.
+- Probabilidad de que no reciba goles: Ghana 16.7% | Panama 56.9%
+- Cuánta probabilidad cubren los 3 marcadores más probables: 40.7% | ventaja final más probable -1 (25.8%)
+- Qué tanto coinciden los modelos entre sí: 94.2%
 - Stack estadístico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotación + Overdispersión calibrada + ML ligero regularizado + Predictivo bayesiano dinámico + Ensamble + asimetría histórica
-- Factores dominantes: Elo dinámico -224.000; Rendimiento competitivo desde 1950 +0.313; Defensa histórica desde 1950 +0.255
+- Factores dominantes: Valor bruto de plantilla -356.140; Elo dinámico -224.000; Minutos Mundial de Clubes -22.824
 - Comparativa entre modelos:
-- Bivariante Poisson: victoria Ghana 9.5% | empate 22.5% | victoria Panama 68.0% | marcador más probable 0-1 (17.7%) | peso actual 37.4%
-- Poisson independiente: victoria Ghana 9.5% | empate 24.5% | victoria Panama 65.9% | marcador más probable 0-1 (15.6%) | peso actual 17.0%
-- Ajuste de baja anotación: victoria Ghana 9.5% | empate 24.5% | victoria Panama 65.9% | marcador más probable 0-1 (15.6%) | peso actual 14.9%
-- Overdispersión calibrada: victoria Ghana 12.3% | empate 22.9% | victoria Panama 64.8% | marcador más probable 0-1 (16.8%) | peso actual 7.6%
-- ML ligero regularizado: victoria Ghana 10.9% | empate 21.8% | victoria Panama 67.2% | marcador más probable 0-1 (16.7%) | peso actual 11.1%
-- Predictivo bayesiano dinámico: victoria Ghana 19.8% | empate 26.3% | victoria Panama 53.8% | marcador más probable 0-1 (14.4%) | peso actual 11.9%
-- Ensamble + asimetría histórica: victoria Ghana 10.9% | empate 23.3% | victoria Panama 65.8% | marcador más probable 0-1 (16.6%)
-- Marcadores más probables: 0-1 16.6%, 0-2 14.5%, 0-0 10.9%, 1-1 9.7%, 0-3 8.8%, 1-2 8.1%, 1-0 5.0%, 1-3 5.0%
+- Bivariante Poisson: victoria Ghana 8.9% | empate 21.3% | victoria Panama 69.8% | marcador más probable 0-1 (17.1%) | peso actual 37.4%
+- Poisson independiente: victoria Ghana 9.0% | empate 23.3% | victoria Panama 67.7% | marcador más probable 0-2 (15.4%) | peso actual 17.0%
+- Ajuste de baja anotación: victoria Ghana 9.0% | empate 23.3% | victoria Panama 67.7% | marcador más probable 0-2 (15.4%) | peso actual 14.8%
+- Overdispersión calibrada: victoria Ghana 11.7% | empate 22.0% | victoria Panama 66.3% | marcador más probable 0-1 (16.4%) | peso actual 7.8%
+- ML ligero regularizado: victoria Ghana 10.4% | empate 20.9% | victoria Panama 68.7% | marcador más probable 0-1 (16.1%) | peso actual 11.3%
+- Predictivo bayesiano dinámico: victoria Ghana 19.3% | empate 25.5% | victoria Panama 55.1% | marcador más probable 0-1 (14.0%) | peso actual 11.7%
+- Ensamble + asimetría histórica: victoria Ghana 10.3% | empate 22.2% | victoria Panama 67.5% | marcador más probable 0-1 (16.0%)
+- Marcadores más probables: 0-1 16.0%, 0-2 14.6%, 0-0 10.2%, 1-1 9.3%, 0-3 9.2%, 1-2 8.1%, 1-3 5.3%, 1-0 4.7%
 
 ### Uzbekistan vs Colombia
 - Etapa: Grupo K
@@ -1356,29 +1345,29 @@ _El Brier 2026 se activa automáticamente con el primer partido terminado; antes
 - Sede: Estadio Banorte | Mexico
 - Hora UTC: 2026-06-18T02:00:00Z
 - Clima estimado: 22.0 C | HR 56% | viento 12 km/h | estrés 0.02
-- Factores que más pesan ahora: Elo dinámico -270.000; Ranking FIFA / puntos FIFA -0.287
-- Marcador proyectado: 0-1
-- Marcador para cargar en Penca: 0-2 | 3.16 pts esp. | exacto 16.8% | diferencia 22.2%
-- Precisión de marcador: Marcador con precisión media | exacto más probable 0-1 17.3% | top-5 cubre 63.2%
-- Promedio estimado de goles del modelo: Uzbekistan 0.42 | Colombia 2.02
-- Probabilidades de resultado (90'): 6.9% / 19.2% / 73.9%
-- Lectura estadistica: Pick fuerte | pick actual Victoria Colombia 73.9% | confianza 81.3%
-- Escenario de goles: ambos marcan 29.2% | más de 2.5 goles 44.0%
-- Goles totales esperados por el modelo: 2.45. Sin línea externa de goles cargada para ese partido.
-- Probabilidad de que no reciba goles: Uzbekistan 15.0% | Colombia 66.1%
-- Cuánta probabilidad cubren los 3 marcadores más probables: 45.8% | ventaja final más probable -1 (25.2%)
-- Qué tanto coinciden los modelos entre sí: 93.8%
+- Factores que más pesan ahora: Valor bruto de plantilla -774.469; Elo dinámico -270.000
+- Marcador proyectado: 0-2
+- Marcador para cargar en Penca: 0-2 | 3.22 pts esp. | exacto 16.7% | diferencia 22.4%
+- Precisión de marcador: Marcador con precisión media | exacto más probable 0-2 16.7% | top-5 cubre 61.6%
+- Promedio estimado de goles del modelo: Uzbekistan 0.42 | Colombia 2.13
+- Probabilidades de resultado (90'): 6.4% / 17.9% / 75.6%
+- Lectura estadistica: Pick fuerte | pick actual Victoria Colombia 75.6% | confianza 83.3%
+- Escenario de goles: ambos marcan 29.5% | más de 2.5 goles 46.6%
+- Goles totales esperados por el modelo: 2.55. Sin línea externa de goles cargada para ese partido.
+- Probabilidad de que no reciba goles: Uzbekistan 13.7% | Colombia 66.1%
+- Cuánta probabilidad cubren los 3 marcadores más probables: 45.5% | ventaja final más probable -1 (24.3%)
+- Qué tanto coinciden los modelos entre sí: 93.7%
 - Stack estadístico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotación + Overdispersión calibrada + ML ligero regularizado + Predictivo bayesiano dinámico + Ensamble + asimetría histórica
-- Factores dominantes: Elo dinámico -270.000; Ranking FIFA / puntos FIFA -0.287; Rendimiento competitivo desde 1950 +0.281
+- Factores dominantes: Valor bruto de plantilla -774.469; Elo dinámico -270.000; Minutos Mundial de Clubes -51.495
 - Comparativa entre modelos:
-- Bivariante Poisson: victoria Uzbekistan 5.4% | empate 18.2% | victoria Colombia 76.4% | marcador más probable 0-1 (18.4%) | peso actual 37.9%
-- Poisson independiente: victoria Uzbekistan 5.8% | empate 19.5% | victoria Colombia 74.7% | marcador más probable 0-2 (17.8%) | peso actual 17.4%
-- Ajuste de baja anotación: victoria Uzbekistan 5.8% | empate 19.5% | victoria Colombia 74.7% | marcador más probable 0-2 (17.8%) | peso actual 14.2%
-- Overdispersión calibrada: victoria Uzbekistan 7.8% | empate 19.8% | victoria Colombia 72.3% | marcador más probable 0-1 (17.7%) | peso actual 8.0%
-- ML ligero regularizado: victoria Uzbekistan 6.7% | empate 18.6% | victoria Colombia 74.6% | marcador más probable 0-1 (17.3%) | peso actual 11.2%
-- Predictivo bayesiano dinámico: victoria Uzbekistan 16.2% | empate 24.3% | victoria Colombia 59.4% | marcador más probable 0-1 (14.6%) | peso actual 11.3%
-- Ensamble + asimetría histórica: victoria Uzbekistan 6.9% | empate 19.2% | victoria Colombia 73.9% | marcador más probable 0-1 (17.3%)
-- Marcadores más probables: 0-1 17.3%, 0-2 16.8%, 0-3 11.8%, 0-0 10.3%, 1-1 7.1%, 1-2 6.7%, 0-4 6.0%, 1-3 4.8%
+- Bivariante Poisson: victoria Uzbekistan 5.0% | empate 16.9% | victoria Colombia 78.1% | marcador más probable 0-2 (17.8%) | peso actual 37.7%
+- Poisson independiente: victoria Uzbekistan 5.4% | empate 18.1% | victoria Colombia 76.5% | marcador más probable 0-2 (17.7%) | peso actual 17.2%
+- Ajuste de baja anotación: victoria Uzbekistan 5.4% | empate 18.1% | victoria Colombia 76.5% | marcador más probable 0-2 (17.7%) | peso actual 14.0%
+- Overdispersión calibrada: victoria Uzbekistan 7.4% | empate 18.8% | victoria Colombia 73.9% | marcador más probable 0-1 (17.0%) | peso actual 8.6%
+- ML ligero regularizado: victoria Uzbekistan 6.3% | empate 17.6% | victoria Colombia 76.1% | marcador más probable 0-2 (16.8%) | peso actual 11.4%
+- Predictivo bayesiano dinámico: victoria Uzbekistan 15.6% | empate 23.3% | victoria Colombia 61.2% | marcador más probable 0-1 (14.1%) | peso actual 11.2%
+- Ensamble + asimetría histórica: victoria Uzbekistan 6.4% | empate 17.9% | victoria Colombia 75.6% | marcador más probable 0-2 (16.7%)
+- Marcadores más probables: 0-2 16.7%, 0-1 16.4%, 0-3 12.4%, 0-0 9.4%, 1-1 6.8%, 1-2 6.7%, 0-4 6.6%, 1-3 5.0%
 
 ### Czech Republic vs South Africa
 - Etapa: Grupo A
@@ -1386,33 +1375,30 @@ _El Brier 2026 se activa automáticamente con el primer partido terminado; antes
 - Sede: Mercedes-Benz Stadium | United States
 - Hora UTC: 2026-06-18T16:00:00Z
 - Clima estimado: 30.0 C | HR 70% | viento 11 km/h | estrés 0.23
-- Noticias relevantes: itnewsafrica.com: South Africa Has FIFA World Cup Warm Up Match Against Mexico – IT News Africa – African Business Technology News; theoaklandpress.com: World Cup Group A preview : Co - host Mexico opens against South Africa; macombdaily.com: World Cup Group A preview : Co - host Mexico opens against South Africa
-- Impacto noticioso South Africa: itnewsafrica.com: South Africa Has FIFA World Cup Warm Up Match Against Mexico – IT News Africa – African Business Technology News; theoaklandpress.com: World Cup Group A preview : Co - host Mexico opens against South Africa
 - Cambio por clima exigente: estrés climático 0.23.
-- Cambio por noticias relevantes detectadas en el feed del partido.
-- Factores que más pesan ahora: Elo dinámico +202.000; Historia mundialista +0.266
+- Factores que más pesan ahora: Valor bruto de plantilla +514.817; Minutos Mundial de Clubes +335.062
 - Marcador proyectado: 1-0
-- Marcador para cargar en Penca: 2-0 | 2.88 pts esp. | exacto 15.2% | diferencia 20.7%
-- Precisión de marcador: Marcador con precisión media | exacto más probable 1-0 17.1% | top-5 cubre 63.1%
-- Promedio estimado de goles del modelo: Czech Republic 1.81 | South Africa 0.50
-- Probabilidades de resultado (90'): 67.1% / 23.5% / 9.5%
-- Lectura estadistica: Pick utilizable | pick actual Victoria Czech Republic 67.1% | confianza 73.2%
-- Escenario de goles: ambos marcan 33.3% | más de 2.5 goles 40.5%
-- Goles totales esperados por el modelo: 2.31. Sin línea externa de goles cargada para ese partido.
-- Probabilidad de que no reciba goles: Czech Republic 60.5% | South Africa 18.0%
-- Cuánta probabilidad cubren los 3 marcadores más probables: 44.2% | ventaja final más probable +1 (26.1%)
-- Qué tanto coinciden los modelos entre sí: 93.7%
+- Marcador para cargar en Penca: 2-0 | 2.93 pts esp. | exacto 15.1% | diferencia 21.0%
+- Precisión de marcador: Marcador con precisión media | exacto más probable 1-0 16.5% | top-5 cubre 61.0%
+- Promedio estimado de goles del modelo: Czech Republic 1.88 | South Africa 0.52
+- Probabilidades de resultado (90'): 68.6% / 21.9% / 9.5%
+- Lectura estadistica: Pick utilizable | pick actual Victoria Czech Republic 68.6% | confianza 74.9%
+- Escenario de goles: ambos marcan 34.3% | más de 2.5 goles 43.1%
+- Goles totales esperados por el modelo: 2.41. Sin línea externa de goles cargada para ese partido.
+- Probabilidad de que no reciba goles: Czech Republic 59.5% | South Africa 16.7%
+- Cuánta probabilidad cubren los 3 marcadores más probables: 42.2% | ventaja final más probable +1 (25.7%)
+- Qué tanto coinciden los modelos entre sí: 94.1%
 - Stack estadístico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotación + Overdispersión calibrada + ML ligero regularizado + Predictivo bayesiano dinámico + Ensamble + asimetría histórica
-- Factores dominantes: Elo dinámico +202.000; Historia mundialista +0.266; Ataque histórico desde 1950 +0.252
+- Factores dominantes: Valor bruto de plantilla +514.817; Minutos Mundial de Clubes +335.062; Elo dinámico +202.000
 - Comparativa entre modelos:
-- Bivariante Poisson: victoria Czech Republic 69.7% | empate 22.1% | victoria South Africa 8.2% | marcador más probable 1-0 (18.8%) | peso actual 37.6%
-- Poisson independiente: victoria Czech Republic 66.7% | empate 25.6% | victoria South Africa 7.8% | marcador más probable 2-0 (16.1%) | peso actual 17.1%
-- Ajuste de baja anotación: victoria Czech Republic 66.7% | empate 25.6% | victoria South Africa 7.8% | marcador más probable 2-0 (16.1%) | peso actual 14.8%
-- Overdispersión calibrada: victoria Czech Republic 66.4% | empate 22.7% | victoria South Africa 10.9% | marcador más probable 1-0 (17.8%) | peso actual 7.7%
-- ML ligero regularizado: victoria Czech Republic 68.8% | empate 21.6% | victoria South Africa 9.6% | marcador más probable 1-0 (17.6%) | peso actual 11.0%
-- Predictivo bayesiano dinámico: victoria Czech Republic 54.4% | empate 26.4% | victoria South Africa 19.2% | marcador más probable 1-0 (14.8%) | peso actual 11.8%
-- Ensamble + asimetría histórica: victoria Czech Republic 67.1% | empate 23.5% | victoria South Africa 9.5% | marcador más probable 1-0 (17.1%)
-- Marcadores más probables: 1-0 17.1%, 2-0 15.2%, 0-0 11.8%, 3-0 9.5%, 1-1 9.4%, 2-1 7.5%, 3-1 4.8%, 0-1 4.6%
+- Bivariante Poisson: victoria Czech Republic 70.9% | empate 21.0% | victoria South Africa 8.1% | marcador más probable 1-0 (17.8%) | peso actual 37.6%
+- Poisson independiente: victoria Czech Republic 68.9% | empate 22.9% | victoria South Africa 8.2% | marcador más probable 2-0 (16.0%) | peso actual 17.1%
+- Ajuste de baja anotación: victoria Czech Republic 68.9% | empate 22.9% | victoria South Africa 8.2% | marcador más probable 2-0 (16.0%) | peso actual 14.7%
+- Overdispersión calibrada: victoria Czech Republic 67.3% | empate 21.8% | victoria South Africa 10.8% | marcador más probable 1-0 (17.0%) | peso actual 7.7%
+- ML ligero regularizado: victoria Czech Republic 69.7% | empate 20.7% | victoria South Africa 9.5% | marcador más probable 1-0 (16.7%) | peso actual 11.2%
+- Predictivo bayesiano dinámico: victoria Czech Republic 55.7% | empate 25.6% | victoria South Africa 18.8% | marcador más probable 1-0 (14.3%) | peso actual 11.7%
+- Ensamble + asimetría histórica: victoria Czech Republic 68.6% | empate 21.9% | victoria South Africa 9.5% | marcador más probable 1-0 (16.5%)
+- Marcadores más probables: 1-0 16.5%, 2-0 15.1%, 0-0 10.5%, 3-0 9.9%, 1-1 8.9%, 2-1 7.7%, 3-1 5.1%, 4-0 4.7%
 
 ### Switzerland vs Bosnia and Herzegovina
 - Etapa: Grupo B
@@ -1420,29 +1406,29 @@ _El Brier 2026 se activa automáticamente con el primer partido terminado; antes
 - Sede: SoFi Stadium | United States
 - Hora UTC: 2026-06-18T19:00:00Z
 - Clima estimado: 26.0 C | HR 70% | viento 11 km/h | estrés 0.06
-- Factores que más pesan ahora: Elo dinámico +326.000; Ranking FIFA / puntos FIFA +0.350
+- Factores que más pesan ahora: Valor bruto de plantilla +1261.445; Minutos Mundial de Clubes +977.942
 - Marcador proyectado: 2-0
-- Marcador para cargar en Penca: 2-0 | 3.42 pts esp. | exacto 18.8% | diferencia 23.5%
-- Precisión de marcador: Marcador con precisión media | exacto más probable 2-0 18.8% | top-5 cubre 67.9%
-- Promedio estimado de goles del modelo: Switzerland 2.16 | Bosnia and Herzegovina 0.29
-- Probabilidades de resultado (90'): 79.6% / 16.2% / 4.2%
-- Lectura estadistica: Pick fuerte | pick actual Victoria Switzerland 79.6% | confianza 88.2%
-- Escenario de goles: ambos marcan 23.2% | más de 2.5 goles 46.3%
-- Goles totales esperados por el modelo: 2.53. Sin línea externa de goles cargada para ese partido.
-- Probabilidad de que no reciba goles: Switzerland 73.8% | Bosnia and Herzegovina 12.5%
-- Cuánta probabilidad cubren los 3 marcadores más probables: 50.3% | ventaja final más probable +2 (23.5%)
+- Marcador para cargar en Penca: 2-0 | 3.46 pts esp. | exacto 18.6% | diferencia 23.4%
+- Precisión de marcador: Marcador con precisión media | exacto más probable 2-0 18.6% | top-5 cubre 67.3%
+- Promedio estimado de goles del modelo: Switzerland 2.26 | Bosnia and Herzegovina 0.28
+- Probabilidades de resultado (90'): 81.1% / 14.9% / 3.9%
+- Lectura estadistica: Pick muy fuerte | pick actual Victoria Switzerland 81.1% | confianza 90.1%
+- Escenario de goles: ambos marcan 23.2% | más de 2.5 goles 48.8%
+- Goles totales esperados por el modelo: 2.63. Sin línea externa de goles cargada para ese partido.
+- Probabilidad de que no reciba goles: Switzerland 74.0% | Bosnia and Herzegovina 11.5%
+- Cuánta probabilidad cubren los 3 marcadores más probables: 49.8% | ventaja final más probable +2 (23.4%)
 - Qué tanto coinciden los modelos entre sí: 93.2%
 - Stack estadístico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotación + Overdispersión calibrada + ML ligero regularizado + Predictivo bayesiano dinámico + Ensamble + asimetría histórica
-- Factores dominantes: Elo dinámico +326.000; Ranking FIFA / puntos FIFA +0.350; Recursos/PIB proxy +0.293
+- Factores dominantes: Valor bruto de plantilla +1261.445; Minutos Mundial de Clubes +977.942; Elo dinámico +326.000
 - Comparativa entre modelos:
-- Bivariante Poisson: victoria Switzerland 82.2% | empate 14.9% | victoria Bosnia and Herzegovina 2.9% | marcador más probable 2-0 (20.4%) | peso actual 38.5%
-- Poisson independiente: victoria Switzerland 80.8% | empate 16.1% | victoria Bosnia and Herzegovina 3.2% | marcador más probable 2-0 (20.3%) | peso actual 17.6%
-- Ajuste de baja anotación: victoria Switzerland 80.8% | empate 16.1% | victoria Bosnia and Herzegovina 3.2% | marcador más probable 2-0 (20.3%) | peso actual 13.6%
-- Overdispersión calibrada: victoria Switzerland 78.0% | empate 17.4% | victoria Bosnia and Herzegovina 4.6% | marcador más probable 1-0 (19.1%) | peso actual 8.2%
-- ML ligero regularizado: victoria Switzerland 79.5% | empate 16.4% | victoria Bosnia and Herzegovina 4.1% | marcador más probable 2-0 (18.8%) | peso actual 11.2%
-- Predictivo bayesiano dinámico: victoria Switzerland 63.8% | empate 22.8% | victoria Bosnia and Herzegovina 13.4% | marcador más probable 1-0 (15.0%) | peso actual 10.9%
-- Ensamble + asimetría histórica: victoria Switzerland 79.6% | empate 16.2% | victoria Bosnia and Herzegovina 4.2% | marcador más probable 2-0 (18.8%)
-- Marcadores más probables: 2-0 18.8%, 1-0 16.8%, 3-0 14.7%, 0-0 9.5%, 4-0 8.2%, 1-1 5.6%, 2-1 5.3%, 3-1 4.3%
+- Bivariante Poisson: victoria Switzerland 83.6% | empate 13.7% | victoria Bosnia and Herzegovina 2.6% | marcador más probable 2-0 (20.3%) | peso actual 38.3%
+- Poisson independiente: victoria Switzerland 82.5% | empate 14.4% | victoria Bosnia and Herzegovina 3.1% | marcador más probable 2-0 (20.1%) | peso actual 17.4%
+- Ajuste de baja anotación: victoria Switzerland 82.5% | empate 14.4% | victoria Bosnia and Herzegovina 3.1% | marcador más probable 2-0 (20.1%) | peso actual 13.3%
+- Overdispersión calibrada: victoria Switzerland 79.3% | empate 16.4% | victoria Bosnia and Herzegovina 4.3% | marcador más probable 1-0 (18.3%) | peso actual 8.7%
+- ML ligero regularizado: victoria Switzerland 81.2% | empate 15.3% | victoria Bosnia and Herzegovina 3.5% | marcador más probable 2-0 (18.9%) | peso actual 11.3%
+- Predictivo bayesiano dinámico: victoria Switzerland 65.5% | empate 21.8% | victoria Bosnia and Herzegovina 12.7% | marcador más probable 1-0 (14.5%) | peso actual 10.8%
+- Ensamble + asimetría histórica: victoria Switzerland 81.1% | empate 14.9% | victoria Bosnia and Herzegovina 3.9% | marcador más probable 2-0 (18.6%)
+- Marcadores más probables: 2-0 18.6%, 1-0 16.0%, 3-0 15.2%, 4-0 8.8%, 0-0 8.7%, 1-1 5.2%, 2-1 5.2%, 3-1 4.3%
 
 ### Canada vs Qatar
 - Etapa: Grupo B
@@ -1450,29 +1436,29 @@ _El Brier 2026 se activa automáticamente con el primer partido terminado; antes
 - Sede: BC Place | Canada
 - Hora UTC: 2026-06-18T22:00:00Z
 - Clima estimado: 21.0 C | HR 71% | viento 10 km/h | estrés 0.02
-- Factores que más pesan ahora: Elo dinámico +379.000; Profundidad de banco +0.308
+- Factores que más pesan ahora: Valor bruto de plantilla +1135.236; Minutos Mundial de Clubes +1115.729
 - Marcador proyectado: 2-0
-- Marcador para cargar en Penca: 2-0 | 3.50 pts esp. | exacto 19.6% | diferencia 23.7%
-- Precisión de marcador: Marcador con precisión media | exacto más probable 2-0 19.6% | top-5 cubre 71.0%
-- Promedio estimado de goles del modelo: Canada 2.20 | Qatar 0.24
-- Probabilidades de resultado (90'): 81.2% / 15.2% / 3.6%
-- Lectura estadistica: Pick muy fuerte | pick actual Victoria Canada 81.2% | confianza 90.4%
-- Escenario de goles: ambos marcan 19.9% | más de 2.5 goles 45.5%
-- Goles totales esperados por el modelo: 2.50. Sin línea externa de goles cargada para ese partido.
-- Probabilidad de que no reciba goles: Canada 77.3% | Qatar 12.4%
-- Cuánta probabilidad cubren los 3 marcadores más probables: 52.7% | ventaja final más probable +2 (23.7%)
+- Marcador para cargar en Penca: 2-0 | 3.55 pts esp. | exacto 19.7% | diferencia 23.7%
+- Precisión de marcador: Marcador defendible | exacto más probable 2-0 19.7% | top-5 cubre 71.4%
+- Promedio estimado de goles del modelo: Canada 2.30 | Qatar 0.22
+- Probabilidades de resultado (90'): 82.9% / 13.9% / 3.2%
+- Lectura estadistica: Pick muy fuerte | pick actual Victoria Canada 82.9% | confianza 92.5%
+- Escenario de goles: ambos marcan 18.8% | más de 2.5 goles 47.6%
+- Goles totales esperados por el modelo: 2.58. Sin línea externa de goles cargada para ese partido.
+- Probabilidad de que no reciba goles: Canada 78.9% | Qatar 11.4%
+- Cuánta probabilidad cubren los 3 marcadores más probables: 53.0% | ventaja final más probable +2 (23.7%)
 - Qué tanto coinciden los modelos entre sí: 93.0%
 - Stack estadístico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotación + Overdispersión calibrada + ML ligero regularizado + Predictivo bayesiano dinámico + Ensamble + asimetría histórica
-- Factores dominantes: Elo dinámico +379.000; Profundidad de banco +0.308; Recursos/PIB proxy +0.298
+- Factores dominantes: Valor bruto de plantilla +1135.236; Minutos Mundial de Clubes +1115.729; Elo dinámico +379.000
 - Comparativa entre modelos:
-- Bivariante Poisson: victoria Canada 83.7% | empate 14.0% | victoria Qatar 2.3% | marcador más probable 2-0 (21.2%) | peso actual 38.8%
-- Poisson independiente: victoria Canada 82.7% | empate 14.6% | victoria Qatar 2.7% | marcador más probable 2-0 (21.1%) | peso actual 17.6%
-- Ajuste de baja anotación: victoria Canada 82.7% | empate 14.6% | victoria Qatar 2.7% | marcador más probable 2-0 (21.1%) | peso actual 13.3%
-- Overdispersión calibrada: victoria Canada 79.5% | empate 16.7% | victoria Qatar 3.8% | marcador más probable 1-0 (19.5%) | peso actual 8.2%
-- ML ligero regularizado: victoria Canada 81.0% | empate 15.7% | victoria Qatar 3.3% | marcador más probable 2-0 (19.5%) | peso actual 11.2%
-- Predictivo bayesiano dinámico: victoria Canada 65.1% | empate 22.4% | victoria Qatar 12.5% | marcador más probable 1-0 (15.2%) | peso actual 10.8%
-- Ensamble + asimetría histórica: victoria Canada 81.2% | empate 15.2% | victoria Qatar 3.6% | marcador más probable 2-0 (19.6%)
-- Marcadores más probables: 2-0 19.6%, 1-0 17.9%, 3-0 15.3%, 0-0 9.7%, 4-0 8.6%, 2-1 4.7%, 1-1 4.7%, 5-0 3.9%
+- Bivariante Poisson: victoria Canada 85.5% | empate 12.6% | victoria Qatar 1.9% | marcador más probable 2-0 (21.4%) | peso actual 38.7%
+- Poisson independiente: victoria Canada 84.6% | empate 13.1% | victoria Qatar 2.3% | marcador más probable 2-0 (21.3%) | peso actual 17.6%
+- Ajuste de baja anotación: victoria Canada 84.6% | empate 13.1% | victoria Qatar 2.3% | marcador más probable 2-0 (21.3%) | peso actual 13.1%
+- Overdispersión calibrada: victoria Canada 81.3% | empate 15.5% | victoria Qatar 3.2% | marcador más probable 1-0 (19.1%) | peso actual 8.7%
+- ML ligero regularizado: victoria Canada 82.4% | empate 14.8% | victoria Qatar 2.8% | marcador más probable 2-0 (19.6%) | peso actual 11.3%
+- Predictivo bayesiano dinámico: victoria Canada 66.8% | empate 21.4% | victoria Qatar 11.7% | marcador más probable 1-0 (14.9%) | peso actual 10.7%
+- Ensamble + asimetría histórica: victoria Canada 82.9% | empate 13.9% | victoria Qatar 3.2% | marcador más probable 2-0 (19.7%)
+- Marcadores más probables: 2-0 19.7%, 1-0 17.2%, 3-0 16.0%, 4-0 9.5%, 0-0 9.0%, 5-0 4.5%, 2-1 4.4%, 1-1 4.2%
 
 ### Mexico vs South Korea
 - Etapa: Grupo A
@@ -1480,33 +1466,29 @@ _El Brier 2026 se activa automáticamente con el primer partido terminado; antes
 - Sede: Estadio Akron | Mexico
 - Hora UTC: 2026-06-19T01:00:00Z
 - Clima estimado: 25.0 C | HR 55% | viento 11 km/h | estrés 0.02
-- Noticias relevantes: koreaherald.com: Son Heung - min off to 4th World Cup as South Korean squad released; itnewsafrica.com: South Africa Has FIFA World Cup Warm Up Match Against Mexico – IT News Africa – African Business Technology News
-- Impacto noticioso Mexico: itnewsafrica.com: South Africa Has FIFA World Cup Warm Up Match Against Mexico – IT News Africa – African Business Technology News
-- Impacto noticioso South Korea: koreaherald.com: Son Heung - min off to 4th World Cup as South Korean squad released
-- Cambio por noticias relevantes detectadas en el feed del partido.
-- Factores que más pesan ahora: Elo dinámico +69.000; Rendimiento en Mundiales desde 1950 +0.141
-- Marcador proyectado: 1-0
-- Marcador para cargar en Penca: 2-1 | 2.21 pts esp. | exacto 8.4% | diferencia 23.4%
-- Precisión de marcador: Marcador frágil | exacto más probable 1-0 12.6% | top-5 cubre 54.3%
-- Promedio estimado de goles del modelo: Mexico 1.51 | South Korea 0.91
-- Probabilidades de resultado (90'): 49.9% / 28.4% / 21.7%
-- Lectura estadistica: Pronóstico parejo: sin favorito estadístico claro | pick actual Victoria Mexico 49.9% | confianza 54.9%
-- Escenario de goles: ambos marcan 45.5% | más de 2.5 goles 43.0%
-- Goles totales esperados por el modelo: 2.42. Sin línea externa de goles cargada para ese partido.
-- Probabilidad de que no reciba goles: Mexico 41.8% | South Korea 23.8%
-- Cuánta probabilidad cubren los 3 marcadores más probables: 36.1% | ventaja final más probable +0 (28.4%)
-- Qué tanto coinciden los modelos entre sí: 94.8%
+- Factores que más pesan ahora: Valor bruto de plantilla +433.711; Elo dinámico +69.000
+- Marcador proyectado: 1-1
+- Marcador para cargar en Penca: 2-1 | 2.25 pts esp. | exacto 8.5% | diferencia 23.1%
+- Precisión de marcador: Marcador frágil | exacto más probable 1-1 12.0% | top-5 cubre 52.2%
+- Promedio estimado de goles del modelo: Mexico 1.60 | South Korea 0.93
+- Probabilidades de resultado (90'): 51.2% / 27.3% / 21.5%
+- Lectura estadistica: Pronóstico parejo: sin favorito estadístico claro | pick actual Victoria Mexico 51.2% | confianza 56.1%
+- Escenario de goles: ambos marcan 47.5% | más de 2.5 goles 45.9%
+- Goles totales esperados por el modelo: 2.54. Sin línea externa de goles cargada para ese partido.
+- Probabilidad de que no reciba goles: Mexico 40.4% | South Korea 22.1%
+- Cuánta probabilidad cubren los 3 marcadores más probables: 33.9% | ventaja final más probable +0 (27.3%)
+- Qué tanto coinciden los modelos entre sí: 94.9%
 - Stack estadístico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotación + Overdispersión calibrada + ML ligero regularizado + Predictivo bayesiano dinámico + Ensamble + asimetría histórica
-- Factores dominantes: Elo dinámico +69.000; Rendimiento en Mundiales desde 1950 +0.141; Localía/sede +0.140
+- Factores dominantes: Valor bruto de plantilla +433.711; Elo dinámico +69.000; Minutos Mundial de Clubes +55.253
 - Comparativa entre modelos:
-- Bivariante Poisson: victoria Mexico 51.7% | empate 27.2% | victoria South Korea 21.1% | marcador más probable 1-0 (14.0%) | peso actual 36.1%
-- Poisson independiente: victoria Mexico 48.6% | empate 31.9% | victoria South Korea 19.5% | marcador más probable 1-1 (15.1%) | peso actual 16.0%
-- Ajuste de baja anotación: victoria Mexico 48.6% | empate 31.9% | victoria South Korea 19.5% | marcador más probable 1-1 (15.1%) | peso actual 16.0%
-- Overdispersión calibrada: victoria Mexico 50.5% | empate 25.9% | victoria South Korea 23.6% | marcador más probable 1-0 (13.5%) | peso actual 7.3%
-- ML ligero regularizado: victoria Mexico 51.4% | empate 25.7% | victoria South Korea 22.9% | marcador más probable 1-0 (13.7%) | peso actual 11.5%
-- Predictivo bayesiano dinámico: victoria Mexico 44.1% | empate 27.8% | victoria South Korea 28.1% | marcador más probable 1-0 (12.4%) | peso actual 13.0%
-- Ensamble + asimetría histórica: victoria Mexico 49.9% | empate 28.4% | victoria South Korea 21.7% | marcador más probable 1-0 (12.6%)
-- Marcadores más probables: 1-0 12.6%, 1-1 12.4%, 0-0 11.2%, 2-0 9.8%, 2-1 8.4%, 0-1 7.4%, 3-0 5.2%, 1-2 5.0%
+- Bivariante Poisson: victoria Mexico 52.8% | empate 26.2% | victoria South Korea 21.0% | marcador más probable 1-0 (13.1%) | peso actual 35.9%
+- Poisson independiente: victoria Mexico 49.8% | empate 30.7% | victoria South Korea 19.5% | marcador más probable 1-1 (14.7%) | peso actual 15.9%
+- Ajuste de baja anotación: victoria Mexico 49.8% | empate 30.7% | victoria South Korea 19.5% | marcador más probable 1-1 (14.7%) | peso actual 15.8%
+- Overdispersión calibrada: victoria Mexico 51.4% | empate 25.0% | victoria South Korea 23.6% | marcador más probable 1-0 (12.8%) | peso actual 7.9%
+- ML ligero regularizado: victoria Mexico 53.2% | empate 24.6% | victoria South Korea 22.1% | marcador más probable 1-0 (13.0%) | peso actual 11.6%
+- Predictivo bayesiano dinámico: victoria Mexico 45.4% | empate 26.9% | victoria South Korea 27.7% | marcador más probable 1-0 (12.0%) | peso actual 12.9%
+- Ensamble + asimetría histórica: victoria Mexico 51.2% | empate 27.3% | victoria South Korea 21.5% | marcador más probable 1-1 (12.0%)
+- Marcadores más probables: 1-1 12.0%, 1-0 11.9%, 0-0 10.1%, 2-0 9.7%, 2-1 8.5%, 0-1 6.9%, 3-0 5.4%, 1-2 5.0%
 
 ### United States vs Australia
 - Etapa: Grupo C
@@ -1514,29 +1496,29 @@ _El Brier 2026 se activa automáticamente con el primer partido terminado; antes
 - Sede: Lumen Field | United States
 - Hora UTC: 2026-06-19T19:00:00Z
 - Clima estimado: 23.0 C | HR 65% | viento 10 km/h | estrés 0.02
-- Factores que más pesan ahora: Elo dinámico -27.000; Rendimiento competitivo desde 1950 -0.218
+- Factores que más pesan ahora: Valor bruto de plantilla +327.855; Minutos Mundial de Clubes -153.145
 - Marcador proyectado: 1-1
-- Marcador para cargar en Penca: 1-1 | 1.98 pts esp. | exacto 13.9% | diferencia 31.3%
-- Precisión de marcador: Marcador con precisión media | exacto más probable 1-1 13.9% | top-5 cubre 53.4%
-- Promedio estimado de goles del modelo: United States 1.12 | Australia 1.22
-- Probabilidades de resultado (90'): 32.1% / 31.3% / 36.6%
-- Lectura estadistica: Pronóstico parejo: sin favorito estadístico claro | pick actual Victoria Australia 36.6% | confianza 42.2%
-- Escenario de goles: ambos marcan 47.4% | más de 2.5 goles 41.2%
-- Goles totales esperados por el modelo: 2.34. Sin línea externa de goles cargada para ese partido.
-- Probabilidad de que no reciba goles: United States 30.9% | Australia 33.9%
-- Cuánta probabilidad cubren los 3 marcadores más probables: 36.5% | ventaja final más probable +0 (31.3%)
-- Qué tanto coinciden los modelos entre sí: 95.3%
+- Marcador para cargar en Penca: 1-1 | 1.94 pts esp. | exacto 13.7% | diferencia 30.6%
+- Precisión de marcador: Marcador con precisión media | exacto más probable 1-1 13.7% | top-5 cubre 50.7%
+- Promedio estimado de goles del modelo: United States 1.22 | Australia 1.23
+- Probabilidades de resultado (90'): 34.3% / 30.6% / 35.1%
+- Lectura estadistica: Pronóstico parejo: sin favorito estadístico claro | pick actual Victoria Australia 35.1% | confianza 40.2%
+- Escenario de goles: ambos marcan 49.9% | más de 2.5 goles 44.2%
+- Goles totales esperados por el modelo: 2.46. Sin línea externa de goles cargada para ese partido.
+- Probabilidad de que no reciba goles: United States 30.3% | Australia 31.0%
+- Cuánta probabilidad cubren los 3 marcadores más probables: 34.2% | ventaja final más probable +0 (30.6%)
+- Qué tanto coinciden los modelos entre sí: 95.2%
 - Stack estadístico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotación + Overdispersión calibrada + ML ligero regularizado + Predictivo bayesiano dinámico + Ensamble + asimetría histórica
-- Factores dominantes: Elo dinámico -27.000; Rendimiento competitivo desde 1950 -0.218; Recursos/PIB proxy +0.178
+- Factores dominantes: Valor bruto de plantilla +327.855; Minutos Mundial de Clubes -153.145; Elo dinámico -27.000
 - Comparativa entre modelos:
-- Bivariante Poisson: victoria United States 32.7% | empate 29.6% | victoria Australia 37.8% | marcador más probable 1-1 (13.2%) | peso actual 35.4%
-- Poisson independiente: victoria United States 29.5% | empate 36.3% | victoria Australia 34.3% | marcador más probable 1-1 (17.2%) | peso actual 15.4%
-- Ajuste de baja anotación: victoria United States 29.5% | empate 36.3% | victoria Australia 34.3% | marcador más probable 1-1 (17.2%) | peso actual 16.8%
-- Overdispersión calibrada: victoria United States 34.0% | empate 27.6% | victoria Australia 38.4% | marcador más probable 0-1 (11.9%) | peso actual 6.9%
-- ML ligero regularizado: victoria United States 33.9% | empate 27.8% | victoria Australia 38.2% | marcador más probable 0-1 (12.1%) | peso actual 11.5%
-- Predictivo bayesiano dinámico: victoria United States 34.1% | empate 29.0% | victoria Australia 36.9% | marcador más probable 0-0 (12.6%) | peso actual 13.9%
-- Ensamble + asimetría histórica: victoria United States 32.1% | empate 31.3% | victoria Australia 36.6% | marcador más probable 1-1 (13.9%)
-- Marcadores más probables: 1-1 13.9%, 0-0 12.2%, 0-1 10.5%, 1-0 9.6%, 1-2 7.3%, 0-2 6.8%, 2-1 6.8%, 2-0 5.8%
+- Bivariante Poisson: victoria United States 35.2% | empate 28.7% | victoria Australia 36.2% | marcador más probable 1-1 (13.0%) | peso actual 35.1%
+- Poisson independiente: victoria United States 31.7% | empate 35.7% | victoria Australia 32.6% | marcador más probable 1-1 (17.1%) | peso actual 15.3%
+- Ajuste de baja anotación: victoria United States 31.7% | empate 35.7% | victoria Australia 32.6% | marcador más probable 1-1 (17.1%) | peso actual 16.9%
+- Overdispersión calibrada: victoria United States 36.2% | empate 26.7% | victoria Australia 37.1% | marcador más probable 1-1 (11.2%) | peso actual 7.1%
+- ML ligero regularizado: victoria United States 36.1% | empate 27.0% | victoria Australia 36.9% | marcador más probable 0-1 (11.1%) | peso actual 11.7%
+- Predictivo bayesiano dinámico: victoria United States 35.7% | empate 28.2% | victoria Australia 36.1% | marcador más probable 1-1 (11.6%) | peso actual 13.9%
+- Ensamble + asimetría histórica: victoria United States 34.3% | empate 30.6% | victoria Australia 35.1% | marcador más probable 1-1 (13.7%)
+- Marcadores más probables: 1-1 13.7%, 0-0 11.1%, 0-1 9.4%, 1-0 9.2%, 1-2 7.2%, 2-1 7.2%, 0-2 6.3%, 2-0 6.1%
 
 ### Scotland vs Morocco
 - Etapa: Grupo D
@@ -1544,29 +1526,29 @@ _El Brier 2026 se activa automáticamente con el primer partido terminado; antes
 - Sede: Gillette Stadium | United States
 - Hora UTC: 2026-06-19T22:00:00Z
 - Clima estimado: 26.0 C | HR 67% | viento 12 km/h | estrés 0.02
-- Factores que más pesan ahora: Elo dinámico -16.000; Defensa histórica desde 1950 -0.424
+- Factores que más pesan ahora: Minutos Mundial de Clubes +221.374; Valor bruto de plantilla +99.639
 - Marcador proyectado: 1-1
-- Marcador para cargar en Penca: 1-1 | 1.96 pts esp. | exacto 13.5% | diferencia 31.1%
-- Precisión de marcador: Marcador frágil | exacto más probable 1-1 13.5% | top-5 cubre 55.1%
-- Promedio estimado de goles del modelo: Scotland 1.05 | Morocco 1.28
-- Probabilidades de resultado (90'): 29.0% / 31.1% / 39.9%
-- Lectura estadistica: Pronóstico parejo: sin favorito estadístico claro | pick actual Victoria Morocco 39.9% | confianza 45.4%
-- Escenario de goles: ambos marcan 45.3% | más de 2.5 goles 39.7%
-- Goles totales esperados por el modelo: 2.29. Sin línea externa de goles cargada para ese partido.
-- Probabilidad de que no reciba goles: Scotland 29.9% | Morocco 37.5%
-- Cuánta probabilidad cubren los 3 marcadores más probables: 37.5% | ventaja final más probable +0 (31.1%)
+- Marcador para cargar en Penca: 1-1 | 1.92 pts esp. | exacto 13.3% | diferencia 30.4%
+- Precisión de marcador: Marcador frágil | exacto más probable 1-1 13.3% | top-5 cubre 52.6%
+- Promedio estimado de goles del modelo: Scotland 1.10 | Morocco 1.32
+- Probabilidades de resultado (90'): 29.9% / 30.4% / 39.8%
+- Lectura estadistica: Pronóstico parejo: sin favorito estadístico claro | pick actual Victoria Morocco 39.8% | confianza 45.3%
+- Escenario de goles: ambos marcan 47.2% | más de 2.5 goles 42.2%
+- Goles totales esperados por el modelo: 2.39. Sin línea externa de goles cargada para ese partido.
+- Probabilidad de que no reciba goles: Scotland 28.8% | Morocco 35.7%
+- Cuánta probabilidad cubren los 3 marcadores más probables: 35.7% | ventaja final más probable +0 (30.4%)
 - Qué tanto coinciden los modelos entre sí: 95.3%
 - Stack estadístico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotación + Overdispersión calibrada + ML ligero regularizado + Predictivo bayesiano dinámico + Ensamble + asimetría histórica
-- Factores dominantes: Elo dinámico -16.000; Defensa histórica desde 1950 -0.424; Historia competitiva desde 1950 -0.281
+- Factores dominantes: Minutos Mundial de Clubes +221.374; Valor bruto de plantilla +99.639; Elo dinámico -16.000
 - Comparativa entre modelos:
-- Bivariante Poisson: victoria Scotland 29.1% | empate 29.5% | victoria Morocco 41.4% | marcador más probable 1-1 (13.1%) | peso actual 35.7%
-- Poisson independiente: victoria Scotland 26.4% | empate 35.7% | victoria Morocco 37.9% | marcador más probable 1-1 (16.9%) | peso actual 15.6%
-- Ajuste de baja anotación: victoria Scotland 26.4% | empate 35.7% | victoria Morocco 37.9% | marcador más probable 1-1 (16.9%) | peso actual 16.6%
-- Overdispersión calibrada: victoria Scotland 30.8% | empate 27.6% | victoria Morocco 41.6% | marcador más probable 0-1 (12.7%) | peso actual 7.0%
-- ML ligero regularizado: victoria Scotland 30.9% | empate 27.8% | victoria Morocco 41.3% | marcador más probable 0-1 (12.8%) | peso actual 11.4%
-- Predictivo bayesiano dinámico: victoria Scotland 32.4% | empate 29.0% | victoria Morocco 38.6% | marcador más probable 0-0 (12.7%) | peso actual 13.7%
-- Ensamble + asimetría histórica: victoria Scotland 29.0% | empate 31.1% | victoria Morocco 39.9% | marcador más probable 1-1 (13.5%)
-- Marcadores más probables: 1-1 13.5%, 0-0 12.7%, 0-1 11.4%, 1-0 9.6%, 0-2 8.0%, 1-2 7.3%, 2-1 6.3%, 2-0 5.2%
+- Bivariante Poisson: victoria Scotland 30.1% | empate 28.7% | victoria Morocco 41.1% | marcador más probable 1-1 (13.0%) | peso actual 35.5%
+- Poisson independiente: victoria Scotland 27.3% | empate 35.0% | victoria Morocco 37.7% | marcador más probable 1-1 (16.7%) | peso actual 15.5%
+- Ajuste de baja anotación: victoria Scotland 27.3% | empate 35.0% | victoria Morocco 37.7% | marcador más probable 1-1 (16.7%) | peso actual 16.6%
+- Overdispersión calibrada: victoria Scotland 31.8% | empate 26.8% | victoria Morocco 41.4% | marcador más probable 0-1 (11.9%) | peso actual 7.1%
+- ML ligero regularizado: victoria Scotland 31.5% | empate 26.9% | victoria Morocco 41.6% | marcador más probable 0-1 (12.0%) | peso actual 11.6%
+- Predictivo bayesiano dinámico: victoria Scotland 32.9% | empate 28.3% | victoria Morocco 38.8% | marcador más probable 0-0 (11.8%) | peso actual 13.7%
+- Ensamble + asimetría histórica: victoria Scotland 29.9% | empate 30.4% | victoria Morocco 39.8% | marcador más probable 1-1 (13.3%)
+- Marcadores más probables: 1-1 13.3%, 0-0 11.7%, 0-1 10.6%, 1-0 9.2%, 0-2 7.8%, 1-2 7.4%, 2-1 6.5%, 2-0 5.2%
 
 ### Brazil vs Haiti
 - Etapa: Grupo D
@@ -1574,29 +1556,29 @@ _El Brier 2026 se activa automáticamente con el primer partido terminado; antes
 - Sede: Lincoln Financial Field | United States
 - Hora UTC: 2026-06-20T00:30:00Z
 - Clima estimado: 29.0 C | HR 66% | viento 12 km/h | estrés 0.08
-- Factores que más pesan ahora: Elo dinámico +436.000; Historia mundialista +0.900
+- Factores que más pesan ahora: Valor bruto de plantilla +2051.673; Minutos Mundial de Clubes +1072.019
 - Marcador proyectado: 2-0
-- Marcador para cargar en Penca: 3-0 | 3.56 pts esp. | exacto 18.9% | diferencia 20.6%
-- Precisión de marcador: Marcador defendible | exacto más probable 2-0 21.0% | top-5 cubre 76.2%
-- Promedio estimado de goles del modelo: Brazil 2.42 | Haiti 0.12
-- Probabilidades de resultado (90'): 86.1% / 11.8% / 2.0%
-- Lectura estadistica: Pick muy fuerte | pick actual Victoria Brazil 86.1% | confianza 96.8%
-- Escenario de goles: ambos marcan 12.7% | más de 2.5 goles 49.9%
-- Goles totales esperados por el modelo: 2.66. Sin línea externa de goles cargada para ese partido.
-- Probabilidad de que no reciba goles: Brazil 85.8% | Haiti 10.2%
-- Cuánta probabilidad cubren los 3 marcadores más probables: 56.1% | ventaja final más probable +2 (23.7%)
-- Qué tanto coinciden los modelos entre sí: 92.5%
+- Marcador para cargar en Penca: 3-0 | 3.63 pts esp. | exacto 19.5% | diferencia 21.1%
+- Precisión de marcador: Marcador defendible | exacto más probable 2-0 20.9% | top-5 cubre 76.2%
+- Promedio estimado de goles del modelo: Brazil 2.52 | Haiti 0.10
+- Probabilidades de resultado (90'): 87.5% / 10.8% / 1.7%
+- Lectura estadistica: Pick muy fuerte | pick actual Victoria Brazil 87.5% | confianza 98.4%
+- Escenario de goles: ambos marcan 11.5% | más de 2.5 goles 51.9%
+- Goles totales esperados por el modelo: 2.74. Sin línea externa de goles cargada para ese partido.
+- Probabilidad de que no reciba goles: Brazil 87.2% | Haiti 9.3%
+- Cuánta probabilidad cubren los 3 marcadores más probables: 55.9% | ventaja final más probable +2 (23.4%)
+- Qué tanto coinciden los modelos entre sí: 92.4%
 - Stack estadístico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotación + Overdispersión calibrada + ML ligero regularizado + Predictivo bayesiano dinámico + Ensamble + asimetría histórica
-- Factores dominantes: Elo dinámico +436.000; Historia mundialista +0.900; Rendimiento en Mundiales desde 1950 +0.789
+- Factores dominantes: Valor bruto de plantilla +2051.673; Minutos Mundial de Clubes +1072.019; Elo dinámico +436.000
 - Comparativa entre modelos:
-- Bivariante Poisson: victoria Brazil 88.8% | empate 10.3% | victoria Haiti 0.9% | marcador más probable 2-0 (23.2%) | peso actual 39.2%
-- Poisson independiente: victoria Brazil 88.4% | empate 10.5% | victoria Haiti 1.1% | marcador más probable 2-0 (23.1%) | peso actual 17.7%
-- Ajuste de baja anotación: victoria Brazil 88.4% | empate 10.5% | victoria Haiti 1.1% | marcador más probable 2-0 (23.1%) | peso actual 12.5%
-- Overdispersión calibrada: victoria Brazil 85.0% | empate 13.5% | victoria Haiti 1.6% | marcador más probable 2-0 (20.7%) | peso actual 8.9%
-- ML ligero regularizado: victoria Brazil 83.3% | empate 14.3% | victoria Haiti 2.5% | marcador más probable 2-0 (19.9%) | peso actual 11.0%
-- Predictivo bayesiano dinámico: victoria Brazil 70.0% | empate 20.2% | victoria Haiti 9.8% | marcador más probable 1-0 (15.2%) | peso actual 10.6%
-- Ensamble + asimetría histórica: victoria Brazil 86.1% | empate 11.8% | victoria Haiti 2.0% | marcador más probable 2-0 (21.0%)
-- Marcadores más probables: 2-0 21.0%, 3-0 18.9%, 1-0 16.2%, 4-0 11.5%, 0-0 8.6%, 5-0 5.7%, 1-1 2.8%, 2-1 2.8%
+- Bivariante Poisson: victoria Brazil 90.2% | empate 9.2% | victoria Haiti 0.7% | marcador más probable 2-0 (23.2%) | peso actual 39.0%
+- Poisson independiente: victoria Brazil 89.9% | empate 9.3% | victoria Haiti 0.8% | marcador más probable 2-0 (23.1%) | peso actual 17.6%
+- Ajuste de baja anotación: victoria Brazil 89.9% | empate 9.3% | victoria Haiti 0.8% | marcador más probable 2-0 (23.1%) | peso actual 12.4%
+- Overdispersión calibrada: victoria Brazil 86.3% | empate 12.5% | victoria Haiti 1.2% | marcador más probable 2-0 (20.7%) | peso actual 9.4%
+- ML ligero regularizado: victoria Brazil 84.3% | empate 13.4% | victoria Haiti 2.3% | marcador más probable 2-0 (19.5%) | peso actual 11.1%
+- Predictivo bayesiano dinámico: victoria Brazil 71.6% | empate 19.3% | victoria Haiti 9.2% | marcador más probable 2-0 (14.9%) | peso actual 10.5%
+- Ensamble + asimetría histórica: victoria Brazil 87.5% | empate 10.8% | victoria Haiti 1.7% | marcador más probable 2-0 (20.9%)
+- Marcadores más probables: 2-0 20.9%, 3-0 19.5%, 1-0 15.5%, 4-0 12.3%, 0-0 8.0%, 5-0 6.4%, 6-0 2.8%, 2-1 2.4%
 
 ### Turkey vs Paraguay
 - Etapa: Grupo C
@@ -1604,29 +1586,29 @@ _El Brier 2026 se activa automáticamente con el primer partido terminado; antes
 - Sede: Levi's Stadium | United States
 - Hora UTC: 2026-06-20T03:00:00Z
 - Clima estimado: 24.0 C | HR 60% | viento 12 km/h | estrés 0.02
-- Factores que más pesan ahora: Elo dinámico +47.000; Ataque histórico desde 1950 +0.264
+- Factores que más pesan ahora: Minutos Mundial de Clubes +825.829; Valor bruto de plantilla +510.027
 - Marcador proyectado: 1-1
-- Marcador para cargar en Penca: 2-1 | 2.06 pts esp. | exacto 8.1% | diferencia 22.6%
-- Precisión de marcador: Marcador frágil | exacto más probable 1-1 13.0% | top-5 cubre 54.8%
-- Promedio estimado de goles del modelo: Turkey 1.40 | Paraguay 0.94
-- Probabilidades de resultado (90'): 45.5% / 30.0% / 24.5%
-- Lectura estadistica: Pronóstico parejo: sin favorito estadístico claro | pick actual Victoria Turkey 45.5% | confianza 50.6%
-- Escenario de goles: ambos marcan 45.7% | más de 2.5 goles 41.0%
-- Goles totales esperados por el modelo: 2.34. Sin línea externa de goles cargada para ese partido.
-- Probabilidad de que no reciba goles: Turkey 39.9% | Paraguay 26.4%
-- Cuánta probabilidad cubren los 3 marcadores más probables: 37.3% | ventaja final más probable +0 (30.0%)
-- Qué tanto coinciden los modelos entre sí: 95.2%
+- Marcador para cargar en Penca: 2-1 | 2.10 pts esp. | exacto 8.4% | diferencia 22.4%
+- Precisión de marcador: Marcador frágil | exacto más probable 1-1 12.7% | top-5 cubre 52.4%
+- Promedio estimado de goles del modelo: Turkey 1.49 | Paraguay 0.97
+- Probabilidades de resultado (90'): 46.9% / 28.9% / 24.3%
+- Lectura estadistica: Pronóstico parejo: sin favorito estadístico claro | pick actual Victoria Turkey 46.9% | confianza 51.9%
+- Escenario de goles: ambos marcan 47.8% | más de 2.5 goles 44.1%
+- Goles totales esperados por el modelo: 2.46. Sin línea externa de goles cargada para ese partido.
+- Probabilidad de que no reciba goles: Turkey 38.5% | Paraguay 24.5%
+- Cuánta probabilidad cubren los 3 marcadores más probables: 35.0% | ventaja final más probable +0 (28.9%)
+- Qué tanto coinciden los modelos entre sí: 95.0%
 - Stack estadístico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotación + Overdispersión calibrada + ML ligero regularizado + Predictivo bayesiano dinámico + Ensamble + asimetría histórica
-- Factores dominantes: Elo dinámico +47.000; Ataque histórico desde 1950 +0.264; Recursos/PIB proxy +0.255
+- Factores dominantes: Minutos Mundial de Clubes +825.829; Valor bruto de plantilla +510.027; Elo dinámico +47.000
 - Comparativa entre modelos:
-- Bivariante Poisson: victoria Turkey 47.3% | empate 28.6% | victoria Paraguay 24.1% | marcador más probable 1-0 (13.8%) | peso actual 36.1%
-- Poisson independiente: victoria Turkey 44.1% | empate 33.8% | victoria Paraguay 22.1% | marcador más probable 1-1 (16.0%) | peso actual 15.9%
-- Ajuste de baja anotación: victoria Turkey 44.1% | empate 33.8% | victoria Paraguay 22.1% | marcador más probable 1-1 (16.0%) | peso actual 16.3%
-- Overdispersión calibrada: victoria Turkey 46.7% | empate 27.0% | victoria Paraguay 26.3% | marcador más probable 1-0 (13.5%) | peso actual 7.1%
-- ML ligero regularizado: victoria Turkey 47.2% | empate 27.1% | victoria Paraguay 25.7% | marcador más probable 1-0 (13.8%) | peso actual 11.4%
-- Predictivo bayesiano dinámico: victoria Turkey 41.8% | empate 28.6% | victoria Paraguay 29.6% | marcador más probable 1-0 (12.6%) | peso actual 13.3%
-- Ensamble + asimetría histórica: victoria Turkey 45.5% | empate 30.0% | victoria Paraguay 24.5% | marcador más probable 1-1 (13.0%)
-- Marcadores más probables: 1-1 13.0%, 1-0 12.3%, 0-0 12.0%, 2-0 9.0%, 0-1 8.4%, 2-1 8.1%, 1-2 5.6%, 3-0 4.3%
+- Bivariante Poisson: victoria Turkey 48.5% | empate 27.5% | victoria Paraguay 23.9% | marcador más probable 1-0 (13.0%) | peso actual 35.9%
+- Poisson independiente: victoria Turkey 45.4% | empate 32.7% | victoria Paraguay 22.0% | marcador más probable 1-1 (15.6%) | peso actual 15.8%
+- Ajuste de baja anotación: victoria Turkey 45.4% | empate 32.7% | victoria Paraguay 22.0% | marcador más probable 1-1 (15.6%) | peso actual 16.1%
+- Overdispersión calibrada: victoria Turkey 47.8% | empate 26.0% | victoria Paraguay 26.2% | marcador más probable 1-0 (12.8%) | peso actual 7.4%
+- ML ligero regularizado: victoria Turkey 49.5% | empate 25.8% | victoria Paraguay 24.7% | marcador más probable 1-0 (13.1%) | peso actual 11.5%
+- Predictivo bayesiano dinámico: victoria Turkey 43.0% | empate 27.7% | victoria Paraguay 29.4% | marcador más probable 1-0 (12.0%) | peso actual 13.2%
+- Ensamble + asimetría histórica: victoria Turkey 46.9% | empate 28.9% | victoria Paraguay 24.3% | marcador más probable 1-1 (12.7%)
+- Marcadores más probables: 1-1 12.7%, 1-0 11.5%, 0-0 10.8%, 2-0 9.0%, 2-1 8.4%, 0-1 7.8%, 1-2 5.7%, 3-0 4.6%
 
 ### Netherlands vs Sweden
 - Etapa: Grupo F
@@ -1635,29 +1617,29 @@ _El Brier 2026 se activa automáticamente con el primer partido terminado; antes
 - Hora UTC: 2026-06-20T17:00:00Z
 - Clima estimado: 33.0 C | HR 73% | viento 12 km/h | estrés 0.33
 - Cambio por clima exigente: estrés climático 0.33.
-- Factores que más pesan ahora: Elo dinámico +299.000; Ataque histórico desde 1950 +0.332
+- Factores que más pesan ahora: Valor bruto de plantilla +919.206; Elo dinámico +299.000
 - Marcador proyectado: 2-0
-- Marcador para cargar en Penca: 2-0 | 3.35 pts esp. | exacto 18.2% | diferencia 23.4%
-- Precisión de marcador: Marcador con precisión media | exacto más probable 2-0 18.2% | top-5 cubre 65.8%
-- Promedio estimado de goles del modelo: Netherlands 2.11 | Sweden 0.32
-- Probabilidades de resultado (90'): 77.8% / 17.2% / 5.0%
-- Lectura estadistica: Pick fuerte | pick actual Victoria Netherlands 77.8% | confianza 86.0%
-- Escenario de goles: ambos marcan 25.6% | más de 2.5 goles 45.7%
-- Goles totales esperados por el modelo: 2.51. Sin línea externa de goles cargada para ese partido.
-- Probabilidad de que no reciba goles: Netherlands 71.0% | Sweden 13.2%
-- Cuánta probabilidad cubren los 3 marcadores más probables: 48.6% | ventaja final más probable +1 (23.5%)
+- Marcador para cargar en Penca: 2-0 | 3.38 pts esp. | exacto 18.0% | diferencia 23.3%
+- Precisión de marcador: Marcador con precisión media | exacto más probable 2-0 18.0% | top-5 cubre 64.8%
+- Promedio estimado de goles del modelo: Netherlands 2.20 | Sweden 0.33
+- Probabilidades de resultado (90'): 79.1% / 16.3% / 4.6%
+- Lectura estadistica: Pick fuerte | pick actual Victoria Netherlands 79.1% | confianza 87.5%
+- Escenario de goles: ambos marcan 26.1% | más de 2.5 goles 48.3%
+- Goles totales esperados por el modelo: 2.62. Sin línea externa de goles cargada para ese partido.
+- Probabilidad de que no reciba goles: Netherlands 70.8% | Sweden 12.1%
+- Cuánta probabilidad cubren los 3 marcadores más probables: 47.8% | ventaja final más probable +2 (23.3%)
 - Qué tanto coinciden los modelos entre sí: 93.4%
 - Stack estadístico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotación + Overdispersión calibrada + ML ligero regularizado + Predictivo bayesiano dinámico + Ensamble + asimetría histórica
-- Factores dominantes: Elo dinámico +299.000; Ataque histórico desde 1950 +0.332; Ranking FIFA / puntos FIFA +0.322
+- Factores dominantes: Valor bruto de plantilla +919.206; Elo dinámico +299.000; Minutos Mundial de Clubes -98.227
 - Comparativa entre modelos:
-- Bivariante Poisson: victoria Netherlands 80.3% | empate 16.1% | victoria Sweden 3.5% | marcador más probable 2-0 (19.7%) | peso actual 38.4%
-- Poisson independiente: victoria Netherlands 79.0% | empate 17.0% | victoria Sweden 4.1% | marcador más probable 2-0 (19.6%) | peso actual 17.5%
-- Ajuste de baja anotación: victoria Netherlands 79.0% | empate 17.0% | victoria Sweden 4.1% | marcador más probable 2-0 (19.6%) | peso actual 13.8%
-- Overdispersión calibrada: victoria Netherlands 76.1% | empate 18.3% | victoria Sweden 5.5% | marcador más probable 1-0 (18.8%) | peso actual 8.1%
-- ML ligero regularizado: victoria Netherlands 78.2% | empate 17.2% | victoria Sweden 4.6% | marcador más probable 2-0 (18.6%) | peso actual 11.2%
-- Predictivo bayesiano dinámico: victoria Netherlands 62.5% | empate 23.3% | victoria Sweden 14.2% | marcador más probable 1-0 (15.0%) | peso actual 11.1%
-- Ensamble + asimetría histórica: victoria Netherlands 77.8% | empate 17.2% | victoria Sweden 5.0% | marcador más probable 2-0 (18.2%)
-- Marcadores más probables: 2-0 18.2%, 1-0 16.8%, 3-0 13.6%, 0-0 9.7%, 4-0 7.5%, 1-1 6.2%, 2-1 5.8%, 3-1 4.6%
+- Bivariante Poisson: victoria Netherlands 81.9% | empate 14.9% | victoria Sweden 3.2% | marcador más probable 2-0 (19.6%) | peso actual 38.0%
+- Poisson independiente: victoria Netherlands 80.1% | empate 16.5% | victoria Sweden 3.4% | marcador más probable 2-0 (19.4%) | peso actual 17.4%
+- Ajuste de baja anotación: victoria Netherlands 80.1% | empate 16.5% | victoria Sweden 3.4% | marcador más probable 2-0 (19.4%) | peso actual 13.6%
+- Overdispersión calibrada: victoria Netherlands 77.5% | empate 17.3% | victoria Sweden 5.2% | marcador más probable 1-0 (18.1%) | peso actual 8.6%
+- ML ligero regularizado: victoria Netherlands 79.1% | empate 16.3% | victoria Sweden 4.6% | marcador más probable 2-0 (18.0%) | peso actual 11.4%
+- Predictivo bayesiano dinámico: victoria Netherlands 63.9% | empate 22.4% | victoria Sweden 13.7% | marcador más probable 1-0 (14.3%) | peso actual 11.0%
+- Ensamble + asimetría histórica: victoria Netherlands 79.1% | empate 16.3% | victoria Sweden 4.6% | marcador más probable 2-0 (18.0%)
+- Marcadores más probables: 2-0 18.0%, 1-0 15.8%, 3-0 14.0%, 0-0 8.9%, 4-0 8.1%, 1-1 6.0%, 2-1 5.7%, 3-1 4.8%
 
 ### Germany vs Ivory Coast
 - Etapa: Grupo E
@@ -1665,29 +1647,29 @@ _El Brier 2026 se activa automáticamente con el primer partido terminado; antes
 - Sede: BMO Field | Canada
 - Hora UTC: 2026-06-20T20:00:00Z
 - Clima estimado: 25.0 C | HR 63% | viento 14 km/h | estrés 0.02
-- Factores que más pesan ahora: Elo dinámico +273.000; Historia mundialista +0.700
+- Factores que más pesan ahora: Valor bruto de plantilla +1677.907; Minutos Mundial de Clubes +1426.904
 - Marcador proyectado: 2-0
-- Marcador para cargar en Penca: 2-0 | 3.41 pts esp. | exacto 18.6% | diferencia 23.5%
-- Precisión de marcador: Marcador con precisión media | exacto más probable 2-0 18.6% | top-5 cubre 67.5%
-- Promedio estimado de goles del modelo: Germany 2.17 | Ivory Coast 0.29
-- Probabilidades de resultado (90'): 79.5% / 16.3% / 4.2%
-- Lectura estadistica: Pick fuerte | pick actual Victoria Germany 79.5% | confianza 88.1%
-- Escenario de goles: ambos marcan 23.8% | más de 2.5 goles 46.3%
-- Goles totales esperados por el modelo: 2.54. Sin línea externa de goles cargada para ese partido.
-- Probabilidad de que no reciba goles: Germany 73.3% | Ivory Coast 12.5%
-- Cuánta probabilidad cubren los 3 marcadores más probables: 49.9% | ventaja final más probable +2 (23.5%)
+- Marcador para cargar en Penca: 2-0 | 3.45 pts esp. | exacto 18.2% | diferencia 23.2%
+- Precisión de marcador: Marcador con precisión media | exacto más probable 2-0 18.2% | top-5 cubre 66.5%
+- Promedio estimado de goles del modelo: Germany 2.29 | Ivory Coast 0.27
+- Probabilidades de resultado (90'): 81.4% / 14.7% / 3.9%
+- Lectura estadistica: Pick muy fuerte | pick actual Victoria Germany 81.4% | confianza 90.4%
+- Escenario de goles: ambos marcan 23.8% | más de 2.5 goles 49.7%
+- Goles totales esperados por el modelo: 2.67. Sin línea externa de goles cargada para ese partido.
+- Probabilidad de que no reciba goles: Germany 73.4% | Ivory Coast 11.2%
+- Cuánta probabilidad cubren los 3 marcadores más probables: 49.0% | ventaja final más probable +2 (23.2%)
 - Qué tanto coinciden los modelos entre sí: 93.3%
 - Stack estadístico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotación + Overdispersión calibrada + ML ligero regularizado + Predictivo bayesiano dinámico + Ensamble + asimetría histórica
-- Factores dominantes: Elo dinámico +273.000; Historia mundialista +0.700; Recursos/PIB proxy +0.547
+- Factores dominantes: Valor bruto de plantilla +1677.907; Minutos Mundial de Clubes +1426.904; Elo dinámico +273.000
 - Comparativa entre modelos:
-- Bivariante Poisson: victoria Germany 82.2% | empate 14.9% | victoria Ivory Coast 2.9% | marcador más probable 2-0 (20.4%) | peso actual 38.5%
-- Poisson independiente: victoria Germany 80.5% | empate 16.5% | victoria Ivory Coast 3.0% | marcador más probable 2-0 (20.3%) | peso actual 17.6%
-- Ajuste de baja anotación: victoria Germany 80.5% | empate 16.5% | victoria Ivory Coast 3.0% | marcador más probable 2-0 (20.3%) | peso actual 13.6%
-- Overdispersión calibrada: victoria Germany 78.0% | empate 17.4% | victoria Ivory Coast 4.6% | marcador más probable 1-0 (19.1%) | peso actual 8.2%
-- ML ligero regularizado: victoria Germany 79.5% | empate 16.4% | victoria Ivory Coast 4.1% | marcador más probable 2-0 (18.8%) | peso actual 11.2%
-- Predictivo bayesiano dinámico: victoria Germany 63.9% | empate 22.8% | victoria Ivory Coast 13.3% | marcador más probable 1-0 (15.0%) | peso actual 11.0%
-- Ensamble + asimetría histórica: victoria Germany 79.5% | empate 16.3% | victoria Ivory Coast 4.2% | marcador más probable 2-0 (18.6%)
-- Marcadores más probables: 2-0 18.6%, 1-0 17.1%, 3-0 14.2%, 0-0 9.5%, 4-0 8.1%, 1-1 5.7%, 2-1 5.4%, 3-1 4.4%
+- Bivariante Poisson: victoria Germany 83.9% | empate 13.5% | victoria Ivory Coast 2.6% | marcador más probable 2-0 (20.2%) | peso actual 38.3%
+- Poisson independiente: victoria Germany 82.8% | empate 14.2% | victoria Ivory Coast 3.0% | marcador más probable 2-0 (20.1%) | peso actual 17.4%
+- Ajuste de baja anotación: victoria Germany 82.8% | empate 14.2% | victoria Ivory Coast 3.0% | marcador más probable 2-0 (20.1%) | peso actual 13.3%
+- Overdispersión calibrada: victoria Germany 79.5% | empate 16.2% | victoria Ivory Coast 4.3% | marcador más probable 1-0 (18.2%) | peso actual 8.8%
+- ML ligero regularizado: victoria Germany 81.4% | empate 15.1% | victoria Ivory Coast 3.4% | marcador más probable 2-0 (18.9%) | peso actual 11.3%
+- Predictivo bayesiano dinámico: victoria Germany 66.0% | empate 21.5% | victoria Ivory Coast 12.5% | marcador más probable 1-0 (14.4%) | peso actual 10.8%
+- Ensamble + asimetría histórica: victoria Germany 81.4% | empate 14.7% | victoria Ivory Coast 3.9% | marcador más probable 2-0 (18.2%)
+- Marcadores más probables: 2-0 18.2%, 1-0 15.9%, 3-0 14.9%, 4-0 9.0%, 0-0 8.5%, 2-1 5.3%, 1-1 5.1%, 3-1 4.6%
 
 ### Ecuador vs Curacao
 - Etapa: Grupo E
@@ -1695,29 +1677,29 @@ _El Brier 2026 se activa automáticamente con el primer partido terminado; antes
 - Sede: GEHA Field at Arrowhead Stadium | United States
 - Hora UTC: 2026-06-21T00:00:00Z
 - Clima estimado: 30.0 C | HR 63% | viento 14 km/h | estrés 0.16
-- Factores que más pesan ahora: Elo dinámico +466.000; Profundidad de banco +0.382
+- Factores que más pesan ahora: Valor bruto de plantilla +1349.355; Elo dinámico +466.000
 - Marcador proyectado: 2-0
-- Marcador para cargar en Penca: 2-0 | 3.66 pts esp. | exacto 21.2% | diferencia 24.5%
-- Precisión de marcador: Marcador defendible | exacto más probable 2-0 21.2% | top-5 cubre 74.5%
-- Promedio estimado de goles del modelo: Ecuador 2.33 | Curacao 0.16
-- Probabilidades de resultado (90'): 84.6% / 13.0% / 2.5%
-- Lectura estadistica: Pick muy fuerte | pick actual Victoria Ecuador 84.6% | confianza 94.8%
-- Escenario de goles: ambos marcan 15.8% | más de 2.5 goles 46.3%
-- Goles totales esperados por el modelo: 2.55. Sin línea externa de goles cargada para ese partido.
-- Probabilidad de que no reciba goles: Ecuador 82.3% | Curacao 10.8%
-- Cuánta probabilidad cubren los 3 marcadores más probables: 55.8% | ventaja final más probable +2 (24.5%)
-- Qué tanto coinciden los modelos entre sí: 92.7%
+- Marcador para cargar en Penca: 2-0 | 3.69 pts esp. | exacto 21.0% | diferencia 24.1%
+- Precisión de marcador: Marcador defendible | exacto más probable 2-0 21.0% | top-5 cubre 74.6%
+- Promedio estimado de goles del modelo: Ecuador 2.43 | Curacao 0.14
+- Probabilidades de resultado (90'): 86.0% / 11.8% / 2.2%
+- Lectura estadistica: Pick muy fuerte | pick actual Victoria Ecuador 86.0% | confianza 96.6%
+- Escenario de goles: ambos marcan 14.7% | más de 2.5 goles 48.8%
+- Goles totales esperados por el modelo: 2.64. Sin línea externa de goles cargada para ese partido.
+- Probabilidad de que no reciba goles: Ecuador 83.7% | Curacao 10.0%
+- Cuánta probabilidad cubren los 3 marcadores más probables: 55.5% | ventaja final más probable +2 (24.1%)
+- Qué tanto coinciden los modelos entre sí: 92.6%
 - Stack estadístico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotación + Overdispersión calibrada + ML ligero regularizado + Predictivo bayesiano dinámico + Ensamble + asimetría histórica
-- Factores dominantes: Elo dinámico +466.000; Profundidad de banco +0.382; Ranking FIFA / puntos FIFA +0.346
+- Factores dominantes: Valor bruto de plantilla +1349.355; Elo dinámico +466.000; Minutos Mundial de Clubes +199.556
 - Comparativa entre modelos:
-- Bivariante Poisson: victoria Ecuador 87.2% | empate 11.5% | victoria Curacao 1.3% | marcador más probable 2-0 (22.6%) | peso actual 39.2%
-- Poisson independiente: victoria Ecuador 86.6% | empate 11.8% | victoria Curacao 1.6% | marcador más probable 2-0 (22.5%) | peso actual 17.7%
-- Ajuste de baja anotación: victoria Ecuador 86.6% | empate 11.8% | victoria Curacao 1.6% | marcador más probable 2-0 (22.5%) | peso actual 12.8%
-- Overdispersión calibrada: victoria Ecuador 83.2% | empate 14.6% | victoria Curacao 2.2% | marcador más probable 2-0 (20.1%) | peso actual 8.6%
-- ML ligero regularizado: victoria Ecuador 82.9% | empate 14.6% | victoria Curacao 2.5% | marcador más probable 2-0 (20.1%) | peso actual 11.1%
-- Predictivo bayesiano dinámico: victoria Ecuador 68.2% | empate 21.1% | victoria Curacao 10.7% | marcador más probable 1-0 (15.4%) | peso actual 10.7%
-- Ensamble + asimetría histórica: victoria Ecuador 84.6% | empate 13.0% | victoria Curacao 2.5% | marcador más probable 2-0 (21.2%)
-- Marcadores más probables: 2-0 21.2%, 1-0 18.2%, 3-0 16.4%, 4-0 9.8%, 0-0 8.9%, 5-0 4.7%, 2-1 3.7%, 1-1 3.5%
+- Bivariante Poisson: victoria Ecuador 88.7% | empate 10.3% | victoria Curacao 1.0% | marcador más probable 2-0 (22.7%) | peso actual 39.0%
+- Poisson independiente: victoria Ecuador 88.2% | empate 10.6% | victoria Curacao 1.3% | marcador más probable 2-0 (22.6%) | peso actual 17.6%
+- Ajuste de baja anotación: victoria Ecuador 88.2% | empate 10.6% | victoria Curacao 1.3% | marcador más probable 2-0 (22.6%) | peso actual 12.6%
+- Overdispersión calibrada: victoria Ecuador 84.7% | empate 13.5% | victoria Curacao 1.8% | marcador más probable 2-0 (20.2%) | peso actual 9.1%
+- ML ligero regularizado: victoria Ecuador 83.7% | empate 13.9% | victoria Curacao 2.4% | marcador más probable 2-0 (19.8%) | peso actual 11.2%
+- Predictivo bayesiano dinámico: victoria Ecuador 69.9% | empate 20.1% | victoria Curacao 10.0% | marcador más probable 1-0 (14.9%) | peso actual 10.6%
+- Ensamble + asimetría histórica: victoria Ecuador 86.0% | empate 11.8% | victoria Curacao 2.2% | marcador más probable 2-0 (21.0%)
+- Marcadores más probables: 2-0 21.0%, 3-0 17.3%, 1-0 17.3%, 4-0 10.7%, 0-0 8.3%, 5-0 5.4%, 2-1 3.4%, 1-1 3.0%
 
 ### Tunisia vs Japan
 - Etapa: Grupo F
@@ -1726,29 +1708,29 @@ _El Brier 2026 se activa automáticamente con el primer partido terminado; antes
 - Hora UTC: 2026-06-21T04:00:00Z
 - Clima estimado: 31.0 C | HR 57% | viento 13 km/h | estrés 0.19
 - Cambio por clima exigente: estrés climático 0.19.
-- Factores que más pesan ahora: Elo dinámico -264.000; Ataque histórico desde 1950 -0.352
-- Marcador proyectado: 0-1
-- Marcador para cargar en Penca: 0-2 | 3.22 pts esp. | exacto 17.4% | diferencia 22.6%
-- Precisión de marcador: Marcador con precisión media | exacto más probable 0-1 17.7% | top-5 cubre 64.7%
-- Promedio estimado de goles del modelo: Tunisia 0.37 | Japan 2.02
-- Probabilidades de resultado (90'): 6.2% / 18.8% / 75.0%
-- Lectura estadistica: Pick fuerte | pick actual Victoria Japan 75.0% | confianza 82.6%
-- Escenario de goles: ambos marcan 27.3% | más de 2.5 goles 43.5%
-- Goles totales esperados por el modelo: 2.43. Sin línea externa de goles cargada para ese partido.
-- Probabilidad de que no reciba goles: Tunisia 14.8% | Japan 68.4%
-- Cuánta probabilidad cubren los 3 marcadores más probables: 47.4% | ventaja final más probable -1 (25.0%)
-- Qué tanto coinciden los modelos entre sí: 93.6%
+- Factores que más pesan ahora: Minutos Mundial de Clubes -1147.417; Valor bruto de plantilla -1082.933
+- Marcador proyectado: 0-2
+- Marcador para cargar en Penca: 0-2 | 3.27 pts esp. | exacto 17.3% | diferencia 22.7%
+- Precisión de marcador: Marcador con precisión media | exacto más probable 0-2 17.3% | top-5 cubre 63.4%
+- Promedio estimado de goles del modelo: Tunisia 0.38 | Japan 2.12
+- Probabilidades de resultado (90'): 5.8% / 17.5% / 76.7%
+- Lectura estadistica: Pick fuerte | pick actual Victoria Japan 76.7% | confianza 84.6%
+- Escenario de goles: ambos marcan 27.7% | más de 2.5 goles 46.1%
+- Goles totales esperados por el modelo: 2.53. Sin línea externa de goles cargada para ese partido.
+- Probabilidad de que no reciba goles: Tunisia 13.5% | Japan 68.3%
+- Cuánta probabilidad cubren los 3 marcadores más probables: 46.9% | ventaja final más probable -1 (24.1%)
+- Qué tanto coinciden los modelos entre sí: 93.7%
 - Stack estadístico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotación + Overdispersión calibrada + ML ligero regularizado + Predictivo bayesiano dinámico + Ensamble + asimetría histórica
-- Factores dominantes: Elo dinámico -264.000; Ataque histórico desde 1950 -0.352; Recursos/PIB proxy -0.306
+- Factores dominantes: Minutos Mundial de Clubes -1147.417; Valor bruto de plantilla -1082.933; Elo dinámico -264.000
 - Comparativa entre modelos:
-- Bivariante Poisson: victoria Tunisia 4.7% | empate 17.9% | victoria Japan 77.5% | marcador más probable 0-1 (19.2%) | peso actual 38.3%
-- Poisson independiente: victoria Tunisia 5.2% | empate 18.9% | victoria Japan 75.9% | marcador más probable 0-2 (18.5%) | peso actual 17.5%
-- Ajuste de baja anotación: victoria Tunisia 5.2% | empate 18.9% | victoria Japan 75.9% | marcador más probable 0-2 (18.5%) | peso actual 14.1%
-- Overdispersión calibrada: victoria Tunisia 7.0% | empate 19.6% | victoria Japan 73.4% | marcador más probable 0-1 (18.4%) | peso actual 7.8%
-- ML ligero regularizado: victoria Tunisia 6.0% | empate 18.4% | victoria Japan 75.7% | marcador más probable 0-1 (17.9%) | peso actual 11.1%
-- Predictivo bayesiano dinámico: victoria Tunisia 15.6% | empate 24.5% | victoria Japan 60.0% | marcador más probable 0-1 (15.1%) | peso actual 11.2%
-- Ensamble + asimetría histórica: victoria Tunisia 6.2% | empate 18.8% | victoria Japan 75.0% | marcador más probable 0-1 (17.7%)
-- Marcadores más probables: 0-1 17.7%, 0-2 17.4%, 0-3 12.3%, 0-0 10.4%, 1-1 6.8%, 0-4 6.4%, 1-2 6.3%, 1-3 4.6%
+- Bivariante Poisson: victoria Tunisia 4.3% | empate 16.5% | victoria Japan 79.2% | marcador más probable 0-2 (18.5%) | peso actual 38.0%
+- Poisson independiente: victoria Tunisia 4.8% | empate 17.6% | victoria Japan 77.6% | marcador más probable 0-2 (18.4%) | peso actual 17.4%
+- Ajuste de baja anotación: victoria Tunisia 4.8% | empate 17.6% | victoria Japan 77.6% | marcador más probable 0-2 (18.4%) | peso actual 13.9%
+- Overdispersión calibrada: victoria Tunisia 6.6% | empate 18.5% | victoria Japan 74.9% | marcador más probable 0-1 (17.6%) | peso actual 8.4%
+- ML ligero regularizado: victoria Tunisia 5.6% | empate 17.4% | victoria Japan 77.0% | marcador más probable 0-2 (17.5%) | peso actual 11.3%
+- Predictivo bayesiano dinámico: victoria Tunisia 14.9% | empate 23.1% | victoria Japan 62.0% | marcador más probable 0-1 (14.3%) | peso actual 11.1%
+- Ensamble + asimetría histórica: victoria Tunisia 5.8% | empate 17.5% | victoria Japan 76.7% | marcador más probable 0-2 (17.3%)
+- Marcadores más probables: 0-2 17.3%, 0-1 16.8%, 0-3 12.8%, 0-0 9.5%, 0-4 7.0%, 1-1 6.5%, 1-2 6.2%, 1-3 4.8%
 
 ### Spain vs Saudi Arabia
 - Etapa: Grupo G
@@ -1756,33 +1738,30 @@ _El Brier 2026 se activa automáticamente con el primer partido terminado; antes
 - Sede: Mercedes-Benz Stadium | United States
 - Hora UTC: 2026-06-21T16:00:00Z
 - Clima estimado: 30.0 C | HR 70% | viento 11 km/h | estrés 0.23
-- Noticias relevantes: prokerala.com: Spain Fermin Lopez ruled out of World Cup with broken foot; ianslive.in: Spain Fermin Lopez ruled out of World Cup with broken foot
-- Impacto noticioso Spain: prokerala.com: Spain Fermin Lopez ruled out of World Cup with broken foot; ianslive.in: Spain Fermin Lopez ruled out of World Cup with broken foot
 - Cambio por clima exigente: estrés climático 0.23.
-- Cambio por noticias relevantes detectadas en el feed del partido.
-- Factores que más pesan ahora: Elo dinámico +578.000; Ataque histórico desde 1950 +0.537
+- Factores que más pesan ahora: Valor bruto de plantilla +1374.655; Elo dinámico +578.000
 - Marcador proyectado: 2-0
-- Marcador para cargar en Penca: 3-0 | 3.61 pts esp. | exacto 19.3% | diferencia 20.6%
-- Precisión de marcador: Marcador defendible | exacto más probable 2-0 21.1% | top-5 cubre 78.1%
-- Promedio estimado de goles del modelo: Spain 2.47 | Saudi Arabia 0.08
-- Probabilidades de resultado (90'): 87.4% / 11.0% / 1.6%
-- Lectura estadistica: Pick muy fuerte | pick actual Victoria Spain 87.4% | confianza 98.4%
-- Escenario de goles: ambos marcan 10.0% | más de 2.5 goles 50.2%
-- Goles totales esperados por el modelo: 2.67. Sin línea externa de goles cargada para ese partido.
-- Probabilidad de que no reciba goles: Spain 88.8% | Saudi Arabia 9.8%
-- Cuánta probabilidad cubren los 3 marcadores más probables: 57.2% | ventaja final más probable +2 (23.3%)
-- Qué tanto coinciden los modelos entre sí: 92.1%
+- Marcador para cargar en Penca: 3-0 | 3.66 pts esp. | exacto 19.6% | diferencia 21.0%
+- Precisión de marcador: Marcador con precisión media | exacto más probable 2-0 20.6% | top-5 cubre 76.8%
+- Promedio estimado de goles del modelo: Spain 2.58 | Saudi Arabia 0.07
+- Probabilidades de resultado (90'): 88.3% / 10.1% / 1.5%
+- Lectura estadistica: Pick muy fuerte | pick actual Victoria Spain 88.3% | confianza 99.0%
+- Escenario de goles: ambos marcan 10.0% | más de 2.5 goles 52.7%
+- Goles totales esperados por el modelo: 2.77. Sin línea externa de goles cargada para ese partido.
+- Probabilidad de que no reciba goles: Spain 88.8% | Saudi Arabia 9.0%
+- Cuánta probabilidad cubren los 3 marcadores más probables: 55.9% | ventaja final más probable +2 (22.8%)
+- Qué tanto coinciden los modelos entre sí: 92.4%
 - Stack estadístico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotación + Overdispersión calibrada + ML ligero regularizado + Predictivo bayesiano dinámico + Ensamble + asimetría histórica
-- Factores dominantes: Elo dinámico +578.000; Ataque histórico desde 1950 +0.537; Ranking FIFA / puntos FIFA +0.536
+- Factores dominantes: Valor bruto de plantilla +1374.655; Elo dinámico +578.000; Minutos Mundial de Clubes -216.391
 - Comparativa entre modelos:
-- Bivariante Poisson: victoria Spain 90.2% | empate 9.3% | victoria Saudi Arabia 0.5% | marcador más probable 2-0 (23.9%) | peso actual 39.4%
-- Poisson independiente: victoria Spain 89.9% | empate 9.4% | victoria Saudi Arabia 0.7% | marcador más probable 2-0 (23.8%) | peso actual 17.8%
-- Ajuste de baja anotación: victoria Spain 89.9% | empate 9.4% | victoria Saudi Arabia 0.7% | marcador más probable 2-0 (23.8%) | peso actual 12.3%
-- Overdispersión calibrada: victoria Spain 86.5% | empate 12.5% | victoria Saudi Arabia 1.0% | marcador más probable 2-0 (21.3%) | peso actual 9.0%
-- ML ligero regularizado: victoria Spain 83.3% | empate 14.3% | victoria Saudi Arabia 2.5% | marcador más probable 2-0 (19.9%) | peso actual 10.9%
-- Predictivo bayesiano dinámico: victoria Spain 71.1% | empate 19.8% | victoria Saudi Arabia 9.1% | marcador más probable 1-0 (15.4%) | peso actual 10.5%
-- Ensamble + asimetría histórica: victoria Spain 87.4% | empate 11.0% | victoria Saudi Arabia 1.6% | marcador más probable 2-0 (21.1%)
-- Marcadores más probables: 2-0 21.1%, 3-0 19.3%, 1-0 16.8%, 4-0 12.4%, 0-0 8.5%, 5-0 6.3%, 6-0 2.7%, 2-1 2.2%
+- Bivariante Poisson: victoria Spain 91.1% | empate 8.4% | victoria Saudi Arabia 0.5% | marcador más probable 2-0 (23.4%) | peso actual 39.1%
+- Poisson independiente: victoria Spain 90.8% | empate 8.6% | victoria Saudi Arabia 0.6% | marcador más probable 2-0 (23.3%) | peso actual 17.6%
+- Ajuste de baja anotación: victoria Spain 90.8% | empate 8.6% | victoria Saudi Arabia 0.6% | marcador más probable 2-0 (23.3%) | peso actual 12.2%
+- Overdispersión calibrada: victoria Spain 87.3% | empate 11.8% | victoria Saudi Arabia 0.9% | marcador más probable 2-0 (20.9%) | peso actual 9.6%
+- ML ligero regularizado: victoria Spain 84.5% | empate 13.3% | victoria Saudi Arabia 2.3% | marcador más probable 2-0 (19.4%) | peso actual 11.0%
+- Predictivo bayesiano dinámico: victoria Spain 72.7% | empate 18.7% | victoria Saudi Arabia 8.6% | marcador más probable 2-0 (15.1%) | peso actual 10.5%
+- Ensamble + asimetría histórica: victoria Spain 88.3% | empate 10.1% | victoria Saudi Arabia 1.5% | marcador más probable 2-0 (20.6%)
+- Marcadores más probables: 2-0 20.6%, 3-0 19.6%, 1-0 15.7%, 4-0 13.1%, 0-0 7.8%, 5-0 6.9%, 6-0 3.1%, 2-1 2.1%
 
 ### Belgium vs Iran
 - Etapa: Grupo H
@@ -1790,29 +1769,29 @@ _El Brier 2026 se activa automáticamente con el primer partido terminado; antes
 - Sede: SoFi Stadium | United States
 - Hora UTC: 2026-06-21T19:00:00Z
 - Clima estimado: 26.0 C | HR 70% | viento 11 km/h | estrés 0.06
-- Factores que más pesan ahora: Elo dinámico +95.000; Rendimiento en Mundiales desde 1950 +0.329
+- Factores que más pesan ahora: Minutos Mundial de Clubes +999.386; Valor bruto de plantilla +792.512
 - Marcador proyectado: 1-0
-- Marcador para cargar en Penca: 2-1 | 2.40 pts esp. | exacto 8.5% | diferencia 24.8%
-- Precisión de marcador: Marcador con precisión media | exacto más probable 1-0 14.1% | top-5 cubre 57.0%
-- Promedio estimado de goles del modelo: Belgium 1.58 | Iran 0.77
-- Probabilidades de resultado (90'): 55.1% / 27.4% / 17.5%
-- Lectura estadistica: Pick utilizable | pick actual Victoria Belgium 55.1% | confianza 60.1%
-- Escenario de goles: ambos marcan 43.0% | más de 2.5 goles 42.0%
-- Goles totales esperados por el modelo: 2.38. Sin línea externa de goles cargada para ese partido.
-- Probabilidad de que no reciba goles: Belgium 46.5% | Iran 21.8%
-- Cuánta probabilidad cubren los 3 marcadores más probables: 37.3% | ventaja final más probable +0 (27.4%)
+- Marcador para cargar en Penca: 2-1 | 2.46 pts esp. | exacto 8.7% | diferencia 24.4%
+- Precisión de marcador: Marcador con precisión media | exacto más probable 1-0 13.3% | top-5 cubre 54.8%
+- Promedio estimado de goles del modelo: Belgium 1.68 | Iran 0.78
+- Probabilidades de resultado (90'): 57.2% / 26.0% / 16.8%
+- Lectura estadistica: Pick utilizable | pick actual Victoria Belgium 57.2% | confianza 62.2%
+- Escenario de goles: ambos marcan 44.6% | más de 2.5 goles 45.1%
+- Goles totales esperados por el modelo: 2.50. Sin línea externa de goles cargada para ese partido.
+- Probabilidad de que no reciba goles: Belgium 45.6% | Iran 19.9%
+- Cuánta probabilidad cubren los 3 marcadores más probables: 36.0% | ventaja final más probable +0 (26.0%)
 - Qué tanto coinciden los modelos entre sí: 94.8%
 - Stack estadístico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotación + Overdispersión calibrada + ML ligero regularizado + Predictivo bayesiano dinámico + Ensamble + asimetría histórica
-- Factores dominantes: Elo dinámico +95.000; Rendimiento en Mundiales desde 1950 +0.329; Historia mundialista +0.290
+- Factores dominantes: Minutos Mundial de Clubes +999.386; Valor bruto de plantilla +792.512; Elo dinámico +95.000
 - Comparativa entre modelos:
-- Bivariante Poisson: victoria Belgium 57.0% | empate 26.4% | victoria Iran 16.6% | marcador más probable 1-0 (15.8%) | peso actual 36.6%
-- Poisson independiente: victoria Belgium 54.3% | empate 30.2% | victoria Iran 15.6% | marcador más probable 1-1 (14.0%) | peso actual 16.4%
-- Ajuste de baja anotación: victoria Belgium 54.3% | empate 30.2% | victoria Iran 15.6% | marcador más probable 1-1 (14.0%) | peso actual 15.7%
-- Overdispersión calibrada: victoria Belgium 55.1% | empate 25.6% | victoria Iran 19.3% | marcador más probable 1-0 (15.1%) | peso actual 7.3%
-- ML ligero regularizado: victoria Belgium 56.6% | empate 25.0% | victoria Iran 18.3% | marcador más probable 1-0 (15.0%) | peso actual 11.3%
-- Predictivo bayesiano dinámico: victoria Belgium 47.4% | empate 27.7% | victoria Iran 25.0% | marcador más probable 1-0 (13.3%) | peso actual 12.7%
-- Ensamble + asimetría histórica: victoria Belgium 55.1% | empate 27.4% | victoria Iran 17.5% | marcador más probable 1-0 (14.1%)
-- Marcadores más probables: 1-0 14.1%, 1-1 11.9%, 0-0 11.3%, 2-0 11.2%, 2-1 8.5%, 0-1 6.7%, 3-0 6.1%, 3-1 4.9%
+- Bivariante Poisson: victoria Belgium 59.1% | empate 25.0% | victoria Iran 15.9% | marcador más probable 1-0 (14.9%) | peso actual 36.4%
+- Poisson independiente: victoria Belgium 56.3% | empate 28.7% | victoria Iran 15.0% | marcador más probable 1-1 (13.5%) | peso actual 16.4%
+- Ajuste de baja anotación: victoria Belgium 56.3% | empate 28.7% | victoria Iran 15.0% | marcador más probable 1-1 (13.5%) | peso actual 15.5%
+- Overdispersión calibrada: victoria Belgium 56.9% | empate 24.4% | victoria Iran 18.7% | marcador más probable 1-0 (14.3%) | peso actual 7.7%
+- ML ligero regularizado: victoria Belgium 58.8% | empate 23.9% | victoria Iran 17.3% | marcador más probable 1-0 (14.5%) | peso actual 11.4%
+- Predictivo bayesiano dinámico: victoria Belgium 49.0% | empate 26.6% | victoria Iran 24.4% | marcador más probable 1-0 (12.8%) | peso actual 12.5%
+- Ensamble + asimetría histórica: victoria Belgium 57.2% | empate 26.0% | victoria Iran 16.8% | marcador más probable 1-0 (13.3%)
+- Marcadores más probables: 1-0 13.3%, 1-1 11.5%, 2-0 11.2%, 0-0 10.1%, 2-1 8.7%, 3-0 6.5%, 0-1 6.1%, 3-1 5.3%
 
 ### Uruguay vs Cape Verde
 - Etapa: Grupo G
@@ -1821,29 +1800,29 @@ _El Brier 2026 se activa automáticamente con el primer partido terminado; antes
 - Hora UTC: 2026-06-21T22:00:00Z
 - Clima estimado: 31.0 C | HR 74% | viento 15 km/h | estrés 0.28
 - Cambio por clima exigente: estrés climático 0.28.
-- Factores que más pesan ahora: Elo dinámico +329.000; Historia mundialista +0.534
+- Factores que más pesan ahora: Valor bruto de plantilla +1162.494; Elo dinámico +329.000
 - Marcador proyectado: 2-0
-- Marcador para cargar en Penca: 2-0 | 3.49 pts esp. | exacto 20.0% | diferencia 23.9%
-- Precisión de marcador: Marcador con precisión media | exacto más probable 2-0 20.0% | top-5 cubre 72.2%
-- Promedio estimado de goles del modelo: Uruguay 2.16 | Cape Verde 0.24
-- Probabilidades de resultado (90'): 80.6% / 15.7% / 3.8%
-- Lectura estadistica: Pick fuerte | pick actual Victoria Uruguay 80.6% | confianza 89.8%
-- Escenario de goles: ambos marcan 19.1% | más de 2.5 goles 43.5%
-- Goles totales esperados por el modelo: 2.42. Sin línea externa de goles cargada para ese partido.
-- Probabilidad de que no reciba goles: Uruguay 78.0% | Cape Verde 13.0%
-- Cuánta probabilidad cubren los 3 marcadores más probables: 53.9% | ventaja final más probable +1 (24.0%)
-- Qué tanto coinciden los modelos entre sí: 93.0%
+- Marcador para cargar en Penca: 2-0 | 3.52 pts esp. | exacto 19.8% | diferencia 23.8%
+- Precisión de marcador: Marcador con precisión media | exacto más probable 2-0 19.8% | top-5 cubre 71.6%
+- Promedio estimado de goles del modelo: Uruguay 2.23 | Cape Verde 0.24
+- Probabilidades de resultado (90'): 81.6% / 14.9% / 3.5%
+- Lectura estadistica: Pick muy fuerte | pick actual Victoria Uruguay 81.6% | confianza 91.0%
+- Escenario de goles: ambos marcan 19.3% | más de 2.5 goles 45.4%
+- Goles totales esperados por el modelo: 2.50. Sin línea externa de goles cargada para ese partido.
+- Probabilidad de que no reciba goles: Uruguay 78.1% | Cape Verde 12.2%
+- Cuánta probabilidad cubren los 3 marcadores más probables: 53.3% | ventaja final más probable +2 (23.8%)
+- Qué tanto coinciden los modelos entre sí: 93.1%
 - Stack estadístico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotación + Overdispersión calibrada + ML ligero regularizado + Predictivo bayesiano dinámico + Ensamble + asimetría histórica
-- Factores dominantes: Elo dinámico +329.000; Historia mundialista +0.534; Ranking FIFA / puntos FIFA +0.362
+- Factores dominantes: Valor bruto de plantilla +1162.494; Elo dinámico +329.000; Minutos Mundial de Clubes +206.193
 - Comparativa entre modelos:
-- Bivariante Poisson: victoria Uruguay 83.1% | empate 14.5% | victoria Cape Verde 2.4% | marcador más probable 2-0 (21.2%) | peso actual 38.9%
-- Poisson independiente: victoria Uruguay 82.1% | empate 15.0% | victoria Cape Verde 2.8% | marcador más probable 2-0 (21.2%) | peso actual 17.7%
-- Ajuste de baja anotación: victoria Uruguay 82.1% | empate 15.0% | victoria Cape Verde 2.8% | marcador más probable 2-0 (21.2%) | peso actual 13.4%
-- Overdispersión calibrada: victoria Uruguay 79.0% | empate 17.1% | victoria Cape Verde 3.9% | marcador más probable 1-0 (19.8%) | peso actual 8.0%
-- ML ligero regularizado: victoria Uruguay 80.3% | empate 16.3% | victoria Cape Verde 3.4% | marcador más probable 2-0 (19.6%) | peso actual 11.1%
-- Predictivo bayesiano dinámico: victoria Uruguay 64.3% | empate 22.9% | victoria Cape Verde 12.8% | marcador más probable 1-0 (15.5%) | peso actual 10.9%
-- Ensamble + asimetría histórica: victoria Uruguay 80.6% | empate 15.7% | victoria Cape Verde 3.8% | marcador más probable 2-0 (20.0%)
-- Marcadores más probables: 2-0 20.0%, 1-0 18.9%, 3-0 15.0%, 0-0 10.2%, 4-0 8.1%, 1-1 4.7%, 2-1 4.6%, 5-0 3.6%
+- Bivariante Poisson: victoria Uruguay 84.2% | empate 13.5% | victoria Cape Verde 2.2% | marcador más probable 2-0 (21.1%) | peso actual 38.7%
+- Poisson independiente: victoria Uruguay 83.0% | empate 14.6% | victoria Cape Verde 2.4% | marcador más probable 2-0 (21.0%) | peso actual 17.6%
+- Ajuste de baja anotación: victoria Uruguay 83.0% | empate 14.6% | victoria Cape Verde 2.4% | marcador más probable 2-0 (21.0%) | peso actual 13.3%
+- Overdispersión calibrada: victoria Uruguay 80.1% | empate 16.2% | victoria Cape Verde 3.7% | marcador más probable 1-0 (19.2%) | peso actual 8.4%
+- ML ligero regularizado: victoria Uruguay 81.2% | empate 15.5% | victoria Cape Verde 3.3% | marcador más probable 2-0 (19.4%) | peso actual 11.2%
+- Predictivo bayesiano dinámico: victoria Uruguay 65.6% | empate 22.1% | victoria Cape Verde 12.3% | marcador más probable 1-0 (15.1%) | peso actual 10.8%
+- Ensamble + asimetría histórica: victoria Uruguay 81.6% | empate 14.9% | victoria Cape Verde 3.5% | marcador más probable 2-0 (19.8%)
+- Marcadores más probables: 2-0 19.8%, 1-0 18.0%, 3-0 15.4%, 0-0 9.6%, 4-0 8.7%, 1-1 4.6%, 2-1 4.6%, 5-0 4.0%
 
 ### New Zealand vs Egypt
 - Etapa: Grupo H
@@ -1851,29 +1830,29 @@ _El Brier 2026 se activa automáticamente con el primer partido terminado; antes
 - Sede: BC Place | Canada
 - Hora UTC: 2026-06-22T01:00:00Z
 - Clima estimado: 21.0 C | HR 71% | viento 10 km/h | estrés 0.02
-- Factores que más pesan ahora: Elo dinámico -74.000; Ranking FIFA / puntos FIFA -0.332
+- Factores que más pesan ahora: Valor bruto de plantilla -130.850; Elo dinámico -74.000
 - Marcador proyectado: 0-1
-- Marcador para cargar en Penca: 1-2 | 2.17 pts esp. | exacto 8.0% | diferencia 23.2%
-- Precisión de marcador: Marcador frágil | exacto más probable 0-1 13.1% | top-5 cubre 56.0%
-- Promedio estimado de goles del modelo: New Zealand 0.87 | Egypt 1.45
-- Probabilidades de resultado (90'): 21.9% / 29.2% / 48.9%
-- Lectura estadistica: Pronóstico parejo: sin favorito estadístico claro | pick actual Victoria Egypt 48.9% | confianza 54.0%
-- Escenario de goles: ambos marcan 43.5% | más de 2.5 goles 40.5%
-- Goles totales esperados por el modelo: 2.32. Sin línea externa de goles cargada para ese partido.
-- Probabilidad de que no reciba goles: New Zealand 25.2% | Egypt 43.3%
-- Cuánta probabilidad cubren los 3 marcadores más probables: 37.9% | ventaja final más probable +0 (29.2%)
-- Qué tanto coinciden los modelos entre sí: 94.9%
+- Marcador para cargar en Penca: 1-2 | 2.22 pts esp. | exacto 8.1% | diferencia 23.2%
+- Precisión de marcador: Marcador frágil | exacto más probable 0-1 12.8% | top-5 cubre 55.0%
+- Promedio estimado de goles del modelo: New Zealand 0.89 | Egypt 1.52
+- Probabilidades de resultado (90'): 21.2% / 28.4% / 50.5%
+- Lectura estadistica: Pronóstico parejo: sin favorito estadístico claro | pick actual Victoria Egypt 50.5% | confianza 55.4%
+- Escenario de goles: ambos marcan 44.4% | más de 2.5 goles 42.2%
+- Goles totales esperados por el modelo: 2.39. Sin línea externa de goles cargada para ese partido.
+- Probabilidad de que no reciba goles: New Zealand 23.8% | Egypt 43.2%
+- Cuánta probabilidad cubren los 3 marcadores más probables: 36.6% | ventaja final más probable +0 (28.4%)
+- Qué tanto coinciden los modelos entre sí: 94.8%
 - Stack estadístico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotación + Overdispersión calibrada + ML ligero regularizado + Predictivo bayesiano dinámico + Ensamble + asimetría histórica
-- Factores dominantes: Elo dinámico -74.000; Ranking FIFA / puntos FIFA -0.332; Defensa histórica desde 1950 -0.312
+- Factores dominantes: Valor bruto de plantilla -130.850; Elo dinámico -74.000; Minutos Mundial de Clubes -42.749
 - Comparativa entre modelos:
-- Bivariante Poisson: victoria New Zealand 21.5% | empate 28.0% | victoria Egypt 50.5% | marcador más probable 0-1 (14.5%) | peso actual 36.3%
-- Poisson independiente: victoria New Zealand 19.8% | empate 32.6% | victoria Egypt 47.5% | marcador más probable 1-1 (15.4%) | peso actual 16.1%
-- Ajuste de baja anotación: victoria New Zealand 19.8% | empate 32.6% | victoria Egypt 47.5% | marcador más probable 1-1 (15.4%) | peso actual 16.1%
-- Overdispersión calibrada: victoria New Zealand 23.9% | empate 26.6% | victoria Egypt 49.5% | marcador más probable 0-1 (14.0%) | peso actual 7.2%
-- ML ligero regularizado: victoria New Zealand 22.6% | empate 26.5% | victoria Egypt 50.9% | marcador más probable 0-1 (14.4%) | peso actual 11.3%
-- Predictivo bayesiano dinámico: victoria New Zealand 28.0% | empate 28.6% | victoria Egypt 43.5% | marcador más probable 0-1 (13.0%) | peso actual 13.1%
-- Ensamble + asimetría histórica: victoria New Zealand 21.9% | empate 29.2% | victoria Egypt 48.9% | marcador más probable 0-1 (13.1%)
-- Marcadores más probables: 0-1 13.1%, 1-1 12.7%, 0-0 12.1%, 0-2 10.1%, 1-2 8.0%, 1-0 7.9%, 0-3 5.2%, 2-1 5.0%
+- Bivariante Poisson: victoria New Zealand 20.6% | empate 27.2% | victoria Egypt 52.2% | marcador más probable 0-1 (14.2%) | peso actual 36.2%
+- Poisson independiente: victoria New Zealand 19.0% | empate 31.8% | victoria Egypt 49.1% | marcador más probable 1-1 (15.0%) | peso actual 16.1%
+- Ajuste de baja anotación: victoria New Zealand 19.0% | empate 31.8% | victoria Egypt 49.1% | marcador más probable 1-1 (15.0%) | peso actual 16.0%
+- Overdispersión calibrada: victoria New Zealand 23.1% | empate 25.9% | victoria Egypt 50.9% | marcador más probable 0-1 (13.8%) | peso actual 7.3%
+- ML ligero regularizado: victoria New Zealand 22.1% | empate 25.6% | victoria Egypt 52.3% | marcador más probable 0-1 (13.8%) | peso actual 11.4%
+- Predictivo bayesiano dinámico: victoria New Zealand 27.7% | empate 27.8% | victoria Egypt 44.5% | marcador más probable 0-1 (12.6%) | peso actual 13.0%
+- Ensamble + asimetría histórica: victoria New Zealand 21.2% | empate 28.4% | victoria Egypt 50.5% | marcador más probable 0-1 (12.8%)
+- Marcadores más probables: 0-1 12.8%, 1-1 12.4%, 0-0 11.4%, 0-2 10.3%, 1-2 8.1%, 1-0 7.5%, 0-3 5.5%, 2-1 4.9%
 
 ### Argentina vs Austria
 - Etapa: Grupo J
@@ -1882,29 +1861,29 @@ _El Brier 2026 se activa automáticamente con el primer partido terminado; antes
 - Hora UTC: 2026-06-22T17:00:00Z
 - Clima estimado: 32.0 C | HR 55% | viento 15 km/h | estrés 0.20
 - Cambio por clima exigente: estrés climático 0.20.
-- Factores que más pesan ahora: Elo dinámico +295.000; Historia mundialista +0.446
+- Factores que más pesan ahora: Valor bruto de plantilla +658.052; Elo dinámico +295.000
 - Marcador proyectado: 2-0
-- Marcador para cargar en Penca: 2-0 | 3.33 pts esp. | exacto 18.1% | diferencia 23.3%
-- Precisión de marcador: Marcador con precisión media | exacto más probable 2-0 18.1% | top-5 cubre 65.0%
-- Promedio estimado de goles del modelo: Argentina 2.10 | Austria 0.33
-- Probabilidades de resultado (90'): 77.4% / 17.4% / 5.2%
-- Lectura estadistica: Pick fuerte | pick actual Victoria Argentina 77.4% | confianza 85.5%
-- Escenario de goles: ambos marcan 26.3% | más de 2.5 goles 45.7%
-- Goles totales esperados por el modelo: 2.52. Sin línea externa de goles cargada para ese partido.
-- Probabilidad de que no reciba goles: Argentina 70.0% | Austria 13.2%
-- Cuánta probabilidad cubren los 3 marcadores más probables: 48.1% | ventaja final más probable +1 (23.5%)
-- Qué tanto coinciden los modelos entre sí: 93.6%
+- Marcador para cargar en Penca: 2-0 | 3.38 pts esp. | exacto 17.6% | diferencia 23.2%
+- Precisión de marcador: Marcador con precisión media | exacto más probable 2-0 17.6% | top-5 cubre 63.7%
+- Promedio estimado de goles del modelo: Argentina 2.24 | Austria 0.34
+- Probabilidades de resultado (90'): 79.5% / 15.8% / 4.8%
+- Lectura estadistica: Pick fuerte | pick actual Victoria Argentina 79.5% | confianza 87.9%
+- Escenario de goles: ambos marcan 26.8% | más de 2.5 goles 49.7%
+- Goles totales esperados por el modelo: 2.67. Sin línea externa de goles cargada para ese partido.
+- Probabilidad de que no reciba goles: Argentina 69.9% | Austria 11.7%
+- Cuánta probabilidad cubren los 3 marcadores más probables: 47.0% | ventaja final más probable +2 (23.2%)
+- Qué tanto coinciden los modelos entre sí: 93.4%
 - Stack estadístico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotación + Overdispersión calibrada + ML ligero regularizado + Predictivo bayesiano dinámico + Ensamble + asimetría histórica
-- Factores dominantes: Elo dinámico +295.000; Historia mundialista +0.446; Ranking FIFA / puntos FIFA +0.345
+- Factores dominantes: Valor bruto de plantilla +658.052; Elo dinámico +295.000; Minutos Mundial de Clubes +95.469
 - Comparativa entre modelos:
-- Bivariante Poisson: victoria Argentina 79.8% | empate 16.4% | victoria Austria 3.8% | marcador más probable 2-0 (19.3%) | peso actual 38.4%
-- Poisson independiente: victoria Argentina 78.4% | empate 17.2% | victoria Austria 4.3% | marcador más probable 2-0 (19.2%) | peso actual 17.5%
-- Ajuste de baja anotación: victoria Argentina 78.4% | empate 17.2% | victoria Austria 4.3% | marcador más probable 2-0 (19.2%) | peso actual 13.8%
-- Overdispersión calibrada: victoria Argentina 75.6% | empate 18.4% | victoria Austria 5.9% | marcador más probable 1-0 (18.5%) | peso actual 8.1%
-- ML ligero regularizado: victoria Argentina 77.8% | empate 17.3% | victoria Austria 4.9% | marcador más probable 2-0 (18.2%) | peso actual 11.2%
-- Predictivo bayesiano dinámico: victoria Argentina 62.3% | empate 23.4% | victoria Austria 14.3% | marcador más probable 1-0 (14.9%) | peso actual 11.1%
-- Ensamble + asimetría histórica: victoria Argentina 77.4% | empate 17.4% | victoria Austria 5.2% | marcador más probable 2-0 (18.1%)
-- Marcadores más probables: 2-0 18.1%, 1-0 16.7%, 3-0 13.4%, 0-0 9.6%, 4-0 7.3%, 1-1 6.4%, 2-1 5.9%, 3-1 4.7%
+- Bivariante Poisson: victoria Argentina 82.0% | empate 14.6% | victoria Austria 3.4% | marcador más probable 2-0 (19.2%) | peso actual 38.0%
+- Poisson independiente: victoria Argentina 80.6% | empate 15.5% | victoria Austria 3.9% | marcador más probable 2-0 (19.0%) | peso actual 17.3%
+- Ajuste de baja anotación: victoria Argentina 80.6% | empate 15.5% | victoria Austria 3.9% | marcador más probable 2-0 (19.0%) | peso actual 13.6%
+- Overdispersión calibrada: victoria Argentina 77.5% | empate 17.0% | victoria Austria 5.4% | marcador más probable 1-0 (17.4%) | peso actual 8.8%
+- ML ligero regularizado: victoria Argentina 79.6% | empate 15.9% | victoria Austria 4.5% | marcador más probable 2-0 (17.9%) | peso actual 11.4%
+- Predictivo bayesiano dinámico: victoria Argentina 64.3% | empate 22.0% | victoria Austria 13.6% | marcador más probable 1-0 (14.1%) | peso actual 10.9%
+- Ensamble + asimetría histórica: victoria Argentina 79.5% | empate 15.8% | victoria Austria 4.8% | marcador más probable 2-0 (17.6%)
+- Marcadores más probables: 2-0 17.6%, 1-0 15.2%, 3-0 14.1%, 0-0 8.5%, 4-0 8.2%, 1-1 5.9%, 2-1 5.9%, 3-1 4.9%
 
 ### France vs Iraq
 - Etapa: Grupo I
@@ -1912,29 +1891,29 @@ _El Brier 2026 se activa automáticamente con el primer partido terminado; antes
 - Sede: Lincoln Financial Field | United States
 - Hora UTC: 2026-06-22T21:00:00Z
 - Clima estimado: 29.0 C | HR 66% | viento 12 km/h | estrés 0.08
-- Factores que más pesan ahora: Elo dinámico +480.000; Historia mundialista +0.647
+- Factores que más pesan ahora: Valor bruto de plantilla +1791.405; Minutos Mundial de Clubes +1025.016
 - Marcador proyectado: 2-0
-- Marcador para cargar en Penca: 2-0 | 3.69 pts esp. | exacto 21.2% | diferencia 23.9%
-- Precisión de marcador: Marcador defendible | exacto más probable 2-0 21.2% | top-5 cubre 76.8%
-- Promedio estimado de goles del modelo: France 2.40 | Iraq 0.11
-- Probabilidades de resultado (90'): 85.9% / 12.0% / 2.0%
-- Lectura estadistica: Pick muy fuerte | pick actual Victoria France 85.9% | confianza 96.6%
-- Escenario de goles: ambos marcan 12.5% | más de 2.5 goles 48.2%
-- Goles totales esperados por el modelo: 2.60. Sin línea externa de goles cargada para ese partido.
-- Probabilidad de que no reciba goles: France 85.9% | Iraq 10.5%
-- Cuánta probabilidad cubren los 3 marcadores más probables: 56.7% | ventaja final más probable +2 (23.9%)
-- Qué tanto coinciden los modelos entre sí: 92.5%
+- Marcador para cargar en Penca: 3-0 | 3.59 pts esp. | exacto 18.8% | diferencia 20.4%
+- Precisión de marcador: Marcador defendible | exacto más probable 2-0 21.1% | top-5 cubre 76.8%
+- Promedio estimado de goles del modelo: France 2.51 | Iraq 0.10
+- Probabilidades de resultado (90'): 87.3% / 11.0% / 1.8%
+- Lectura estadistica: Pick muy fuerte | pick actual Victoria France 87.3% | confianza 98.2%
+- Escenario de goles: ambos marcan 11.3% | más de 2.5 goles 50.4%
+- Goles totales esperados por el modelo: 2.69. Sin línea externa de goles cargada para ese partido.
+- Probabilidad de que no reciba goles: France 87.3% | Iraq 9.6%
+- Cuánta probabilidad cubren los 3 marcadores más probables: 56.5% | ventaja final más probable +2 (23.5%)
+- Qué tanto coinciden los modelos entre sí: 92.4%
 - Stack estadístico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotación + Overdispersión calibrada + ML ligero regularizado + Predictivo bayesiano dinámico + Ensamble + asimetría histórica
-- Factores dominantes: Elo dinámico +480.000; Historia mundialista +0.647; Rendimiento en Mundiales desde 1950 +0.557
+- Factores dominantes: Valor bruto de plantilla +1791.405; Minutos Mundial de Clubes +1025.016; Elo dinámico +480.000
 - Comparativa entre modelos:
-- Bivariante Poisson: victoria France 88.6% | empate 10.5% | victoria Iraq 0.9% | marcador más probable 2-0 (23.3%) | peso actual 39.3%
-- Poisson independiente: victoria France 88.2% | empate 10.7% | victoria Iraq 1.1% | marcador más probable 2-0 (23.2%) | peso actual 17.8%
-- Ajuste de baja anotación: victoria France 88.2% | empate 10.7% | victoria Iraq 1.1% | marcador más probable 2-0 (23.2%) | peso actual 12.5%
-- Overdispersión calibrada: victoria France 84.8% | empate 13.6% | victoria Iraq 1.6% | marcador más probable 2-0 (20.7%) | peso actual 8.7%
-- ML ligero regularizado: victoria France 83.1% | empate 14.4% | victoria Iraq 2.5% | marcador más probable 2-0 (20.0%) | peso actual 11.0%
-- Predictivo bayesiano dinámico: victoria France 69.8% | empate 20.4% | victoria Iraq 9.8% | marcador más probable 1-0 (15.4%) | peso actual 10.6%
-- Ensamble + asimetría histórica: victoria France 85.9% | empate 12.0% | victoria Iraq 2.0% | marcador más probable 2-0 (21.2%)
-- Marcadores más probables: 2-0 21.2%, 3-0 18.1%, 1-0 17.4%, 4-0 11.1%, 0-0 8.9%, 5-0 5.5%, 2-1 2.9%, 1-1 2.7%
+- Bivariante Poisson: victoria France 90.0% | empate 9.3% | victoria Iraq 0.7% | marcador más probable 2-0 (23.3%) | peso actual 39.1%
+- Poisson independiente: victoria France 89.6% | empate 9.6% | victoria Iraq 0.8% | marcador más probable 2-0 (23.2%) | peso actual 17.6%
+- Ajuste de baja anotación: victoria France 89.6% | empate 9.6% | victoria Iraq 0.8% | marcador más probable 2-0 (23.2%) | peso actual 12.4%
+- Overdispersión calibrada: victoria France 86.1% | empate 12.6% | victoria Iraq 1.2% | marcador más probable 2-0 (20.8%) | peso actual 9.3%
+- ML ligero regularizado: victoria France 84.1% | empate 13.6% | victoria Iraq 2.3% | marcador más probable 2-0 (19.6%) | peso actual 11.1%
+- Predictivo bayesiano dinámico: victoria France 71.4% | empate 19.4% | victoria Iraq 9.2% | marcador más probable 2-0 (14.9%) | peso actual 10.5%
+- Ensamble + asimetría histórica: victoria France 87.3% | empate 11.0% | victoria Iraq 1.8% | marcador más probable 2-0 (21.1%)
+- Marcadores más probables: 2-0 21.1%, 3-0 18.8%, 1-0 16.6%, 4-0 12.0%, 0-0 8.3%, 5-0 6.2%, 6-0 2.7%, 2-1 2.5%
 
 ### Norway vs Senegal
 - Etapa: Grupo I
@@ -1942,29 +1921,29 @@ _El Brier 2026 se activa automáticamente con el primer partido terminado; antes
 - Sede: MetLife Stadium | United States
 - Hora UTC: 2026-06-23T00:00:00Z
 - Clima estimado: 29.0 C | HR 68% | viento 13 km/h | estrés 0.08
-- Factores que más pesan ahora: Elo dinámico +53.000; Recursos/PIB proxy +0.315
+- Factores que más pesan ahora: Minutos Mundial de Clubes +1078.936; Valor bruto de plantilla +552.642
 - Marcador proyectado: 1-1
-- Marcador para cargar en Penca: 1-1 | 1.94 pts esp. | exacto 13.6% | diferencia 30.6%
-- Precisión de marcador: Marcador con precisión media | exacto más probable 1-1 13.6% | top-5 cubre 55.0%
-- Promedio estimado de goles del modelo: Norway 1.34 | Senegal 0.98
-- Probabilidades de resultado (90'): 43.0% / 30.6% / 26.4%
-- Lectura estadistica: Pronóstico parejo: sin favorito estadístico claro | pick actual Victoria Norway 43.0% | confianza 48.3%
-- Escenario de goles: ambos marcan 45.7% | más de 2.5 goles 40.2%
-- Goles totales esperados por el modelo: 2.31. Sin línea externa de goles cargada para ese partido.
-- Probabilidad de que no reciba goles: Norway 38.5% | Senegal 28.0%
-- Cuánta probabilidad cubren los 3 marcadores más probables: 38.0% | ventaja final más probable +0 (30.6%)
+- Marcador para cargar en Penca: 1-1 | 1.88 pts esp. | exacto 13.3% | diferencia 29.6%
+- Precisión de marcador: Marcador frágil | exacto más probable 1-1 13.3% | top-5 cubre 52.8%
+- Promedio estimado de goles del modelo: Norway 1.43 | Senegal 1.01
+- Probabilidades de resultado (90'): 44.6% / 29.6% / 25.8%
+- Lectura estadistica: Pronóstico parejo: sin favorito estadístico claro | pick actual Victoria Norway 44.6% | confianza 49.8%
+- Escenario de goles: ambos marcan 47.3% | más de 2.5 goles 42.7%
+- Goles totales esperados por el modelo: 2.41. Sin línea externa de goles cargada para ese partido.
+- Probabilidad de que no reciba goles: Norway 37.8% | Senegal 26.1%
+- Cuánta probabilidad cubren los 3 marcadores más probables: 36.2% | ventaja final más probable +0 (29.6%)
 - Qué tanto coinciden los modelos entre sí: 95.2%
 - Stack estadístico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotación + Overdispersión calibrada + ML ligero regularizado + Predictivo bayesiano dinámico + Ensamble + asimetría histórica
-- Factores dominantes: Elo dinámico +53.000; Recursos/PIB proxy +0.315; Rendimiento competitivo desde 1950 -0.267
+- Factores dominantes: Minutos Mundial de Clubes +1078.936; Valor bruto de plantilla +552.642; Elo dinámico +53.000
 - Comparativa entre modelos:
-- Bivariante Poisson: victoria Norway 44.6% | empate 29.1% | victoria Senegal 26.3% | marcador más probable 1-0 (13.5%) | peso actual 35.9%
-- Poisson independiente: victoria Norway 41.3% | empate 34.8% | victoria Senegal 23.9% | marcador más probable 1-1 (16.5%) | peso actual 15.8%
-- Ajuste de baja anotación: victoria Norway 41.3% | empate 34.8% | victoria Senegal 23.9% | marcador más probable 1-1 (16.5%) | peso actual 16.4%
-- Overdispersión calibrada: victoria Norway 44.4% | empate 27.4% | victoria Senegal 28.3% | marcador más probable 1-0 (13.2%) | peso actual 7.1%
-- ML ligero regularizado: victoria Norway 44.9% | empate 27.5% | victoria Senegal 27.6% | marcador más probable 1-0 (13.5%) | peso actual 11.4%
-- Predictivo bayesiano dinámico: victoria Norway 40.3% | empate 28.9% | victoria Senegal 30.8% | marcador más probable 0-0 (12.7%) | peso actual 13.4%
-- Ensamble + asimetría histórica: victoria Norway 43.0% | empate 30.6% | victoria Senegal 26.4% | marcador más probable 1-1 (13.6%)
-- Marcadores más probables: 1-1 13.6%, 0-0 12.2%, 1-0 12.2%, 0-1 8.8%, 2-0 8.3%, 2-1 7.9%, 1-2 5.8%, 0-2 4.8%
+- Bivariante Poisson: victoria Norway 46.4% | empate 28.1% | victoria Senegal 25.5% | marcador más probable 1-0 (13.0%) | peso actual 35.8%
+- Poisson independiente: victoria Norway 43.1% | empate 33.7% | victoria Senegal 23.2% | marcador más probable 1-1 (16.0%) | peso actual 15.7%
+- Ajuste de baja anotación: victoria Norway 43.1% | empate 33.7% | victoria Senegal 23.2% | marcador más probable 1-1 (16.0%) | peso actual 16.3%
+- Overdispersión calibrada: victoria Norway 45.9% | empate 26.5% | victoria Senegal 27.6% | marcador más probable 1-0 (12.7%) | peso actual 7.3%
+- ML ligero regularizado: victoria Norway 46.4% | empate 26.6% | victoria Senegal 27.0% | marcador más probable 1-0 (13.0%) | peso actual 11.6%
+- Predictivo bayesiano dinámico: victoria Norway 41.6% | empate 28.0% | victoria Senegal 30.5% | marcador más probable 1-0 (11.9%) | peso actual 13.3%
+- Ensamble + asimetría histórica: victoria Norway 44.6% | empate 29.6% | victoria Senegal 25.8% | marcador más probable 1-1 (13.3%)
+- Marcadores más probables: 1-1 13.3%, 1-0 11.7%, 0-0 11.2%, 2-0 8.4%, 2-1 8.2%, 0-1 8.1%, 1-2 5.8%, 0-2 4.6%
 
 ### Jordan vs Algeria
 - Etapa: Grupo J
@@ -1972,29 +1951,29 @@ _El Brier 2026 se activa automáticamente con el primer partido terminado; antes
 - Sede: Levi's Stadium | United States
 - Hora UTC: 2026-06-23T03:00:00Z
 - Clima estimado: 24.0 C | HR 60% | viento 12 km/h | estrés 0.02
-- Factores que más pesan ahora: Elo dinámico +17.000; Ranking FIFA / puntos FIFA -0.206
+- Factores que más pesan ahora: Minutos Mundial de Clubes -126.534; Valor bruto de plantilla -89.622
 - Marcador proyectado: 1-1
-- Marcador para cargar en Penca: 1-1 | 2.00 pts esp. | exacto 13.8% | diferencia 31.8%
-- Precisión de marcador: Marcador frágil | exacto más probable 1-1 13.8% | top-5 cubre 54.6%
-- Promedio estimado de goles del modelo: Jordan 1.12 | Algeria 1.18
-- Probabilidades de resultado (90'): 32.8% / 31.8% / 35.5%
-- Lectura estadistica: Pronóstico parejo: sin favorito estadístico claro | pick actual Victoria Algeria 35.5% | confianza 41.1%
-- Escenario de goles: ambos marcan 45.9% | más de 2.5 goles 39.6%
-- Goles totales esperados por el modelo: 2.28. Sin línea externa de goles cargada para ese partido.
-- Probabilidad de que no reciba goles: Jordan 32.5% | Algeria 34.5%
-- Cuánta probabilidad cubren los 3 marcadores más probables: 37.3% | ventaja final más probable +0 (31.8%)
+- Marcador para cargar en Penca: 1-1 | 1.96 pts esp. | exacto 13.7% | diferencia 31.0%
+- Precisión de marcador: Marcador con precisión media | exacto más probable 1-1 13.7% | top-5 cubre 52.9%
+- Promedio estimado de goles del modelo: Jordan 1.14 | Algeria 1.23
+- Probabilidades de resultado (90'): 32.3% / 31.0% / 36.7%
+- Lectura estadistica: Pronóstico parejo: sin favorito estadístico claro | pick actual Victoria Algeria 36.7% | confianza 42.2%
+- Escenario de goles: ambos marcan 47.4% | más de 2.5 goles 41.5%
+- Goles totales esperados por el modelo: 2.36. Sin línea externa de goles cargada para ese partido.
+- Probabilidad de que no reciba goles: Jordan 30.8% | Algeria 33.9%
+- Cuánta probabilidad cubren los 3 marcadores más probables: 36.0% | ventaja final más probable +0 (31.0%)
 - Qué tanto coinciden los modelos entre sí: 95.2%
 - Stack estadístico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotación + Overdispersión calibrada + ML ligero regularizado + Predictivo bayesiano dinámico + Ensamble + asimetría histórica
-- Factores dominantes: Elo dinámico +17.000; Ranking FIFA / puntos FIFA -0.206; Ataque histórico desde 1950 -0.204
+- Factores dominantes: Minutos Mundial de Clubes -126.534; Valor bruto de plantilla -89.622; Elo dinámico +17.000
 - Comparativa entre modelos:
-- Bivariante Poisson: victoria Jordan 33.5% | empate 29.9% | victoria Algeria 36.6% | marcador más probable 1-1 (13.3%) | peso actual 35.4%
-- Poisson independiente: victoria Jordan 30.1% | empate 36.8% | victoria Algeria 33.0% | marcador más probable 1-1 (17.4%) | peso actual 15.4%
-- Ajuste de baja anotación: victoria Jordan 30.1% | empate 36.8% | victoria Algeria 33.0% | marcador más probable 1-1 (17.4%) | peso actual 16.9%
-- Overdispersión calibrada: victoria Jordan 34.7% | empate 27.9% | victoria Algeria 37.4% | marcador más probable 0-1 (12.0%) | peso actual 6.9%
-- ML ligero regularizado: victoria Jordan 34.6% | empate 28.2% | victoria Algeria 37.2% | marcador más probable 0-0 (12.4%) | peso actual 11.4%
-- Predictivo bayesiano dinámico: victoria Jordan 34.5% | empate 29.3% | victoria Algeria 36.2% | marcador más probable 0-0 (12.9%) | peso actual 14.0%
-- Ensamble + asimetría histórica: victoria Jordan 32.8% | empate 31.8% | victoria Algeria 35.5% | marcador más probable 1-1 (13.8%)
-- Marcadores más probables: 1-1 13.8%, 0-0 12.9%, 0-1 10.6%, 1-0 10.3%, 1-2 6.9%, 0-2 6.8%, 2-1 6.8%, 2-0 6.0%
+- Bivariante Poisson: victoria Jordan 32.9% | empate 29.2% | victoria Algeria 37.9% | marcador más probable 1-1 (13.1%) | peso actual 35.3%
+- Poisson independiente: victoria Jordan 29.6% | empate 36.0% | victoria Algeria 34.4% | marcador más probable 1-1 (17.2%) | peso actual 15.4%
+- Ajuste de baja anotación: victoria Jordan 29.6% | empate 36.0% | victoria Algeria 34.4% | marcador más probable 1-1 (17.2%) | peso actual 16.8%
+- Overdispersión calibrada: victoria Jordan 34.2% | empate 27.3% | victoria Algeria 38.6% | marcador más probable 0-1 (11.7%) | peso actual 6.9%
+- ML ligero regularizado: victoria Jordan 34.1% | empate 27.5% | victoria Algeria 38.4% | marcador más probable 0-1 (11.9%) | peso actual 11.6%
+- Predictivo bayesiano dinámico: victoria Jordan 34.4% | empate 28.7% | victoria Algeria 36.9% | marcador más probable 0-0 (12.2%) | peso actual 13.9%
+- Ensamble + asimetría histórica: victoria Jordan 32.3% | empate 31.0% | victoria Algeria 36.7% | marcador más probable 1-1 (13.7%)
+- Marcadores más probables: 1-1 13.7%, 0-0 12.1%, 0-1 10.3%, 1-0 9.7%, 1-2 7.2%, 0-2 7.0%, 2-1 6.8%, 2-0 5.8%
 
 ### Portugal vs Uzbekistan
 - Etapa: Grupo K
@@ -2003,29 +1982,29 @@ _El Brier 2026 se activa automáticamente con el primer partido terminado; antes
 - Hora UTC: 2026-06-23T17:00:00Z
 - Clima estimado: 33.0 C | HR 73% | viento 12 km/h | estrés 0.33
 - Cambio por clima exigente: estrés climático 0.33.
-- Factores que más pesan ahora: Elo dinámico +248.000; Historia mundialista +0.447
+- Factores que más pesan ahora: Valor bruto de plantilla +882.359; Minutos Mundial de Clubes +832.338
 - Marcador proyectado: 2-0
-- Marcador para cargar en Penca: 2-0 | 3.21 pts esp. | exacto 17.3% | diferencia 22.6%
-- Precisión de marcador: Marcador con precisión media | exacto más probable 2-0 17.3% | top-5 cubre 64.2%
-- Promedio estimado de goles del modelo: Portugal 2.01 | Uzbekistan 0.38
-- Probabilidades de resultado (90'): 74.8% / 19.1% / 6.1%
-- Lectura estadistica: Pick fuerte | pick actual Victoria Portugal 74.8% | confianza 82.3%
-- Escenario de goles: ambos marcan 27.7% | más de 2.5 goles 44.1%
-- Goles totales esperados por el modelo: 2.45. Sin línea externa de goles cargada para ese partido.
-- Probabilidad de que no reciba goles: Portugal 68.0% | Uzbekistan 14.7%
-- Cuánta probabilidad cubren los 3 marcadores más probables: 46.8% | ventaja final más probable +1 (24.4%)
-- Qué tanto coinciden los modelos entre sí: 93.5%
+- Marcador para cargar en Penca: 2-0 | 3.27 pts esp. | exacto 17.2% | diferencia 22.8%
+- Precisión de marcador: Marcador con precisión media | exacto más probable 2-0 17.2% | top-5 cubre 63.1%
+- Promedio estimado de goles del modelo: Portugal 2.12 | Uzbekistan 0.37
+- Probabilidades de resultado (90'): 76.7% / 17.5% / 5.8%
+- Lectura estadistica: Pick fuerte | pick actual Victoria Portugal 76.7% | confianza 84.6%
+- Escenario de goles: ambos marcan 27.9% | más de 2.5 goles 46.8%
+- Goles totales esperados por el modelo: 2.56. Sin línea externa de goles cargada para ese partido.
+- Probabilidad de que no reciba goles: Portugal 68.1% | Uzbekistan 13.4%
+- Cuánta probabilidad cubren los 3 marcadores más probables: 46.5% | ventaja final más probable +1 (23.6%)
+- Qué tanto coinciden los modelos entre sí: 93.7%
 - Stack estadístico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotación + Overdispersión calibrada + ML ligero regularizado + Predictivo bayesiano dinámico + Ensamble + asimetría histórica
-- Factores dominantes: Elo dinámico +248.000; Historia mundialista +0.447; Rendimiento en Mundiales desde 1950 +0.395
+- Factores dominantes: Valor bruto de plantilla +882.359; Minutos Mundial de Clubes +832.338; Elo dinámico +248.000
 - Comparativa entre modelos:
-- Bivariante Poisson: victoria Portugal 77.5% | empate 17.9% | victoria Uzbekistan 4.7% | marcador más probable 1-0 (19.2%) | peso actual 38.2%
-- Poisson independiente: victoria Portugal 75.4% | empate 19.6% | victoria Uzbekistan 4.9% | marcador más probable 2-0 (18.5%) | peso actual 17.5%
-- Ajuste de baja anotación: victoria Portugal 75.4% | empate 19.6% | victoria Uzbekistan 4.9% | marcador más probable 2-0 (18.5%) | peso actual 14.1%
-- Overdispersión calibrada: victoria Portugal 73.4% | empate 19.6% | victoria Uzbekistan 7.0% | marcador más probable 1-0 (18.4%) | peso actual 7.8%
-- ML ligero regularizado: victoria Portugal 75.6% | empate 18.4% | victoria Uzbekistan 6.0% | marcador más probable 1-0 (17.9%) | peso actual 11.1%
-- Predictivo bayesiano dinámico: victoria Portugal 59.9% | empate 24.5% | victoria Uzbekistan 15.7% | marcador más probable 1-0 (15.1%) | peso actual 11.2%
-- Ensamble + asimetría histórica: victoria Portugal 74.8% | empate 19.1% | victoria Uzbekistan 6.1% | marcador más probable 2-0 (17.3%)
-- Marcadores más probables: 2-0 17.3%, 1-0 17.1%, 3-0 12.4%, 0-0 10.5%, 1-1 7.0%, 4-0 6.5%, 2-1 6.3%, 3-1 4.7%
+- Bivariante Poisson: victoria Portugal 79.2% | empate 16.5% | victoria Uzbekistan 4.3% | marcador más probable 2-0 (18.5%) | peso actual 38.0%
+- Poisson independiente: victoria Portugal 77.6% | empate 17.5% | victoria Uzbekistan 4.8% | marcador más probable 2-0 (18.4%) | peso actual 17.4%
+- Ajuste de baja anotación: victoria Portugal 77.6% | empate 17.5% | victoria Uzbekistan 4.8% | marcador más probable 2-0 (18.4%) | peso actual 13.9%
+- Overdispersión calibrada: victoria Portugal 74.9% | empate 18.5% | victoria Uzbekistan 6.6% | marcador más probable 1-0 (17.6%) | peso actual 8.3%
+- ML ligero regularizado: victoria Portugal 77.1% | empate 17.3% | victoria Uzbekistan 5.6% | marcador más probable 2-0 (17.5%) | peso actual 11.3%
+- Predictivo bayesiano dinámico: victoria Portugal 62.1% | empate 23.1% | victoria Uzbekistan 14.8% | marcador más probable 1-0 (14.4%) | peso actual 11.1%
+- Ensamble + asimetría histórica: victoria Portugal 76.7% | empate 17.5% | victoria Uzbekistan 5.8% | marcador más probable 2-0 (17.2%)
+- Marcadores más probables: 2-0 17.2%, 1-0 16.3%, 3-0 13.0%, 0-0 9.4%, 4-0 7.2%, 1-1 6.5%, 2-1 6.2%, 3-1 4.9%
 
 ### England vs Ghana
 - Etapa: Grupo L
@@ -2033,32 +2012,29 @@ _El Brier 2026 se activa automáticamente con el primer partido terminado; antes
 - Sede: Gillette Stadium | United States
 - Hora UTC: 2026-06-23T20:00:00Z
 - Clima estimado: 26.0 C | HR 67% | viento 12 km/h | estrés 0.02
-- Noticias relevantes: venezuelastar.com: Ghana names FIFA World Cup squad without injured Kudus; english.news.cn: Ghana names FIFA World Cup squad without injured Kudus - Xinhua; brazilsun.com: Ghana names FIFA World Cup squad without injured Kudus
-- Impacto noticioso Ghana: venezuelastar.com: Ghana names FIFA World Cup squad without injured Kudus; english.news.cn: Ghana names FIFA World Cup squad without injured Kudus - Xinhua
-- Cambio por noticias relevantes detectadas en el feed del partido.
-- Factores que más pesan ahora: Elo dinámico +533.000; Ranking FIFA / puntos FIFA +0.579
+- Factores que más pesan ahora: Valor bruto de plantilla +1746.426; Minutos Mundial de Clubes +972.650
 - Marcador proyectado: 2-0
-- Marcador para cargar en Penca: 2-0 | 3.73 pts esp. | exacto 21.7% | diferencia 23.8%
-- Precisión de marcador: Marcador defendible | exacto más probable 2-0 21.7% | top-5 cubre 79.0%
-- Promedio estimado de goles del modelo: England 2.43 | Ghana 0.08
-- Probabilidades de resultado (90'): 86.8% / 11.5% / 1.7%
-- Lectura estadistica: Pick muy fuerte | pick actual Victoria England 86.8% | confianza 97.7%
-- Escenario de goles: ambos marcan 9.8% | más de 2.5 goles 48.3%
-- Goles totales esperados por el modelo: 2.60. Sin línea externa de goles cargada para ese partido.
-- Probabilidad de que no reciba goles: England 88.8% | Ghana 10.3%
-- Cuánta probabilidad cubren los 3 marcadores más probables: 58.2% | ventaja final más probable +2 (23.8%)
-- Qué tanto coinciden los modelos entre sí: 92.0%
+- Marcador para cargar en Penca: 3-0 | 3.64 pts esp. | exacto 19.4% | diferencia 20.8%
+- Precisión de marcador: Marcador defendible | exacto más probable 2-0 21.2% | top-5 cubre 77.6%
+- Promedio estimado de goles del modelo: England 2.54 | Ghana 0.07
+- Probabilidades de resultado (90'): 88.0% / 10.5% / 1.6%
+- Lectura estadistica: Pick muy fuerte | pick actual Victoria England 88.0% | confianza 99.0%
+- Escenario de goles: ambos marcan 9.9% | más de 2.5 goles 51.3%
+- Goles totales esperados por el modelo: 2.72. Sin línea externa de goles cargada para ese partido.
+- Probabilidad de que no reciba goles: England 88.9% | Ghana 9.3%
+- Cuánta probabilidad cubren los 3 marcadores más probables: 56.8% | ventaja final más probable +2 (23.3%)
+- Qué tanto coinciden los modelos entre sí: 92.3%
 - Stack estadístico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotación + Overdispersión calibrada + ML ligero regularizado + Predictivo bayesiano dinámico + Ensamble + asimetría histórica
-- Factores dominantes: Elo dinámico +533.000; Ranking FIFA / puntos FIFA +0.579; Historia mundialista +0.523
+- Factores dominantes: Valor bruto de plantilla +1746.426; Minutos Mundial de Clubes +972.650; Elo dinámico +533.000
 - Comparativa entre modelos:
-- Bivariante Poisson: victoria England 89.6% | empate 9.8% | victoria Ghana 0.6% | marcador más probable 2-0 (24.1%) | peso actual 39.5%
-- Poisson independiente: victoria England 89.3% | empate 9.9% | victoria Ghana 0.7% | marcador más probable 2-0 (24.0%) | peso actual 17.8%
-- Ajuste de baja anotación: victoria England 89.3% | empate 9.9% | victoria Ghana 0.7% | marcador más probable 2-0 (24.0%) | peso actual 12.4%
-- Overdispersión calibrada: victoria England 85.9% | empate 13.1% | victoria Ghana 1.0% | marcador más probable 2-0 (21.5%) | peso actual 8.8%
-- ML ligero regularizado: victoria England 83.1% | empate 14.4% | victoria Ghana 2.5% | marcador más probable 2-0 (20.0%) | peso actual 10.9%
-- Predictivo bayesiano dinámico: victoria England 70.1% | empate 20.3% | victoria Ghana 9.6% | marcador más probable 1-0 (15.5%) | peso actual 10.5%
-- Ensamble + asimetría histórica: victoria England 86.8% | empate 11.5% | victoria Ghana 1.7% | marcador más probable 2-0 (21.7%)
-- Marcadores más probables: 2-0 21.7%, 3-0 19.0%, 1-0 17.4%, 4-0 11.8%, 0-0 9.0%, 5-0 5.9%, 6-0 2.5%, 1-1 2.2%
+- Bivariante Poisson: victoria England 90.7% | empate 8.8% | victoria Ghana 0.5% | marcador más probable 2-0 (23.6%) | peso actual 39.2%
+- Poisson independiente: victoria England 90.4% | empate 8.9% | victoria Ghana 0.6% | marcador más probable 2-0 (23.5%) | peso actual 17.7%
+- Ajuste de baja anotación: victoria England 90.4% | empate 8.9% | victoria Ghana 0.6% | marcador más probable 2-0 (23.5%) | peso actual 12.2%
+- Overdispersión calibrada: victoria England 87.0% | empate 12.1% | victoria Ghana 0.9% | marcador más probable 2-0 (21.1%) | peso actual 9.4%
+- ML ligero regularizado: victoria England 84.1% | empate 13.6% | victoria Ghana 2.3% | marcador más probable 2-0 (19.6%) | peso actual 11.0%
+- Predictivo bayesiano dinámico: victoria England 72.2% | empate 19.1% | victoria Ghana 8.8% | marcador más probable 2-0 (15.1%) | peso actual 10.5%
+- Ensamble + asimetría histórica: victoria England 88.0% | empate 10.5% | victoria Ghana 1.6% | marcador más probable 2-0 (21.2%)
+- Marcadores más probables: 2-0 21.2%, 3-0 19.4%, 1-0 16.2%, 4-0 12.6%, 0-0 8.1%, 5-0 6.6%, 6-0 2.9%, 2-1 2.1%
 
 ### Panama vs Croatia
 - Etapa: Grupo L
@@ -2066,29 +2042,29 @@ _El Brier 2026 se activa automáticamente con el primer partido terminado; antes
 - Sede: BMO Field | Canada
 - Hora UTC: 2026-06-23T23:00:00Z
 - Clima estimado: 25.0 C | HR 63% | viento 14 km/h | estrés 0.02
-- Factores que más pesan ahora: Elo dinámico -199.000; Rendimiento competitivo desde 1950 -0.437
+- Factores que más pesan ahora: Minutos Mundial de Clubes -1092.113; Valor bruto de plantilla -988.157
 - Marcador proyectado: 0-2
-- Marcador para cargar en Penca: 0-2 | 3.10 pts esp. | exacto 16.3% | diferencia 21.9%
-- Precisión de marcador: Marcador con precisión media | exacto más probable 0-2 16.3% | top-5 cubre 62.5%
-- Promedio estimado de goles del modelo: Panama 0.45 | Croatia 1.96
-- Probabilidades de resultado (90'): 7.5% / 20.2% / 72.3%
-- Lectura estadistica: Pick fuerte | pick actual Victoria Croatia 72.3% | confianza 79.2%
-- Escenario de goles: ambos marcan 30.9% | más de 2.5 goles 44.5%
-- Goles totales esperados por el modelo: 2.46. Sin línea externa de goles cargada para ese partido.
-- Probabilidad de que no reciba goles: Panama 15.1% | Croatia 64.1%
-- Cuánta probabilidad cubren los 3 marcadores más probables: 44.3% | ventaja final más probable -1 (24.4%)
-- Qué tanto coinciden los modelos entre sí: 93.9%
+- Marcador para cargar en Penca: 0-2 | 3.16 pts esp. | exacto 16.3% | diferencia 22.2%
+- Precisión de marcador: Marcador con precisión media | exacto más probable 0-2 16.3% | top-5 cubre 60.6%
+- Promedio estimado de goles del modelo: Panama 0.44 | Croatia 2.08
+- Probabilidades de resultado (90'): 6.9% / 18.6% / 74.4%
+- Lectura estadistica: Pick fuerte | pick actual Victoria Croatia 74.4% | confianza 81.7%
+- Escenario de goles: ambos marcan 31.3% | más de 2.5 goles 47.6%
+- Goles totales esperados por el modelo: 2.58. Sin línea externa de goles cargada para ese partido.
+- Probabilidad de que no reciba goles: Panama 13.6% | Croatia 64.2%
+- Cuánta probabilidad cubren los 3 marcadores más probables: 44.0% | ventaja final más probable -1 (23.4%)
+- Qué tanto coinciden los modelos entre sí: 93.8%
 - Stack estadístico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotación + Overdispersión calibrada + ML ligero regularizado + Predictivo bayesiano dinámico + Ensamble + asimetría histórica
-- Factores dominantes: Elo dinámico -199.000; Rendimiento competitivo desde 1950 -0.437; Historia mundialista -0.430
+- Factores dominantes: Minutos Mundial de Clubes -1092.113; Valor bruto de plantilla -988.157; Elo dinámico -199.000
 - Comparativa entre modelos:
-- Bivariante Poisson: victoria Panama 6.0% | empate 19.2% | victoria Croatia 74.7% | marcador más probable 0-1 (18.6%) | peso actual 37.9%
-- Poisson independiente: victoria Panama 6.4% | empate 20.7% | victoria Croatia 72.9% | marcador más probable 0-2 (17.4%) | peso actual 17.3%
-- Ajuste de baja anotación: victoria Panama 6.4% | empate 20.7% | victoria Croatia 72.9% | marcador más probable 0-2 (17.4%) | peso actual 14.4%
-- Overdispersión calibrada: victoria Panama 8.6% | empate 20.6% | victoria Croatia 70.8% | marcador más probable 0-1 (17.8%) | peso actual 7.8%
-- ML ligero regularizado: victoria Panama 7.4% | empate 19.4% | victoria Croatia 73.2% | marcador más probable 0-1 (17.4%) | peso actual 11.2%
-- Predictivo bayesiano dinámico: victoria Panama 17.0% | empate 24.8% | victoria Croatia 58.1% | marcador más probable 0-1 (14.6%) | peso actual 11.4%
-- Ensamble + asimetría histórica: victoria Panama 7.5% | empate 20.2% | victoria Croatia 72.3% | marcador más probable 0-2 (16.3%)
-- Marcadores más probables: 0-2 16.3%, 0-1 16.3%, 0-3 11.8%, 0-0 10.1%, 1-1 8.0%, 1-2 6.9%, 0-4 5.9%, 1-3 4.9%
+- Bivariante Poisson: victoria Panama 5.5% | empate 17.6% | victoria Croatia 76.9% | marcador más probable 0-1 (17.6%) | peso actual 37.6%
+- Poisson independiente: victoria Panama 5.8% | empate 19.0% | victoria Croatia 75.2% | marcador más probable 0-2 (17.4%) | peso actual 17.2%
+- Ajuste de baja anotación: victoria Panama 5.8% | empate 19.0% | victoria Croatia 75.2% | marcador más probable 0-2 (17.4%) | peso actual 14.2%
+- Overdispersión calibrada: victoria Panama 8.0% | empate 19.3% | victoria Croatia 72.7% | marcador más probable 0-1 (16.9%) | peso actual 8.4%
+- ML ligero regularizado: victoria Panama 6.9% | empate 18.1% | victoria Croatia 75.0% | marcador más probable 0-2 (16.5%) | peso actual 11.4%
+- Predictivo bayesiano dinámico: victoria Panama 16.2% | empate 23.7% | victoria Croatia 60.1% | marcador más probable 0-1 (14.0%) | peso actual 11.2%
+- Ensamble + asimetría histórica: victoria Panama 6.9% | empate 18.6% | victoria Croatia 74.4% | marcador más probable 0-2 (16.3%)
+- Marcadores más probables: 0-2 16.3%, 0-1 15.3%, 0-3 12.5%, 0-0 9.1%, 1-1 7.5%, 1-2 6.8%, 0-4 6.6%, 1-3 5.2%
 
 ### Colombia vs Dem. Rep. of Congo
 - Etapa: Grupo K
@@ -2096,29 +2072,29 @@ _El Brier 2026 se activa automáticamente con el primer partido terminado; antes
 - Sede: Estadio Akron | Mexico
 - Hora UTC: 2026-06-24T02:00:00Z
 - Clima estimado: 25.0 C | HR 55% | viento 11 km/h | estrés 0.02
-- Factores que más pesan ahora: Elo dinámico +359.000; Rendimiento en Mundiales desde 1950 +0.348
+- Factores que más pesan ahora: Valor bruto de plantilla +1006.663; Elo dinámico +359.000
 - Marcador proyectado: 2-0
-- Marcador para cargar en Penca: 2-0 | 3.49 pts esp. | exacto 19.2% | diferencia 23.5%
-- Precisión de marcador: Marcador con precisión media | exacto más probable 2-0 19.2% | top-5 cubre 69.7%
-- Promedio estimado de goles del modelo: Colombia 2.27 | Dem. Rep. of Congo 0.26
-- Probabilidades de resultado (90'): 81.5% / 14.7% / 3.7%
-- Lectura estadistica: Pick muy fuerte | pick actual Victoria Colombia 81.5% | confianza 90.8%
-- Escenario de goles: ambos marcan 21.0% | más de 2.5 goles 46.6%
-- Goles totales esperados por el modelo: 2.55. Sin línea externa de goles cargada para ese partido.
-- Probabilidad de que no reciba goles: Colombia 76.3% | Dem. Rep. of Congo 11.8%
-- Cuánta probabilidad cubren los 3 marcadores más probables: 52.0% | ventaja final más probable +2 (23.5%)
-- Qué tanto coinciden los modelos entre sí: 93.2%
+- Marcador para cargar en Penca: 2-0 | 3.54 pts esp. | exacto 19.0% | diferencia 23.2%
+- Precisión de marcador: Marcador con precisión media | exacto más probable 2-0 19.0% | top-5 cubre 69.6%
+- Promedio estimado de goles del modelo: Colombia 2.39 | Dem. Rep. of Congo 0.25
+- Probabilidades de resultado (90'): 83.5% / 13.3% / 3.2%
+- Lectura estadistica: Pick muy fuerte | pick actual Victoria Colombia 83.5% | confianza 93.1%
+- Escenario de goles: ambos marcan 20.0% | más de 2.5 goles 49.6%
+- Goles totales esperados por el modelo: 2.67. Sin línea externa de goles cargada para ese partido.
+- Probabilidad de que no reciba goles: Colombia 77.6% | Dem. Rep. of Congo 10.7%
+- Cuánta probabilidad cubren los 3 marcadores más probables: 51.7% | ventaja final más probable +2 (23.2%)
+- Qué tanto coinciden los modelos entre sí: 93.1%
 - Stack estadístico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotación + Overdispersión calibrada + ML ligero regularizado + Predictivo bayesiano dinámico + Ensamble + asimetría histórica
-- Factores dominantes: Elo dinámico +359.000; Rendimiento en Mundiales desde 1950 +0.348; Historia mundialista +0.284
+- Factores dominantes: Valor bruto de plantilla +1006.663; Elo dinámico +359.000; Minutos Mundial de Clubes +59.641
 - Comparativa entre modelos:
-- Bivariante Poisson: victoria Colombia 84.1% | empate 13.5% | victoria Dem. Rep. of Congo 2.4% | marcador más probable 2-0 (20.7%) | peso actual 38.5%
-- Poisson independiente: victoria Colombia 83.0% | empate 14.1% | victoria Dem. Rep. of Congo 2.8% | marcador más probable 2-0 (20.5%) | peso actual 17.5%
-- Ajuste de baja anotación: victoria Colombia 83.0% | empate 14.1% | victoria Dem. Rep. of Congo 2.8% | marcador más probable 2-0 (20.5%) | peso actual 13.3%
-- Overdispersión calibrada: victoria Colombia 79.8% | empate 16.2% | victoria Dem. Rep. of Congo 4.0% | marcador más probable 1-0 (18.7%) | peso actual 8.7%
-- ML ligero regularizado: victoria Colombia 81.2% | empate 15.3% | victoria Dem. Rep. of Congo 3.5% | marcador más probable 2-0 (18.9%) | peso actual 11.3%
-- Predictivo bayesiano dinámico: victoria Colombia 65.8% | empate 21.7% | victoria Dem. Rep. of Congo 12.4% | marcador más probable 1-0 (14.7%) | peso actual 10.8%
-- Ensamble + asimetría histórica: victoria Colombia 81.5% | empate 14.7% | victoria Dem. Rep. of Congo 3.7% | marcador más probable 2-0 (19.2%)
-- Marcadores más probables: 2-0 19.2%, 1-0 17.6%, 3-0 15.2%, 0-0 9.1%, 4-0 8.6%, 2-1 4.9%, 1-1 4.8%, 5-0 4.0%
+- Bivariante Poisson: victoria Colombia 86.0% | empate 12.0% | victoria Dem. Rep. of Congo 2.0% | marcador más probable 2-0 (20.8%) | peso actual 38.2%
+- Poisson independiente: victoria Colombia 85.1% | empate 12.6% | victoria Dem. Rep. of Congo 2.3% | marcador más probable 2-0 (20.6%) | peso actual 17.4%
+- Ajuste de baja anotación: victoria Colombia 85.1% | empate 12.6% | victoria Dem. Rep. of Congo 2.3% | marcador más probable 2-0 (20.6%) | peso actual 13.0%
+- Overdispersión calibrada: victoria Colombia 81.6% | empate 15.0% | victoria Dem. Rep. of Congo 3.4% | marcador más probable 2-0 (18.4%) | peso actual 9.3%
+- ML ligero regularizado: victoria Colombia 83.0% | empate 14.1% | victoria Dem. Rep. of Congo 2.9% | marcador más probable 2-0 (18.9%) | peso actual 11.4%
+- Predictivo bayesiano dinámico: victoria Colombia 67.8% | empate 20.6% | victoria Dem. Rep. of Congo 11.6% | marcador más probable 1-0 (14.1%) | peso actual 10.7%
+- Ensamble + asimetría histórica: victoria Colombia 83.5% | empate 13.3% | victoria Dem. Rep. of Congo 3.2% | marcador más probable 2-0 (19.0%)
+- Marcadores más probables: 2-0 19.0%, 1-0 16.5%, 3-0 16.1%, 4-0 9.6%, 0-0 8.3%, 5-0 4.7%, 2-1 4.6%, 1-1 4.2%
 
 ### Bosnia and Herzegovina vs Qatar
 - Etapa: Grupo B
@@ -2126,29 +2102,29 @@ _El Brier 2026 se activa automáticamente con el primer partido terminado; antes
 - Sede: Lumen Field | United States
 - Hora UTC: 2026-06-24T19:00:00Z
 - Clima estimado: 23.0 C | HR 65% | viento 10 km/h | estrés 0.02
-- Factores que más pesan ahora: Elo dinámico +144.000; Recursos/PIB proxy -0.136
+- Factores que más pesan ahora: Valor bruto de plantilla +226.079; Elo dinámico +144.000
 - Marcador proyectado: 1-0
-- Marcador para cargar en Penca: 2-1 | 2.45 pts esp. | exacto 8.6% | diferencia 25.2%
-- Precisión de marcador: Marcador con precisión media | exacto más probable 1-0 14.5% | top-5 cubre 57.7%
-- Promedio estimado de goles del modelo: Bosnia and Herzegovina 1.60 | Qatar 0.74
-- Probabilidades de resultado (90'): 56.2% / 27.0% / 16.7%
-- Lectura estadistica: Pick utilizable | pick actual Victoria Bosnia and Herzegovina 56.2% | confianza 61.3%
-- Escenario de goles: ambos marcan 42.3% | más de 2.5 goles 41.8%
-- Goles totales esperados por el modelo: 2.36. Sin línea externa de goles cargada para ese partido.
-- Probabilidad de que no reciba goles: Bosnia and Herzegovina 47.7% | Qatar 21.4%
-- Cuánta probabilidad cubren los 3 marcadores más probables: 37.8% | ventaja final más probable +0 (27.0%)
-- Qué tanto coinciden los modelos entre sí: 94.8%
+- Marcador para cargar en Penca: 2-1 | 2.46 pts esp. | exacto 8.6% | diferencia 24.6%
+- Precisión de marcador: Marcador con precisión media | exacto más probable 1-0 13.7% | top-5 cubre 57.2%
+- Promedio estimado de goles del modelo: Bosnia and Herzegovina 1.66 | Qatar 0.74
+- Probabilidades de resultado (90'): 57.1% / 27.2% / 15.8%
+- Lectura estadistica: Pick utilizable | pick actual Victoria Bosnia and Herzegovina 57.1% | confianza 61.9%
+- Escenario de goles: ambos marcan 43.1% | más de 2.5 goles 43.1%
+- Goles totales esperados por el modelo: 2.42. Sin línea externa de goles cargada para ese partido.
+- Probabilidad de que no reciba goles: Bosnia and Herzegovina 47.6% | Qatar 20.4%
+- Cuánta probabilidad cubren los 3 marcadores más probables: 37.4% | ventaja final más probable +0 (27.2%)
+- Qué tanto coinciden los modelos entre sí: 93.5%
 - Stack estadístico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotación + Overdispersión calibrada + ML ligero regularizado + Predictivo bayesiano dinámico + Ensamble + asimetría histórica
-- Factores dominantes: Elo dinámico +144.000; Recursos/PIB proxy -0.136; Portero +0.122
+- Factores dominantes: Valor bruto de plantilla +226.079; Elo dinámico +144.000; Minutos Mundial de Clubes +48.029
 - Comparativa entre modelos:
-- Bivariante Poisson: victoria Bosnia and Herzegovina 58.1% | empate 26.1% | victoria Qatar 15.8% | marcador más probable 1-0 (16.0%) | peso actual 36.7%
-- Poisson independiente: victoria Bosnia and Herzegovina 55.4% | empate 29.6% | victoria Qatar 15.0% | marcador más probable 1-1 (13.8%) | peso actual 16.5%
-- Ajuste de baja anotación: victoria Bosnia and Herzegovina 55.4% | empate 29.6% | victoria Qatar 15.0% | marcador más probable 1-1 (13.8%) | peso actual 15.6%
-- Overdispersión calibrada: victoria Bosnia and Herzegovina 56.1% | empate 25.4% | victoria Qatar 18.6% | marcador más probable 1-0 (15.3%) | peso actual 7.4%
-- ML ligero regularizado: victoria Bosnia and Herzegovina 58.1% | empate 24.8% | victoria Qatar 17.1% | marcador más probable 1-0 (15.4%) | peso actual 11.2%
-- Predictivo bayesiano dinámico: victoria Bosnia and Herzegovina 48.1% | empate 27.5% | victoria Qatar 24.4% | marcador más probable 1-0 (13.5%) | peso actual 12.6%
-- Ensamble + asimetría histórica: victoria Bosnia and Herzegovina 56.2% | empate 27.0% | victoria Qatar 16.7% | marcador más probable 1-0 (14.5%)
-- Marcadores más probables: 1-0 14.5%, 1-1 11.8%, 2-0 11.6%, 0-0 11.3%, 2-1 8.6%, 0-1 6.5%, 3-0 6.4%, 3-1 4.8%
+- Bivariante Poisson: victoria Bosnia and Herzegovina 59.6% | empate 25.2% | victoria Qatar 15.1% | marcador más probable 1-0 (15.6%) | peso actual 36.8%
+- Poisson independiente: victoria Bosnia and Herzegovina 55.2% | empate 31.5% | victoria Qatar 13.3% | marcador más probable 1-1 (14.8%) | peso actual 16.4%
+- Ajuste de baja anotación: victoria Bosnia and Herzegovina 55.2% | empate 31.5% | victoria Qatar 13.3% | marcador más probable 1-1 (14.8%) | peso actual 15.4%
+- Overdispersión calibrada: victoria Bosnia and Herzegovina 57.4% | empate 24.7% | victoria Qatar 17.9% | marcador más probable 1-0 (15.0%) | peso actual 7.4%
+- ML ligero regularizado: victoria Bosnia and Herzegovina 59.4% | empate 24.1% | victoria Qatar 16.5% | marcador más probable 1-0 (15.1%) | peso actual 11.4%
+- Predictivo bayesiano dinámico: victoria Bosnia and Herzegovina 49.0% | empate 27.0% | victoria Qatar 24.0% | marcador más probable 1-0 (13.2%) | peso actual 12.7%
+- Ensamble + asimetría histórica: victoria Bosnia and Herzegovina 57.1% | empate 27.2% | victoria Qatar 15.8% | marcador más probable 1-0 (13.7%)
+- Marcadores más probables: 1-0 13.7%, 1-1 11.9%, 2-0 11.7%, 0-0 11.2%, 2-1 8.6%, 3-0 6.7%, 0-1 5.8%, 3-1 5.0%
 
 ### Switzerland vs Canada
 - Etapa: Grupo B
@@ -2156,29 +2132,29 @@ _El Brier 2026 se activa automáticamente con el primer partido terminado; antes
 - Sede: BC Place | Canada
 - Hora UTC: 2026-06-24T19:00:00Z
 - Clima estimado: 21.0 C | HR 71% | viento 10 km/h | estrés 0.02
-- Factores que más pesan ahora: Elo dinámico +91.000; Historia mundialista +0.276
-- Marcador proyectado: 1-0
-- Marcador para cargar en Penca: 2-1 | 2.29 pts esp. | exacto 8.4% | diferencia 23.8%
-- Precisión de marcador: Marcador frágil | exacto más probable 1-0 13.1% | top-5 cubre 55.4%
-- Promedio estimado de goles del modelo: Switzerland 1.53 | Canada 0.85
-- Probabilidades de resultado (90'): 51.9% / 28.1% / 20.0%
-- Lectura estadistica: Pronóstico parejo: sin favorito estadístico claro | pick actual Victoria Switzerland 51.9% | confianza 56.8%
-- Escenario de goles: ambos marcan 44.8% | más de 2.5 goles 42.7%
-- Goles totales esperados por el modelo: 2.40. Sin línea externa de goles cargada para ese partido.
-- Probabilidad de que no reciba goles: Switzerland 43.5% | Canada 22.8%
-- Cuánta probabilidad cubren los 3 marcadores más probables: 36.6% | ventaja final más probable +0 (28.1%)
+- Factores que más pesan ahora: Valor bruto de plantilla +352.288; Elo dinámico +91.000
+- Marcador proyectado: 1-1
+- Marcador para cargar en Penca: 2-1 | 2.28 pts esp. | exacto 8.6% | diferencia 23.3%
+- Precisión de marcador: Marcador frágil | exacto más probable 1-1 12.2% | top-5 cubre 52.9%
+- Promedio estimado de goles del modelo: Switzerland 1.59 | Canada 0.90
+- Probabilidades de resultado (90'): 52.0% / 27.4% / 20.7%
+- Lectura estadistica: Pronóstico parejo: sin favorito estadístico claro | pick actual Victoria Switzerland 52.0% | confianza 56.8%
+- Escenario de goles: ambos marcan 47.2% | más de 2.5 goles 45.6%
+- Goles totales esperados por el modelo: 2.52. Sin línea externa de goles cargada para ese partido.
+- Probabilidad de que no reciba goles: Switzerland 41.2% | Canada 21.6%
+- Cuánta probabilidad cubren los 3 marcadores más probables: 34.3% | ventaja final más probable +0 (27.4%)
 - Qué tanto coinciden los modelos entre sí: 94.8%
 - Stack estadístico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotación + Overdispersión calibrada + ML ligero regularizado + Predictivo bayesiano dinámico + Ensamble + asimetría histórica
-- Factores dominantes: Elo dinámico +91.000; Historia mundialista +0.276; Rendimiento en Mundiales desde 1950 +0.265
+- Factores dominantes: Valor bruto de plantilla +352.288; Elo dinámico +91.000; Minutos Mundial de Clubes -89.758
 - Comparativa entre modelos:
-- Bivariante Poisson: victoria Switzerland 53.8% | empate 27.0% | victoria Canada 19.2% | marcador más probable 1-0 (14.7%) | peso actual 36.3%
-- Poisson independiente: victoria Switzerland 50.8% | empate 31.3% | victoria Canada 17.9% | marcador más probable 1-1 (14.8%) | peso actual 16.2%
-- Ajuste de baja anotación: victoria Switzerland 50.8% | empate 31.3% | victoria Canada 17.9% | marcador más probable 1-1 (14.8%) | peso actual 15.9%
-- Overdispersión calibrada: victoria Switzerland 52.3% | empate 25.8% | victoria Canada 21.8% | marcador más probable 1-0 (14.2%) | peso actual 7.3%
-- ML ligero regularizado: victoria Switzerland 53.3% | empate 25.6% | victoria Canada 21.1% | marcador más probable 1-0 (14.3%) | peso actual 11.4%
-- Predictivo bayesiano dinámico: victoria Switzerland 45.1% | empate 27.9% | victoria Canada 26.9% | marcador más probable 1-0 (12.9%) | peso actual 12.9%
-- Ensamble + asimetría histórica: victoria Switzerland 51.9% | empate 28.1% | victoria Canada 20.0% | marcador más probable 1-0 (13.1%)
-- Marcadores más probables: 1-0 13.1%, 1-1 12.4%, 0-0 11.1%, 2-0 10.4%, 2-1 8.4%, 0-1 7.1%, 3-0 5.6%, 1-2 4.7%
+- Bivariante Poisson: victoria Switzerland 53.8% | empate 26.2% | victoria Canada 20.0% | marcador más probable 1-0 (13.6%) | peso actual 36.0%
+- Poisson independiente: victoria Switzerland 50.8% | empate 30.6% | victoria Canada 18.5% | marcador más probable 1-1 (14.6%) | peso actual 16.0%
+- Ajuste de baja anotación: victoria Switzerland 50.8% | empate 30.6% | victoria Canada 18.5% | marcador más probable 1-1 (14.6%) | peso actual 15.9%
+- Overdispersión calibrada: victoria Switzerland 52.3% | empate 25.1% | victoria Canada 22.6% | marcador más probable 1-0 (13.2%) | peso actual 7.7%
+- ML ligero regularizado: victoria Switzerland 53.3% | empate 24.9% | victoria Canada 21.9% | marcador más probable 1-0 (13.3%) | peso actual 11.6%
+- Predictivo bayesiano dinámico: victoria Switzerland 45.5% | empate 27.2% | victoria Canada 27.3% | marcador más probable 1-0 (12.2%) | peso actual 12.8%
+- Ensamble + asimetría histórica: victoria Switzerland 52.0% | empate 27.4% | victoria Canada 20.7% | marcador más probable 1-1 (12.2%)
+- Marcadores más probables: 1-1 12.2%, 1-0 12.1%, 0-0 10.0%, 2-0 10.0%, 2-1 8.6%, 0-1 6.7%, 3-0 5.6%, 1-2 5.0%
 
 ### Morocco vs Haiti
 - Etapa: Grupo D
@@ -2187,29 +2163,29 @@ _El Brier 2026 se activa automáticamente con el primer partido terminado; antes
 - Hora UTC: 2026-06-24T22:00:00Z
 - Clima estimado: 30.0 C | HR 70% | viento 11 km/h | estrés 0.23
 - Cambio por clima exigente: estrés climático 0.23.
-- Factores que más pesan ahora: Elo dinámico +264.000; Defensa histórica desde 1950 +0.591
+- Factores que más pesan ahora: Valor bruto de plantilla +792.505; Elo dinámico +264.000
 - Marcador proyectado: 2-0
-- Marcador para cargar en Penca: 2-0 | 3.27 pts esp. | exacto 17.9% | diferencia 23.0%
-- Precisión de marcador: Marcador con precisión media | exacto más probable 2-0 17.9% | top-5 cubre 65.4%
-- Promedio estimado de goles del modelo: Morocco 2.05 | Haiti 0.36
-- Probabilidades de resultado (90'): 75.8% / 18.4% / 5.8%
-- Lectura estadistica: Pick fuerte | pick actual Victoria Morocco 75.8% | confianza 83.6%
-- Escenario de goles: ambos marcan 26.0% | más de 2.5 goles 44.5%
-- Goles totales esperados por el modelo: 2.46. Sin línea externa de goles cargada para ese partido.
-- Probabilidad de que no reciba goles: Morocco 70.0% | Haiti 14.5%
-- Cuánta probabilidad cubren los 3 marcadores más probables: 47.9% | ventaja final más probable +1 (23.7%)
+- Marcador para cargar en Penca: 2-0 | 3.34 pts esp. | exacto 18.1% | diferencia 23.1%
+- Precisión de marcador: Marcador con precisión media | exacto más probable 2-0 18.1% | top-5 cubre 65.8%
+- Promedio estimado de goles del modelo: Morocco 2.14 | Haiti 0.34
+- Probabilidades de resultado (90'): 78.0% / 16.9% / 5.1%
+- Lectura estadistica: Pick fuerte | pick actual Victoria Morocco 78.0% | confianza 86.2%
+- Escenario de goles: ambos marcan 25.1% | más de 2.5 goles 46.7%
+- Goles totales esperados por el modelo: 2.54. Sin línea externa de goles cargada para ese partido.
+- Probabilidad de que no reciba goles: Morocco 71.3% | Haiti 13.3%
+- Cuánta probabilidad cubren los 3 marcadores más probables: 48.3% | ventaja final más probable +2 (23.1%)
 - Qué tanto coinciden los modelos entre sí: 93.5%
 - Stack estadístico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotación + Overdispersión calibrada + ML ligero regularizado + Predictivo bayesiano dinámico + Ensamble + asimetría histórica
-- Factores dominantes: Elo dinámico +264.000; Defensa histórica desde 1950 +0.591; Ranking FIFA / puntos FIFA +0.530
+- Factores dominantes: Valor bruto de plantilla +792.505; Elo dinámico +264.000; Minutos Mundial de Clubes +0.670
 - Comparativa entre modelos:
-- Bivariante Poisson: victoria Morocco 78.3% | empate 17.4% | victoria Haiti 4.3% | marcador más probable 1-0 (19.4%) | peso actual 38.3%
-- Poisson independiente: victoria Morocco 76.8% | empate 18.4% | victoria Haiti 4.8% | marcador más probable 2-0 (18.9%) | peso actual 17.5%
-- Ajuste de baja anotación: victoria Morocco 76.8% | empate 18.4% | victoria Haiti 4.8% | marcador más probable 2-0 (18.9%) | peso actual 14.0%
-- Overdispersión calibrada: victoria Morocco 74.2% | empate 19.2% | victoria Haiti 6.5% | marcador más probable 1-0 (18.6%) | peso actual 7.9%
-- ML ligero regularizado: victoria Morocco 76.4% | empate 18.1% | victoria Haiti 5.5% | marcador más probable 1-0 (18.1%) | peso actual 11.1%
-- Predictivo bayesiano dinámico: victoria Morocco 60.7% | empate 24.1% | victoria Haiti 15.2% | marcador más probable 1-0 (15.0%) | peso actual 11.2%
-- Ensamble + asimetría histórica: victoria Morocco 75.8% | empate 18.4% | victoria Haiti 5.8% | marcador más probable 2-0 (17.9%)
-- Marcadores más probables: 2-0 17.9%, 1-0 16.8%, 3-0 13.2%, 0-0 10.5%, 4-0 7.0%, 1-1 6.4%, 2-1 5.9%, 3-1 4.5%
+- Bivariante Poisson: victoria Morocco 80.5% | empate 15.9% | victoria Haiti 3.7% | marcador más probable 2-0 (19.3%) | peso actual 38.2%
+- Poisson independiente: victoria Morocco 79.1% | empate 16.8% | victoria Haiti 4.2% | marcador más probable 2-0 (19.2%) | peso actual 17.4%
+- Ajuste de baja anotación: victoria Morocco 79.1% | empate 16.8% | victoria Haiti 4.2% | marcador más probable 2-0 (19.2%) | peso actual 13.8%
+- Overdispersión calibrada: victoria Morocco 76.2% | empate 18.0% | victoria Haiti 5.8% | marcador más probable 1-0 (18.2%) | peso actual 8.3%
+- ML ligero regularizado: victoria Morocco 78.3% | empate 16.9% | victoria Haiti 4.8% | marcador más probable 2-0 (18.1%) | peso actual 11.3%
+- Predictivo bayesiano dinámico: victoria Morocco 62.7% | empate 23.0% | victoria Haiti 14.3% | marcador más probable 1-0 (14.6%) | peso actual 11.0%
+- Ensamble + asimetría histórica: victoria Morocco 78.0% | empate 16.9% | victoria Haiti 5.1% | marcador más probable 2-0 (18.1%)
+- Marcadores más probables: 2-0 18.1%, 1-0 16.2%, 3-0 14.0%, 0-0 9.7%, 4-0 7.8%, 1-1 5.9%, 2-1 5.6%, 3-1 4.5%
 
 ### Scotland vs Brazil
 - Etapa: Grupo D
@@ -2217,33 +2193,30 @@ _El Brier 2026 se activa automáticamente con el primer partido terminado; antes
 - Sede: Hard Rock Stadium | United States
 - Hora UTC: 2026-06-24T22:00:00Z
 - Clima estimado: 31.0 C | HR 74% | viento 15 km/h | estrés 0.28
-- Noticias relevantes: q1045.iheart.com: Neymar Could Miss Brazil World Cup Opener Due To Injury; pyx106.iheart.com: Neymar Could Miss Brazil World Cup Opener Due To Injury; b98fm.iheart.com: Neymar Could Miss Brazil World Cup Opener Due To Injury
-- Impacto noticioso Brazil: q1045.iheart.com: Neymar Could Miss Brazil World Cup Opener Due To Injury; pyx106.iheart.com: Neymar Could Miss Brazil World Cup Opener Due To Injury
 - Cambio por clima exigente: estrés climático 0.28.
-- Cambio por noticias relevantes detectadas en el feed del partido.
-- Factores que más pesan ahora: Elo dinámico -188.000; Historia mundialista -0.665
+- Factores que más pesan ahora: Valor bruto de plantilla -1159.530; Minutos Mundial de Clubes -849.975
 - Marcador proyectado: 0-2
-- Marcador para cargar en Penca: 0-2 | 3.09 pts esp. | exacto 16.7% | diferencia 22.1%
-- Precisión de marcador: Marcador con precisión media | exacto más probable 0-2 16.7% | top-5 cubre 63.3%
-- Promedio estimado de goles del modelo: Scotland 0.45 | Brazil 1.93
-- Probabilidades de resultado (90'): 7.8% / 20.7% / 71.5%
-- Lectura estadistica: Pick fuerte | pick actual Victoria Brazil 71.5% | confianza 78.4%
-- Escenario de goles: ambos marcan 30.3% | más de 2.5 goles 43.3%
-- Goles totales esperados por el modelo: 2.42. Sin línea externa de goles cargada para ese partido.
-- Probabilidad de que no reciba goles: Scotland 15.8% | Brazil 64.5%
-- Cuánta probabilidad cubren los 3 marcadores más probables: 44.7% | ventaja final más probable -1 (24.2%)
+- Marcador para cargar en Penca: 0-2 | 3.17 pts esp. | exacto 16.7% | diferencia 22.5%
+- Precisión de marcador: Marcador con precisión media | exacto más probable 0-2 16.7% | top-5 cubre 61.3%
+- Promedio estimado de goles del modelo: Scotland 0.44 | Brazil 2.06
+- Probabilidades de resultado (90'): 7.0% / 18.9% / 74.1%
+- Lectura estadistica: Pick fuerte | pick actual Victoria Brazil 74.1% | confianza 81.4%
+- Escenario de goles: ambos marcan 30.7% | más de 2.5 goles 46.8%
+- Goles totales esperados por el modelo: 2.56. Sin línea externa de goles cargada para ese partido.
+- Probabilidad de que no reciba goles: Scotland 14.0% | Brazil 64.7%
+- Cuánta probabilidad cubren los 3 marcadores más probables: 44.5% | ventaja final más probable -1 (23.0%)
 - Qué tanto coinciden los modelos entre sí: 93.8%
 - Stack estadístico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotación + Overdispersión calibrada + ML ligero regularizado + Predictivo bayesiano dinámico + Ensamble + asimetría histórica
-- Factores dominantes: Elo dinámico -188.000; Historia mundialista -0.665; Rendimiento en Mundiales desde 1950 -0.658
+- Factores dominantes: Valor bruto de plantilla -1159.530; Minutos Mundial de Clubes -849.975; Elo dinámico -188.000
 - Comparativa entre modelos:
-- Bivariante Poisson: victoria Scotland 6.3% | empate 19.8% | victoria Brazil 73.9% | marcador más probable 0-1 (18.9%) | peso actual 37.9%
-- Poisson independiente: victoria Scotland 6.6% | empate 21.2% | victoria Brazil 72.1% | marcador más probable 0-2 (17.4%) | peso actual 17.3%
-- Ajuste de baja anotación: victoria Scotland 6.6% | empate 21.2% | victoria Brazil 72.1% | marcador más probable 0-2 (17.4%) | peso actual 14.5%
-- Overdispersión calibrada: victoria Scotland 8.8% | empate 21.1% | victoria Brazil 70.1% | marcador más probable 0-1 (18.0%) | peso actual 7.8%
-- ML ligero regularizado: victoria Scotland 7.6% | empate 19.9% | victoria Brazil 72.5% | marcador más probable 0-1 (17.7%) | peso actual 11.1%
-- Predictivo bayesiano dinámico: victoria Scotland 17.4% | empate 25.3% | victoria Brazil 57.3% | marcador más probable 0-1 (14.8%) | peso actual 11.4%
-- Ensamble + asimetría histórica: victoria Scotland 7.8% | empate 20.7% | victoria Brazil 71.5% | marcador más probable 0-2 (16.7%)
-- Marcadores más probables: 0-2 16.7%, 0-1 16.3%, 0-3 11.7%, 0-0 10.6%, 1-1 8.0%, 1-2 6.6%, 0-4 5.7%, 1-3 4.8%
+- Bivariante Poisson: victoria Scotland 5.6% | empate 17.9% | victoria Brazil 76.6% | marcador más probable 0-1 (17.7%) | peso actual 37.6%
+- Poisson independiente: victoria Scotland 5.9% | empate 19.2% | victoria Brazil 74.8% | marcador más probable 0-2 (17.4%) | peso actual 17.2%
+- Ajuste de baja anotación: victoria Scotland 5.9% | empate 19.2% | victoria Brazil 74.8% | marcador más probable 0-2 (17.4%) | peso actual 14.2%
+- Overdispersión calibrada: victoria Scotland 8.1% | empate 19.5% | victoria Brazil 72.4% | marcador más probable 0-1 (17.1%) | peso actual 8.3%
+- ML ligero regularizado: victoria Scotland 6.9% | empate 18.3% | victoria Brazil 74.7% | marcador más probable 0-1 (16.6%) | peso actual 11.3%
+- Predictivo bayesiano dinámico: victoria Scotland 16.3% | empate 23.9% | victoria Brazil 59.8% | marcador más probable 0-1 (14.2%) | peso actual 11.3%
+- Ensamble + asimetría histórica: victoria Scotland 7.0% | empate 18.9% | victoria Brazil 74.1% | marcador más probable 0-2 (16.7%)
+- Marcadores más probables: 0-2 16.7%, 0-1 15.2%, 0-3 12.5%, 0-0 9.4%, 1-1 7.5%, 1-2 6.5%, 0-4 6.5%, 1-3 5.1%
 
 ### Czech Republic vs Mexico
 - Etapa: Grupo A
@@ -2251,29 +2224,29 @@ _El Brier 2026 se activa automáticamente con el primer partido terminado; antes
 - Sede: Estadio Banorte | Mexico
 - Hora UTC: 2026-06-25T01:00:00Z
 - Clima estimado: 22.0 C | HR 56% | viento 12 km/h | estrés 0.02
-- Factores que más pesan ahora: Elo dinámico -122.000; Ranking FIFA / puntos FIFA -0.226
+- Factores que más pesan ahora: Minutos Mundial de Clubes -953.718; Valor bruto de plantilla -704.452
 - Marcador proyectado: 0-1
-- Marcador para cargar en Penca: 1-2 | 2.49 pts esp. | exacto 8.6% | diferencia 24.3%
-- Precisión de marcador: Marcador con precisión media | exacto más probable 0-1 13.4% | top-5 cubre 55.2%
-- Promedio estimado de goles del modelo: Czech Republic 0.76 | Mexico 1.70
-- Probabilidades de resultado (90'): 16.1% / 25.7% / 58.1%
-- Lectura estadistica: Pick utilizable | pick actual Victoria Mexico 58.1% | confianza 63.3%
-- Escenario de goles: ambos marcan 43.6% | más de 2.5 goles 45.0%
-- Goles totales esperados por el modelo: 2.49. Sin línea externa de goles cargada para ese partido.
-- Probabilidad de que no reciba goles: Czech Republic 19.6% | Mexico 47.1%
-- Cuánta probabilidad cubren los 3 marcadores más probables: 36.4% | ventaja final más probable +0 (25.7%)
+- Marcador para cargar en Penca: 1-2 | 2.54 pts esp. | exacto 8.6% | diferencia 24.1%
+- Precisión de marcador: Marcador frágil | exacto más probable 0-1 13.0% | top-5 cubre 53.9%
+- Promedio estimado de goles del modelo: Czech Republic 0.76 | Mexico 1.78
+- Probabilidades de resultado (90'): 15.3% / 24.6% / 60.1%
+- Lectura estadistica: Pick utilizable | pick actual Victoria Mexico 60.1% | confianza 65.3%
+- Escenario de goles: ambos marcan 44.1% | más de 2.5 goles 46.9%
+- Goles totales esperados por el modelo: 2.57. Sin línea externa de goles cargada para ese partido.
+- Probabilidad de que no reciba goles: Czech Republic 18.2% | Mexico 47.2%
+- Cuánta probabilidad cubren los 3 marcadores más probables: 35.7% | ventaja final más probable +0 (24.6%)
 - Qué tanto coinciden los modelos entre sí: 94.8%
 - Stack estadístico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotación + Overdispersión calibrada + ML ligero regularizado + Predictivo bayesiano dinámico + Ensamble + asimetría histórica
-- Factores dominantes: Elo dinámico -122.000; Ranking FIFA / puntos FIFA -0.226; Recursos/PIB proxy -0.192
+- Factores dominantes: Minutos Mundial de Clubes -953.718; Valor bruto de plantilla -704.452; Elo dinámico -122.000
 - Comparativa entre modelos:
-- Bivariante Poisson: victoria Czech Republic 15.2% | empate 24.7% | victoria Mexico 60.1% | marcador más probable 0-1 (15.1%) | peso actual 36.5%
-- Poisson independiente: victoria Czech Republic 14.4% | empate 28.2% | victoria Mexico 57.4% | marcador más probable 1-1 (13.3%) | peso actual 16.5%
-- Ajuste de baja anotación: victoria Czech Republic 14.4% | empate 28.2% | victoria Mexico 57.4% | marcador más probable 1-1 (13.3%) | peso actual 15.5%
-- Overdispersión calibrada: victoria Czech Republic 18.0% | empate 24.2% | victoria Mexico 57.8% | marcador más probable 0-1 (14.5%) | peso actual 7.7%
-- ML ligero regularizado: victoria Czech Republic 16.6% | empate 23.6% | victoria Mexico 59.7% | marcador más probable 0-1 (14.7%) | peso actual 11.4%
-- Predictivo bayesiano dinámico: victoria Czech Republic 23.9% | empate 26.6% | victoria Mexico 49.5% | marcador más probable 0-1 (12.9%) | peso actual 12.4%
-- Ensamble + asimetría histórica: victoria Czech Republic 16.1% | empate 25.7% | victoria Mexico 58.1% | marcador más probable 0-1 (13.4%)
-- Marcadores más probables: 0-1 13.4%, 0-2 11.8%, 1-1 11.2%, 0-0 10.2%, 1-2 8.6%, 0-3 7.0%, 1-0 6.0%, 1-3 5.2%
+- Bivariante Poisson: victoria Czech Republic 14.3% | empate 23.7% | victoria Mexico 62.0% | marcador más probable 0-1 (14.6%) | peso actual 36.3%
+- Poisson independiente: victoria Czech Republic 13.6% | empate 26.9% | victoria Mexico 59.5% | marcador más probable 1-1 (12.7%) | peso actual 16.4%
+- Ajuste de baja anotación: victoria Czech Republic 13.6% | empate 26.9% | victoria Mexico 59.5% | marcador más probable 1-1 (12.7%) | peso actual 15.3%
+- Overdispersión calibrada: victoria Czech Republic 17.2% | empate 23.4% | victoria Mexico 59.4% | marcador más probable 0-1 (14.1%) | peso actual 8.2%
+- ML ligero regularizado: victoria Czech Republic 15.8% | empate 22.7% | victoria Mexico 61.4% | marcador más probable 0-1 (14.2%) | peso actual 11.5%
+- Predictivo bayesiano dinámico: victoria Czech Republic 23.2% | empate 25.7% | victoria Mexico 51.1% | marcador más probable 0-1 (12.5%) | peso actual 12.3%
+- Ensamble + asimetría histórica: victoria Czech Republic 15.3% | empate 24.6% | victoria Mexico 60.1% | marcador más probable 0-1 (13.0%)
+- Marcadores más probables: 0-1 13.0%, 0-2 11.9%, 1-1 10.8%, 0-0 9.5%, 1-2 8.6%, 0-3 7.4%, 1-0 5.5%, 1-3 5.5%
 
 ### South Africa vs South Korea
 - Etapa: Grupo A
@@ -2282,29 +2255,29 @@ _El Brier 2026 se activa automáticamente con el primer partido terminado; antes
 - Hora UTC: 2026-06-25T01:00:00Z
 - Clima estimado: 31.0 C | HR 57% | viento 13 km/h | estrés 0.19
 - Cambio por clima exigente: estrés climático 0.19.
-- Factores que más pesan ahora: Elo dinámico -255.000; Ataque histórico desde 1950 -0.280
-- Marcador proyectado: 0-1
-- Marcador para cargar en Penca: 0-2 | 3.13 pts esp. | exacto 17.1% | diferencia 22.3%
-- Precisión de marcador: Marcador con precisión media | exacto más probable 0-1 17.9% | top-5 cubre 65.0%
-- Promedio estimado de goles del modelo: South Africa 0.41 | South Korea 1.95
-- Probabilidades de resultado (90'): 7.3% / 20.2% / 72.5%
-- Lectura estadistica: Pick fuerte | pick actual Victoria South Korea 72.5% | confianza 79.7%
-- Escenario de goles: ambos marcan 28.5% | más de 2.5 goles 41.6%
-- Goles totales esperados por el modelo: 2.36. Sin línea externa de goles cargada para ese partido.
-- Probabilidad de que no reciba goles: South Africa 16.0% | South Korea 66.5%
-- Cuánta probabilidad cubren los 3 marcadores más probables: 46.5% | ventaja final más probable -1 (25.7%)
-- Qué tanto coinciden los modelos entre sí: 93.9%
+- Factores que más pesan ahora: Minutos Mundial de Clubes -1233.527; Valor bruto de plantilla -785.557
+- Marcador proyectado: 0-2
+- Marcador para cargar en Penca: 0-2 | 3.19 pts esp. | exacto 17.2% | diferencia 22.6%
+- Precisión de marcador: Marcador con precisión media | exacto más probable 0-2 17.2% | top-5 cubre 63.4%
+- Promedio estimado de goles del modelo: South Africa 0.41 | South Korea 2.04
+- Probabilidades de resultado (90'): 6.8% / 18.9% / 74.3%
+- Lectura estadistica: Pick fuerte | pick actual Victoria South Korea 74.3% | confianza 81.7%
+- Escenario de goles: ambos marcan 28.9% | más de 2.5 goles 44.1%
+- Goles totales esperados por el modelo: 2.46. Sin línea externa de goles cargada para ese partido.
+- Probabilidad de que no reciba goles: South Africa 14.6% | South Korea 66.5%
+- Cuánta probabilidad cubren los 3 marcadores más probables: 46.2% | ventaja final más probable -1 (24.8%)
+- Qué tanto coinciden los modelos entre sí: 93.7%
 - Stack estadístico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotación + Overdispersión calibrada + ML ligero regularizado + Predictivo bayesiano dinámico + Ensamble + asimetría histórica
-- Factores dominantes: Elo dinámico -255.000; Ataque histórico desde 1950 -0.280; Recursos/PIB proxy -0.255
+- Factores dominantes: Minutos Mundial de Clubes -1233.527; Valor bruto de plantilla -785.557; Elo dinámico -255.000
 - Comparativa entre modelos:
-- Bivariante Poisson: victoria South Africa 5.8% | empate 19.4% | victoria South Korea 74.9% | marcador más probable 0-1 (19.2%) | peso actual 38.0%
-- Poisson independiente: victoria South Africa 6.2% | empate 20.6% | victoria South Korea 73.2% | marcador más probable 0-2 (17.8%) | peso actual 17.4%
-- Ajuste de baja anotación: victoria South Africa 6.2% | empate 20.6% | victoria South Korea 73.2% | marcador más probable 0-2 (17.8%) | peso actual 14.3%
-- Overdispersión calibrada: victoria South Africa 8.2% | empate 20.7% | victoria South Korea 71.0% | marcador más probable 0-1 (18.2%) | peso actual 7.8%
-- ML ligero regularizado: victoria South Africa 7.1% | empate 19.5% | victoria South Korea 73.4% | marcador más probable 0-1 (17.8%) | peso actual 11.1%
-- Predictivo bayesiano dinámico: victoria South Africa 16.6% | empate 25.1% | victoria South Korea 58.3% | marcador más probable 0-1 (15.1%) | peso actual 11.4%
-- Ensamble + asimetría histórica: victoria South Africa 7.3% | empate 20.2% | victoria South Korea 72.5% | marcador más probable 0-1 (17.9%)
-- Marcadores más probables: 0-1 17.9%, 0-2 17.1%, 0-3 11.4%, 0-0 11.0%, 1-1 7.5%, 1-2 6.6%, 0-4 5.6%, 1-3 4.5%
+- Bivariante Poisson: victoria South Africa 5.3% | empate 18.0% | victoria South Korea 76.7% | marcador más probable 0-1 (18.3%) | peso actual 37.9%
+- Poisson independiente: victoria South Africa 5.7% | empate 19.2% | victoria South Korea 75.1% | marcador más probable 0-2 (17.8%) | peso actual 17.4%
+- Ajuste de baja anotación: victoria South Africa 5.7% | empate 19.2% | victoria South Korea 75.1% | marcador más probable 0-2 (17.8%) | peso actual 14.2%
+- Overdispersión calibrada: victoria South Africa 7.8% | empate 19.6% | victoria South Korea 72.6% | marcador más probable 0-1 (17.5%) | peso actual 8.1%
+- ML ligero regularizado: victoria South Africa 6.6% | empate 18.4% | victoria South Korea 74.9% | marcador más probable 0-1 (17.1%) | peso actual 11.2%
+- Predictivo bayesiano dinámico: victoria South Africa 16.1% | empate 24.2% | victoria South Korea 59.8% | marcador más probable 0-1 (14.6%) | peso actual 11.3%
+- Ensamble + asimetría histórica: victoria South Africa 6.8% | empate 18.9% | victoria South Korea 74.3% | marcador más probable 0-2 (17.2%)
+- Marcadores más probables: 0-2 17.2%, 0-1 17.1%, 0-3 12.0%, 0-0 10.0%, 1-1 7.2%, 1-2 6.6%, 0-4 6.2%, 1-3 4.7%
 
 ### Curacao vs Ivory Coast
 - Etapa: Grupo E
@@ -2312,29 +2285,29 @@ _El Brier 2026 se activa automáticamente con el primer partido terminado; antes
 - Sede: Lincoln Financial Field | United States
 - Hora UTC: 2026-06-25T20:00:00Z
 - Clima estimado: 29.0 C | HR 66% | viento 12 km/h | estrés 0.08
-- Factores que más pesan ahora: Elo dinámico -170.000; Defensa histórica desde 1950 -0.413
+- Factores que más pesan ahora: Valor bruto de plantilla -355.773; Elo dinámico -170.000
 - Marcador proyectado: 0-1
-- Marcador para cargar en Penca: 0-2 | 2.79 pts esp. | exacto 14.1% | diferencia 20.2%
-- Precisión de marcador: Marcador con precisión media | exacto más probable 0-1 15.3% | top-5 cubre 59.0%
-- Promedio estimado de goles del modelo: Curacao 0.58 | Ivory Coast 1.80
-- Probabilidades de resultado (90'): 11.3% / 23.4% / 65.3%
-- Lectura estadistica: Pick utilizable | pick actual Victoria Ivory Coast 65.3% | confianza 71.1%
-- Escenario de goles: ambos marcan 37.2% | más de 2.5 goles 43.6%
-- Goles totales esperados por el modelo: 2.43. Sin línea externa de goles cargada para ese partido.
-- Probabilidad de que no reciba goles: Curacao 17.6% | Ivory Coast 55.8%
-- Cuánta probabilidad cubren los 3 marcadores más probables: 39.9% | ventaja final más probable -1 (24.9%)
-- Qué tanto coinciden los modelos entre sí: 94.4%
+- Marcador para cargar en Penca: 0-2 | 2.83 pts esp. | exacto 14.2% | diferencia 20.5%
+- Precisión de marcador: Marcador con precisión media | exacto más probable 0-1 14.9% | top-5 cubre 58.2%
+- Promedio estimado de goles del modelo: Curacao 0.57 | Ivory Coast 1.85
+- Probabilidades de resultado (90'): 10.8% / 22.6% / 66.6%
+- Lectura estadistica: Pick utilizable | pick actual Victoria Ivory Coast 66.6% | confianza 72.5%
+- Escenario de goles: ambos marcan 37.4% | más de 2.5 goles 45.1%
+- Goles totales esperados por el modelo: 2.49. Sin línea externa de goles cargada para ese partido.
+- Probabilidad de que no reciba goles: Curacao 16.6% | Ivory Coast 55.9%
+- Cuánta probabilidad cubren los 3 marcadores más probables: 39.1% | ventaja final más probable -1 (24.6%)
+- Qué tanto coinciden los modelos entre sí: 94.3%
 - Stack estadístico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotación + Overdispersión calibrada + ML ligero regularizado + Predictivo bayesiano dinámico + Ensamble + asimetría histórica
-- Factores dominantes: Elo dinámico -170.000; Defensa histórica desde 1950 -0.413; Rendimiento competitivo desde 1950 -0.400
+- Factores dominantes: Valor bruto de plantilla -355.773; Elo dinámico -170.000; Minutos Mundial de Clubes +115.976
 - Comparativa entre modelos:
-- Bivariante Poisson: victoria Curacao 10.0% | empate 22.6% | victoria Ivory Coast 67.5% | marcador más probable 0-1 (17.4%) | peso actual 37.3%
-- Poisson independiente: victoria Curacao 9.9% | empate 24.8% | victoria Ivory Coast 65.3% | marcador más probable 0-1 (15.2%) | peso actual 17.0%
-- Ajuste de baja anotación: victoria Curacao 9.9% | empate 24.8% | victoria Ivory Coast 65.3% | marcador más probable 0-1 (15.2%) | peso actual 15.0%
-- Overdispersión calibrada: victoria Curacao 12.8% | empate 22.9% | victoria Ivory Coast 64.3% | marcador más probable 0-1 (16.5%) | peso actual 7.6%
-- ML ligero regularizado: victoria Curacao 11.4% | empate 21.9% | victoria Ivory Coast 66.7% | marcador más probable 0-1 (16.4%) | peso actual 11.2%
-- Predictivo bayesiano dinámico: victoria Curacao 20.2% | empate 26.2% | victoria Ivory Coast 53.6% | marcador más probable 0-1 (14.2%) | peso actual 11.9%
-- Ensamble + asimetría histórica: victoria Curacao 11.3% | empate 23.4% | victoria Ivory Coast 65.3% | marcador más probable 0-1 (15.3%)
-- Marcadores más probables: 0-1 15.3%, 0-2 14.1%, 0-0 10.5%, 1-1 9.9%, 0-3 9.2%, 1-2 7.9%, 1-3 5.2%, 1-0 5.0%
+- Bivariante Poisson: victoria Curacao 9.5% | empate 21.7% | victoria Ivory Coast 68.8% | marcador más probable 0-1 (16.9%) | peso actual 37.3%
+- Poisson independiente: victoria Curacao 9.5% | empate 23.9% | victoria Ivory Coast 66.7% | marcador más probable 0-2 (15.0%) | peso actual 17.0%
+- Ajuste de baja anotación: victoria Curacao 9.5% | empate 23.9% | victoria Ivory Coast 66.7% | marcador más probable 0-2 (15.0%) | peso actual 14.9%
+- Overdispersión calibrada: victoria Curacao 12.3% | empate 22.2% | victoria Ivory Coast 65.4% | marcador más probable 0-1 (16.2%) | peso actual 7.7%
+- ML ligero regularizado: victoria Curacao 10.5% | empate 21.1% | victoria Ivory Coast 68.3% | marcador más probable 0-1 (16.3%) | peso actual 11.2%
+- Predictivo bayesiano dinámico: victoria Curacao 19.7% | empate 25.7% | victoria Ivory Coast 54.6% | marcador más probable 0-1 (13.9%) | peso actual 11.8%
+- Ensamble + asimetría histórica: victoria Curacao 10.8% | empate 22.6% | victoria Ivory Coast 66.6% | marcador más probable 0-1 (14.9%)
+- Marcadores más probables: 0-1 14.9%, 0-2 14.2%, 0-0 10.0%, 1-1 9.6%, 0-3 9.5%, 1-2 7.9%, 1-3 5.4%, 1-0 4.7%
 
 ### Ecuador vs Germany
 - Etapa: Grupo E
@@ -2342,29 +2315,29 @@ _El Brier 2026 se activa automáticamente con el primer partido terminado; antes
 - Sede: MetLife Stadium | United States
 - Hora UTC: 2026-06-25T20:00:00Z
 - Clima estimado: 29.0 C | HR 68% | viento 13 km/h | estrés 0.08
-- Factores que más pesan ahora: Elo dinámico +23.000; Rendimiento competitivo desde 1950 -0.748
+- Factores que más pesan ahora: Minutos Mundial de Clubes -1111.372; Valor bruto de plantilla -684.325
 - Marcador proyectado: 1-1
-- Marcador para cargar en Penca: 1-2 | 2.11 pts esp. | exacto 8.2% | diferencia 22.4%
-- Precisión de marcador: Marcador frágil | exacto más probable 1-1 13.3% | top-5 cubre 53.7%
-- Promedio estimado de goles del modelo: Ecuador 0.91 | Germany 1.44
-- Probabilidades de resultado (90'): 23.4% / 29.5% / 47.1%
-- Lectura estadistica: Pronóstico parejo: sin favorito estadístico claro | pick actual Victoria Germany 47.1% | confianza 52.1%
-- Escenario de goles: ambos marcan 47.2% | más de 2.5 goles 42.9%
-- Goles totales esperados por el modelo: 2.41. Sin línea externa de goles cargada para ese partido.
-- Probabilidad de que no reciba goles: Ecuador 24.3% | Germany 39.6%
-- Cuánta probabilidad cubren los 3 marcadores más probables: 36.3% | ventaja final más probable +0 (29.5%)
-- Qué tanto coinciden los modelos entre sí: 95.1%
+- Marcador para cargar en Penca: 1-2 | 2.11 pts esp. | exacto 8.3% | diferencia 21.9%
+- Precisión de marcador: Marcador con precisión media | exacto más probable 1-1 13.0% | top-5 cubre 51.2%
+- Promedio estimado de goles del modelo: Ecuador 0.98 | Germany 1.51
+- Probabilidades de resultado (90'): 24.1% / 28.6% / 47.3%
+- Lectura estadistica: Pronóstico parejo: sin favorito estadístico claro | pick actual Victoria Germany 47.3% | confianza 52.2%
+- Escenario de goles: ambos marcan 49.6% | más de 2.5 goles 46.0%
+- Goles totales esperados por el modelo: 2.54. Sin línea externa de goles cargada para ese partido.
+- Probabilidad de que no reciba goles: Ecuador 22.9% | Germany 37.4%
+- Cuánta probabilidad cubren los 3 marcadores más probables: 33.9% | ventaja final más probable +0 (28.6%)
+- Qué tanto coinciden los modelos entre sí: 95.0%
 - Stack estadístico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotación + Overdispersión calibrada + ML ligero regularizado + Predictivo bayesiano dinámico + Ensamble + asimetría histórica
-- Factores dominantes: Elo dinámico +23.000; Rendimiento competitivo desde 1950 -0.748; Ataque histórico desde 1950 -0.619
+- Factores dominantes: Minutos Mundial de Clubes -1111.372; Valor bruto de plantilla -684.325; Elo dinámico +23.000
 - Comparativa entre modelos:
-- Bivariante Poisson: victoria Ecuador 22.9% | empate 28.1% | victoria Germany 49.0% | marcador más probable 0-1 (14.0%) | peso actual 36.1%
-- Poisson independiente: victoria Ecuador 21.1% | empate 33.1% | victoria Germany 45.8% | marcador más probable 1-1 (15.7%) | peso actual 16.0%
-- Ajuste de baja anotación: victoria Ecuador 21.1% | empate 33.1% | victoria Germany 45.8% | marcador más probable 1-1 (15.7%) | peso actual 16.2%
-- Overdispersión calibrada: victoria Ecuador 25.2% | empate 26.6% | victoria Germany 48.1% | marcador más probable 0-1 (13.6%) | peso actual 7.2%
-- ML ligero regularizado: victoria Ecuador 24.4% | empate 26.5% | victoria Germany 49.0% | marcador más probable 0-1 (13.7%) | peso actual 11.4%
-- Predictivo bayesiano dinámico: victoria Ecuador 28.8% | empate 28.4% | victoria Germany 42.8% | marcador más probable 0-1 (12.7%) | peso actual 13.2%
-- Ensamble + asimetría histórica: victoria Ecuador 23.4% | empate 29.5% | victoria Germany 47.1% | marcador más probable 1-1 (13.3%)
-- Marcadores más probables: 1-1 13.3%, 0-1 11.9%, 0-0 11.1%, 0-2 9.2%, 1-2 8.2%, 1-0 7.8%, 2-1 5.6%, 0-3 4.8%
+- Bivariante Poisson: victoria Ecuador 23.6% | empate 27.3% | victoria Germany 49.1% | marcador más probable 0-1 (13.0%) | peso actual 35.8%
+- Poisson independiente: victoria Ecuador 21.7% | empate 32.4% | victoria Germany 45.9% | marcador más probable 1-1 (15.5%) | peso actual 15.8%
+- Ajuste de baja anotación: victoria Ecuador 21.7% | empate 32.4% | victoria Germany 45.9% | marcador más probable 1-1 (15.5%) | peso actual 16.1%
+- Overdispersión calibrada: victoria Ecuador 26.0% | empate 25.8% | victoria Germany 48.2% | marcador más probable 0-1 (12.7%) | peso actual 7.6%
+- ML ligero regularizado: victoria Ecuador 24.9% | empate 25.5% | victoria Germany 49.6% | marcador más probable 0-1 (12.8%) | peso actual 11.6%
+- Predictivo bayesiano dinámico: victoria Ecuador 29.3% | empate 27.5% | victoria Germany 43.2% | marcador más probable 0-1 (11.9%) | peso actual 13.1%
+- Ensamble + asimetría histórica: victoria Ecuador 24.1% | empate 28.6% | victoria Germany 47.3% | marcador más probable 1-1 (13.0%)
+- Marcadores más probables: 1-1 13.0%, 0-1 10.9%, 0-0 10.0%, 0-2 8.9%, 1-2 8.3%, 1-0 7.3%, 2-1 5.8%, 0-3 4.8%
 
 ### Japan vs Sweden
 - Etapa: Grupo F
@@ -2373,29 +2346,29 @@ _El Brier 2026 se activa automáticamente con el primer partido terminado; antes
 - Hora UTC: 2026-06-25T23:00:00Z
 - Clima estimado: 32.0 C | HR 55% | viento 15 km/h | estrés 0.20
 - Cambio por clima exigente: estrés climático 0.20.
-- Factores que más pesan ahora: Elo dinámico +218.000; Ranking FIFA / puntos FIFA +0.195
+- Factores que más pesan ahora: Valor bruto de plantilla +773.300; Elo dinámico +218.000
 - Marcador proyectado: 1-0
-- Marcador para cargar en Penca: 2-0 | 2.93 pts esp. | exacto 15.0% | diferencia 21.1%
-- Precisión de marcador: Marcador con precisión media | exacto más probable 1-0 15.7% | top-5 cubre 60.0%
-- Promedio estimado de goles del modelo: Japan 1.88 | Sweden 0.52
-- Probabilidades de resultado (90'): 68.6% / 21.9% / 9.5%
-- Lectura estadistica: Pick utilizable | pick actual Victoria Japan 68.6% | confianza 74.8%
-- Escenario de goles: ambos marcan 35.0% | más de 2.5 goles 44.2%
-- Goles totales esperados por el modelo: 2.46. Sin línea externa de goles cargada para ese partido.
-- Probabilidad de que no reciba goles: Japan 58.9% | Sweden 16.4%
-- Cuánta probabilidad cubren los 3 marcadores más probables: 41.1% | ventaja final más probable +1 (25.0%)
-- Qué tanto coinciden los modelos entre sí: 94.1%
+- Marcador para cargar en Penca: 2-0 | 2.92 pts esp. | exacto 14.5% | diferencia 21.0%
+- Precisión de marcador: Marcador frágil | exacto más probable 1-0 14.7% | top-5 cubre 57.6%
+- Promedio estimado de goles del modelo: Japan 1.95 | Sweden 0.55
+- Probabilidades de resultado (90'): 68.9% / 21.3% / 9.8%
+- Lectura estadistica: Pick fuerte | pick actual Victoria Japan 68.9% | confianza 75.0%
+- Escenario de goles: ambos marcan 37.0% | más de 2.5 goles 46.7%
+- Goles totales esperados por el modelo: 2.56. Sin línea externa de goles cargada para ese partido.
+- Probabilidad de que no reciba goles: Japan 56.9% | Sweden 15.5%
+- Cuánta probabilidad cubren los 3 marcadores más probables: 39.2% | ventaja final más probable +1 (24.4%)
+- Qué tanto coinciden los modelos entre sí: 94.2%
 - Stack estadístico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotación + Overdispersión calibrada + ML ligero regularizado + Predictivo bayesiano dinámico + Ensamble + asimetría histórica
-- Factores dominantes: Elo dinámico +218.000; Ranking FIFA / puntos FIFA +0.195; Ataque histórico desde 1950 +0.195
+- Factores dominantes: Valor bruto de plantilla +773.300; Elo dinámico +218.000; Minutos Mundial de Clubes -6.507
 - Comparativa entre modelos:
-- Bivariante Poisson: victoria Japan 70.9% | empate 21.0% | victoria Sweden 8.1% | marcador más probable 1-0 (17.8%) | peso actual 37.6%
-- Poisson independiente: victoria Japan 68.9% | empate 22.9% | victoria Sweden 8.2% | marcador más probable 2-0 (16.0%) | peso actual 17.1%
-- Ajuste de baja anotación: victoria Japan 68.9% | empate 22.9% | victoria Sweden 8.2% | marcador más probable 2-0 (16.0%) | peso actual 14.7%
-- Overdispersión calibrada: victoria Japan 67.4% | empate 21.8% | victoria Sweden 10.8% | marcador más probable 1-0 (17.0%) | peso actual 7.7%
-- ML ligero regularizado: victoria Japan 69.8% | empate 20.7% | victoria Sweden 9.5% | marcador más probable 1-0 (16.7%) | peso actual 11.2%
-- Predictivo bayesiano dinámico: victoria Japan 55.6% | empate 25.6% | victoria Sweden 18.8% | marcador más probable 1-0 (14.3%) | peso actual 11.7%
-- Ensamble + asimetría histórica: victoria Japan 68.6% | empate 21.9% | victoria Sweden 9.5% | marcador más probable 1-0 (15.7%)
-- Marcadores más probables: 1-0 15.7%, 2-0 15.0%, 0-0 10.3%, 3-0 10.0%, 1-1 9.0%, 2-1 7.6%, 3-1 5.3%, 4-0 4.9%
+- Bivariante Poisson: victoria Japan 71.0% | empate 20.5% | victoria Sweden 8.5% | marcador más probable 1-0 (16.7%) | peso actual 37.3%
+- Poisson independiente: victoria Japan 69.0% | empate 22.4% | victoria Sweden 8.6% | marcador más probable 2-0 (15.4%) | peso actual 17.0%
+- Ajuste de baja anotación: victoria Japan 69.0% | empate 22.4% | victoria Sweden 8.6% | marcador más probable 2-0 (15.4%) | peso actual 14.6%
+- Overdispersión calibrada: victoria Japan 67.4% | empate 21.3% | victoria Sweden 11.3% | marcador más probable 1-0 (16.0%) | peso actual 8.2%
+- ML ligero regularizado: victoria Japan 70.6% | empate 19.9% | victoria Sweden 9.5% | marcador más probable 1-0 (15.9%) | peso actual 11.3%
+- Predictivo bayesiano dinámico: victoria Japan 56.5% | empate 24.8% | victoria Sweden 18.7% | marcador más probable 1-0 (13.7%) | peso actual 11.6%
+- Ensamble + asimetría histórica: victoria Japan 68.9% | empate 21.3% | victoria Sweden 9.8% | marcador más probable 1-0 (14.7%)
+- Marcadores más probables: 1-0 14.7%, 2-0 14.5%, 3-0 10.0%, 0-0 9.5%, 1-1 9.0%, 2-1 7.8%, 3-1 5.6%, 4-0 5.1%
 
 ### Tunisia vs Netherlands
 - Etapa: Grupo F
@@ -2403,29 +2376,29 @@ _El Brier 2026 se activa automáticamente con el primer partido terminado; antes
 - Sede: GEHA Field at Arrowhead Stadium | United States
 - Hora UTC: 2026-06-25T23:00:00Z
 - Clima estimado: 30.0 C | HR 63% | viento 14 km/h | estrés 0.16
-- Factores que más pesan ahora: Elo dinámico -345.000; Rendimiento en Mundiales desde 1950 -0.502
+- Factores que más pesan ahora: Valor bruto de plantilla -1228.839; Minutos Mundial de Clubes -1055.698
 - Marcador proyectado: 0-2
-- Marcador para cargar en Penca: 0-2 | 3.53 pts esp. | exacto 20.1% | diferencia 23.9%
-- Precisión de marcador: Marcador con precisión media | exacto más probable 0-2 20.1% | top-5 cubre 72.3%
-- Promedio estimado de goles del modelo: Tunisia 0.22 | Netherlands 2.20
-- Probabilidades de resultado (90'): 3.4% / 15.0% / 81.6%
-- Lectura estadistica: Pick muy fuerte | pick actual Victoria Netherlands 81.6% | confianza 91.0%
-- Escenario de goles: ambos marcan 18.7% | más de 2.5 goles 45.1%
-- Goles totales esperados por el modelo: 2.49. Sin línea externa de goles cargada para ese partido.
-- Probabilidad de que no reciba goles: Tunisia 12.3% | Netherlands 78.8%
-- Cuánta probabilidad cubren los 3 marcadores más probables: 53.7% | ventaja final más probable -2 (23.9%)
+- Marcador para cargar en Penca: 0-2 | 3.56 pts esp. | exacto 19.7% | diferencia 23.7%
+- Precisión de marcador: Marcador defendible | exacto más probable 0-2 19.7% | top-5 cubre 71.1%
+- Promedio estimado de goles del modelo: Tunisia 0.22 | Netherlands 2.32
+- Probabilidades de resultado (90'): 3.1% / 13.7% / 83.2%
+- Lectura estadistica: Pick muy fuerte | pick actual Victoria Netherlands 83.2% | confianza 92.9%
+- Escenario de goles: ambos marcan 18.9% | más de 2.5 goles 48.1%
+- Goles totales esperados por el modelo: 2.61. Sin línea externa de goles cargada para ese partido.
+- Probabilidad de que no reciba goles: Tunisia 11.1% | Netherlands 78.8%
+- Cuánta probabilidad cubren los 3 marcadores más probables: 52.7% | ventaja final más probable -2 (23.7%)
 - Qué tanto coinciden los modelos entre sí: 93.0%
 - Stack estadístico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotación + Overdispersión calibrada + ML ligero regularizado + Predictivo bayesiano dinámico + Ensamble + asimetría histórica
-- Factores dominantes: Elo dinámico -345.000; Rendimiento en Mundiales desde 1950 -0.502; Historia mundialista -0.497
+- Factores dominantes: Valor bruto de plantilla -1228.839; Minutos Mundial de Clubes -1055.698; Elo dinámico -345.000
 - Comparativa entre modelos:
-- Bivariante Poisson: victoria Tunisia 2.1% | empate 13.8% | victoria Netherlands 84.1% | marcador más probable 0-2 (21.6%) | peso actual 39.0%
-- Poisson independiente: victoria Tunisia 2.5% | empate 14.3% | victoria Netherlands 83.2% | marcador más probable 0-2 (21.5%) | peso actual 17.7%
-- Ajuste de baja anotación: victoria Tunisia 2.5% | empate 14.3% | victoria Netherlands 83.2% | marcador más probable 0-2 (21.5%) | peso actual 13.2%
-- Overdispersión calibrada: victoria Tunisia 3.4% | empate 16.5% | victoria Netherlands 80.1% | marcador más probable 0-1 (19.9%) | peso actual 8.1%
-- ML ligero regularizado: victoria Tunisia 3.0% | empate 15.7% | victoria Netherlands 81.2% | marcador más probable 0-2 (19.9%) | peso actual 11.1%
-- Predictivo bayesiano dinámico: victoria Tunisia 12.2% | empate 22.4% | victoria Netherlands 65.3% | marcador más probable 0-1 (15.5%) | peso actual 10.8%
-- Ensamble + asimetría histórica: victoria Tunisia 3.4% | empate 15.0% | victoria Netherlands 81.6% | marcador más probable 0-2 (20.1%)
-- Marcadores más probables: 0-2 20.1%, 0-1 18.2%, 0-3 15.5%, 0-0 9.8%, 0-4 8.9%, 1-1 4.5%, 1-2 4.3%, 0-5 4.0%
+- Bivariante Poisson: victoria Tunisia 1.9% | empate 12.4% | victoria Netherlands 85.7% | marcador más probable 0-2 (21.4%) | peso actual 38.7%
+- Poisson independiente: victoria Tunisia 2.2% | empate 12.9% | victoria Netherlands 84.9% | marcador más probable 0-2 (21.2%) | peso actual 17.6%
+- Ajuste de baja anotación: victoria Tunisia 2.2% | empate 12.9% | victoria Netherlands 84.9% | marcador más probable 0-2 (21.2%) | peso actual 13.0%
+- Overdispersión calibrada: victoria Tunisia 3.2% | empate 15.3% | victoria Netherlands 81.5% | marcador más probable 0-2 (18.9%) | peso actual 8.8%
+- ML ligero regularizado: victoria Tunisia 2.8% | empate 14.6% | victoria Netherlands 82.6% | marcador más probable 0-2 (19.6%) | peso actual 11.3%
+- Predictivo bayesiano dinámico: victoria Tunisia 11.5% | empate 21.2% | victoria Netherlands 67.2% | marcador más probable 0-1 (14.8%) | peso actual 10.7%
+- Ensamble + asimetría histórica: victoria Tunisia 3.1% | empate 13.7% | victoria Netherlands 83.2% | marcador más probable 0-2 (19.7%)
+- Marcadores más probables: 0-2 19.7%, 0-1 17.0%, 0-3 16.0%, 0-4 9.7%, 0-0 8.8%, 0-5 4.6%, 1-2 4.3%, 1-1 4.2%
 
 ### Paraguay vs Australia
 - Etapa: Grupo C
@@ -2433,29 +2406,29 @@ _El Brier 2026 se activa automáticamente con el primer partido terminado; antes
 - Sede: Levi's Stadium | United States
 - Hora UTC: 2026-06-26T02:00:00Z
 - Clima estimado: 24.0 C | HR 60% | viento 12 km/h | estrés 0.02
-- Factores que más pesan ahora: Elo dinámico +59.000; Rendimiento competitivo desde 1950 -0.523
+- Factores que más pesan ahora: Minutos Mundial de Clubes -1019.319; Valor bruto de plantilla +109.530
 - Marcador proyectado: 1-1
-- Marcador para cargar en Penca: 1-1 | 1.96 pts esp. | exacto 13.6% | diferencia 31.0%
-- Precisión de marcador: Marcador frágil | exacto más probable 1-1 13.6% | top-5 cubre 54.0%
-- Promedio estimado de goles del modelo: Paraguay 1.25 | Australia 1.09
-- Probabilidades de resultado (90'): 38.1% / 31.0% / 30.8%
-- Lectura estadistica: Pronóstico parejo: sin favorito estadístico claro | pick actual Victoria Paraguay 38.1% | confianza 43.8%
-- Escenario de goles: ambos marcan 47.0% | más de 2.5 goles 40.8%
-- Goles totales esperados por el modelo: 2.33. Sin línea externa de goles cargada para ese partido.
-- Probabilidad de que no reciba goles: Paraguay 34.7% | Australia 30.5%
-- Cuánta probabilidad cubren los 3 marcadores más probables: 37.0% | ventaja final más probable +0 (31.0%)
+- Marcador para cargar en Penca: 1-1 | 1.91 pts esp. | exacto 13.3% | diferencia 30.3%
+- Precisión de marcador: Marcador con precisión media | exacto más probable 1-1 13.3% | top-5 cubre 52.3%
+- Promedio estimado de goles del modelo: Paraguay 1.32 | Australia 1.12
+- Probabilidades de resultado (90'): 39.3% / 30.3% / 30.4%
+- Lectura estadistica: Pronóstico parejo: sin favorito estadístico claro | pick actual Victoria Paraguay 39.3% | confianza 44.8%
+- Escenario de goles: ambos marcan 48.5% | más de 2.5 goles 42.9%
+- Goles totales esperados por el modelo: 2.42. Sin línea externa de goles cargada para ese partido.
+- Probabilidad de que no reciba goles: Paraguay 34.0% | Australia 29.0%
+- Cuánta probabilidad cubren los 3 marcadores más probables: 35.6% | ventaja final más probable +0 (30.3%)
 - Qué tanto coinciden los modelos entre sí: 95.3%
 - Stack estadístico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotación + Overdispersión calibrada + ML ligero regularizado + Predictivo bayesiano dinámico + Ensamble + asimetría histórica
-- Factores dominantes: Elo dinámico +59.000; Rendimiento competitivo desde 1950 -0.523; Ataque histórico desde 1950 -0.446
+- Factores dominantes: Minutos Mundial de Clubes -1019.319; Valor bruto de plantilla +109.530; Elo dinámico +59.000
 - Comparativa entre modelos:
-- Bivariante Poisson: victoria Paraguay 39.4% | empate 29.3% | victoria Australia 31.3% | marcador más probable 1-1 (13.1%) | peso actual 35.5%
-- Poisson independiente: victoria Paraguay 35.9% | empate 35.8% | victoria Australia 28.3% | marcador más probable 1-1 (17.0%) | peso actual 15.5%
-- Ajuste de baja anotación: victoria Paraguay 35.9% | empate 35.8% | victoria Australia 28.3% | marcador más probable 1-1 (17.0%) | peso actual 16.7%
-- Overdispersión calibrada: victoria Paraguay 39.9% | empate 27.4% | victoria Australia 32.8% | marcador más probable 1-0 (12.1%) | peso actual 7.0%
-- ML ligero regularizado: victoria Paraguay 40.0% | empate 27.8% | victoria Australia 32.2% | marcador más probable 1-0 (12.4%) | peso actual 11.5%
-- Predictivo bayesiano dinámico: victoria Paraguay 37.7% | empate 28.9% | victoria Australia 33.4% | marcador más probable 0-0 (12.5%) | peso actual 13.8%
-- Ensamble + asimetría histórica: victoria Paraguay 38.1% | empate 31.0% | victoria Australia 30.8% | marcador más probable 1-1 (13.6%)
-- Marcadores más probables: 1-1 13.6%, 0-0 12.2%, 1-0 11.2%, 0-1 9.4%, 2-1 7.6%, 2-0 7.1%, 1-2 6.4%, 0-2 5.7%
+- Bivariante Poisson: victoria Paraguay 40.7% | empate 28.6% | victoria Australia 30.7% | marcador más probable 1-1 (13.0%) | peso actual 35.4%
+- Poisson independiente: victoria Paraguay 37.2% | empate 35.0% | victoria Australia 27.8% | marcador más probable 1-1 (16.7%) | peso actual 15.4%
+- Ajuste de baja anotación: victoria Paraguay 37.2% | empate 35.0% | victoria Australia 27.8% | marcador más probable 1-1 (16.7%) | peso actual 16.6%
+- Overdispersión calibrada: victoria Paraguay 41.0% | empate 26.7% | victoria Australia 32.3% | marcador más probable 1-0 (11.7%) | peso actual 7.2%
+- ML ligero regularizado: victoria Paraguay 40.7% | empate 27.0% | victoria Australia 32.3% | marcador más probable 1-0 (11.9%) | peso actual 11.6%
+- Predictivo bayesiano dinámico: victoria Paraguay 38.5% | empate 28.2% | victoria Australia 33.4% | marcador más probable 0-0 (11.6%) | peso actual 13.7%
+- Ensamble + asimetría histórica: victoria Paraguay 39.3% | empate 30.3% | victoria Australia 30.4% | marcador más probable 1-1 (13.3%)
+- Marcadores más probables: 1-1 13.3%, 0-0 11.4%, 1-0 10.8%, 0-1 8.9%, 2-1 7.8%, 2-0 7.2%, 1-2 6.5%, 0-2 5.5%
 
 ### Turkey vs United States
 - Etapa: Grupo C
@@ -2463,29 +2436,29 @@ _El Brier 2026 se activa automáticamente con el primer partido terminado; antes
 - Sede: SoFi Stadium | United States
 - Hora UTC: 2026-06-26T02:00:00Z
 - Clima estimado: 26.0 C | HR 70% | viento 11 km/h | estrés 0.06
-- Factores que más pesan ahora: Elo dinámico +133.000; Rendimiento competitivo desde 1950 -0.191
+- Factores que más pesan ahora: Valor bruto de plantilla +291.702; Elo dinámico +133.000
 - Marcador proyectado: 1-0
-- Marcador para cargar en Penca: 2-1 | 2.34 pts esp. | exacto 8.7% | diferencia 24.3%
-- Precisión de marcador: Marcador frágil | exacto más probable 1-0 13.3% | top-5 cubre 55.8%
-- Promedio estimado de goles del modelo: Turkey 1.56 | United States 0.81
-- Probabilidades de resultado (90'): 53.2% / 27.7% / 19.1%
-- Lectura estadistica: Pronóstico parejo: sin favorito estadístico claro | pick actual Victoria Turkey 53.2% | confianza 58.1%
-- Escenario de goles: ambos marcan 44.8% | más de 2.5 goles 42.9%
-- Goles totales esperados por el modelo: 2.41. Sin línea externa de goles cargada para ese partido.
-- Probabilidad de que no reciba goles: Turkey 44.0% | United States 22.3%
-- Cuánta probabilidad cubren los 3 marcadores más probables: 36.5% | ventaja final más probable +0 (27.7%)
+- Marcador para cargar en Penca: 2-1 | 2.35 pts esp. | exacto 8.9% | diferencia 23.7%
+- Precisión de marcador: Marcador frágil | exacto más probable 1-0 12.1% | top-5 cubre 52.9%
+- Promedio estimado de goles del modelo: Turkey 1.64 | United States 0.88
+- Probabilidades de resultado (90'): 53.7% / 26.8% / 19.6%
+- Lectura estadistica: Pronóstico parejo: sin favorito estadístico claro | pick actual Victoria Turkey 53.7% | confianza 58.6%
+- Escenario de goles: ambos marcan 47.6% | más de 2.5 goles 46.5%
+- Goles totales esperados por el modelo: 2.56. Sin línea externa de goles cargada para ese partido.
+- Probabilidad de que no reciba goles: Turkey 41.5% | United States 20.7%
+- Cuánta probabilidad cubren los 3 marcadores más probables: 34.2% | ventaja final más probable +0 (26.8%)
 - Qué tanto coinciden los modelos entre sí: 94.9%
 - Stack estadístico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotación + Overdispersión calibrada + ML ligero regularizado + Predictivo bayesiano dinámico + Ensamble + asimetría histórica
-- Factores dominantes: Elo dinámico +133.000; Rendimiento competitivo desde 1950 -0.191; Recursos/PIB proxy -0.187
+- Factores dominantes: Valor bruto de plantilla +291.702; Elo dinámico +133.000; Minutos Mundial de Clubes -40.345
 - Comparativa entre modelos:
-- Bivariante Poisson: victoria Turkey 54.9% | empate 26.7% | victoria United States 18.4% | marcador más probable 1-0 (14.9%) | peso actual 36.5%
-- Poisson independiente: victoria Turkey 52.1% | empate 30.7% | victoria United States 17.2% | marcador más probable 1-1 (14.5%) | peso actual 16.3%
-- Ajuste de baja anotación: victoria Turkey 52.1% | empate 30.7% | victoria United States 17.2% | marcador más probable 1-1 (14.5%) | peso actual 15.8%
-- Overdispersión calibrada: victoria Turkey 53.3% | empate 25.7% | victoria United States 21.1% | marcador más probable 1-0 (14.4%) | peso actual 7.3%
-- ML ligero regularizado: victoria Turkey 55.2% | empate 25.2% | victoria United States 19.6% | marcador más probable 1-0 (14.6%) | peso actual 11.3%
-- Predictivo bayesiano dinámico: victoria Turkey 46.5% | empate 27.6% | victoria United States 25.8% | marcador más probable 1-0 (13.0%) | peso actual 12.8%
-- Ensamble + asimetría histórica: victoria Turkey 53.2% | empate 27.7% | victoria United States 19.1% | marcador más probable 1-0 (13.3%)
-- Marcadores más probables: 1-0 13.3%, 1-1 12.1%, 0-0 11.1%, 2-0 10.6%, 2-1 8.7%, 0-1 6.8%, 3-0 5.6%, 3-1 4.8%
+- Bivariante Poisson: victoria Turkey 55.4% | empate 25.7% | victoria United States 18.9% | marcador más probable 1-0 (13.7%) | peso actual 36.1%
+- Poisson independiente: victoria Turkey 52.5% | empate 29.9% | victoria United States 17.6% | marcador más probable 1-1 (14.2%) | peso actual 16.1%
+- Ajuste de baja anotación: victoria Turkey 52.5% | empate 29.9% | victoria United States 17.6% | marcador más probable 1-1 (14.2%) | peso actual 15.7%
+- Overdispersión calibrada: victoria Turkey 53.6% | empate 24.7% | victoria United States 21.6% | marcador más probable 1-0 (13.3%) | peso actual 7.9%
+- ML ligero regularizado: victoria Turkey 55.5% | empate 24.3% | victoria United States 20.2% | marcador más probable 1-0 (13.5%) | peso actual 11.5%
+- Predictivo bayesiano dinámico: victoria Turkey 47.1% | empate 26.6% | victoria United States 26.3% | marcador más probable 1-0 (12.2%) | peso actual 12.7%
+- Ensamble + asimetría histórica: victoria Turkey 53.7% | empate 26.8% | victoria United States 19.6% | marcador más probable 1-0 (12.1%)
+- Marcadores más probables: 1-0 12.1%, 1-1 11.9%, 2-0 10.2%, 0-0 9.8%, 2-1 8.9%, 0-1 6.4%, 3-0 5.7%, 3-1 5.2%
 
 ### Norway vs France
 - Etapa: Grupo I
@@ -2493,29 +2466,29 @@ _El Brier 2026 se activa automáticamente con el primer partido terminado; antes
 - Sede: Gillette Stadium | United States
 - Hora UTC: 2026-06-26T19:00:00Z
 - Clima estimado: 26.0 C | HR 67% | viento 12 km/h | estrés 0.02
-- Factores que más pesan ahora: Elo dinámico -141.000; Rendimiento competitivo desde 1950 -0.443
-- Marcador proyectado: 0-1
-- Marcador para cargar en Penca: 0-2 | 2.77 pts esp. | exacto 14.0% | diferencia 20.2%
-- Precisión de marcador: Marcador con precisión media | exacto más probable 0-1 14.8% | top-5 cubre 58.2%
-- Promedio estimado de goles del modelo: Norway 0.61 | France 1.80
-- Probabilidades de resultado (90'): 11.7% / 23.6% / 64.7%
-- Lectura estadistica: Pick utilizable | pick actual Victoria France 64.7% | confianza 70.4%
-- Escenario de goles: ambos marcan 38.1% | más de 2.5 goles 44.0%
-- Goles totales esperados por el modelo: 2.45. Sin línea externa de goles cargada para ese partido.
-- Probabilidad de que no reciba goles: Norway 17.6% | France 54.7%
-- Cuánta probabilidad cubren los 3 marcadores más probables: 39.3% | ventaja final más probable -1 (24.6%)
+- Factores que más pesan ahora: Valor bruto de plantilla -620.228; Elo dinámico -141.000
+- Marcador proyectado: 0-2
+- Marcador para cargar en Penca: 0-2 | 2.84 pts esp. | exacto 13.9% | diferencia 20.7%
+- Precisión de marcador: Marcador frágil | exacto más probable 0-2 13.9% | top-5 cubre 55.8%
+- Promedio estimado de goles del modelo: Norway 0.61 | France 1.93
+- Probabilidades de resultado (90'): 11.1% / 22.0% / 66.9%
+- Lectura estadistica: Pick utilizable | pick actual Victoria France 66.9% | confianza 72.7%
+- Escenario de goles: ambos marcan 39.5% | más de 2.5 goles 47.5%
+- Goles totales esperados por el modelo: 2.60. Sin línea externa de goles cargada para ese partido.
+- Probabilidad de que no reciba goles: Norway 15.8% | France 53.9%
+- Cuánta probabilidad cubren los 3 marcadores más probables: 37.2% | ventaja final más probable -1 (23.8%)
 - Qué tanto coinciden los modelos entre sí: 94.4%
 - Stack estadístico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotación + Overdispersión calibrada + ML ligero regularizado + Predictivo bayesiano dinámico + Ensamble + asimetría histórica
-- Factores dominantes: Elo dinámico -141.000; Rendimiento competitivo desde 1950 -0.443; Rendimiento en Mundiales desde 1950 -0.420
+- Factores dominantes: Valor bruto de plantilla -620.228; Elo dinámico -141.000; Minutos Mundial de Clubes -95.119
 - Comparativa entre modelos:
-- Bivariante Poisson: victoria Norway 10.4% | empate 22.7% | victoria France 66.9% | marcador más probable 0-1 (17.0%) | peso actual 37.2%
-- Poisson independiente: victoria Norway 10.3% | empate 25.1% | victoria France 64.6% | marcador más probable 0-1 (14.7%) | peso actual 16.9%
-- Ajuste de baja anotación: victoria Norway 10.3% | empate 25.1% | victoria France 64.6% | marcador más probable 0-1 (14.7%) | peso actual 15.1%
-- Overdispersión calibrada: victoria Norway 13.2% | empate 23.0% | victoria France 63.8% | marcador más probable 0-1 (16.2%) | peso actual 7.6%
-- ML ligero regularizado: victoria Norway 11.9% | empate 22.0% | victoria France 66.2% | marcador más probable 0-1 (16.1%) | peso actual 11.3%
-- Predictivo bayesiano dinámico: victoria Norway 20.7% | empate 26.1% | victoria France 53.2% | marcador más probable 0-1 (13.8%) | peso actual 12.0%
-- Ensamble + asimetría histórica: victoria Norway 11.7% | empate 23.6% | victoria France 64.7% | marcador más probable 0-1 (14.8%)
-- Marcadores más probables: 0-1 14.8%, 0-2 14.0%, 0-0 10.4%, 1-1 10.0%, 0-3 8.9%, 1-2 7.9%, 1-3 5.3%, 1-0 5.1%
+- Bivariante Poisson: victoria Norway 9.9% | empate 21.1% | victoria France 69.0% | marcador más probable 0-1 (15.9%) | peso actual 36.9%
+- Poisson independiente: victoria Norway 9.8% | empate 23.4% | victoria France 66.8% | marcador más probable 0-2 (14.5%) | peso actual 16.8%
+- Ajuste de baja anotación: victoria Norway 9.8% | empate 23.4% | victoria France 66.8% | marcador más probable 0-2 (14.5%) | peso actual 14.8%
+- Overdispersión calibrada: victoria Norway 12.8% | empate 21.7% | victoria France 65.5% | marcador más probable 0-1 (15.2%) | peso actual 8.3%
+- ML ligero regularizado: victoria Norway 10.9% | empate 20.4% | victoria France 68.8% | marcador más probable 0-1 (15.2%) | peso actual 11.4%
+- Predictivo bayesiano dinámico: victoria Norway 19.8% | empate 24.8% | victoria France 55.3% | marcador más probable 0-1 (13.2%) | peso actual 11.8%
+- Ensamble + asimetría histórica: victoria Norway 11.1% | empate 22.0% | victoria France 66.9% | marcador más probable 0-2 (13.9%)
+- Marcadores más probables: 0-2 13.9%, 0-1 13.7%, 1-1 9.5%, 0-3 9.4%, 0-0 9.2%, 1-2 8.0%, 1-3 5.7%, 0-4 4.7%
 
 ### Senegal vs Iraq
 - Etapa: Grupo I
@@ -2523,29 +2496,29 @@ _El Brier 2026 se activa automáticamente con el primer partido terminado; antes
 - Sede: BMO Field | Canada
 - Hora UTC: 2026-06-26T19:00:00Z
 - Clima estimado: 25.0 C | HR 63% | viento 14 km/h | estrés 0.02
-- Factores que más pesan ahora: Elo dinámico +286.000; Ranking FIFA / puntos FIFA +0.323
+- Factores que más pesan ahora: Valor bruto de plantilla +618.536; Elo dinámico +286.000
 - Marcador proyectado: 2-0
-- Marcador para cargar en Penca: 2-0 | 3.24 pts esp. | exacto 18.0% | diferencia 23.1%
-- Precisión de marcador: Marcador con precisión media | exacto más probable 2-0 18.0% | top-5 cubre 65.7%
-- Promedio estimado de goles del modelo: Senegal 2.01 | Iraq 0.38
-- Probabilidades de resultado (90'): 74.6% / 19.3% / 6.0%
-- Lectura estadistica: Pick fuerte | pick actual Victoria Senegal 74.6% | confianza 82.2%
-- Escenario de goles: ambos marcan 27.0% | más de 2.5 goles 42.4%
-- Goles totales esperados por el modelo: 2.39. Sin línea externa de goles cargada para ese partido.
-- Probabilidad de que no reciba goles: Senegal 68.7% | Iraq 15.0%
-- Cuánta probabilidad cubren los 3 marcadores más probables: 47.8% | ventaja final más probable +1 (25.0%)
-- Qué tanto coinciden los modelos entre sí: 93.4%
+- Marcador para cargar en Penca: 2-0 | 3.28 pts esp. | exacto 18.0% | diferencia 23.2%
+- Precisión de marcador: Marcador con precisión media | exacto más probable 2-0 18.0% | top-5 cubre 64.6%
+- Promedio estimado de goles del modelo: Senegal 2.08 | Iraq 0.38
+- Probabilidades de resultado (90'): 75.8% / 18.4% / 5.8%
+- Lectura estadistica: Pick fuerte | pick actual Victoria Senegal 75.8% | confianza 83.6%
+- Escenario de goles: ambos marcan 27.1% | más de 2.5 goles 43.9%
+- Goles totales esperados por el modelo: 2.46. Sin línea externa de goles cargada para ese partido.
+- Probabilidad de que no reciba goles: Senegal 68.8% | Iraq 14.2%
+- Cuánta probabilidad cubren los 3 marcadores más probables: 47.7% | ventaja final más probable +1 (24.5%)
+- Qué tanto coinciden los modelos entre sí: 93.6%
 - Stack estadístico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotación + Overdispersión calibrada + ML ligero regularizado + Predictivo bayesiano dinámico + Ensamble + asimetría histórica
-- Factores dominantes: Elo dinámico +286.000; Ranking FIFA / puntos FIFA +0.323; Historia competitiva desde 1950 +0.226
+- Factores dominantes: Valor bruto de plantilla +618.536; Elo dinámico +286.000; Minutos Mundial de Clubes -149.039
 - Comparativa entre modelos:
-- Bivariante Poisson: victoria Senegal 77.5% | empate 17.9% | victoria Iraq 4.7% | marcador más probable 1-0 (19.2%) | peso actual 38.2%
-- Poisson independiente: victoria Senegal 74.9% | empate 20.4% | victoria Iraq 4.7% | marcador más probable 2-0 (18.4%) | peso actual 17.5%
-- Ajuste de baja anotación: victoria Senegal 74.9% | empate 20.4% | victoria Iraq 4.7% | marcador más probable 2-0 (18.4%) | peso actual 14.1%
-- Overdispersión calibrada: victoria Senegal 73.4% | empate 19.6% | victoria Iraq 7.0% | marcador más probable 1-0 (18.4%) | peso actual 7.9%
-- ML ligero regularizado: victoria Senegal 75.7% | empate 18.4% | victoria Iraq 6.0% | marcador más probable 1-0 (17.9%) | peso actual 11.1%
-- Predictivo bayesiano dinámico: victoria Senegal 59.9% | empate 24.5% | victoria Iraq 15.6% | marcador más probable 1-0 (15.1%) | peso actual 11.3%
-- Ensamble + asimetría histórica: victoria Senegal 74.6% | empate 19.3% | victoria Iraq 6.0% | marcador más probable 2-0 (18.0%)
-- Marcadores más probables: 2-0 18.0%, 1-0 17.7%, 3-0 12.1%, 0-0 10.8%, 1-1 7.0%, 2-1 6.3%, 4-0 6.1%, 3-1 4.5%
+- Bivariante Poisson: victoria Senegal 78.5% | empate 17.0% | victoria Iraq 4.4% | marcador más probable 1-0 (18.6%) | peso actual 38.0%
+- Poisson independiente: victoria Senegal 76.3% | empate 19.1% | victoria Iraq 4.6% | marcador más probable 2-0 (18.4%) | peso actual 17.4%
+- Ajuste de baja anotación: victoria Senegal 76.3% | empate 19.1% | victoria Iraq 4.6% | marcador más probable 2-0 (18.4%) | peso actual 14.0%
+- Overdispersión calibrada: victoria Senegal 74.3% | empate 18.9% | victoria Iraq 6.8% | marcador más probable 1-0 (17.9%) | peso actual 8.2%
+- ML ligero regularizado: victoria Senegal 76.5% | empate 17.8% | victoria Iraq 5.7% | marcador más probable 2-0 (17.5%) | peso actual 11.2%
+- Predictivo bayesiano dinámico: victoria Senegal 61.0% | empate 23.7% | victoria Iraq 15.3% | marcador más probable 1-0 (14.6%) | peso actual 11.2%
+- Ensamble + asimetría histórica: victoria Senegal 75.8% | empate 18.4% | victoria Iraq 5.8% | marcador más probable 2-0 (18.0%)
+- Marcadores más probables: 2-0 18.0%, 1-0 17.3%, 3-0 12.5%, 0-0 10.1%, 1-1 6.8%, 4-0 6.5%, 2-1 6.2%, 3-1 4.6%
 
 ### Cape Verde vs Saudi Arabia
 - Etapa: Grupo G
@@ -2554,29 +2527,29 @@ _El Brier 2026 se activa automáticamente con el primer partido terminado; antes
 - Hora UTC: 2026-06-27T00:00:00Z
 - Clima estimado: 33.0 C | HR 73% | viento 12 km/h | estrés 0.33
 - Cambio por clima exigente: estrés climático 0.33.
-- Factores que más pesan ahora: Elo dinámico -32.000; Recursos/PIB proxy -0.513
+- Factores que más pesan ahora: Minutos Mundial de Clubes -1126.085; Valor bruto de plantilla -361.304
 - Marcador proyectado: 0-1
-- Marcador para cargar en Penca: 0-1 | 2.23 pts esp. | exacto 13.6% | diferencia 23.1%
-- Precisión de marcador: Marcador frágil | exacto más probable 0-1 13.6% | top-5 cubre 58.1%
-- Promedio estimado de goles del modelo: Cape Verde 0.91 | Saudi Arabia 1.35
-- Probabilidades de resultado (90'): 24.1% / 30.6% / 45.3%
-- Lectura estadistica: Pronóstico parejo: sin favorito estadístico claro | pick actual Victoria Saudi Arabia 45.3% | confianza 50.6%
-- Escenario de goles: ambos marcan 42.4% | más de 2.5 goles 37.7%
-- Goles totales esperados por el modelo: 2.21. Sin línea externa de goles cargada para ese partido.
-- Probabilidad de que no reciba goles: Cape Verde 28.1% | Saudi Arabia 42.8%
-- Cuánta probabilidad cubren los 3 marcadores más probables: 40.0% | ventaja final más probable +0 (30.6%)
+- Marcador para cargar en Penca: 1-2 | 2.08 pts esp. | exacto 7.8% | diferencia 23.1%
+- Precisión de marcador: Marcador frágil | exacto más probable 0-1 13.2% | top-5 cubre 56.7%
+- Promedio estimado de goles del modelo: Cape Verde 0.92 | Saudi Arabia 1.39
+- Probabilidades de resultado (90'): 24.0% / 30.0% / 46.0%
+- Lectura estadistica: Pronóstico parejo: sin favorito estadístico claro | pick actual Victoria Saudi Arabia 46.0% | confianza 51.2%
+- Escenario de goles: ambos marcan 43.4% | más de 2.5 goles 39.1%
+- Goles totales esperados por el modelo: 2.26. Sin línea externa de goles cargada para ese partido.
+- Probabilidad de que no reciba goles: Cape Verde 27.2% | Saudi Arabia 42.1%
+- Cuánta probabilidad cubren los 3 marcadores más probables: 38.9% | ventaja final más probable +0 (30.0%)
 - Qué tanto coinciden los modelos entre sí: 95.1%
 - Stack estadístico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotación + Overdispersión calibrada + ML ligero regularizado + Predictivo bayesiano dinámico + Ensamble + asimetría histórica
-- Factores dominantes: Elo dinámico -32.000; Recursos/PIB proxy -0.513; Rendimiento competitivo desde 1950 -0.268
+- Factores dominantes: Minutos Mundial de Clubes -1126.085; Valor bruto de plantilla -361.304; Elo dinámico -32.000
 - Comparativa entre modelos:
-- Bivariante Poisson: victoria Cape Verde 23.6% | empate 29.2% | victoria Saudi Arabia 47.2% | marcador más probable 0-1 (14.5%) | peso actual 36.1%
-- Poisson independiente: victoria Cape Verde 21.6% | empate 34.4% | victoria Saudi Arabia 44.0% | marcador más probable 1-1 (16.1%) | peso actual 15.9%
-- Ajuste de baja anotación: victoria Cape Verde 21.6% | empate 34.4% | victoria Saudi Arabia 44.0% | marcador más probable 1-1 (16.1%) | peso actual 16.3%
-- Overdispersión calibrada: victoria Cape Verde 25.8% | empate 27.6% | victoria Saudi Arabia 46.6% | marcador más probable 0-1 (14.1%) | peso actual 7.1%
-- ML ligero regularizado: victoria Cape Verde 25.2% | empate 27.7% | victoria Saudi Arabia 47.1% | marcador más probable 0-1 (14.4%) | peso actual 11.2%
-- Predictivo bayesiano dinámico: victoria Cape Verde 29.3% | empate 29.2% | victoria Saudi Arabia 41.4% | marcador más probable 0-0 (13.3%) | peso actual 13.3%
-- Ensamble + asimetría histórica: victoria Cape Verde 24.1% | empate 30.6% | victoria Saudi Arabia 45.3% | marcador más probable 0-1 (13.6%)
-- Marcadores más probables: 0-1 13.6%, 0-0 13.3%, 1-1 13.1%, 0-2 9.3%, 1-0 8.9%, 1-2 7.7%, 2-1 5.4%, 0-3 4.5%
+- Bivariante Poisson: victoria Cape Verde 23.5% | empate 28.6% | victoria Saudi Arabia 47.8% | marcador más probable 0-1 (14.1%) | peso actual 36.1%
+- Poisson independiente: victoria Cape Verde 21.6% | empate 33.7% | victoria Saudi Arabia 44.7% | marcador más probable 1-1 (15.9%) | peso actual 15.9%
+- Ajuste de baja anotación: victoria Cape Verde 21.6% | empate 33.7% | victoria Saudi Arabia 44.7% | marcador más probable 1-1 (15.9%) | peso actual 16.3%
+- Overdispersión calibrada: victoria Cape Verde 25.8% | empate 27.1% | victoria Saudi Arabia 47.2% | marcador más probable 0-1 (13.7%) | peso actual 7.1%
+- ML ligero regularizado: victoria Cape Verde 25.2% | empate 27.2% | victoria Saudi Arabia 47.6% | marcador más probable 0-1 (14.0%) | peso actual 11.3%
+- Predictivo bayesiano dinámico: victoria Cape Verde 29.2% | empate 28.8% | victoria Saudi Arabia 42.0% | marcador más probable 0-0 (12.8%) | peso actual 13.2%
+- Ensamble + asimetría histórica: victoria Cape Verde 24.0% | empate 30.0% | victoria Saudi Arabia 46.0% | marcador más probable 0-1 (13.2%)
+- Marcadores más probables: 0-1 13.2%, 1-1 13.0%, 0-0 12.7%, 0-2 9.3%, 1-0 8.6%, 1-2 7.8%, 2-1 5.4%, 0-3 4.6%
 
 ### Uruguay vs Spain
 - Etapa: Grupo G
@@ -2584,29 +2557,29 @@ _El Brier 2026 se activa automáticamente con el primer partido terminado; antes
 - Sede: Estadio Akron | Mexico
 - Hora UTC: 2026-06-27T00:00:00Z
 - Clima estimado: 25.0 C | HR 55% | viento 11 km/h | estrés 0.02
-- Factores que más pesan ahora: Elo dinámico -281.000; Ataque histórico desde 1950 -0.441
+- Factores que más pesan ahora: Minutos Mundial de Clubes -703.501; Valor bruto de plantilla -573.464
 - Marcador proyectado: 0-2
-- Marcador para cargar en Penca: 0-2 | 3.27 pts esp. | exacto 17.2% | diferencia 22.8%
-- Precisión de marcador: Marcador con precisión media | exacto más probable 0-2 17.2% | top-5 cubre 62.7%
-- Promedio estimado de goles del modelo: Uruguay 0.38 | Spain 2.13
-- Probabilidades de resultado (90'): 5.8% / 17.6% / 76.6%
-- Lectura estadistica: Pick fuerte | pick actual Victoria Spain 76.6% | confianza 84.5%
-- Escenario de goles: ambos marcan 28.3% | más de 2.5 goles 47.0%
-- Goles totales esperados por el modelo: 2.57. Sin línea externa de goles cargada para ese partido.
-- Probabilidad de que no reciba goles: Uruguay 13.2% | Spain 67.7%
-- Cuánta probabilidad cubren los 3 marcadores más probables: 46.3% | ventaja final más probable -1 (23.5%)
+- Marcador para cargar en Penca: 0-2 | 3.31 pts esp. | exacto 16.7% | diferencia 22.6%
+- Precisión de marcador: Marcador con precisión media | exacto más probable 0-2 16.7% | top-5 cubre 61.6%
+- Promedio estimado de goles del modelo: Uruguay 0.38 | Spain 2.25
+- Probabilidades de resultado (90'): 5.3% / 16.1% / 78.5%
+- Lectura estadistica: Pick fuerte | pick actual Victoria Spain 78.5% | confianza 86.7%
+- Escenario de goles: ambos marcan 28.8% | más de 2.5 goles 50.5%
+- Goles totales esperados por el modelo: 2.71. Sin línea externa de goles cargada para ese partido.
+- Probabilidad de que no reciba goles: Uruguay 11.9% | Spain 67.7%
+- Cuánta probabilidad cubren los 3 marcadores más probables: 45.3% | ventaja final más probable -2 (22.6%)
 - Qué tanto coinciden los modelos entre sí: 93.6%
 - Stack estadístico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotación + Overdispersión calibrada + ML ligero regularizado + Predictivo bayesiano dinámico + Ensamble + asimetría histórica
-- Factores dominantes: Elo dinámico -281.000; Ataque histórico desde 1950 -0.441; Rendimiento competitivo desde 1950 -0.403
+- Factores dominantes: Minutos Mundial de Clubes -703.501; Valor bruto de plantilla -573.464; Elo dinámico -281.000
 - Comparativa entre modelos:
-- Bivariante Poisson: victoria Uruguay 4.3% | empate 16.5% | victoria Spain 79.2% | marcador más probable 0-2 (18.5%) | peso actual 37.9%
-- Poisson independiente: victoria Uruguay 4.8% | empate 17.6% | victoria Spain 77.6% | marcador más probable 0-2 (18.4%) | peso actual 17.3%
-- Ajuste de baja anotación: victoria Uruguay 4.8% | empate 17.6% | victoria Spain 77.6% | marcador más probable 0-2 (18.4%) | peso actual 13.9%
-- Overdispersión calibrada: victoria Uruguay 6.6% | empate 18.5% | victoria Spain 74.9% | marcador más probable 0-1 (17.6%) | peso actual 8.4%
-- ML ligero regularizado: victoria Uruguay 5.6% | empate 17.4% | victoria Spain 77.0% | marcador más probable 0-2 (17.5%) | peso actual 11.3%
-- Predictivo bayesiano dinámico: victoria Uruguay 15.0% | empate 23.3% | victoria Spain 61.7% | marcador más probable 0-1 (14.4%) | peso actual 11.1%
-- Ensamble + asimetría histórica: victoria Uruguay 5.8% | empate 17.6% | victoria Spain 76.6% | marcador más probable 0-2 (17.2%)
-- Marcadores más probables: 0-2 17.2%, 0-1 16.1%, 0-3 13.0%, 0-0 9.3%, 0-4 7.2%, 1-1 6.7%, 1-2 6.3%, 1-3 5.0%
+- Bivariante Poisson: victoria Uruguay 3.9% | empate 15.1% | victoria Spain 81.1% | marcador más probable 0-2 (18.4%) | peso actual 37.6%
+- Poisson independiente: victoria Uruguay 4.4% | empate 16.1% | victoria Spain 79.5% | marcador más probable 0-2 (18.3%) | peso actual 17.2%
+- Ajuste de baja anotación: victoria Uruguay 4.4% | empate 16.1% | victoria Spain 79.5% | marcador más probable 0-2 (18.3%) | peso actual 13.7%
+- Overdispersión calibrada: victoria Uruguay 6.2% | empate 17.3% | victoria Spain 76.5% | marcador más probable 0-1 (16.8%) | peso actual 9.1%
+- ML ligero regularizado: victoria Uruguay 5.1% | empate 16.0% | victoria Spain 78.9% | marcador más probable 0-2 (17.1%) | peso actual 11.5%
+- Predictivo bayesiano dinámico: victoria Uruguay 14.2% | empate 21.9% | victoria Spain 63.9% | marcador más probable 0-1 (13.6%) | peso actual 11.0%
+- Ensamble + asimetría histórica: victoria Uruguay 5.3% | empate 16.1% | victoria Spain 78.5% | marcador más probable 0-2 (16.7%)
+- Marcadores más probables: 0-2 16.7%, 0-1 14.9%, 0-3 13.7%, 0-0 8.3%, 0-4 8.0%, 1-2 6.2%, 1-1 6.2%, 1-3 5.2%
 
 ### Egypt vs Iran
 - Etapa: Grupo H
@@ -2614,29 +2587,29 @@ _El Brier 2026 se activa automáticamente con el primer partido terminado; antes
 - Sede: Lumen Field | United States
 - Hora UTC: 2026-06-27T03:00:00Z
 - Clima estimado: 23.0 C | HR 65% | viento 10 km/h | estrés 0.02
-- Factores que más pesan ahora: Elo dinámico -94.000; Ataque histórico desde 1950 -0.221
+- Factores que más pesan ahora: Valor bruto de plantilla -205.955; Elo dinámico -94.000
 - Marcador proyectado: 0-1
-- Marcador para cargar en Penca: 1-2 | 2.22 pts esp. | exacto 8.0% | diferencia 24.0%
-- Precisión de marcador: Marcador con precisión media | exacto más probable 0-1 14.0% | top-5 cubre 57.2%
-- Promedio estimado de goles del modelo: Egypt 0.84 | Iran 1.47
-- Probabilidades de resultado (90'): 20.8% / 29.2% / 50.0%
-- Lectura estadistica: Pronóstico parejo: sin favorito estadístico claro | pick actual Victoria Iran 50.0% | confianza 55.1%
-- Escenario de goles: ambos marcan 42.3% | más de 2.5 goles 39.4%
-- Goles totales esperados por el modelo: 2.27. Sin línea externa de goles cargada para ese partido.
-- Probabilidad de que no reciba goles: Egypt 25.2% | Iran 44.9%
-- Cuánta probabilidad cubren los 3 marcadores más probables: 39.0% | ventaja final más probable +0 (29.2%)
-- Qué tanto coinciden los modelos entre sí: 94.9%
+- Marcador para cargar en Penca: 1-2 | 2.25 pts esp. | exacto 8.2% | diferencia 23.6%
+- Precisión de marcador: Marcador frágil | exacto más probable 0-1 13.1% | top-5 cubre 55.0%
+- Promedio estimado de goles del modelo: Egypt 0.88 | Iran 1.53
+- Probabilidades de resultado (90'): 20.9% / 28.1% / 50.9%
+- Lectura estadistica: Pronóstico parejo: sin favorito estadístico claro | pick actual Victoria Iran 50.9% | confianza 55.9%
+- Escenario de goles: ambos marcan 44.6% | más de 2.5 goles 42.4%
+- Goles totales esperados por el modelo: 2.40. Sin línea externa de goles cargada para ese partido.
+- Probabilidad de que no reciba goles: Egypt 23.5% | Iran 43.1%
+- Cuánta probabilidad cubren los 3 marcadores más probables: 36.6% | ventaja final más probable +0 (28.1%)
+- Qué tanto coinciden los modelos entre sí: 94.8%
 - Stack estadístico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotación + Overdispersión calibrada + ML ligero regularizado + Predictivo bayesiano dinámico + Ensamble + asimetría histórica
-- Factores dominantes: Elo dinámico -94.000; Ataque histórico desde 1950 -0.221; Rendimiento competitivo desde 1950 -0.189
+- Factores dominantes: Valor bruto de plantilla -205.955; Elo dinámico -94.000; Minutos Mundial de Clubes -50.236
 - Comparativa entre modelos:
-- Bivariante Poisson: victoria Egypt 20.4% | empate 28.0% | victoria Iran 51.6% | marcador más probable 0-1 (15.1%) | peso actual 36.4%
-- Poisson independiente: victoria Egypt 18.9% | empate 32.5% | victoria Iran 48.7% | marcador más probable 1-1 (15.2%) | peso actual 16.2%
-- Ajuste de baja anotación: victoria Egypt 18.9% | empate 32.5% | victoria Iran 48.7% | marcador más probable 1-1 (15.2%) | peso actual 16.0%
-- Overdispersión calibrada: victoria Egypt 22.8% | empate 26.7% | victoria Iran 50.4% | marcador más probable 0-1 (14.5%) | peso actual 7.2%
-- ML ligero regularizado: victoria Egypt 21.3% | empate 26.4% | victoria Iran 52.3% | marcador más probable 0-1 (14.8%) | peso actual 11.2%
-- Predictivo bayesiano dinámico: victoria Egypt 27.2% | empate 28.6% | victoria Iran 44.2% | marcador más probable 0-1 (13.2%) | peso actual 13.0%
-- Ensamble + asimetría histórica: victoria Egypt 20.8% | empate 29.2% | victoria Iran 50.0% | marcador más probable 0-1 (14.0%)
-- Marcadores más probables: 0-1 14.0%, 1-1 12.5%, 0-0 12.5%, 0-2 10.3%, 1-2 8.0%, 1-0 7.9%, 0-3 5.3%, 2-1 4.7%
+- Bivariante Poisson: victoria Egypt 20.3% | empate 26.9% | victoria Iran 52.7% | marcador más probable 0-1 (14.2%) | peso actual 36.2%
+- Poisson independiente: victoria Egypt 18.8% | empate 31.5% | victoria Iran 49.7% | marcador más probable 1-1 (14.9%) | peso actual 16.1%
+- Ajuste de baja anotación: victoria Egypt 18.8% | empate 31.5% | victoria Iran 49.7% | marcador más probable 1-1 (14.9%) | peso actual 16.0%
+- Overdispersión calibrada: victoria Egypt 22.9% | empate 25.7% | victoria Iran 51.4% | marcador más probable 0-1 (13.7%) | peso actual 7.3%
+- ML ligero regularizado: victoria Egypt 22.1% | empate 25.6% | victoria Iran 52.3% | marcador más probable 0-1 (13.8%) | peso actual 11.5%
+- Predictivo bayesiano dinámico: victoria Egypt 27.5% | empate 27.8% | victoria Iran 44.7% | marcador más probable 0-1 (12.6%) | peso actual 12.9%
+- Ensamble + asimetría histórica: victoria Egypt 20.9% | empate 28.1% | victoria Iran 50.9% | marcador más probable 0-1 (13.1%)
+- Marcadores más probables: 0-1 13.1%, 1-1 12.3%, 0-0 11.3%, 0-2 10.1%, 1-2 8.2%, 1-0 7.4%, 0-3 5.5%, 2-1 4.9%
 
 ### New Zealand vs Belgium
 - Etapa: Grupo H
@@ -2644,29 +2617,29 @@ _El Brier 2026 se activa automáticamente con el primer partido terminado; antes
 - Sede: BC Place | Canada
 - Hora UTC: 2026-06-27T03:00:00Z
 - Clima estimado: 21.0 C | HR 71% | viento 10 km/h | estrés 0.02
-- Factores que más pesan ahora: Elo dinámico -263.000; Ranking FIFA / puntos FIFA -0.541
+- Factores que más pesan ahora: Valor bruto de plantilla -1129.317; Minutos Mundial de Clubes -1092.371
 - Marcador proyectado: 0-2
-- Marcador para cargar en Penca: 0-2 | 3.28 pts esp. | exacto 17.3% | diferencia 22.8%
-- Precisión de marcador: Marcador con precisión media | exacto más probable 0-2 17.3% | top-5 cubre 63.7%
-- Promedio estimado de goles del modelo: New Zealand 0.35 | Belgium 2.10
-- Probabilidades de resultado (90'): 5.5% / 17.6% / 76.9%
-- Lectura estadistica: Pick fuerte | pick actual Victoria Belgium 76.9% | confianza 84.7%
-- Escenario de goles: ambos marcan 27.4% | más de 2.5 goles 47.0%
-- Goles totales esperados por el modelo: 2.55. Sin línea externa de goles cargada para ese partido.
-- Probabilidad de que no reciba goles: New Zealand 13.4% | Belgium 68.8%
-- Cuánta probabilidad cubren los 3 marcadores más probables: 46.7% | ventaja final más probable -1 (23.1%)
-- Qué tanto coinciden los modelos entre sí: 93.6%
+- Marcador para cargar en Penca: 0-2 | 3.35 pts esp. | exacto 17.4% | diferencia 22.9%
+- Precisión de marcador: Marcador con precisión media | exacto más probable 0-2 17.4% | top-5 cubre 63.9%
+- Promedio estimado de goles del modelo: New Zealand 0.35 | Belgium 2.20
+- Probabilidades de resultado (90'): 5.0% / 16.3% / 78.8%
+- Lectura estadistica: Pick fuerte | pick actual Victoria Belgium 78.8% | confianza 87.0%
+- Escenario de goles: ambos marcan 26.7% | más de 2.5 goles 49.2%
+- Goles totales esperados por el modelo: 2.64. Sin línea externa de goles cargada para ese partido.
+- Probabilidad de que no reciba goles: New Zealand 12.3% | Belgium 69.9%
+- Cuánta probabilidad cubren los 3 marcadores más probables: 46.9% | ventaja final más probable -2 (22.9%)
+- Qué tanto coinciden los modelos entre sí: 93.4%
 - Stack estadístico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotación + Overdispersión calibrada + ML ligero regularizado + Predictivo bayesiano dinámico + Ensamble + asimetría histórica
-- Factores dominantes: Elo dinámico -263.000; Ranking FIFA / puntos FIFA -0.541; Historia mundialista -0.408
+- Factores dominantes: Valor bruto de plantilla -1129.317; Minutos Mundial de Clubes -1092.371; Elo dinámico -263.000
 - Comparativa entre modelos:
-- Bivariante Poisson: victoria New Zealand 4.1% | empate 16.6% | victoria Belgium 79.4% | marcador más probable 0-2 (18.9%) | peso actual 38.2%
-- Poisson independiente: victoria New Zealand 4.6% | empate 17.5% | victoria Belgium 77.9% | marcador más probable 0-2 (18.8%) | peso actual 17.5%
-- Ajuste de baja anotación: victoria New Zealand 4.6% | empate 17.5% | victoria Belgium 77.9% | marcador más probable 0-2 (18.8%) | peso actual 13.9%
-- Overdispersión calibrada: victoria New Zealand 6.3% | empate 18.6% | victoria Belgium 75.1% | marcador más probable 0-1 (18.1%) | peso actual 8.1%
-- ML ligero regularizado: victoria New Zealand 5.3% | empate 17.4% | victoria Belgium 77.3% | marcador más probable 0-2 (17.9%) | peso actual 11.2%
-- Predictivo bayesiano dinámico: victoria New Zealand 14.7% | empate 23.4% | victoria Belgium 61.9% | marcador más probable 0-1 (14.7%) | peso actual 11.1%
-- Ensamble + asimetría histórica: victoria New Zealand 5.5% | empate 17.6% | victoria Belgium 76.9% | marcador más probable 0-2 (17.3%)
-- Marcadores más probables: 0-2 17.3%, 0-1 15.9%, 0-3 13.4%, 0-0 9.6%, 0-4 7.4%, 1-1 6.5%, 1-2 6.1%, 1-3 4.9%
+- Bivariante Poisson: victoria New Zealand 3.5% | empate 15.1% | victoria Belgium 81.4% | marcador más probable 0-2 (19.2%) | peso actual 37.9%
+- Poisson independiente: victoria New Zealand 4.0% | empate 16.0% | victoria Belgium 80.0% | marcador más probable 0-2 (19.1%) | peso actual 17.3%
+- Ajuste de baja anotación: victoria New Zealand 4.0% | empate 16.0% | victoria Belgium 80.0% | marcador más probable 0-2 (19.1%) | peso actual 13.7%
+- Overdispersión calibrada: victoria New Zealand 5.6% | empate 17.4% | victoria Belgium 77.0% | marcador más probable 0-1 (17.7%) | peso actual 8.7%
+- ML ligero regularizado: victoria New Zealand 5.0% | empate 16.4% | victoria Belgium 78.6% | marcador más probable 0-2 (17.6%) | peso actual 11.4%
+- Predictivo bayesiano dinámico: victoria New Zealand 14.0% | empate 22.4% | victoria Belgium 63.6% | marcador más probable 0-1 (14.2%) | peso actual 11.0%
+- Ensamble + asimetría histórica: victoria New Zealand 5.0% | empate 16.3% | victoria Belgium 78.8% | marcador más probable 0-2 (17.4%)
+- Marcadores más probables: 0-2 17.4%, 0-1 15.3%, 0-3 14.1%, 0-0 8.9%, 0-4 8.2%, 1-1 6.0%, 1-2 5.8%, 1-3 4.9%
 
 ### Croatia vs Ghana
 - Etapa: Grupo L
@@ -2674,29 +2647,29 @@ _El Brier 2026 se activa automáticamente con el primer partido terminado; antes
 - Sede: Lincoln Financial Field | United States
 - Hora UTC: 2026-06-27T21:00:00Z
 - Clima estimado: 29.0 C | HR 66% | viento 12 km/h | estrés 0.08
-- Factores que más pesan ahora: Elo dinámico +423.000; Ranking FIFA / puntos FIFA +0.438
+- Factores que más pesan ahora: Valor bruto de plantilla +1344.296; Minutos Mundial de Clubes +1114.937
 - Marcador proyectado: 2-0
-- Marcador para cargar en Penca: 2-0 | 3.62 pts esp. | exacto 20.6% | diferencia 23.8%
-- Precisión de marcador: Marcador defendible | exacto más probable 2-0 20.6% | top-5 cubre 74.8%
-- Promedio estimado de goles del modelo: Croatia 2.31 | Ghana 0.17
-- Probabilidades de resultado (90'): 84.3% / 13.2% / 2.5%
-- Lectura estadistica: Pick muy fuerte | pick actual Victoria Croatia 84.3% | confianza 94.5%
-- Escenario de goles: ambos marcan 15.3% | más de 2.5 goles 47.0%
-- Goles totales esperados por el modelo: 2.55. Sin línea externa de goles cargada para ese partido.
-- Probabilidad de que no reciba goles: Croatia 82.7% | Ghana 11.1%
-- Cuánta probabilidad cubren los 3 marcadores más probables: 55.5% | ventaja final más probable +2 (23.8%)
-- Qué tanto coinciden los modelos entre sí: 92.6%
+- Marcador para cargar en Penca: 3-0 | 3.48 pts esp. | exacto 17.6% | diferencia 19.6%
+- Precisión de marcador: Marcador defendible | exacto más probable 2-0 20.1% | top-5 cubre 73.8%
+- Promedio estimado de goles del modelo: Croatia 2.40 | Ghana 0.16
+- Probabilidades de resultado (90'): 85.3% / 12.4% / 2.4%
+- Lectura estadistica: Pick muy fuerte | pick actual Victoria Croatia 85.3% | confianza 95.6%
+- Escenario de goles: ambos marcan 15.4% | más de 2.5 goles 49.4%
+- Goles totales esperados por el modelo: 2.65. Sin línea externa de goles cargada para ese partido.
+- Probabilidad de que no reciba goles: Croatia 82.7% | Ghana 10.4%
+- Cuánta probabilidad cubren los 3 marcadores más probables: 54.5% | ventaja final más probable +2 (23.4%)
+- Qué tanto coinciden los modelos entre sí: 92.8%
 - Stack estadístico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotación + Overdispersión calibrada + ML ligero regularizado + Predictivo bayesiano dinámico + Ensamble + asimetría histórica
-- Factores dominantes: Elo dinámico +423.000; Ranking FIFA / puntos FIFA +0.438; Historia mundialista +0.411
+- Factores dominantes: Valor bruto de plantilla +1344.296; Minutos Mundial de Clubes +1114.937; Elo dinámico +423.000
 - Comparativa entre modelos:
-- Bivariante Poisson: victoria Croatia 87.0% | empate 11.7% | victoria Ghana 1.3% | marcador más probable 2-0 (22.7%) | peso actual 39.1%
-- Poisson independiente: victoria Croatia 86.3% | empate 12.1% | victoria Ghana 1.6% | marcador más probable 2-0 (22.5%) | peso actual 17.7%
-- Ajuste de baja anotación: victoria Croatia 86.3% | empate 12.1% | victoria Ghana 1.6% | marcador más probable 2-0 (22.5%) | peso actual 12.9%
-- Overdispersión calibrada: victoria Croatia 83.0% | empate 14.8% | victoria Ghana 2.3% | marcador más probable 2-0 (20.1%) | peso actual 8.5%
-- ML ligero regularizado: victoria Croatia 82.6% | empate 14.8% | victoria Ghana 2.6% | marcador más probable 2-0 (20.1%) | peso actual 11.1%
-- Predictivo bayesiano dinámico: victoria Croatia 67.8% | empate 21.3% | victoria Ghana 10.9% | marcador más probable 1-0 (15.4%) | peso actual 10.7%
-- Ensamble + asimetría histórica: victoria Croatia 84.3% | empate 13.2% | victoria Ghana 2.5% | marcador más probable 2-0 (20.6%)
-- Marcadores más probables: 2-0 20.6%, 1-0 17.9%, 3-0 17.1%, 4-0 10.1%, 0-0 9.1%, 5-0 4.8%, 2-1 3.6%, 1-1 3.5%
+- Bivariante Poisson: victoria Croatia 87.9% | empate 10.9% | victoria Ghana 1.2% | marcador más probable 2-0 (22.4%) | peso actual 38.9%
+- Poisson independiente: victoria Croatia 87.3% | empate 11.2% | victoria Ghana 1.5% | marcador más probable 2-0 (22.3%) | peso actual 17.6%
+- Ajuste de baja anotación: victoria Croatia 87.3% | empate 11.2% | victoria Ghana 1.5% | marcador más probable 2-0 (22.3%) | peso actual 12.7%
+- Overdispersión calibrada: victoria Croatia 83.8% | empate 14.0% | victoria Ghana 2.1% | marcador más probable 2-0 (19.9%) | peso actual 8.9%
+- ML ligero regularizado: victoria Croatia 83.5% | empate 14.1% | victoria Ghana 2.4% | marcador más probable 2-0 (19.8%) | peso actual 11.2%
+- Predictivo bayesiano dinámico: victoria Croatia 69.2% | empate 20.5% | victoria Ghana 10.4% | marcador más probable 1-0 (15.0%) | peso actual 10.6%
+- Ensamble + asimetría histórica: victoria Croatia 85.3% | empate 12.4% | victoria Ghana 2.4% | marcador más probable 2-0 (20.1%)
+- Marcadores más probables: 2-0 20.1%, 3-0 17.6%, 1-0 16.9%, 4-0 10.7%, 0-0 8.6%, 5-0 5.3%, 2-1 3.5%, 1-1 3.3%
 
 ### Panama vs England
 - Etapa: Grupo L
@@ -2704,29 +2677,29 @@ _El Brier 2026 se activa automáticamente con el primer partido terminado; antes
 - Sede: MetLife Stadium | United States
 - Hora UTC: 2026-06-27T21:00:00Z
 - Clima estimado: 29.0 C | HR 68% | viento 13 km/h | estrés 0.08
-- Factores que más pesan ahora: Elo dinámico -309.000; Rendimiento competitivo desde 1950 -0.585
+- Factores que más pesan ahora: Valor bruto de plantilla -1390.286; Minutos Mundial de Clubes -949.826
 - Marcador proyectado: 0-2
-- Marcador para cargar en Penca: 0-2 | 3.51 pts esp. | exacto 19.7% | diferencia 23.7%
-- Precisión de marcador: Marcador defendible | exacto más probable 0-2 19.7% | top-5 cubre 71.1%
-- Promedio estimado de goles del modelo: Panama 0.24 | England 2.22
-- Probabilidades de resultado (90'): 3.6% / 15.0% / 81.4%
-- Lectura estadistica: Pick muy fuerte | pick actual Victoria England 81.4% | confianza 90.7%
-- Escenario de goles: ambos marcan 19.6% | más de 2.5 goles 46.9%
-- Goles totales esperados por el modelo: 2.54. Sin línea externa de goles cargada para ese partido.
-- Probabilidad de que no reciba goles: Panama 12.1% | England 77.8%
-- Cuánta probabilidad cubren los 3 marcadores más probables: 52.6% | ventaja final más probable -2 (23.7%)
+- Marcador para cargar en Penca: 0-3 | 3.41 pts esp. | exacto 17.0% | diferencia 19.4%
+- Precisión de marcador: Marcador defendible | exacto más probable 0-2 19.7% | top-5 cubre 71.0%
+- Promedio estimado de goles del modelo: Panama 0.23 | England 2.36
+- Probabilidades de resultado (90'): 3.0% / 13.3% / 83.6%
+- Lectura estadistica: Pick muy fuerte | pick actual Victoria England 83.6% | confianza 93.4%
+- Escenario de goles: ambos marcan 18.6% | más de 2.5 goles 49.9%
+- Goles totales esperados por el modelo: 2.67. Sin línea externa de goles cargada para ese partido.
+- Probabilidad de que no reciba goles: Panama 10.7% | England 79.2%
+- Cuánta probabilidad cubren los 3 marcadores más probables: 52.4% | ventaja final más probable -2 (23.7%)
 - Qué tanto coinciden los modelos entre sí: 93.0%
 - Stack estadístico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotación + Overdispersión calibrada + ML ligero regularizado + Predictivo bayesiano dinámico + Ensamble + asimetría histórica
-- Factores dominantes: Elo dinámico -309.000; Rendimiento competitivo desde 1950 -0.585; Defensa histórica desde 1950 -0.559
+- Factores dominantes: Valor bruto de plantilla -1390.286; Minutos Mundial de Clubes -949.826; Elo dinámico -309.000
 - Comparativa entre modelos:
-- Bivariante Poisson: victoria Panama 2.3% | empate 13.8% | victoria England 84.0% | marcador más probable 0-2 (21.2%) | peso actual 38.8%
-- Poisson independiente: victoria Panama 2.7% | empate 14.3% | victoria England 83.0% | marcador más probable 0-2 (21.0%) | peso actual 17.6%
-- Ajuste de baja anotación: victoria Panama 2.7% | empate 14.3% | victoria England 83.0% | marcador más probable 0-2 (21.0%) | peso actual 13.3%
-- Overdispersión calibrada: victoria Panama 3.7% | empate 16.5% | victoria England 79.8% | marcador más probable 0-1 (19.4%) | peso actual 8.3%
-- ML ligero regularizado: victoria Panama 3.3% | empate 15.7% | victoria England 81.0% | marcador más probable 0-2 (19.5%) | peso actual 11.2%
-- Predictivo bayesiano dinámico: victoria Panama 12.4% | empate 22.3% | victoria England 65.3% | marcador más probable 0-1 (15.2%) | peso actual 10.8%
-- Ensamble + asimetría histórica: victoria Panama 3.6% | empate 15.0% | victoria England 81.4% | marcador más probable 0-2 (19.7%)
-- Marcadores más probables: 0-2 19.7%, 0-1 16.7%, 0-3 16.2%, 0-0 9.5%, 0-4 9.0%, 1-1 4.7%, 1-2 4.4%, 0-5 4.2%
+- Bivariante Poisson: victoria Panama 1.8% | empate 12.0% | victoria England 86.2% | marcador más probable 0-2 (21.3%) | peso actual 38.5%
+- Poisson independiente: victoria Panama 2.2% | empate 12.5% | victoria England 85.3% | marcador más probable 0-2 (21.1%) | peso actual 17.5%
+- Ajuste de baja anotación: victoria Panama 2.2% | empate 12.5% | victoria England 85.3% | marcador más probable 0-2 (21.1%) | peso actual 13.0%
+- Overdispersión calibrada: victoria Panama 3.1% | empate 15.0% | victoria England 81.9% | marcador más probable 0-2 (18.8%) | peso actual 9.0%
+- ML ligero regularizado: victoria Panama 2.7% | empate 14.3% | victoria England 83.0% | marcador más probable 0-2 (19.4%) | peso actual 11.4%
+- Predictivo bayesiano dinámico: victoria Panama 11.5% | empate 20.8% | victoria England 67.7% | marcador más probable 0-1 (14.5%) | peso actual 10.7%
+- Ensamble + asimetría histórica: victoria Panama 3.0% | empate 13.3% | victoria England 83.6% | marcador más probable 0-2 (19.7%)
+- Marcadores más probables: 0-2 19.7%, 0-3 17.0%, 0-1 15.7%, 0-4 10.1%, 0-0 8.5%, 0-5 4.9%, 1-1 4.1%, 1-2 4.1%
 
 ### Colombia vs Portugal
 - Etapa: Grupo K
@@ -2735,29 +2708,29 @@ _El Brier 2026 se activa automáticamente con el primer partido terminado; antes
 - Hora UTC: 2026-06-27T23:30:00Z
 - Clima estimado: 31.0 C | HR 74% | viento 15 km/h | estrés 0.28
 - Cambio por clima exigente: estrés climático 0.28.
-- Factores que más pesan ahora: Elo dinámico +22.000; Ataque histórico desde 1950 -0.371
+- Factores que más pesan ahora: Minutos Mundial de Clubes -780.843; Valor bruto de plantilla -107.890
 - Marcador proyectado: 1-1
-- Marcador para cargar en Penca: 1-1 | 1.99 pts esp. | exacto 13.7% | diferencia 31.6%
-- Precisión de marcador: Marcador frágil | exacto más probable 1-1 13.7% | top-5 cubre 54.7%
-- Promedio estimado de goles del modelo: Colombia 1.08 | Portugal 1.21
-- Probabilidades de resultado (90'): 31.1% / 31.6% / 37.4%
-- Lectura estadistica: Pronóstico parejo: sin favorito estadístico claro | pick actual Victoria Portugal 37.4% | confianza 43.1%
-- Escenario de goles: ambos marcan 46.0% | más de 2.5 goles 39.8%
-- Goles totales esperados por el modelo: 2.29. Sin línea externa de goles cargada para ese partido.
-- Probabilidad de que no reciba goles: Colombia 31.3% | Portugal 35.5%
-- Cuánta probabilidad cubren los 3 marcadores más probables: 37.6% | ventaja final más probable +0 (31.6%)
+- Marcador para cargar en Penca: 1-1 | 1.93 pts esp. | exacto 13.5% | diferencia 30.6%
+- Precisión de marcador: Marcador con precisión media | exacto más probable 1-1 13.5% | top-5 cubre 52.0%
+- Promedio estimado de goles del modelo: Colombia 1.13 | Portugal 1.29
+- Probabilidades de resultado (90'): 31.5% / 30.6% / 38.0%
+- Lectura estadistica: Pronóstico parejo: sin favorito estadístico claro | pick actual Victoria Portugal 38.0% | confianza 43.4%
+- Escenario de goles: ambos marcan 48.4% | más de 2.5 goles 42.8%
+- Goles totales esperados por el modelo: 2.41. Sin línea externa de goles cargada para ese partido.
+- Probabilidad de que no reciba goles: Colombia 29.5% | Portugal 33.7%
+- Cuánta probabilidad cubren los 3 marcadores más probables: 35.4% | ventaja final más probable +0 (30.6%)
 - Qué tanto coinciden los modelos entre sí: 95.3%
 - Stack estadístico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotación + Overdispersión calibrada + ML ligero regularizado + Predictivo bayesiano dinámico + Ensamble + asimetría histórica
-- Factores dominantes: Elo dinámico +22.000; Ataque histórico desde 1950 -0.371; Rendimiento competitivo desde 1950 -0.341
+- Factores dominantes: Minutos Mundial de Clubes -780.843; Valor bruto de plantilla -107.890; Elo dinámico +22.000
 - Comparativa entre modelos:
-- Bivariante Poisson: victoria Colombia 31.5% | empate 29.9% | victoria Portugal 38.7% | marcador más probable 1-1 (13.3%) | peso actual 35.5%
-- Poisson independiente: victoria Colombia 28.4% | empate 36.4% | victoria Portugal 35.2% | marcador más probable 1-1 (17.3%) | peso actual 15.5%
-- Ajuste de baja anotación: victoria Colombia 28.4% | empate 36.4% | victoria Portugal 35.2% | marcador más probable 1-1 (17.3%) | peso actual 16.8%
-- Overdispersión calibrada: victoria Colombia 32.9% | empate 27.9% | victoria Portugal 39.2% | marcador más probable 0-1 (12.4%) | peso actual 7.0%
-- ML ligero regularizado: victoria Colombia 32.9% | empate 28.1% | victoria Portugal 39.0% | marcador más probable 0-1 (12.5%) | peso actual 11.4%
-- Predictivo bayesiano dinámico: victoria Colombia 33.6% | empate 29.3% | victoria Portugal 37.1% | marcador más probable 0-0 (13.0%) | peso actual 13.9%
-- Ensamble + asimetría histórica: victoria Colombia 31.1% | empate 31.6% | victoria Portugal 37.4% | marcador más probable 1-1 (13.7%)
-- Marcadores más probables: 1-1 13.7%, 0-0 12.8%, 0-1 11.1%, 1-0 9.9%, 1-2 7.2%, 0-2 7.1%, 2-1 6.6%, 2-0 5.6%
+- Bivariante Poisson: victoria Colombia 32.1% | empate 28.9% | victoria Portugal 39.1% | marcador más probable 1-1 (13.0%) | peso actual 35.4%
+- Poisson independiente: victoria Colombia 29.0% | empate 35.4% | victoria Portugal 35.6% | marcador más probable 1-1 (16.9%) | peso actual 15.4%
+- Ajuste de baja anotación: victoria Colombia 29.0% | empate 35.4% | victoria Portugal 35.6% | marcador más probable 1-1 (16.9%) | peso actual 16.7%
+- Overdispersión calibrada: victoria Colombia 33.5% | empate 26.9% | victoria Portugal 39.6% | marcador más probable 0-1 (11.6%) | peso actual 7.1%
+- ML ligero regularizado: victoria Colombia 32.6% | empate 27.1% | victoria Portugal 40.2% | marcador más probable 0-1 (11.9%) | peso actual 11.6%
+- Predictivo bayesiano dinámico: victoria Colombia 33.8% | empate 28.3% | victoria Portugal 37.9% | marcador más probable 0-0 (11.8%) | peso actual 13.8%
+- Ensamble + asimetría histórica: victoria Colombia 31.5% | empate 30.6% | victoria Portugal 38.0% | marcador más probable 1-1 (13.5%)
+- Marcadores más probables: 1-1 13.5%, 0-0 11.6%, 0-1 10.3%, 1-0 9.3%, 1-2 7.4%, 0-2 7.0%, 2-1 6.8%, 2-0 5.5%
 
 ### Dem. Rep. of Congo vs Uzbekistan
 - Etapa: Grupo K
@@ -2766,29 +2739,29 @@ _El Brier 2026 se activa automáticamente con el primer partido terminado; antes
 - Hora UTC: 2026-06-27T23:30:00Z
 - Clima estimado: 30.0 C | HR 70% | viento 11 km/h | estrés 0.23
 - Cambio por clima exigente: estrés climático 0.23.
-- Factores que más pesan ahora: Elo dinámico -89.000; Rendimiento competitivo desde 1950 -0.267
+- Factores que más pesan ahora: Valor bruto de plantilla -232.193; Elo dinámico -89.000
 - Marcador proyectado: 0-1
-- Marcador para cargar en Penca: 1-2 | 2.29 pts esp. | exacto 8.1% | diferencia 24.4%
-- Precisión de marcador: Marcador con precisión media | exacto más probable 0-1 14.3% | top-5 cubre 57.9%
-- Promedio estimado de goles del modelo: Dem. Rep. of Congo 0.80 | Uzbekistan 1.49
-- Probabilidades de resultado (90'): 19.5% / 28.6% / 51.9%
-- Lectura estadistica: Pronóstico parejo: sin favorito estadístico claro | pick actual Victoria Uzbekistan 51.9% | confianza 57.0%
-- Escenario de goles: ambos marcan 42.0% | más de 2.5 goles 39.5%
-- Goles totales esperados por el modelo: 2.28. Sin línea externa de goles cargada para ese partido.
-- Probabilidad de que no reciba goles: Dem. Rep. of Congo 24.1% | Uzbekistan 46.1%
-- Cuánta probabilidad cubren los 3 marcadores más probables: 38.9% | ventaja final más probable +0 (28.6%)
+- Marcador para cargar en Penca: 1-2 | 2.34 pts esp. | exacto 8.3% | diferencia 24.4%
+- Precisión de marcador: Marcador con precisión media | exacto más probable 0-1 14.0% | top-5 cubre 57.0%
+- Promedio estimado de goles del modelo: Dem. Rep. of Congo 0.81 | Uzbekistan 1.56
+- Probabilidades de resultado (90'): 18.7% / 27.7% / 53.6%
+- Lectura estadistica: Pronóstico parejo: sin favorito estadístico claro | pick actual Victoria Uzbekistan 53.6% | confianza 58.6%
+- Escenario de goles: ambos marcan 42.6% | más de 2.5 goles 41.2%
+- Goles totales esperados por el modelo: 2.35. Sin línea externa de goles cargada para ese partido.
+- Probabilidad de que no reciba goles: Dem. Rep. of Congo 22.7% | Uzbekistan 46.2%
+- Cuánta probabilidad cubren los 3 marcadores más probables: 37.6% | ventaja final más probable +0 (27.7%)
 - Qué tanto coinciden los modelos entre sí: 94.8%
 - Stack estadístico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotación + Overdispersión calibrada + ML ligero regularizado + Predictivo bayesiano dinámico + Ensamble + asimetría histórica
-- Factores dominantes: Elo dinámico -89.000; Rendimiento competitivo desde 1950 -0.267; Ataque histórico desde 1950 -0.228
+- Factores dominantes: Valor bruto de plantilla -232.193; Elo dinámico -89.000; Minutos Mundial de Clubes -8.146
 - Comparativa entre modelos:
-- Bivariante Poisson: victoria Dem. Rep. of Congo 18.7% | empate 27.5% | victoria Uzbekistan 53.8% | marcador más probable 0-1 (15.5%) | peso actual 36.4%
-- Poisson independiente: victoria Dem. Rep. of Congo 17.4% | empate 31.7% | victoria Uzbekistan 50.9% | marcador más probable 1-1 (14.8%) | peso actual 16.3%
-- Ajuste de baja anotación: victoria Dem. Rep. of Congo 17.4% | empate 31.7% | victoria Uzbekistan 50.9% | marcador más probable 1-1 (14.8%) | peso actual 15.9%
-- Overdispersión calibrada: victoria Dem. Rep. of Congo 21.3% | empate 26.4% | victoria Uzbekistan 52.3% | marcador más probable 0-1 (14.9%) | peso actual 7.3%
-- ML ligero regularizado: victoria Dem. Rep. of Congo 20.5% | empate 26.2% | victoria Uzbekistan 53.3% | marcador más probable 0-1 (15.0%) | peso actual 11.2%
-- Predictivo bayesiano dinámico: victoria Dem. Rep. of Congo 26.5% | empate 28.6% | victoria Uzbekistan 45.0% | marcador más probable 0-1 (13.5%) | peso actual 12.9%
-- Ensamble + asimetría histórica: victoria Dem. Rep. of Congo 19.5% | empate 28.6% | victoria Uzbekistan 51.9% | marcador más probable 0-1 (14.3%)
-- Marcadores más probables: 0-1 14.3%, 1-1 12.4%, 0-0 12.2%, 0-2 10.9%, 1-2 8.1%, 1-0 7.5%, 0-3 5.6%, 2-1 4.5%
+- Bivariante Poisson: victoria Dem. Rep. of Congo 17.9% | empate 26.7% | victoria Uzbekistan 55.4% | marcador más probable 0-1 (15.2%) | peso actual 36.5%
+- Poisson independiente: victoria Dem. Rep. of Congo 16.7% | empate 30.7% | victoria Uzbekistan 52.5% | marcador más probable 1-1 (14.4%) | peso actual 16.3%
+- Ajuste de baja anotación: victoria Dem. Rep. of Congo 16.7% | empate 30.7% | victoria Uzbekistan 52.5% | marcador más probable 1-1 (14.4%) | peso actual 15.8%
+- Overdispersión calibrada: victoria Dem. Rep. of Congo 20.6% | empate 25.7% | victoria Uzbekistan 53.7% | marcador más probable 0-1 (14.6%) | peso actual 7.3%
+- ML ligero regularizado: victoria Dem. Rep. of Congo 19.6% | empate 25.2% | victoria Uzbekistan 55.2% | marcador más probable 0-1 (14.6%) | peso actual 11.3%
+- Predictivo bayesiano dinámico: victoria Dem. Rep. of Congo 25.8% | empate 27.6% | victoria Uzbekistan 46.6% | marcador más probable 0-1 (13.0%) | peso actual 12.8%
+- Ensamble + asimetría histórica: victoria Dem. Rep. of Congo 18.7% | empate 27.7% | victoria Uzbekistan 53.6% | marcador más probable 0-1 (14.0%)
+- Marcadores más probables: 0-1 14.0%, 1-1 12.1%, 0-0 11.5%, 0-2 11.1%, 1-2 8.3%, 1-0 7.1%, 0-3 6.0%, 1-3 4.5%
 
 ### Algeria vs Austria
 - Etapa: Grupo J
@@ -2796,29 +2769,29 @@ _El Brier 2026 se activa automáticamente con el primer partido terminado; antes
 - Sede: GEHA Field at Arrowhead Stadium | United States
 - Hora UTC: 2026-06-28T02:00:00Z
 - Clima estimado: 30.0 C | HR 63% | viento 14 km/h | estrés 0.16
-- Factores que más pesan ahora: Elo dinámico -144.000; Defensa histórica desde 1950 +0.192
+- Factores que más pesan ahora: Minutos Mundial de Clubes -1072.210; Valor bruto de plantilla -561.725
 - Marcador proyectado: 0-1
-- Marcador para cargar en Penca: 1-2 | 2.53 pts esp. | exacto 8.7% | diferencia 25.5%
-- Precisión de marcador: Marcador con precisión media | exacto más probable 0-1 14.6% | top-5 cubre 57.7%
-- Promedio estimado de goles del modelo: Algeria 0.71 | Austria 1.66
-- Probabilidades de resultado (90'): 15.2% / 26.1% / 58.8%
-- Lectura estadistica: Pick utilizable | pick actual Victoria Austria 58.8% | confianza 64.0%
-- Escenario de goles: ambos marcan 42.1% | más de 2.5 goles 42.7%
-- Goles totales esperados por el modelo: 2.41. Sin línea externa de goles cargada para ese partido.
-- Probabilidad de que no reciba goles: Algeria 20.0% | Austria 48.7%
-- Cuánta probabilidad cubren los 3 marcadores más probables: 38.1% | ventaja final más probable +0 (26.1%)
+- Marcador para cargar en Penca: 1-2 | 2.59 pts esp. | exacto 8.7% | diferencia 25.2%
+- Precisión de marcador: Marcador con precisión media | exacto más probable 0-1 14.2% | top-5 cubre 56.2%
+- Promedio estimado de goles del modelo: Algeria 0.70 | Austria 1.75
+- Probabilidades de resultado (90'): 14.4% / 24.9% / 60.7%
+- Lectura estadistica: Pick utilizable | pick actual Victoria Austria 60.7% | confianza 66.0%
+- Escenario de goles: ambos marcan 42.8% | más de 2.5 goles 44.8%
+- Goles totales esperados por el modelo: 2.49. Sin línea externa de goles cargada para ese partido.
+- Probabilidad de que no reciba goles: Algeria 18.5% | Austria 48.8%
+- Cuánta probabilidad cubren los 3 marcadores más probables: 37.4% | ventaja final más probable -1 (25.2%)
 - Qué tanto coinciden los modelos entre sí: 94.7%
 - Stack estadístico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotación + Overdispersión calibrada + ML ligero regularizado + Predictivo bayesiano dinámico + Ensamble + asimetría histórica
-- Factores dominantes: Elo dinámico -144.000; Defensa histórica desde 1950 +0.192; Historia mundialista -0.169
+- Factores dominantes: Minutos Mundial de Clubes -1072.210; Valor bruto de plantilla -561.725; Elo dinámico -144.000
 - Comparativa entre modelos:
-- Bivariante Poisson: victoria Algeria 14.1% | empate 25.1% | victoria Austria 60.8% | marcador más probable 0-1 (16.3%) | peso actual 36.8%
-- Poisson independiente: victoria Algeria 13.5% | empate 28.3% | victoria Austria 58.2% | marcador más probable 0-1 (13.6%) | peso actual 16.6%
-- Ajuste de baja anotación: victoria Algeria 13.5% | empate 28.3% | victoria Austria 58.2% | marcador más probable 0-1 (13.6%) | peso actual 15.5%
-- Overdispersión calibrada: victoria Algeria 16.9% | empate 24.7% | victoria Austria 58.4% | marcador más probable 0-1 (15.5%) | peso actual 7.4%
-- ML ligero regularizado: victoria Algeria 15.5% | empate 24.1% | victoria Austria 60.4% | marcador más probable 0-1 (15.7%) | peso actual 11.3%
-- Predictivo bayesiano dinámico: victoria Algeria 23.3% | empate 27.1% | victoria Austria 49.5% | marcador más probable 0-1 (13.6%) | peso actual 12.4%
-- Ensamble + asimetría histórica: victoria Algeria 15.2% | empate 26.1% | victoria Austria 58.8% | marcador más probable 0-1 (14.6%)
-- Marcadores más probables: 0-1 14.6%, 0-2 12.1%, 1-1 11.4%, 0-0 10.8%, 1-2 8.7%, 0-3 6.7%, 1-0 6.0%, 1-3 5.2%
+- Bivariante Poisson: victoria Algeria 13.3% | empate 24.0% | victoria Austria 62.7% | marcador más probable 0-1 (15.8%) | peso actual 36.7%
+- Poisson independiente: victoria Algeria 12.7% | empate 27.1% | victoria Austria 60.2% | marcador más probable 0-1 (13.2%) | peso actual 16.6%
+- Ajuste de baja anotación: victoria Algeria 12.7% | empate 27.1% | victoria Austria 60.2% | marcador más probable 0-1 (13.2%) | peso actual 15.3%
+- Overdispersión calibrada: victoria Algeria 16.2% | empate 23.8% | victoria Austria 60.1% | marcador más probable 0-1 (15.1%) | peso actual 7.7%
+- ML ligero regularizado: victoria Algeria 14.7% | empate 22.9% | victoria Austria 62.4% | marcador más probable 0-1 (15.1%) | peso actual 11.4%
+- Predictivo bayesiano dinámico: victoria Algeria 22.6% | empate 26.3% | victoria Austria 51.1% | marcador más probable 0-1 (13.2%) | peso actual 12.2%
+- Ensamble + asimetría histórica: victoria Algeria 14.4% | empate 24.9% | victoria Austria 60.7% | marcador más probable 0-1 (14.2%)
+- Marcadores más probables: 0-1 14.2%, 0-2 12.3%, 1-1 11.0%, 0-0 10.0%, 1-2 8.7%, 0-3 7.2%, 1-0 5.5%, 1-3 5.4%
 
 ### Jordan vs Argentina
 - Etapa: Grupo J
@@ -2827,29 +2800,29 @@ _El Brier 2026 se activa automáticamente con el primer partido terminado; antes
 - Hora UTC: 2026-06-28T02:00:00Z
 - Clima estimado: 32.0 C | HR 55% | viento 15 km/h | estrés 0.20
 - Cambio por clima exigente: estrés climático 0.20.
-- Factores que más pesan ahora: Elo dinámico -422.000; Historia mundialista -0.726
+- Factores que más pesan ahora: Valor bruto de plantilla -1309.399; Minutos Mundial de Clubes -1294.213
 - Marcador proyectado: 0-2
-- Marcador para cargar en Penca: 0-2 | 3.65 pts esp. | exacto 21.1% | diferencia 23.9%
-- Precisión de marcador: Marcador defendible | exacto más probable 0-2 21.1% | top-5 cubre 76.5%
-- Promedio estimado de goles del modelo: Jordan 0.15 | Argentina 2.32
-- Probabilidades de resultado (90'): 2.3% / 13.0% / 84.7%
-- Lectura estadistica: Pick muy fuerte | pick actual Victoria Argentina 84.7% | confianza 95.0%
-- Escenario de goles: ambos marcan 13.4% | más de 2.5 goles 47.0%
-- Goles totales esperados por el modelo: 2.55. Sin línea externa de goles cargada para ese partido.
-- Probabilidad de que no reciba goles: Jordan 11.3% | Argentina 84.8%
-- Cuánta probabilidad cubren los 3 marcadores más probables: 56.5% | ventaja final más probable -2 (23.9%)
-- Qué tanto coinciden los modelos entre sí: 92.5%
+- Marcador para cargar en Penca: 0-3 | 3.53 pts esp. | exacto 18.2% | diferencia 20.0%
+- Precisión de marcador: Marcador defendible | exacto más probable 0-2 20.6% | top-5 cubre 75.2%
+- Promedio estimado de goles del modelo: Jordan 0.14 | Argentina 2.45
+- Probabilidades de resultado (90'): 2.2% / 11.8% / 86.0%
+- Lectura estadistica: Pick muy fuerte | pick actual Victoria Argentina 86.0% | confianza 96.6%
+- Escenario de goles: ambos marcan 13.5% | más de 2.5 goles 50.0%
+- Goles totales esperados por el modelo: 2.67. Sin línea externa de goles cargada para ese partido.
+- Probabilidad de que no reciba goles: Jordan 10.2% | Argentina 84.9%
+- Cuánta probabilidad cubren los 3 marcadores más probables: 55.2% | ventaja final más probable -2 (23.5%)
+- Qué tanto coinciden los modelos entre sí: 92.7%
 - Stack estadístico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotación + Overdispersión calibrada + ML ligero regularizado + Predictivo bayesiano dinámico + Ensamble + asimetría histórica
-- Factores dominantes: Elo dinámico -422.000; Historia mundialista -0.726; Ranking FIFA / puntos FIFA -0.580
+- Factores dominantes: Valor bruto de plantilla -1309.399; Minutos Mundial de Clubes -1294.213; Elo dinámico -422.000
 - Comparativa entre modelos:
-- Bivariante Poisson: victoria Jordan 1.1% | empate 11.5% | victoria Argentina 87.4% | marcador más probable 0-2 (23.1%) | peso actual 39.3%
-- Poisson independiente: victoria Jordan 1.4% | empate 11.8% | victoria Argentina 86.8% | marcador más probable 0-2 (23.0%) | peso actual 17.8%
-- Ajuste de baja anotación: victoria Jordan 1.4% | empate 11.8% | victoria Argentina 86.8% | marcador más probable 0-2 (23.0%) | peso actual 12.8%
-- Overdispersión calibrada: victoria Jordan 2.0% | empate 14.6% | victoria Argentina 83.5% | marcador más probable 0-2 (20.5%) | peso actual 8.5%
-- ML ligero regularizado: victoria Jordan 2.6% | empate 14.8% | victoria Argentina 82.7% | marcador más probable 0-2 (20.1%) | peso actual 11.0%
-- Predictivo bayesiano dinámico: victoria Jordan 10.6% | empate 21.3% | victoria Argentina 68.1% | marcador más probable 0-1 (15.6%) | peso actual 10.7%
-- Ensamble + asimetría histórica: victoria Jordan 2.3% | empate 13.0% | victoria Argentina 84.7% | marcador más probable 0-2 (21.1%)
-- Marcadores más probables: 0-2 21.1%, 0-3 17.7%, 0-1 17.6%, 0-4 10.6%, 0-0 9.4%, 0-5 5.1%, 1-2 3.1%, 1-1 3.1%
+- Bivariante Poisson: victoria Jordan 1.0% | empate 10.3% | victoria Argentina 88.7% | marcador más probable 0-2 (22.7%) | peso actual 38.9%
+- Poisson independiente: victoria Jordan 1.3% | empate 10.6% | victoria Argentina 88.2% | marcador más probable 0-2 (22.6%) | peso actual 17.6%
+- Ajuste de baja anotación: victoria Jordan 1.3% | empate 10.6% | victoria Argentina 88.2% | marcador más probable 0-2 (22.6%) | peso actual 12.6%
+- Overdispersión calibrada: victoria Jordan 1.8% | empate 13.5% | victoria Argentina 84.7% | marcador más probable 0-2 (20.2%) | peso actual 9.1%
+- ML ligero regularizado: victoria Jordan 2.4% | empate 13.9% | victoria Argentina 83.7% | marcador más probable 0-2 (19.7%) | peso actual 11.2%
+- Predictivo bayesiano dinámico: victoria Jordan 9.9% | empate 20.0% | victoria Argentina 70.1% | marcador más probable 0-1 (14.8%) | peso actual 10.6%
+- Ensamble + asimetría histórica: victoria Jordan 2.2% | empate 11.8% | victoria Argentina 86.0% | marcador más probable 0-2 (20.6%)
+- Marcadores más probables: 0-2 20.6%, 0-3 18.2%, 0-1 16.4%, 0-4 11.4%, 0-0 8.5%, 0-5 5.7%, 1-2 3.0%, 1-1 2.9%
 
 ### Dieciseisavos 1: South Korea vs Canada
 - Etapa: Dieciseisavos de final
@@ -2857,37 +2830,37 @@ _El Brier 2026 se activa automáticamente con el primer partido terminado; antes
 - Sede: SoFi Stadium | United States
 - Hora UTC: 2026-06-28T19:00:00Z
 - Clima estimado: 26.0 C | HR 70% | viento 11 km/h | estrés 0.06
-- Factores que más pesan ahora: Elo dinámico -22.000; Rendimiento competitivo desde 1950 +0.305
+- Factores que más pesan ahora: Valor bruto de plantilla -190.312; Minutos Mundial de Clubes +29.155
 - Proyección automática: Cruce usado para este casillero hoy: South Korea vs Canada | probabilidad de que se dé 20.4% | ganador global del casillero: Canada 26.6% | si se juega exactamente este cruce: South Korea 50.0%
 - Otras opciones de cruce: South Korea vs Canada -> Canada 10.2%; Czech Republic vs Canada -> Canada 9.2%
-- Marcador proyectado: 0-0
-- Marcador para cargar en Penca: 1-1 | 2.09 pts esp. | exacto 14.3% | diferencia 33.2%
-- Precisión de marcador: Marcador frágil | exacto más probable 0-0 14.4% | top-5 cubre 57.2%
-- Promedio estimado de goles del modelo: South Korea 1.10 | Canada 1.12
-- Probabilidades de resultado (90'): 32.9% / 33.2% / 33.8%
-- Lectura estadistica: Pronóstico parejo: sin favorito estadístico claro | pick actual Victoria Canada 33.8% | confianza 39.8%
-- Escenario de goles: ambos marcan 43.9% | más de 2.5 goles 36.6%
-- Goles totales esperados por el modelo: 2.17. Sin línea externa de goles cargada para ese partido.
-- Probabilidad de que no reciba goles: South Korea 35.2% | Canada 35.3%
-- Cuánta probabilidad cubren los 3 marcadores más probables: 39.5% | ventaja final más probable +0 (33.2%)
-- Qué tanto coinciden los modelos entre sí: 94.9%
+- Marcador proyectado: 1-1
+- Marcador para cargar en Penca: 1-1 | 2.03 pts esp. | exacto 14.1% | diferencia 32.1%
+- Precisión de marcador: Marcador con precisión media | exacto más probable 1-1 14.1% | top-5 cubre 54.8%
+- Promedio estimado de goles del modelo: South Korea 1.11 | Canada 1.22
+- Probabilidades de resultado (90'): 31.7% / 32.1% / 36.3%
+- Lectura estadistica: Pronóstico parejo: sin favorito estadístico claro | pick actual Victoria Canada 36.3% | confianza 42.0%
+- Escenario de goles: ambos marcan 46.1% | más de 2.5 goles 39.5%
+- Goles totales esperados por el modelo: 2.28. Sin línea externa de goles cargada para ese partido.
+- Probabilidad de que no reciba goles: South Korea 32.2% | Canada 34.7%
+- Cuánta probabilidad cubren los 3 marcadores más probables: 37.7% | ventaja final más probable +0 (32.1%)
+- Qué tanto coinciden los modelos entre sí: 95.0%
 - Stack estadístico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotación + Overdispersión calibrada + ML ligero regularizado + Predictivo bayesiano dinámico + Ensamble + asimetría histórica
-- Factores dominantes: Elo dinámico -22.000; Rendimiento competitivo desde 1950 +0.305; Historia competitiva desde 1950 +0.197
+- Factores dominantes: Valor bruto de plantilla -190.312; Minutos Mundial de Clubes +29.155; Elo dinámico -22.000
 - Comparativa entre modelos:
-- Bivariante Poisson: victoria South Korea 34.1% | empate 30.7% | victoria Canada 35.2% | marcador más probable 1-1 (13.4%) | peso actual 33.8%
-- Poisson independiente: victoria South Korea 30.1% | empate 38.8% | victoria Canada 31.1% | marcador más probable 1-1 (18.2%) | peso actual 14.7%
-- Ajuste de baja anotación: victoria South Korea 30.1% | empate 38.8% | victoria Canada 31.1% | marcador más probable 1-1 (18.2%) | peso actual 18.8%
-- Overdispersión calibrada: victoria South Korea 35.2% | empate 28.6% | victoria Canada 36.2% | marcador más probable 0-0 (12.6%) | peso actual 6.6%
-- ML ligero regularizado: victoria South Korea 34.2% | empate 30.8% | victoria Canada 35.1% | marcador más probable 0-0 (14.8%) | peso actual 12.7%
-- Predictivo bayesiano dinámico: victoria South Korea 34.5% | empate 30.4% | victoria Canada 35.1% | marcador más probable 0-0 (13.9%) | peso actual 13.4%
-- Ensamble + asimetría histórica: victoria South Korea 32.9% | empate 33.2% | victoria Canada 33.8% | marcador más probable 0-0 (14.4%)
-- Quién tiene más probabilidad de avanzar: South Korea 50.2% | Canada 49.8%
-- Si empatan tras 90': gana en prórroga South Korea 19.0% | siguen empatados 62.0% | Canada 19.0%
-- Si llegan a penales: South Korea 53.5% | Canada 46.5%
+- Bivariante Poisson: victoria South Korea 32.7% | empate 29.6% | victoria Canada 37.8% | marcador más probable 1-1 (13.2%) | peso actual 33.8%
+- Poisson independiente: victoria South Korea 28.9% | empate 37.3% | victoria Canada 33.7% | marcador más probable 1-1 (17.8%) | peso actual 14.8%
+- Ajuste de baja anotación: victoria South Korea 28.9% | empate 37.3% | victoria Canada 33.7% | marcador más probable 1-1 (17.8%) | peso actual 18.6%
+- Overdispersión calibrada: victoria South Korea 33.9% | empate 27.6% | victoria Canada 38.5% | marcador más probable 0-1 (11.9%) | peso actual 6.6%
+- ML ligero regularizado: victoria South Korea 32.4% | empate 29.8% | victoria Canada 37.8% | marcador más probable 0-0 (13.6%) | peso actual 12.9%
+- Predictivo bayesiano dinámico: victoria South Korea 33.9% | empate 29.5% | victoria Canada 36.6% | marcador más probable 0-0 (12.8%) | peso actual 13.4%
+- Ensamble + asimetría histórica: victoria South Korea 31.7% | empate 32.1% | victoria Canada 36.3% | marcador más probable 1-1 (14.1%)
+- Quién tiene más probabilidad de avanzar: South Korea 47.4% | Canada 52.6%
+- Si empatan tras 90': gana en prórroga South Korea 18.6% | siguen empatados 60.0% | Canada 21.3%
+- Si llegan a penales: South Korea 50.8% | Canada 49.2%
 - Marcador más probable de la tanda: 4-3
-- Marcador medio esperado en la tanda: South Korea 3.82 | Canada 3.66
-- Marcadores de tanda más probables: 4-3 12.4%, 5-4 9.9%, 4-2 9.4%, 3-4 8.8%, 4-5 8.6%
-- Marcadores más probables: 0-0 14.4%, 1-1 14.3%, 0-1 10.9%, 1-0 10.7%, 1-2 6.9%, 2-0 6.6%, 0-2 6.5%, 2-1 6.5%
+- Marcador medio esperado en la tanda: South Korea 3.80 | Canada 3.80
+- Marcadores de tanda más probables: 4-3 10.4%, 3-4 10.2%, 2-4 9.1%, 4-2 9.1%, 5-4 8.6%
+- Marcadores más probables: 1-1 14.1%, 0-0 13.0%, 0-1 10.6%, 1-0 9.8%, 1-2 7.3%, 0-2 6.9%, 2-1 6.5%, 2-0 6.1%
 
 ### Dieciseisavos 2: Germany vs Bosnia and Herzegovina
 - Etapa: Dieciseisavos de final
@@ -2896,37 +2869,37 @@ _El Brier 2026 se activa automáticamente con el primer partido terminado; antes
 - Hora UTC: 2026-06-29T17:00:00Z
 - Clima estimado: 33.0 C | HR 73% | viento 12 km/h | estrés 0.33
 - Cambio por clima exigente: estrés climático 0.33.
-- Factores que más pesan ahora: Elo dinámico +339.000; Historia mundialista +0.706
+- Factores que más pesan ahora: Valor bruto de plantilla +1760.557; Minutos Mundial de Clubes +1210.384
 - Proyección automática: Cruce usado para este casillero hoy: Germany vs Bosnia and Herzegovina | probabilidad de que se dé 8.9% | ganador global del casillero: Germany 53.5% | si se juega exactamente este cruce: Germany 94.2%
 - Otras opciones de cruce: Germany vs Czech Republic -> Germany 5.5%; Ecuador vs Bosnia and Herzegovina -> Ecuador 4.5%
 - Marcador proyectado: 2-0
-- Marcador para cargar en Penca: 2-0 | 3.43 pts esp. | exacto 19.3% | diferencia 23.6%
-- Precisión de marcador: Marcador con precisión media | exacto más probable 2-0 19.3% | top-5 cubre 70.1%
-- Promedio estimado de goles del modelo: Germany 2.10 | Bosnia and Herzegovina 0.25
-- Probabilidades de resultado (90'): 79.3% / 16.7% / 4.0%
-- Lectura estadistica: Pick fuerte | pick actual Victoria Germany 79.3% | confianza 88.0%
-- Escenario de goles: ambos marcan 21.5% | más de 2.5 goles 45.0%
-- Goles totales esperados por el modelo: 2.46. Sin línea externa de goles cargada para ese partido.
-- Probabilidad de que no reciba goles: Germany 75.6% | Bosnia and Herzegovina 13.1%
-- Cuánta probabilidad cubren los 3 marcadores más probables: 51.8% | ventaja final más probable +2 (23.6%)
+- Marcador para cargar en Penca: 2-0 | 3.47 pts esp. | exacto 19.1% | diferencia 23.5%
+- Precisión de marcador: Marcador defendible | exacto más probable 2-0 19.1% | top-5 cubre 69.1%
+- Promedio estimado de goles del modelo: Germany 2.21 | Bosnia and Herzegovina 0.25
+- Probabilidades de resultado (90'): 81.0% / 15.3% / 3.7%
+- Lectura estadistica: Pick muy fuerte | pick actual Victoria Germany 81.0% | confianza 90.1%
+- Escenario de goles: ambos marcan 21.7% | más de 2.5 goles 48.1%
+- Goles totales esperados por el modelo: 2.58. Sin línea externa de goles cargada para ese partido.
+- Probabilidad de que no reciba goles: Germany 75.7% | Bosnia and Herzegovina 11.8%
+- Cuánta probabilidad cubren los 3 marcadores más probables: 51.0% | ventaja final más probable +2 (23.5%)
 - Qué tanto coinciden los modelos entre sí: 93.2%
 - Stack estadístico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotación + Overdispersión calibrada + ML ligero regularizado + Predictivo bayesiano dinámico + Ensamble + asimetría histórica
-- Factores dominantes: Elo dinámico +339.000; Historia mundialista +0.706; Ataque histórico desde 1950 +0.609
+- Factores dominantes: Valor bruto de plantilla +1760.557; Minutos Mundial de Clubes +1210.384; Elo dinámico +339.000
 - Comparativa entre modelos:
-- Bivariante Poisson: victoria Germany 81.7% | empate 15.5% | victoria Bosnia and Herzegovina 2.8% | marcador más probable 2-0 (20.9%) | peso actual 37.1%
-- Poisson independiente: victoria Germany 80.5% | empate 16.5% | victoria Bosnia and Herzegovina 3.1% | marcador más probable 2-0 (20.8%) | peso actual 16.9%
-- Ajuste de baja anotación: victoria Germany 80.5% | empate 16.5% | victoria Bosnia and Herzegovina 3.1% | marcador más probable 2-0 (20.8%) | peso actual 15.7%
-- Overdispersión calibrada: victoria Germany 78.2% | empate 17.5% | victoria Bosnia and Herzegovina 4.3% | marcador más probable 1-0 (20.0%) | peso actual 7.6%
-- ML ligero regularizado: victoria Germany 79.6% | empate 16.9% | victoria Bosnia and Herzegovina 3.5% | marcador más probable 2-0 (20.1%) | peso actual 12.3%
-- Predictivo bayesiano dinámico: victoria Germany 62.9% | empate 23.9% | victoria Bosnia and Herzegovina 13.2% | marcador más probable 1-0 (15.6%) | peso actual 10.4%
-- Ensamble + asimetría histórica: victoria Germany 79.3% | empate 16.7% | victoria Bosnia and Herzegovina 4.0% | marcador más probable 2-0 (19.3%)
-- Quién tiene más probabilidad de avanzar: Germany 91.8% | Bosnia and Herzegovina 8.2%
-- Si empatan tras 90': gana en prórroga Germany 41.3% | siguen empatados 53.5% | Bosnia and Herzegovina 5.2%
-- Si llegan a penales: Germany 62.5% | Bosnia and Herzegovina 37.5%
+- Bivariante Poisson: victoria Germany 83.5% | empate 14.0% | victoria Bosnia and Herzegovina 2.5% | marcador más probable 2-0 (20.8%) | peso actual 36.9%
+- Poisson independiente: victoria Germany 82.3% | empate 15.0% | victoria Bosnia and Herzegovina 2.8% | marcador más probable 2-0 (20.6%) | peso actual 16.8%
+- Ajuste de baja anotación: victoria Germany 82.3% | empate 15.0% | victoria Bosnia and Herzegovina 2.8% | marcador más probable 2-0 (20.6%) | peso actual 15.5%
+- Overdispersión calibrada: victoria Germany 79.8% | empate 16.2% | victoria Bosnia and Herzegovina 4.0% | marcador más probable 1-0 (19.0%) | peso actual 8.0%
+- ML ligero regularizado: victoria Germany 81.1% | empate 15.6% | victoria Bosnia and Herzegovina 3.3% | marcador más probable 2-0 (19.8%) | peso actual 12.5%
+- Predictivo bayesiano dinámico: victoria Germany 64.7% | empate 22.7% | victoria Bosnia and Herzegovina 12.5% | marcador más probable 1-0 (15.0%) | peso actual 10.3%
+- Ensamble + asimetría histórica: victoria Germany 81.0% | empate 15.3% | victoria Bosnia and Herzegovina 3.7% | marcador más probable 2-0 (19.1%)
+- Quién tiene más probabilidad de avanzar: Germany 92.7% | Bosnia and Herzegovina 7.3%
+- Si empatan tras 90': gana en prórroga Germany 43.1% | siguen empatados 51.9% | Bosnia and Herzegovina 5.1%
+- Si llegan a penales: Germany 63.9% | Bosnia and Herzegovina 36.1%
 - Marcador más probable de la tanda: 4-2
-- Marcador medio esperado en la tanda: Germany 3.96 | Bosnia and Herzegovina 3.33
-- Marcadores de tanda más probables: 4-2 13.6%, 4-3 12.6%, 5-4 10.8%, 3-4 7.8%, 5-3 6.3%
-- Marcadores más probables: 2-0 19.3%, 1-0 17.1%, 3-0 15.3%, 0-0 10.2%, 4-0 8.1%, 1-1 5.5%, 2-1 5.1%, 3-1 3.9%
+- Marcador medio esperado en la tanda: Germany 3.92 | Bosnia and Herzegovina 3.09
+- Marcadores de tanda más probables: 4-2 15.2%, 4-3 12.5%, 5-4 11.1%, 3-1 6.9%, 5-3 6.8%
+- Marcadores más probables: 2-0 19.1%, 1-0 16.0%, 3-0 16.0%, 0-0 9.2%, 4-0 8.9%, 1-1 5.2%, 2-1 5.0%, 3-1 4.1%
 
 ### Dieciseisavos 3: Netherlands vs Morocco
 - Etapa: Dieciseisavos de final
@@ -2934,37 +2907,37 @@ _El Brier 2026 se activa automáticamente con el primer partido terminado; antes
 - Sede: Gillette Stadium | United States
 - Hora UTC: 2026-06-29T20:30:00Z
 - Clima estimado: 26.0 C | HR 67% | viento 12 km/h | estrés 0.02
-- Factores que más pesan ahora: Elo dinámico +153.000; Rendimiento en Mundiales desde 1950 +0.427
+- Factores que más pesan ahora: Minutos Mundial de Clubes +1037.547; Valor bruto de plantilla +640.096
 - Proyección automática: Cruce usado para este casillero hoy: Netherlands vs Morocco | probabilidad de que se dé 29.9% | ganador global del casillero: Netherlands 50.6% | si se juega exactamente este cruce: Netherlands 80.8%
 - Otras opciones de cruce: Netherlands vs Scotland -> Netherlands 18.2%; Japan vs Morocco -> Japan 9.9%
 - Marcador proyectado: 1-0
-- Marcador para cargar en Penca: 1-0 | 2.83 pts esp. | exacto 16.2% | diferencia 25.9%
-- Precisión de marcador: Marcador con precisión media | exacto más probable 1-0 16.2% | top-5 cubre 60.9%
-- Promedio estimado de goles del modelo: Netherlands 1.65 | Morocco 0.62
-- Probabilidades de resultado (90'): 60.7% / 26.2% / 13.1%
-- Lectura estadistica: Pick utilizable | pick actual Victoria Netherlands 60.7% | confianza 66.2%
-- Escenario de goles: ambos marcan 37.1% | más de 2.5 goles 39.3%
-- Goles totales esperados por el modelo: 2.27. Sin línea externa de goles cargada para ese partido.
-- Probabilidad de que no reciba goles: Netherlands 54.5% | Morocco 20.6%
-- Cuánta probabilidad cubren los 3 marcadores más probables: 41.9% | ventaja final más probable +0 (26.2%)
-- Qué tanto coinciden los modelos entre sí: 94.4%
+- Marcador para cargar en Penca: 1-0 | 2.84 pts esp. | exacto 15.4% | diferencia 25.4%
+- Precisión de marcador: Marcador con precisión media | exacto más probable 1-0 15.4% | top-5 cubre 58.8%
+- Promedio estimado de goles del modelo: Netherlands 1.75 | Morocco 0.64
+- Probabilidades de resultado (90'): 62.2% / 25.0% / 12.8%
+- Lectura estadistica: Pick utilizable | pick actual Victoria Netherlands 62.2% | confianza 67.7%
+- Escenario de goles: ambos marcan 38.5% | más de 2.5 goles 42.0%
+- Goles totales esperados por el modelo: 2.37. Sin línea externa de goles cargada para ese partido.
+- Probabilidad de que no reciba goles: Netherlands 53.5% | Morocco 19.1%
+- Cuánta probabilidad cubren los 3 marcadores más probables: 40.0% | ventaja final más probable +1 (25.4%)
+- Qué tanto coinciden los modelos entre sí: 94.5%
 - Stack estadístico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotación + Overdispersión calibrada + ML ligero regularizado + Predictivo bayesiano dinámico + Ensamble + asimetría histórica
-- Factores dominantes: Elo dinámico +153.000; Rendimiento en Mundiales desde 1950 +0.427; Ataque histórico desde 1950 +0.347
+- Factores dominantes: Minutos Mundial de Clubes +1037.547; Valor bruto de plantilla +640.096; Elo dinámico +153.000
 - Comparativa entre modelos:
-- Bivariante Poisson: victoria Netherlands 63.0% | empate 24.9% | victoria Morocco 12.1% | marcador más probable 1-0 (17.6%) | peso actual 35.4%
-- Poisson independiente: victoria Netherlands 60.1% | empate 28.4% | victoria Morocco 11.4% | marcador más probable 1-0 (14.7%) | peso actual 16.1%
-- Ajuste de baja anotación: victoria Netherlands 60.1% | empate 28.4% | victoria Morocco 11.4% | marcador más probable 1-0 (14.7%) | peso actual 17.3%
-- Overdispersión calibrada: victoria Netherlands 60.7% | empate 24.5% | victoria Morocco 14.7% | marcador más probable 1-0 (16.8%) | peso actual 7.2%
-- ML ligero regularizado: victoria Netherlands 62.0% | empate 24.8% | victoria Morocco 13.2% | marcador más probable 1-0 (17.3%) | peso actual 12.4%
-- Predictivo bayesiano dinámico: victoria Netherlands 50.1% | empate 28.0% | victoria Morocco 21.9% | marcador más probable 1-0 (14.3%) | peso actual 11.6%
-- Ensamble + asimetría histórica: victoria Netherlands 60.7% | empate 26.2% | victoria Morocco 13.1% | marcador más probable 1-0 (16.2%)
-- Quién tiene más probabilidad de avanzar: Netherlands 77.4% | Morocco 22.6%
-- Si empatan tras 90': gana en prórroga Netherlands 31.5% | siguen empatados 58.2% | Morocco 10.2%
-- Si llegan a penales: Netherlands 55.2% | Morocco 44.8%
+- Bivariante Poisson: victoria Netherlands 64.4% | empate 23.8% | victoria Morocco 11.9% | marcador más probable 1-0 (16.8%) | peso actual 35.4%
+- Poisson independiente: victoria Netherlands 61.6% | empate 27.2% | victoria Morocco 11.2% | marcador más probable 1-0 (14.0%) | peso actual 16.1%
+- Ajuste de baja anotación: victoria Netherlands 61.6% | empate 27.2% | victoria Morocco 11.2% | marcador más probable 1-0 (14.0%) | peso actual 17.2%
+- Overdispersión calibrada: victoria Netherlands 61.9% | empate 23.6% | victoria Morocco 14.5% | marcador más probable 1-0 (16.0%) | peso actual 7.2%
+- ML ligero regularizado: victoria Netherlands 63.7% | empate 23.5% | victoria Morocco 12.9% | marcador más probable 1-0 (16.4%) | peso actual 12.5%
+- Predictivo bayesiano dinámico: victoria Netherlands 51.7% | empate 27.0% | victoria Morocco 21.3% | marcador más probable 1-0 (13.7%) | peso actual 11.6%
+- Ensamble + asimetría histórica: victoria Netherlands 62.2% | empate 25.0% | victoria Morocco 12.8% | marcador más probable 1-0 (15.4%)
+- Quién tiene más probabilidad de avanzar: Netherlands 78.3% | Morocco 21.7%
+- Si empatan tras 90': gana en prórroga Netherlands 32.7% | siguen empatados 57.0% | Morocco 10.3%
+- Si llegan a penales: Netherlands 55.8% | Morocco 44.2%
 - Marcador más probable de la tanda: 4-3
-- Marcador medio esperado en la tanda: Netherlands 3.87 | Morocco 3.73
-- Marcadores de tanda más probables: 4-3 11.3%, 5-4 9.6%, 4-5 9.4%, 4-2 9.2%, 3-4 8.4%
-- Marcadores más probables: 1-0 16.2%, 2-0 13.5%, 0-0 12.2%, 1-1 10.9%, 2-1 8.0%, 3-0 7.7%, 0-1 5.8%, 3-1 4.6%
+- Marcador medio esperado en la tanda: Netherlands 3.92 | Morocco 3.72
+- Marcadores de tanda más probables: 4-3 11.0%, 5-4 9.8%, 4-2 9.6%, 3-4 9.3%, 4-5 7.6%
+- Marcadores más probables: 1-0 15.4%, 2-0 13.4%, 0-0 11.2%, 1-1 10.7%, 2-1 8.2%, 3-0 8.1%, 0-1 5.4%, 3-1 5.0%
 
 ### Dieciseisavos 4: Brazil vs Japan
 - Etapa: Dieciseisavos de final
@@ -2973,37 +2946,37 @@ _El Brier 2026 se activa automáticamente con el primer partido terminado; antes
 - Hora UTC: 2026-06-30T01:00:00Z
 - Clima estimado: 31.0 C | HR 57% | viento 13 km/h | estrés 0.19
 - Cambio por clima exigente: estrés climático 0.19.
-- Factores que más pesan ahora: Elo dinámico +100.000; Historia mundialista +0.730
+- Factores que más pesan ahora: Valor bruto de plantilla +764.978; Elo dinámico +100.000
 - Proyección automática: Cruce usado para este casillero hoy: Brazil vs Japan | probabilidad de que se dé 40.0% | ganador global del casillero: Brazil 60.7% | si se juega exactamente este cruce: Brazil 79.3%
 - Otras opciones de cruce: Brazil vs Netherlands -> Brazil 14.7%; Brazil vs Sweden -> Brazil 9.5%
 - Marcador proyectado: 1-0
-- Marcador para cargar en Penca: 1-0 | 2.64 pts esp. | exacto 15.0% | diferencia 24.9%
-- Precisión de marcador: Marcador con precisión media | exacto más probable 1-0 15.0% | top-5 cubre 59.5%
-- Promedio estimado de goles del modelo: Brazil 1.57 | Japan 0.70
-- Probabilidades de resultado (90'): 56.4% / 27.8% / 15.8%
-- Lectura estadistica: Pick utilizable | pick actual Victoria Brazil 56.4% | confianza 61.4%
-- Escenario de goles: ambos marcan 40.0% | más de 2.5 goles 39.6%
-- Goles totales esperados por el modelo: 2.28. Sin línea externa de goles cargada para ese partido.
-- Probabilidad de que no reciba goles: Brazil 50.3% | Japan 22.0%
-- Cuánta probabilidad cubren los 3 marcadores más probables: 39.5% | ventaja final más probable +0 (27.8%)
+- Marcador para cargar en Penca: 2-1 | 2.52 pts esp. | exacto 8.2% | diferencia 24.6%
+- Precisión de marcador: Marcador con precisión media | exacto más probable 1-0 14.3% | top-5 cubre 57.5%
+- Promedio estimado de goles del modelo: Brazil 1.69 | Japan 0.70
+- Probabilidades de resultado (90'): 59.3% / 26.0% / 14.6%
+- Lectura estadistica: Pick utilizable | pick actual Victoria Brazil 59.3% | confianza 64.5%
+- Escenario de goles: ambos marcan 40.9% | más de 2.5 goles 42.7%
+- Goles totales esperados por el modelo: 2.40. Sin línea externa de goles cargada para ese partido.
+- Probabilidad de que no reciba goles: Brazil 50.3% | Japan 19.7%
+- Cuánta probabilidad cubren los 3 marcadores más probables: 38.3% | ventaja final más probable +0 (26.0%)
 - Qué tanto coinciden los modelos entre sí: 94.6%
 - Stack estadístico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotación + Overdispersión calibrada + ML ligero regularizado + Predictivo bayesiano dinámico + Ensamble + asimetría histórica
-- Factores dominantes: Elo dinámico +100.000; Historia mundialista +0.730; Rendimiento en Mundiales desde 1950 +0.568
+- Factores dominantes: Valor bruto de plantilla +764.978; Elo dinámico +100.000; Minutos Mundial de Clubes -57.917
 - Comparativa entre modelos:
-- Bivariante Poisson: victoria Brazil 58.7% | empate 26.3% | victoria Japan 15.0% | marcador más probable 1-0 (16.7%) | peso actual 35.1%
-- Poisson independiente: victoria Brazil 55.6% | empate 30.5% | victoria Japan 13.9% | marcador más probable 1-1 (14.1%) | peso actual 15.8%
-- Ajuste de baja anotación: victoria Brazil 55.6% | empate 30.5% | victoria Japan 13.9% | marcador más probable 1-1 (14.1%) | peso actual 17.5%
-- Overdispersión calibrada: victoria Brazil 56.9% | empate 25.5% | victoria Japan 17.6% | marcador más probable 1-0 (16.0%) | peso actual 7.1%
-- ML ligero regularizado: victoria Brazil 56.7% | empate 26.5% | victoria Japan 16.8% | marcador más probable 1-0 (16.5%) | peso actual 12.5%
-- Predictivo bayesiano dinámico: victoria Brazil 47.8% | empate 28.5% | victoria Japan 23.7% | marcador más probable 1-0 (13.9%) | peso actual 12.0%
-- Ensamble + asimetría histórica: victoria Brazil 56.4% | empate 27.8% | victoria Japan 15.8% | marcador más probable 1-0 (15.0%)
-- Quién tiene más probabilidad de avanzar: Brazil 74.2% | Japan 25.8%
-- Si empatan tras 90': gana en prórroga Brazil 30.0% | siguen empatados 58.4% | Japan 11.6%
-- Si llegan a penales: Brazil 58.4% | Japan 41.6%
+- Bivariante Poisson: victoria Brazil 61.7% | empate 24.6% | victoria Japan 13.7% | marcador más probable 1-0 (16.0%) | peso actual 35.1%
+- Poisson independiente: victoria Brazil 58.7% | empate 28.6% | victoria Japan 12.7% | marcador más probable 1-1 (13.3%) | peso actual 15.9%
+- Ajuste de baja anotación: victoria Brazil 58.7% | empate 28.6% | victoria Japan 12.7% | marcador más probable 1-1 (13.3%) | peso actual 17.4%
+- Overdispersión calibrada: victoria Brazil 59.5% | empate 24.1% | victoria Japan 16.3% | marcador más probable 1-0 (15.3%) | peso actual 7.1%
+- ML ligero regularizado: victoria Brazil 59.5% | empate 24.9% | victoria Japan 15.6% | marcador más probable 1-0 (15.8%) | peso actual 12.7%
+- Predictivo bayesiano dinámico: victoria Brazil 49.9% | empate 27.3% | victoria Japan 22.8% | marcador más probable 1-0 (13.4%) | peso actual 11.8%
+- Ensamble + asimetría histórica: victoria Brazil 59.3% | empate 26.0% | victoria Japan 14.6% | marcador más probable 1-0 (14.3%)
+- Quién tiene más probabilidad de avanzar: Brazil 76.6% | Japan 23.4%
+- Si empatan tras 90': gana en prórroga Brazil 32.0% | siguen empatados 56.8% | Japan 11.2%
+- Si llegan a penales: Brazil 60.5% | Japan 39.5%
 - Marcador más probable de la tanda: 4-2
-- Marcador medio esperado en la tanda: Brazil 3.97 | Japan 3.67
-- Marcadores de tanda más probables: 4-2 10.9%, 5-4 10.1%, 4-3 10.0%, 4-5 8.8%, 3-4 8.6%
-- Marcadores más probables: 1-0 15.0%, 2-0 12.3%, 0-0 12.2%, 1-1 11.9%, 2-1 8.1%, 3-0 6.8%, 0-1 6.5%, 3-1 4.5%
+- Marcador medio esperado en la tanda: Brazil 4.09 | Japan 3.55
+- Marcadores de tanda más probables: 4-2 15.0%, 5-4 11.9%, 4-3 10.9%, 4-5 7.4%, 5-3 6.6%
+- Marcadores más probables: 1-0 14.3%, 2-0 12.7%, 1-1 11.4%, 0-0 11.0%, 2-1 8.2%, 3-0 7.5%, 0-1 5.8%, 3-1 5.0%
 
 ### Dieciseisavos 5: France vs Egypt
 - Etapa: Dieciseisavos de final
@@ -3012,37 +2985,37 @@ _El Brier 2026 se activa automáticamente con el primer partido terminado; antes
 - Hora UTC: 2026-06-30T17:00:00Z
 - Clima estimado: 32.0 C | HR 55% | viento 15 km/h | estrés 0.20
 - Cambio por clima exigente: estrés climático 0.20.
-- Factores que más pesan ahora: Elo dinámico +403.000; Rendimiento en Mundiales desde 1950 +0.560
+- Factores que más pesan ahora: Valor bruto de plantilla +1534.858; Minutos Mundial de Clubes +982.034
 - Proyección automática: Cruce usado para este casillero hoy: France vs Egypt | probabilidad de que se dé 7.1% | ganador global del casillero: France 67.0% | si se juega exactamente este cruce: France 93.4%
 - Otras opciones de cruce: France vs Scotland -> France 6.4%; France vs United States -> France 5.6%
 - Marcador proyectado: 2-0
-- Marcador para cargar en Penca: 2-0 | 3.49 pts esp. | exacto 20.2% | diferencia 24.1%
-- Precisión de marcador: Marcador con precisión media | exacto más probable 2-0 20.2% | top-5 cubre 72.3%
-- Promedio estimado de goles del modelo: France 2.12 | Egypt 0.24
-- Probabilidades de resultado (90'): 80.0% / 16.2% / 3.7%
-- Lectura estadistica: Pick fuerte | pick actual Victoria France 80.0% | confianza 89.1%
-- Escenario de goles: ambos marcan 19.5% | más de 2.5 goles 42.7%
-- Goles totales esperados por el modelo: 2.39. Sin línea externa de goles cargada para ese partido.
-- Probabilidad de que no reciba goles: France 77.7% | Egypt 13.3%
-- Cuánta probabilidad cubren los 3 marcadores más probables: 54.0% | ventaja final más probable +1 (24.1%)
-- Qué tanto coinciden los modelos entre sí: 93.1%
+- Marcador para cargar en Penca: 2-0 | 3.53 pts esp. | exacto 20.0% | diferencia 24.1%
+- Precisión de marcador: Marcador defendible | exacto más probable 2-0 20.0% | top-5 cubre 71.2%
+- Promedio estimado de goles del modelo: France 2.25 | Egypt 0.24
+- Probabilidades de resultado (90'): 81.6% / 15.0% / 3.3%
+- Lectura estadistica: Pick muy fuerte | pick actual Victoria France 81.6% | confianza 91.0%
+- Escenario de goles: ambos marcan 19.9% | más de 2.5 goles 45.8%
+- Goles totales esperados por el modelo: 2.51. Sin línea externa de goles cargada para ese partido.
+- Probabilidad de que no reciba goles: France 77.7% | Egypt 12.0%
+- Cuánta probabilidad cubren los 3 marcadores más probables: 53.1% | ventaja final más probable +2 (24.1%)
+- Qué tanto coinciden los modelos entre sí: 93.2%
 - Stack estadístico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotación + Overdispersión calibrada + ML ligero regularizado + Predictivo bayesiano dinámico + Ensamble + asimetría histórica
-- Factores dominantes: Elo dinámico +403.000; Rendimiento en Mundiales desde 1950 +0.560; Historia mundialista +0.552
+- Factores dominantes: Valor bruto de plantilla +1534.858; Minutos Mundial de Clubes +982.034; Elo dinámico +403.000
 - Comparativa entre modelos:
-- Bivariante Poisson: victoria France 82.5% | empate 15.0% | victoria Egypt 2.5% | marcador más probable 2-0 (21.3%) | peso actual 37.1%
-- Poisson independiente: victoria France 81.3% | empate 15.9% | victoria Egypt 2.8% | marcador más probable 2-0 (21.2%) | peso actual 16.9%
-- Ajuste de baja anotación: victoria France 81.3% | empate 15.9% | victoria Egypt 2.8% | marcador más probable 2-0 (21.2%) | peso actual 15.6%
-- Overdispersión calibrada: victoria France 79.0% | empate 17.1% | victoria Egypt 3.9% | marcador más probable 1-0 (20.2%) | peso actual 7.6%
-- ML ligero regularizado: victoria France 79.9% | empate 16.6% | victoria Egypt 3.5% | marcador más probable 2-0 (20.0%) | peso actual 12.4%
-- Predictivo bayesiano dinámico: victoria France 63.5% | empate 23.7% | victoria Egypt 12.8% | marcador más probable 1-0 (15.7%) | peso actual 10.3%
-- Ensamble + asimetría histórica: victoria France 80.0% | empate 16.2% | victoria Egypt 3.7% | marcador más probable 2-0 (20.2%)
-- Quién tiene más probabilidad de avanzar: France 92.1% | Egypt 7.9%
-- Si empatan tras 90': gana en prórroga France 42.7% | siguen empatados 52.9% | Egypt 4.4%
-- Si llegan a penales: France 59.4% | Egypt 40.6%
+- Bivariante Poisson: victoria France 84.2% | empate 13.5% | victoria Egypt 2.2% | marcador más probable 2-0 (21.1%) | peso actual 36.8%
+- Poisson independiente: victoria France 82.7% | empate 15.0% | victoria Egypt 2.3% | marcador más probable 2-0 (21.0%) | peso actual 16.8%
+- Ajuste de baja anotación: victoria France 82.7% | empate 15.0% | victoria Egypt 2.3% | marcador más probable 2-0 (21.0%) | peso actual 15.5%
+- Overdispersión calibrada: victoria France 80.5% | empate 15.9% | victoria Egypt 3.6% | marcador más probable 1-0 (19.2%) | peso actual 8.1%
+- ML ligero regularizado: victoria France 81.6% | empate 15.2% | victoria Egypt 3.2% | marcador más probable 2-0 (19.7%) | peso actual 12.6%
+- Predictivo bayesiano dinámico: victoria France 65.4% | empate 22.4% | victoria Egypt 12.2% | marcador más probable 1-0 (14.9%) | peso actual 10.3%
+- Ensamble + asimetría histórica: victoria France 81.6% | empate 15.0% | victoria Egypt 3.3% | marcador más probable 2-0 (20.0%)
+- Quién tiene más probabilidad de avanzar: France 93.0% | Egypt 7.0%
+- Si empatan tras 90': gana en prórroga France 44.6% | siguen empatados 51.1% | Egypt 4.3%
+- Si llegan a penales: France 60.3% | Egypt 39.7%
 - Marcador más probable de la tanda: 4-2
-- Marcador medio esperado en la tanda: France 3.96 | Egypt 3.51
-- Marcadores de tanda más probables: 4-2 13.4%, 4-3 11.8%, 5-4 10.7%, 3-4 8.3%, 4-5 7.2%
-- Marcadores más probables: 2-0 20.2%, 1-0 18.9%, 3-0 14.9%, 0-0 10.5%, 4-0 7.8%, 1-1 5.0%, 2-1 4.8%, 3-1 3.6%
+- Marcador medio esperado en la tanda: France 3.98 | Egypt 3.42
+- Marcadores de tanda más probables: 4-2 12.5%, 4-3 12.5%, 5-4 10.6%, 3-4 6.6%, 5-3 6.4%
+- Marcadores más probables: 2-0 20.0%, 1-0 17.6%, 3-0 15.6%, 0-0 9.5%, 4-0 8.6%, 1-1 4.8%, 2-1 4.7%, 5-0 4.0%
 
 ### Dieciseisavos 6: Ecuador vs Norway
 - Etapa: Dieciseisavos de final
@@ -3050,37 +3023,37 @@ _El Brier 2026 se activa automáticamente con el primer partido terminado; antes
 - Sede: MetLife Stadium | United States
 - Hora UTC: 2026-06-30T21:00:00Z
 - Clima estimado: 29.0 C | HR 68% | viento 13 km/h | estrés 0.08
-- Factores que más pesan ahora: Elo dinámico +11.000; Ataque histórico desde 1950 -0.207
+- Factores que más pesan ahora: Minutos Mundial de Clubes -883.165; Valor bruto de plantilla -86.234
 - Proyección automática: Cruce usado para este casillero hoy: Ecuador vs Norway | probabilidad de que se dé 22.1% | ganador global del casillero: Norway 23.1% | si se juega exactamente este cruce: Norway 56.7%
 - Otras opciones de cruce: Ecuador vs Senegal -> Ecuador 10.0%; Ecuador vs Norway -> Ecuador 9.5%
 - Marcador proyectado: 1-1
-- Marcador para cargar en Penca: 1-1 | 2.11 pts esp. | exacto 14.8% | diferencia 33.3%
-- Precisión de marcador: Marcador con precisión media | exacto más probable 1-1 14.8% | top-5 cubre 57.6%
-- Promedio estimado de goles del modelo: Ecuador 1.07 | Norway 1.14
-- Probabilidades de resultado (90'): 31.5% / 33.3% / 35.2%
-- Lectura estadistica: Pronóstico parejo: sin favorito estadístico claro | pick actual Victoria Norway 35.2% | confianza 41.0%
-- Escenario de goles: ambos marcan 44.6% | más de 2.5 goles 36.6%
-- Goles totales esperados por el modelo: 2.17. Sin línea externa de goles cargada para ese partido.
-- Probabilidad de que no reciba goles: Ecuador 33.5% | Norway 36.0%
-- Cuánta probabilidad cubren los 3 marcadores más probables: 40.0% | ventaja final más probable +0 (33.3%)
-- Qué tanto coinciden los modelos entre sí: 94.9%
+- Marcador para cargar en Penca: 1-1 | 2.05 pts esp. | exacto 14.6% | diferencia 32.3%
+- Precisión de marcador: Marcador con precisión media | exacto más probable 1-1 14.6% | top-5 cubre 54.6%
+- Promedio estimado de goles del modelo: Ecuador 1.15 | Norway 1.18
+- Probabilidades de resultado (90'): 33.4% / 32.3% / 34.3%
+- Lectura estadistica: Pronóstico parejo: sin favorito estadístico claro | pick actual Victoria Norway 34.3% | confianza 40.0%
+- Escenario de goles: ambos marcan 47.3% | más de 2.5 goles 39.9%
+- Goles totales esperados por el modelo: 2.29. Sin línea externa de goles cargada para ese partido.
+- Probabilidad de que no reciba goles: Ecuador 32.3% | Norway 33.0%
+- Cuánta probabilidad cubren los 3 marcadores más probables: 37.4% | ventaja final más probable +0 (32.3%)
+- Qué tanto coinciden los modelos entre sí: 95.0%
 - Stack estadístico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotación + Overdispersión calibrada + ML ligero regularizado + Predictivo bayesiano dinámico + Ensamble + asimetría histórica
-- Factores dominantes: Elo dinámico +11.000; Ataque histórico desde 1950 -0.207; Rendimiento competitivo desde 1950 -0.181
+- Factores dominantes: Minutos Mundial de Clubes -883.165; Valor bruto de plantilla -86.234; Elo dinámico +11.000
 - Comparativa entre modelos:
-- Bivariante Poisson: victoria Ecuador 32.5% | empate 30.8% | victoria Norway 36.7% | marcador más probable 1-1 (13.5%) | peso actual 33.9%
-- Poisson independiente: victoria Ecuador 28.7% | empate 38.7% | victoria Norway 32.6% | marcador más probable 1-1 (18.1%) | peso actual 14.8%
-- Ajuste de baja anotación: victoria Ecuador 28.7% | empate 38.7% | victoria Norway 32.6% | marcador más probable 1-1 (18.1%) | peso actual 18.7%
-- Overdispersión calibrada: victoria Ecuador 33.8% | empate 28.8% | victoria Norway 37.5% | marcador más probable 0-0 (12.8%) | peso actual 6.6%
-- ML ligero regularizado: victoria Ecuador 32.7% | empate 30.9% | victoria Norway 36.4% | marcador más probable 0-0 (15.1%) | peso actual 12.6%
-- Predictivo bayesiano dinámico: victoria Ecuador 33.8% | empate 30.5% | victoria Norway 35.7% | marcador más probable 0-0 (14.1%) | peso actual 13.4%
-- Ensamble + asimetría histórica: victoria Ecuador 31.5% | empate 33.3% | victoria Norway 35.2% | marcador más probable 1-1 (14.8%)
-- Quién tiene más probabilidad de avanzar: Ecuador 47.1% | Norway 52.9%
-- Si empatan tras 90': gana en prórroga Ecuador 18.1% | siguen empatados 61.2% | Norway 20.7%
-- Si llegan a penales: Ecuador 46.6% | Norway 53.4%
+- Bivariante Poisson: victoria Ecuador 34.7% | empate 29.6% | victoria Norway 35.7% | marcador más probable 1-1 (13.3%) | peso actual 33.6%
+- Poisson independiente: victoria Ecuador 30.7% | empate 37.7% | victoria Norway 31.6% | marcador más probable 1-1 (18.0%) | peso actual 14.7%
+- Ajuste de baja anotación: victoria Ecuador 30.7% | empate 37.7% | victoria Norway 31.6% | marcador más probable 1-1 (18.0%) | peso actual 18.7%
+- Overdispersión calibrada: victoria Ecuador 35.7% | empate 27.6% | victoria Norway 36.6% | marcador más probable 1-1 (11.6%) | peso actual 6.6%
+- ML ligero regularizado: victoria Ecuador 34.5% | empate 30.0% | victoria Norway 35.4% | marcador más probable 0-0 (13.9%) | peso actual 12.9%
+- Predictivo bayesiano dinámico: victoria Ecuador 34.9% | empate 29.6% | victoria Norway 35.5% | marcador más probable 0-0 (12.9%) | peso actual 13.4%
+- Ensamble + asimetría histórica: victoria Ecuador 33.4% | empate 32.3% | victoria Norway 34.3% | marcador más probable 1-1 (14.6%)
+- Quién tiene más probabilidad de avanzar: Ecuador 49.2% | Norway 50.8%
+- Si empatan tras 90': gana en prórroga Ecuador 19.6% | siguen empatados 60.9% | Norway 19.6%
+- Si llegan a penales: Ecuador 48.2% | Norway 51.8%
 - Marcador más probable de la tanda: 3-4
-- Marcador medio esperado en la tanda: Ecuador 3.67 | Norway 3.80
-- Marcadores de tanda más probables: 3-4 11.2%, 2-4 10.3%, 4-3 9.0%, 4-5 8.6%, 4-2 8.6%
-- Marcadores más probables: 1-1 14.8%, 0-0 14.1%, 0-1 11.2%, 1-0 10.5%, 1-2 7.1%, 0-2 6.9%, 2-1 6.7%, 2-0 6.0%
+- Marcador medio esperado en la tanda: Ecuador 3.70 | Norway 3.69
+- Marcadores de tanda más probables: 3-4 10.3%, 5-4 9.6%, 4-3 9.2%, 4-5 8.8%, 2-4 8.7%
+- Marcadores más probables: 1-1 14.6%, 0-0 12.7%, 0-1 10.1%, 1-0 10.0%, 1-2 7.2%, 2-1 7.2%, 0-2 6.5%, 2-0 6.3%
 
 ### Dieciseisavos 7: Mexico vs Scotland
 - Etapa: Dieciseisavos de final
@@ -3088,37 +3061,37 @@ _El Brier 2026 se activa automáticamente con el primer partido terminado; antes
 - Sede: Estadio Banorte | Mexico
 - Hora UTC: 2026-07-01T01:00:00Z
 - Clima estimado: 22.0 C | HR 56% | viento 12 km/h | estrés 0.02
-- Factores que más pesan ahora: Elo dinámico +63.000; Rendimiento competitivo desde 1950 +0.251
+- Factores que más pesan ahora: Minutos Mundial de Clubes +964.201; Valor bruto de plantilla +434.312
 - Proyección automática: Cruce usado para este casillero hoy: Mexico vs Scotland | probabilidad de que se dé 10.5% | ganador global del casillero: Mexico 43.4% | si se juega exactamente este cruce: Mexico 72.2%
 - Otras opciones de cruce: Mexico vs Morocco -> Mexico 5.6%; Mexico vs Saudi Arabia -> Mexico 5.0%
 - Marcador proyectado: 1-1
-- Marcador para cargar en Penca: 2-1 | 2.16 pts esp. | exacto 8.1% | diferencia 23.0%
-- Precisión de marcador: Marcador frágil | exacto más probable 1-1 13.0% | top-5 cubre 56.3%
-- Promedio estimado de goles del modelo: Mexico 1.46 | Scotland 0.88
-- Probabilidades de resultado (90'): 48.5% / 29.8% / 21.7%
-- Lectura estadistica: Pronóstico parejo: sin favorito estadístico claro | pick actual Victoria Mexico 48.5% | confianza 53.4%
-- Escenario de goles: ambos marcan 44.0% | más de 2.5 goles 40.4%
-- Goles totales esperados por el modelo: 2.31. Sin línea externa de goles cargada para ese partido.
-- Probabilidad de que no reciba goles: Mexico 43.2% | Scotland 25.1%
-- Cuánta probabilidad cubren los 3 marcadores más probables: 38.1% | ventaja final más probable +0 (29.8%)
-- Qué tanto coinciden los modelos entre sí: 94.8%
+- Marcador para cargar en Penca: 2-1 | 2.19 pts esp. | exacto 8.3% | diferencia 22.9%
+- Precisión de marcador: Marcador frágil | exacto más probable 1-1 12.8% | top-5 cubre 55.0%
+- Promedio estimado de goles del modelo: Mexico 1.52 | Scotland 0.91
+- Probabilidades de resultado (90'): 49.5% / 29.0% / 21.5%
+- Lectura estadistica: Pronóstico parejo: sin favorito estadístico claro | pick actual Victoria Mexico 49.5% | confianza 54.4%
+- Escenario de goles: ambos marcan 45.2% | más de 2.5 goles 42.4%
+- Goles totales esperados por el modelo: 2.39. Sin línea externa de goles cargada para ese partido.
+- Probabilidad de que no reciba goles: Mexico 42.4% | Scotland 23.9%
+- Cuánta probabilidad cubren los 3 marcadores más probables: 36.6% | ventaja final más probable +0 (29.0%)
+- Qué tanto coinciden los modelos entre sí: 94.6%
 - Stack estadístico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotación + Overdispersión calibrada + ML ligero regularizado + Predictivo bayesiano dinámico + Ensamble + asimetría histórica
-- Factores dominantes: Elo dinámico +63.000; Rendimiento competitivo desde 1950 +0.251; Historia competitiva desde 1950 +0.213
+- Factores dominantes: Minutos Mundial de Clubes +964.201; Valor bruto de plantilla +434.312; Elo dinámico +63.000
 - Comparativa entre modelos:
-- Bivariante Poisson: victoria Mexico 50.5% | empate 28.0% | victoria Scotland 21.5% | marcador más probable 1-0 (14.5%) | peso actual 34.6%
-- Poisson independiente: victoria Mexico 46.9% | empate 33.7% | victoria Scotland 19.4% | marcador más probable 1-1 (15.9%) | peso actual 15.4%
-- Ajuste de baja anotación: victoria Mexico 46.9% | empate 33.7% | victoria Scotland 19.4% | marcador más probable 1-1 (15.9%) | peso actual 17.9%
-- Overdispersión calibrada: victoria Mexico 49.7% | empate 26.6% | victoria Scotland 23.8% | marcador más probable 1-0 (14.0%) | peso actual 6.9%
-- ML ligero regularizado: victoria Mexico 49.1% | empate 28.1% | victoria Scotland 22.8% | marcador más probable 1-0 (14.9%) | peso actual 12.7%
-- Predictivo bayesiano dinámico: victoria Mexico 43.3% | empate 28.9% | victoria Scotland 27.8% | marcador más probable 1-0 (12.8%) | peso actual 12.5%
-- Ensamble + asimetría histórica: victoria Mexico 48.5% | empate 29.8% | victoria Scotland 21.7% | marcador más probable 1-1 (13.0%)
-- Quién tiene más probabilidad de avanzar: Mexico 65.6% | Scotland 34.4%
-- Si empatan tras 90': gana en prórroga Mexico 26.3% | siguen empatados 58.9% | Scotland 14.8%
-- Si llegan a penales: Mexico 52.8% | Scotland 47.2%
-- Marcador más probable de la tanda: 4-2
-- Marcador medio esperado en la tanda: Mexico 3.93 | Scotland 3.76
-- Marcadores de tanda más probables: 4-2 10.6%, 4-3 10.0%, 5-4 9.4%, 4-5 8.4%, 2-4 7.8%
-- Marcadores más probables: 1-1 13.0%, 1-0 12.9%, 0-0 12.3%, 2-0 10.1%, 2-1 8.1%, 0-1 7.7%, 3-0 5.3%, 1-2 5.1%
+- Bivariante Poisson: victoria Mexico 51.7% | empate 27.2% | victoria Scotland 21.1% | marcador más probable 1-0 (14.0%) | peso actual 34.5%
+- Poisson independiente: victoria Mexico 48.0% | empate 32.9% | victoria Scotland 19.1% | marcador más probable 1-1 (15.6%) | peso actual 15.3%
+- Ajuste de baja anotación: victoria Mexico 48.0% | empate 32.9% | victoria Scotland 19.1% | marcador más probable 1-1 (15.6%) | peso actual 17.9%
+- Overdispersión calibrada: victoria Mexico 50.6% | empate 25.9% | victoria Scotland 23.5% | marcador más probable 1-0 (13.5%) | peso actual 7.0%
+- ML ligero regularizado: victoria Mexico 49.7% | empate 27.2% | victoria Scotland 23.0% | marcador más probable 1-0 (14.1%) | peso actual 12.9%
+- Predictivo bayesiano dinámico: victoria Mexico 44.0% | empate 28.2% | victoria Scotland 27.8% | marcador más probable 1-0 (12.4%) | peso actual 12.5%
+- Ensamble + asimetría histórica: victoria Mexico 49.5% | empate 29.0% | victoria Scotland 21.5% | marcador más probable 1-1 (12.8%)
+- Quién tiene más probabilidad de avanzar: Mexico 65.9% | Scotland 34.1%
+- Si empatan tras 90': gana en prórroga Mexico 27.2% | siguen empatados 58.1% | Scotland 14.6%
+- Si llegan a penales: Mexico 50.4% | Scotland 49.6%
+- Marcador más probable de la tanda: 3-4
+- Marcador medio esperado en la tanda: Mexico 3.72 | Scotland 3.61
+- Marcadores de tanda más probables: 3-4 10.4%, 4-3 10.2%, 5-4 9.1%, 4-5 9.1%, 4-2 8.8%
+- Marcadores más probables: 1-1 12.8%, 1-0 12.3%, 0-0 11.5%, 2-0 10.1%, 2-1 8.3%, 0-1 7.3%, 3-0 5.5%, 1-2 5.2%
 
 ### Dieciseisavos 8: England vs Uzbekistan
 - Etapa: Dieciseisavos de final
@@ -3127,37 +3100,37 @@ _El Brier 2026 se activa automáticamente con el primer partido terminado; antes
 - Hora UTC: 2026-07-01T16:00:00Z
 - Clima estimado: 30.0 C | HR 70% | viento 11 km/h | estrés 0.23
 - Cambio por clima exigente: estrés climático 0.23.
-- Factores que más pesan ahora: Elo dinámico +314.000; Historia mundialista +0.532
+- Factores que más pesan ahora: Valor bruto de plantilla +1365.254; Minutos Mundial de Clubes +913.324
 - Proyección automática: Cruce usado para este casillero hoy: England vs Uzbekistan | probabilidad de que se dé 23.7% | ganador global del casillero: England 60.0% | si se juega exactamente este cruce: England 92.1%
 - Otras opciones de cruce: Croatia vs Uzbekistan -> Croatia 9.2%; England vs Dem. Rep. of Congo -> England 8.8%
 - Marcador proyectado: 2-0
-- Marcador para cargar en Penca: 2-0 | 3.33 pts esp. | exacto 18.8% | diferencia 23.4%
-- Precisión de marcador: Marcador con precisión media | exacto más probable 2-0 18.8% | top-5 cubre 68.2%
-- Promedio estimado de goles del modelo: England 2.01 | Uzbekistan 0.32
-- Probabilidades de resultado (90'): 76.5% / 18.4% / 5.1%
-- Lectura estadistica: Pick fuerte | pick actual Victoria England 76.5% | confianza 84.6%
-- Escenario de goles: ambos marcan 23.7% | más de 2.5 goles 42.0%
-- Goles totales esperados por el modelo: 2.36. Sin línea externa de goles cargada para ese partido.
-- Probabilidad de que no reciba goles: England 72.6% | Uzbekistan 14.7%
-- Cuánta probabilidad cubren los 3 marcadores más probables: 50.6% | ventaja final más probable +1 (24.7%)
-- Qué tanto coinciden los modelos entre sí: 93.4%
+- Marcador para cargar en Penca: 2-0 | 3.41 pts esp. | exacto 19.1% | diferencia 23.6%
+- Precisión de marcador: Marcador con precisión media | exacto más probable 2-0 19.1% | top-5 cubre 68.5%
+- Promedio estimado de goles del modelo: England 2.13 | Uzbekistan 0.31
+- Probabilidades de resultado (90'): 78.8% / 16.7% / 4.5%
+- Lectura estadistica: Pick fuerte | pick actual Victoria England 78.8% | confianza 87.4%
+- Escenario de goles: ambos marcan 22.9% | más de 2.5 goles 44.7%
+- Goles totales esperados por el modelo: 2.47. Sin línea externa de goles cargada para ese partido.
+- Probabilidad de que no reciba goles: England 73.8% | Uzbekistan 13.2%
+- Cuánta probabilidad cubren los 3 marcadores más probables: 50.9% | ventaja final más probable +2 (23.6%)
+- Qué tanto coinciden los modelos entre sí: 93.2%
 - Stack estadístico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotación + Overdispersión calibrada + ML ligero regularizado + Predictivo bayesiano dinámico + Ensamble + asimetría histórica
-- Factores dominantes: Elo dinámico +314.000; Historia mundialista +0.532; Ranking FIFA / puntos FIFA +0.446
+- Factores dominantes: Valor bruto de plantilla +1365.254; Minutos Mundial de Clubes +913.324; Elo dinámico +314.000
 - Comparativa entre modelos:
-- Bivariante Poisson: victoria England 79.0% | empate 17.2% | victoria Uzbekistan 3.8% | marcador más probable 1-0 (20.2%) | peso actual 36.7%
-- Poisson independiente: victoria England 77.3% | empate 18.6% | victoria Uzbekistan 4.1% | marcador más probable 2-0 (19.6%) | peso actual 16.8%
-- Ajuste de baja anotación: victoria England 77.3% | empate 18.6% | victoria Uzbekistan 4.1% | marcador más probable 2-0 (19.6%) | peso actual 16.1%
-- Overdispersión calibrada: victoria England 75.4% | empate 18.9% | victoria Uzbekistan 5.7% | marcador más probable 1-0 (19.5%) | peso actual 7.6%
-- ML ligero regularizado: victoria England 76.9% | empate 18.3% | victoria Uzbekistan 4.8% | marcador más probable 1-0 (19.2%) | peso actual 12.3%
-- Predictivo bayesiano dinámico: victoria England 60.6% | empate 24.8% | victoria Uzbekistan 14.6% | marcador más probable 1-0 (15.4%) | peso actual 10.5%
-- Ensamble + asimetría histórica: victoria England 76.5% | empate 18.4% | victoria Uzbekistan 5.1% | marcador más probable 2-0 (18.8%)
-- Quién tiene más probabilidad de avanzar: England 89.4% | Uzbekistan 10.6%
-- Si empatan tras 90': gana en prórroga England 39.5% | siguen empatados 54.4% | Uzbekistan 6.2%
-- Si llegan a penales: England 56.5% | Uzbekistan 43.5%
-- Marcador más probable de la tanda: 4-2
-- Marcador medio esperado en la tanda: England 3.93 | Uzbekistan 3.53
-- Marcadores de tanda más probables: 4-2 12.4%, 4-3 11.6%, 5-4 11.1%, 3-4 8.0%, 4-5 7.0%
-- Marcadores más probables: 2-0 18.8%, 1-0 18.3%, 3-0 13.4%, 0-0 10.9%, 4-0 6.7%, 1-1 6.3%, 2-1 5.7%, 3-1 4.1%
+- Bivariante Poisson: victoria England 81.4% | empate 15.4% | victoria Uzbekistan 3.2% | marcador más probable 2-0 (20.0%) | peso actual 36.6%
+- Poisson independiente: victoria England 79.9% | empate 16.7% | victoria Uzbekistan 3.4% | marcador más probable 2-0 (19.9%) | peso actual 16.7%
+- Ajuste de baja anotación: victoria England 79.9% | empate 16.7% | victoria Uzbekistan 3.4% | marcador más probable 2-0 (19.9%) | peso actual 15.8%
+- Overdispersión calibrada: victoria England 77.7% | empate 17.4% | victoria Uzbekistan 4.9% | marcador más probable 1-0 (18.9%) | peso actual 7.8%
+- ML ligero regularizado: victoria England 78.6% | empate 17.0% | victoria Uzbekistan 4.5% | marcador más probable 2-0 (18.8%) | peso actual 12.6%
+- Predictivo bayesiano dinámico: victoria England 62.7% | empate 23.5% | victoria Uzbekistan 13.8% | marcador más probable 1-0 (14.9%) | peso actual 10.4%
+- Ensamble + asimetría histórica: victoria England 78.8% | empate 16.7% | victoria Uzbekistan 4.5% | marcador más probable 2-0 (19.1%)
+- Quién tiene más probabilidad de avanzar: England 91.1% | Uzbekistan 8.9%
+- Si empatan tras 90': gana en prórroga England 42.0% | siguen empatados 52.7% | Uzbekistan 5.3%
+- Si llegan a penales: England 59.9% | Uzbekistan 40.1%
+- Marcador más probable de la tanda: 4-3
+- Marcador medio esperado en la tanda: England 3.99 | Uzbekistan 3.33
+- Marcadores de tanda más probables: 4-3 15.2%, 4-2 13.0%, 5-4 10.1%, 4-5 6.4%, 3-4 6.1%
+- Marcadores más probables: 2-0 19.1%, 1-0 17.4%, 3-0 14.4%, 0-0 9.9%, 4-0 7.6%, 1-1 5.7%, 2-1 5.3%, 3-1 4.1%
 
 ### Dieciseisavos 9: Turkey vs Bosnia and Herzegovina
 - Etapa: Dieciseisavos de final
@@ -3165,37 +3138,37 @@ _El Brier 2026 se activa automáticamente con el primer partido terminado; antes
 - Sede: Lumen Field | United States
 - Hora UTC: 2026-07-01T20:00:00Z
 - Clima estimado: 23.0 C | HR 65% | viento 10 km/h | estrés 0.02
-- Factores que más pesan ahora: Elo dinámico +309.000; Recursos/PIB proxy +0.301
+- Factores que más pesan ahora: Valor bruto de plantilla +1184.881; Minutos Mundial de Clubes +989.555
 - Proyección automática: Cruce usado para este casillero hoy: Turkey vs Bosnia and Herzegovina | probabilidad de que se dé 10.5% | ganador global del casillero: Turkey 34.9% | si se juega exactamente este cruce: Turkey 91.1%
 - Otras opciones de cruce: Paraguay vs Bosnia and Herzegovina -> Paraguay 4.8%; Australia vs Bosnia and Herzegovina -> Australia 3.8%
 - Marcador proyectado: 2-0
-- Marcador para cargar en Penca: 2-0 | 3.21 pts esp. | exacto 17.8% | diferencia 22.9%
-- Precisión de marcador: Marcador con precisión media | exacto más probable 2-0 17.8% | top-5 cubre 65.5%
-- Promedio estimado de goles del modelo: Turkey 1.97 | Bosnia and Herzegovina 0.37
-- Probabilidades de resultado (90'): 73.9% / 19.8% / 6.3%
-- Lectura estadistica: Pick fuerte | pick actual Victoria Turkey 73.9% | confianza 81.3%
-- Escenario de goles: ambos marcan 28.1% | más de 2.5 goles 42.3%
-- Goles totales esperados por el modelo: 2.38. Sin línea externa de goles cargada para ese partido.
-- Probabilidad de que no reciba goles: Turkey 67.5% | Bosnia and Herzegovina 15.2%
-- Cuánta probabilidad cubren los 3 marcadores más probables: 47.3% | ventaja final más probable +1 (25.3%)
-- Qué tanto coinciden los modelos entre sí: 93.6%
+- Marcador para cargar en Penca: 2-0 | 3.27 pts esp. | exacto 17.8% | diferencia 23.2%
+- Precisión de marcador: Marcador con precisión media | exacto más probable 2-0 17.8% | top-5 cubre 64.0%
+- Promedio estimado de goles del modelo: Turkey 2.07 | Bosnia and Herzegovina 0.37
+- Probabilidades de resultado (90'): 75.6% / 18.8% / 5.6%
+- Lectura estadistica: Pick fuerte | pick actual Victoria Turkey 75.6% | confianza 83.2%
+- Escenario de goles: ambos marcan 28.5% | más de 2.5 goles 45.1%
+- Goles totales esperados por el modelo: 2.49. Sin línea externa de goles cargada para ese partido.
+- Probabilidad de que no reciba goles: Turkey 67.7% | Bosnia and Herzegovina 13.8%
+- Cuánta probabilidad cubren los 3 marcadores más probables: 46.8% | ventaja final más probable +1 (24.0%)
+- Qué tanto coinciden los modelos entre sí: 93.3%
 - Stack estadístico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotación + Overdispersión calibrada + ML ligero regularizado + Predictivo bayesiano dinámico + Ensamble + asimetría histórica
-- Factores dominantes: Elo dinámico +309.000; Recursos/PIB proxy +0.301; Ranking FIFA / puntos FIFA +0.264
+- Factores dominantes: Valor bruto de plantilla +1184.881; Minutos Mundial de Clubes +989.555; Elo dinámico +309.000
 - Comparativa entre modelos:
-- Bivariante Poisson: victoria Turkey 76.4% | empate 18.7% | victoria Bosnia and Herzegovina 4.9% | marcador más probable 1-0 (19.8%) | peso actual 36.5%
-- Poisson independiente: victoria Turkey 74.4% | empate 20.3% | victoria Bosnia and Herzegovina 5.2% | marcador más probable 2-0 (18.5%) | peso actual 16.7%
-- Ajuste de baja anotación: victoria Turkey 74.4% | empate 20.3% | victoria Bosnia and Herzegovina 5.2% | marcador más probable 2-0 (18.5%) | peso actual 16.3%
-- Overdispersión calibrada: victoria Turkey 72.9% | empate 20.0% | victoria Bosnia and Herzegovina 7.2% | marcador más probable 1-0 (18.8%) | peso actual 7.5%
-- ML ligero regularizado: victoria Turkey 74.7% | empate 19.2% | victoria Bosnia and Herzegovina 6.1% | marcador más probable 1-0 (18.5%) | peso actual 12.3%
-- Predictivo bayesiano dinámico: victoria Turkey 58.8% | empate 25.4% | victoria Bosnia and Herzegovina 15.8% | marcador más probable 1-0 (15.2%) | peso actual 10.7%
-- Ensamble + asimetría histórica: victoria Turkey 73.9% | empate 19.8% | victoria Bosnia and Herzegovina 6.3% | marcador más probable 2-0 (17.8%)
-- Quién tiene más probabilidad de avanzar: Turkey 87.5% | Bosnia and Herzegovina 12.5%
-- Si empatan tras 90': gana en prórroga Turkey 39.2% | siguen empatados 54.6% | Bosnia and Herzegovina 6.3%
-- Si llegan a penales: Turkey 53.7% | Bosnia and Herzegovina 46.3%
-- Marcador más probable de la tanda: 4-3
-- Marcador medio esperado en la tanda: Turkey 3.81 | Bosnia and Herzegovina 3.61
-- Marcadores de tanda más probables: 4-3 10.6%, 5-4 10.1%, 4-2 9.6%, 3-4 9.4%, 4-5 8.5%
-- Marcadores más probables: 2-0 17.8%, 1-0 17.5%, 3-0 12.1%, 0-0 10.8%, 1-1 7.4%, 2-1 6.7%, 4-0 5.8%, 3-1 4.6%
+- Bivariante Poisson: victoria Turkey 78.5% | empate 17.1% | victoria Bosnia and Herzegovina 4.4% | marcador más probable 1-0 (18.6%) | peso actual 36.3%
+- Poisson independiente: victoria Turkey 75.7% | empate 20.1% | victoria Bosnia and Herzegovina 4.3% | marcador más probable 2-0 (18.4%) | peso actual 16.7%
+- Ajuste de baja anotación: victoria Turkey 75.7% | empate 20.1% | victoria Bosnia and Herzegovina 4.3% | marcador más probable 2-0 (18.4%) | peso actual 16.1%
+- Overdispersión calibrada: victoria Turkey 74.8% | empate 18.6% | victoria Bosnia and Herzegovina 6.6% | marcador más probable 1-0 (17.9%) | peso actual 7.7%
+- ML ligero regularizado: victoria Turkey 76.7% | empate 17.9% | victoria Bosnia and Herzegovina 5.4% | marcador más probable 2-0 (18.2%) | peso actual 12.5%
+- Predictivo bayesiano dinámico: victoria Turkey 60.5% | empate 24.3% | victoria Bosnia and Herzegovina 15.1% | marcador más probable 1-0 (14.7%) | peso actual 10.6%
+- Ensamble + asimetría histórica: victoria Turkey 75.6% | empate 18.8% | victoria Bosnia and Herzegovina 5.6% | marcador más probable 2-0 (17.8%)
+- Quién tiene más probabilidad de avanzar: Turkey 88.6% | Bosnia and Herzegovina 11.4%
+- Si empatan tras 90': gana en prórroga Turkey 40.4% | siguen empatados 53.4% | Bosnia and Herzegovina 6.2%
+- Si llegan a penales: Turkey 53.5% | Bosnia and Herzegovina 46.5%
+- Marcador más probable de la tanda: 4-2
+- Marcador medio esperado en la tanda: Turkey 3.83 | Bosnia and Herzegovina 3.48
+- Marcadores de tanda más probables: 4-2 12.0%, 4-3 10.3%, 5-4 9.8%, 3-4 8.6%, 4-5 8.1%
+- Marcadores más probables: 2-0 17.8%, 1-0 16.3%, 3-0 12.8%, 0-0 10.0%, 1-1 7.2%, 2-1 6.6%, 4-0 6.5%, 3-1 4.8%
 
 ### Dieciseisavos 10: Belgium vs Czech Republic
 - Etapa: Dieciseisavos de final
@@ -3203,37 +3176,37 @@ _El Brier 2026 se activa automáticamente con el primer partido terminado; antes
 - Sede: Levi's Stadium | United States
 - Hora UTC: 2026-07-02T00:00:00Z
 - Clima estimado: 24.0 C | HR 60% | viento 12 km/h | estrés 0.02
-- Factores que más pesan ahora: Elo dinámico +118.000; Rendimiento en Mundiales desde 1950 +0.302
+- Factores que más pesan ahora: Minutos Mundial de Clubes +946.492; Valor bruto de plantilla +798.199
 - Proyección automática: Cruce usado para este casillero hoy: Belgium vs Czech Republic | probabilidad de que se dé 12.8% | ganador global del casillero: Belgium 50.2% | si se juega exactamente este cruce: Belgium 78.8%
 - Otras opciones de cruce: Belgium vs South Korea -> Belgium 7.3%; Belgium vs Saudi Arabia -> Belgium 4.6%
 - Marcador proyectado: 1-0
-- Marcador para cargar en Penca: 2-1 | 2.37 pts esp. | exacto 8.5% | diferencia 24.6%
-- Precisión de marcador: Marcador con precisión media | exacto más probable 1-0 14.0% | top-5 cubre 58.5%
-- Promedio estimado de goles del modelo: Belgium 1.55 | Czech Republic 0.75
-- Probabilidades de resultado (90'): 54.2% / 28.5% / 17.2%
-- Lectura estadistica: Pronóstico parejo: sin favorito estadístico claro | pick actual Victoria Belgium 54.2% | confianza 59.2%
-- Escenario de goles: ambos marcan 42.5% | más de 2.5 goles 40.6%
-- Goles totales esperados por el modelo: 2.32. Sin línea externa de goles cargada para ese partido.
-- Probabilidad de que no reciba goles: Belgium 47.2% | Czech Republic 22.3%
-- Cuánta probabilidad cubren los 3 marcadores más probables: 38.6% | ventaja final más probable +0 (28.5%)
+- Marcador para cargar en Penca: 2-1 | 2.45 pts esp. | exacto 8.7% | diferencia 24.4%
+- Precisión de marcador: Marcador con precisión media | exacto más probable 1-0 13.6% | top-5 cubre 57.0%
+- Promedio estimado de goles del modelo: Belgium 1.64 | Czech Republic 0.75
+- Probabilidades de resultado (90'): 56.8% / 27.0% / 16.2%
+- Lectura estadistica: Pick utilizable | pick actual Victoria Belgium 56.8% | confianza 61.8%
+- Escenario de goles: ambos marcan 43.3% | más de 2.5 goles 43.1%
+- Goles totales esperados por el modelo: 2.42. Sin línea externa de goles cargada para ese partido.
+- Probabilidad de que no reciba goles: Belgium 47.2% | Czech Republic 20.4%
+- Cuánta probabilidad cubren los 3 marcadores más probables: 37.4% | ventaja final más probable +0 (27.0%)
 - Qué tanto coinciden los modelos entre sí: 94.6%
 - Stack estadístico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotación + Overdispersión calibrada + ML ligero regularizado + Predictivo bayesiano dinámico + Ensamble + asimetría histórica
-- Factores dominantes: Elo dinámico +118.000; Rendimiento en Mundiales desde 1950 +0.302; Ranking FIFA / puntos FIFA +0.292
+- Factores dominantes: Minutos Mundial de Clubes +946.492; Valor bruto de plantilla +798.199; Elo dinámico +118.000
 - Comparativa entre modelos:
-- Bivariante Poisson: victoria Belgium 56.5% | empate 26.9% | victoria Czech Republic 16.5% | marcador más probable 1-0 (16.3%) | peso actual 35.0%
-- Poisson independiente: victoria Belgium 53.2% | empate 31.6% | victoria Czech Republic 15.2% | marcador más probable 1-1 (14.6%) | peso actual 15.7%
-- Ajuste de baja anotación: victoria Belgium 53.2% | empate 31.6% | victoria Czech Republic 15.2% | marcador más probable 1-1 (14.6%) | peso actual 17.6%
-- Overdispersión calibrada: victoria Belgium 54.9% | empate 26.0% | victoria Czech Republic 19.1% | marcador más probable 1-0 (15.6%) | peso actual 7.0%
-- ML ligero regularizado: victoria Belgium 54.7% | empate 27.0% | victoria Czech Republic 18.3% | marcador más probable 1-0 (16.1%) | peso actual 12.5%
-- Predictivo bayesiano dinámico: victoria Belgium 46.7% | empate 28.5% | victoria Czech Republic 24.7% | marcador más probable 1-0 (13.5%) | peso actual 12.2%
-- Ensamble + asimetría histórica: victoria Belgium 54.2% | empate 28.5% | victoria Czech Republic 17.2% | marcador más probable 1-0 (14.0%)
-- Quién tiene más probabilidad de avanzar: Belgium 71.1% | Czech Republic 28.9%
-- Si empatan tras 90': gana en prórroga Belgium 28.2% | siguen empatados 59.3% | Czech Republic 12.5%
-- Si llegan a penales: Belgium 52.4% | Czech Republic 47.6%
+- Bivariante Poisson: victoria Belgium 59.1% | empate 25.5% | victoria Czech Republic 15.3% | marcador más probable 1-0 (15.8%) | peso actual 35.0%
+- Poisson independiente: victoria Belgium 55.9% | empate 29.9% | victoria Czech Republic 14.1% | marcador más probable 1-1 (14.0%) | peso actual 15.8%
+- Ajuste de baja anotación: victoria Belgium 55.9% | empate 29.9% | victoria Czech Republic 14.1% | marcador más probable 1-1 (14.0%) | peso actual 17.5%
+- Overdispersión calibrada: victoria Belgium 57.2% | empate 24.8% | victoria Czech Republic 18.0% | marcador más probable 1-0 (15.1%) | peso actual 7.0%
+- ML ligero regularizado: victoria Belgium 57.1% | empate 25.7% | victoria Czech Republic 17.2% | marcador más probable 1-0 (15.6%) | peso actual 12.7%
+- Predictivo bayesiano dinámico: victoria Belgium 48.5% | empate 27.6% | victoria Czech Republic 23.9% | marcador más probable 1-0 (13.2%) | peso actual 12.0%
+- Ensamble + asimetría histórica: victoria Belgium 56.8% | empate 27.0% | victoria Czech Republic 16.2% | marcador más probable 1-0 (13.6%)
+- Quién tiene más probabilidad de avanzar: Belgium 73.2% | Czech Republic 26.8%
+- Si empatan tras 90': gana en prórroga Belgium 30.2% | siguen empatados 57.7% | Czech Republic 12.1%
+- Si llegan a penales: Belgium 52.6% | Czech Republic 47.4%
 - Marcador más probable de la tanda: 4-3
-- Marcador medio esperado en la tanda: Belgium 3.78 | Czech Republic 3.73
-- Marcadores de tanda más probables: 4-3 10.1%, 3-4 9.7%, 4-2 9.2%, 5-4 9.2%, 4-5 8.8%
-- Marcadores más probables: 1-0 14.0%, 1-1 12.6%, 0-0 12.0%, 2-0 11.4%, 2-1 8.5%, 0-1 6.6%, 3-0 6.2%, 3-1 4.6%
+- Marcador medio esperado en la tanda: Belgium 3.90 | Czech Republic 3.63
+- Marcadores de tanda más probables: 4-3 11.1%, 4-2 10.8%, 5-4 10.2%, 3-4 8.3%, 4-5 8.1%
+- Marcadores más probables: 1-0 13.6%, 1-1 12.1%, 2-0 11.7%, 0-0 10.9%, 2-1 8.7%, 3-0 6.8%, 0-1 6.0%, 3-1 5.0%
 
 ### Dieciseisavos 11: Colombia vs Croatia
 - Etapa: Dieciseisavos de final
@@ -3241,37 +3214,37 @@ _El Brier 2026 se activa automáticamente con el primer partido terminado; antes
 - Sede: SoFi Stadium | United States
 - Hora UTC: 2026-07-02T19:00:00Z
 - Clima estimado: 26.0 C | HR 70% | viento 11 km/h | estrés 0.06
-- Factores que más pesan ahora: Elo dinámico +66.000; Rendimiento competitivo desde 1950 -0.282
+- Factores que más pesan ahora: Minutos Mundial de Clubes -1004.117; Valor bruto de plantilla -188.656
 - Proyección automática: Cruce usado para este casillero hoy: Colombia vs Croatia | probabilidad de que se dé 24.4% | ganador global del casillero: Croatia 27.5% | si se juega exactamente este cruce: Colombia 55.0%
 - Otras opciones de cruce: Colombia vs Croatia -> Colombia 13.4%; Colombia vs Croatia -> Croatia 11.0%
 - Marcador proyectado: 1-1
-- Marcador para cargar en Penca: 1-1 | 2.06 pts esp. | exacto 14.3% | diferencia 32.5%
-- Precisión de marcador: Marcador con precisión media | exacto más probable 1-1 14.3% | top-5 cubre 56.7%
-- Promedio estimado de goles del modelo: Colombia 1.21 | Croatia 1.03
-- Probabilidades de resultado (90'): 37.8% / 32.5% / 29.7%
+- Marcador para cargar en Penca: 1-1 | 2.01 pts esp. | exacto 14.2% | diferencia 31.7%
+- Precisión de marcador: Marcador con precisión media | exacto más probable 1-1 14.2% | top-5 cubre 54.5%
+- Promedio estimado de goles del modelo: Colombia 1.27 | Croatia 1.09
+- Probabilidades de resultado (90'): 37.8% / 31.7% / 30.4%
 - Lectura estadistica: Pronóstico parejo: sin favorito estadístico claro | pick actual Victoria Colombia 37.8% | confianza 43.4%
-- Escenario de goles: ambos marcan 45.1% | más de 2.5 goles 38.0%
-- Goles totales esperados por el modelo: 2.21. Sin línea externa de goles cargada para ese partido.
-- Probabilidad de que no reciba goles: Colombia 36.9% | Croatia 31.6%
-- Cuánta probabilidad cubren los 3 marcadores más probables: 39.4% | ventaja final más probable +0 (32.5%)
+- Escenario de goles: ambos marcan 47.1% | más de 2.5 goles 40.5%
+- Goles totales esperados por el modelo: 2.31. Sin línea externa de goles cargada para ese partido.
+- Probabilidad de que no reciba goles: Colombia 35.1% | Croatia 30.3%
+- Cuánta probabilidad cubren los 3 marcadores más probables: 37.5% | ventaja final más probable +0 (31.7%)
 - Qué tanto coinciden los modelos entre sí: 95.1%
 - Stack estadístico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotación + Overdispersión calibrada + ML ligero regularizado + Predictivo bayesiano dinámico + Ensamble + asimetría histórica
-- Factores dominantes: Elo dinámico +66.000; Rendimiento competitivo desde 1950 -0.282; Ataque histórico desde 1950 -0.201
+- Factores dominantes: Minutos Mundial de Clubes -1004.117; Valor bruto de plantilla -188.656; Elo dinámico +66.000
 - Comparativa entre modelos:
-- Bivariante Poisson: victoria Colombia 39.6% | empate 30.1% | victoria Croatia 30.3% | marcador más probable 1-1 (13.3%) | peso actual 34.0%
-- Poisson independiente: victoria Colombia 35.6% | empate 37.5% | victoria Croatia 26.9% | marcador más probable 1-1 (17.7%) | peso actual 14.9%
-- Ajuste de baja anotación: victoria Colombia 35.6% | empate 37.5% | victoria Croatia 26.9% | marcador más probable 1-1 (17.7%) | peso actual 18.5%
-- Overdispersión calibrada: victoria Colombia 40.0% | empate 28.2% | victoria Croatia 31.8% | marcador más probable 1-0 (12.8%) | peso actual 6.7%
-- ML ligero regularizado: victoria Colombia 38.4% | empate 30.4% | victoria Croatia 31.2% | marcador más probable 0-0 (14.5%) | peso actual 12.7%
-- Predictivo bayesiano dinámico: victoria Colombia 37.3% | empate 30.1% | victoria Croatia 32.6% | marcador más probable 0-0 (13.7%) | peso actual 13.3%
-- Ensamble + asimetría histórica: victoria Colombia 37.8% | empate 32.5% | victoria Croatia 29.7% | marcador más probable 1-1 (14.3%)
-- Quién tiene más probabilidad de avanzar: Colombia 54.2% | Croatia 45.8%
-- Si empatan tras 90': gana en prórroga Colombia 21.6% | siguen empatados 61.0% | Croatia 17.5%
-- Si llegan a penales: Colombia 47.5% | Croatia 52.5%
-- Marcador más probable de la tanda: 5-4
-- Marcador medio esperado en la tanda: Colombia 3.87 | Croatia 3.93
-- Marcadores de tanda más probables: 5-4 10.3%, 4-5 10.2%, 3-4 9.1%, 4-3 8.8%, 2-4 8.6%
-- Marcadores más probables: 1-1 14.3%, 0-0 13.5%, 1-0 11.6%, 0-1 9.8%, 2-1 7.4%, 2-0 7.3%, 1-2 6.4%, 0-2 5.5%
+- Bivariante Poisson: victoria Colombia 39.4% | empate 29.3% | victoria Croatia 31.3% | marcador más probable 1-1 (13.1%) | peso actual 33.9%
+- Poisson independiente: victoria Colombia 35.4% | empate 36.9% | victoria Croatia 27.7% | marcador más probable 1-1 (17.5%) | peso actual 14.8%
+- Ajuste de baja anotación: victoria Colombia 35.4% | empate 36.9% | victoria Croatia 27.7% | marcador más probable 1-1 (17.5%) | peso actual 18.5%
+- Overdispersión calibrada: victoria Colombia 39.9% | empate 27.4% | victoria Croatia 32.7% | marcador más probable 1-0 (12.1%) | peso actual 6.6%
+- ML ligero regularizado: victoria Colombia 39.2% | empate 29.5% | victoria Croatia 31.2% | marcador más probable 0-0 (13.3%) | peso actual 12.9%
+- Predictivo bayesiano dinámico: victoria Colombia 37.7% | empate 29.2% | victoria Croatia 33.0% | marcador más probable 0-0 (12.5%) | peso actual 13.3%
+- Ensamble + asimetría histórica: victoria Colombia 37.8% | empate 31.7% | victoria Croatia 30.4% | marcador más probable 1-1 (14.2%)
+- Quién tiene más probabilidad de avanzar: Colombia 53.6% | Croatia 46.4%
+- Si empatan tras 90': gana en prórroga Colombia 21.5% | siguen empatados 59.9% | Croatia 18.6%
+- Si llegan a penales: Colombia 47.2% | Croatia 52.8%
+- Marcador más probable de la tanda: 2-4
+- Marcador medio esperado en la tanda: Colombia 3.71 | Croatia 3.97
+- Marcadores de tanda más probables: 2-4 11.8%, 4-5 10.0%, 3-4 9.8%, 4-3 9.2%, 5-4 8.5%
+- Marcadores más probables: 1-1 14.2%, 0-0 12.5%, 1-0 10.8%, 0-1 9.3%, 2-1 7.6%, 2-0 7.2%, 1-2 6.6%, 0-2 5.5%
 
 ### Dieciseisavos 12: Spain vs Austria
 - Etapa: Dieciseisavos de final
@@ -3279,37 +3252,37 @@ _El Brier 2026 se activa automáticamente con el primer partido terminado; antes
 - Sede: BMO Field | Canada
 - Hora UTC: 2026-07-02T23:00:00Z
 - Clima estimado: 25.0 C | HR 63% | viento 14 km/h | estrés 0.02
-- Factores que más pesan ahora: Elo dinámico +353.000; Rendimiento competitivo desde 1950 +0.408
+- Factores que más pesan ahora: Valor bruto de plantilla +595.236; Elo dinámico +353.000
 - Proyección automática: Cruce usado para este casillero hoy: Spain vs Austria | probabilidad de que se dé 46.7% | ganador global del casillero: Spain 77.4% | si se juega exactamente este cruce: Spain 91.0%
 - Otras opciones de cruce: Spain vs Algeria -> Spain 15.0%; Spain vs Jordan -> Spain 13.6%
 - Marcador proyectado: 2-0
-- Marcador para cargar en Penca: 2-0 | 3.35 pts esp. | exacto 18.4% | diferencia 23.4%
-- Precisión de marcador: Marcador con precisión media | exacto más probable 2-0 18.4% | top-5 cubre 66.4%
-- Promedio estimado de goles del modelo: Spain 2.08 | Austria 0.32
-- Probabilidades de resultado (90'): 77.5% / 17.6% / 4.9%
-- Lectura estadistica: Pick fuerte | pick actual Victoria Spain 77.5% | confianza 85.7%
-- Escenario de goles: ambos marcan 25.3% | más de 2.5 goles 44.8%
-- Goles totales esperados por el modelo: 2.47. Sin línea externa de goles cargada para ese partido.
-- Probabilidad de que no reciba goles: Spain 71.3% | Austria 13.4%
-- Cuánta probabilidad cubren los 3 marcadores más probables: 49.3% | ventaja final más probable +1 (23.8%)
-- Qué tanto coinciden los modelos entre sí: 93.5%
+- Marcador para cargar en Penca: 2-0 | 3.39 pts esp. | exacto 18.2% | diferencia 23.4%
+- Precisión de marcador: Marcador con precisión media | exacto más probable 2-0 18.2% | top-5 cubre 65.4%
+- Promedio estimado de goles del modelo: Spain 2.20 | Austria 0.33
+- Probabilidades de resultado (90'): 79.1% / 16.5% / 4.4%
+- Lectura estadistica: Pick fuerte | pick actual Victoria Spain 79.1% | confianza 87.5%
+- Escenario de goles: ambos marcan 25.8% | más de 2.5 goles 47.8%
+- Goles totales esperados por el modelo: 2.59. Sin línea externa de goles cargada para ese partido.
+- Probabilidad de que no reciba goles: Spain 71.2% | Austria 12.1%
+- Cuánta probabilidad cubren los 3 marcadores más probables: 48.4% | ventaja final más probable +2 (23.4%)
+- Qué tanto coinciden los modelos entre sí: 93.4%
 - Stack estadístico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotación + Overdispersión calibrada + ML ligero regularizado + Predictivo bayesiano dinámico + Ensamble + asimetría histórica
-- Factores dominantes: Elo dinámico +353.000; Rendimiento competitivo desde 1950 +0.408; Historia competitiva desde 1950 +0.388
+- Factores dominantes: Valor bruto de plantilla +595.236; Elo dinámico +353.000; Minutos Mundial de Clubes -302.161
 - Comparativa entre modelos:
-- Bivariante Poisson: victoria Spain 80.0% | empate 16.4% | victoria Austria 3.6% | marcador más probable 1-0 (19.7%) | peso actual 36.7%
-- Poisson independiente: victoria Spain 78.4% | empate 17.7% | victoria Austria 3.9% | marcador más probable 2-0 (19.6%) | peso actual 16.8%
-- Ajuste de baja anotación: victoria Spain 78.4% | empate 17.7% | victoria Austria 3.9% | marcador más probable 2-0 (19.6%) | peso actual 16.0%
-- Overdispersión calibrada: victoria Spain 76.3% | empate 18.2% | victoria Austria 5.5% | marcador más probable 1-0 (19.0%) | peso actual 7.6%
-- ML ligero regularizado: victoria Spain 77.8% | empate 17.6% | victoria Austria 4.6% | marcador más probable 2-0 (18.9%) | peso actual 12.5%
-- Predictivo bayesiano dinámico: victoria Spain 61.8% | empate 24.0% | victoria Austria 14.1% | marcador más probable 1-0 (15.1%) | peso actual 10.5%
-- Ensamble + asimetría histórica: victoria Spain 77.5% | empate 17.6% | victoria Austria 4.9% | marcador más probable 2-0 (18.4%)
-- Quién tiene más probabilidad de avanzar: Spain 89.9% | Austria 10.1%
-- Si empatan tras 90': gana en prórroga Spain 40.6% | siguen empatados 53.4% | Austria 6.1%
+- Bivariante Poisson: victoria Spain 81.9% | empate 14.9% | victoria Austria 3.2% | marcador más probable 2-0 (19.6%) | peso actual 36.3%
+- Poisson independiente: victoria Spain 79.6% | empate 17.2% | victoria Austria 3.2% | marcador más probable 2-0 (19.4%) | peso actual 16.6%
+- Ajuste de baja anotación: victoria Spain 79.6% | empate 17.2% | victoria Austria 3.2% | marcador más probable 2-0 (19.4%) | peso actual 15.8%
+- Overdispersión calibrada: victoria Spain 78.0% | empate 17.0% | victoria Austria 5.1% | marcador más probable 1-0 (18.1%) | peso actual 8.2%
+- ML ligero regularizado: victoria Spain 79.4% | empate 16.4% | victoria Austria 4.3% | marcador más probable 2-0 (18.7%) | peso actual 12.6%
+- Predictivo bayesiano dinámico: victoria Spain 63.5% | empate 22.8% | victoria Austria 13.7% | marcador más probable 1-0 (14.3%) | peso actual 10.4%
+- Ensamble + asimetría histórica: victoria Spain 79.1% | empate 16.5% | victoria Austria 4.4% | marcador más probable 2-0 (18.2%)
+- Quién tiene más probabilidad de avanzar: Spain 90.9% | Austria 9.1%
+- Si empatan tras 90': gana en prórroga Spain 42.3% | siguen empatados 51.7% | Austria 5.9%
 - Si llegan a penales: Spain 56.1% | Austria 43.9%
-- Marcador más probable de la tanda: 5-4
-- Marcador medio esperado en la tanda: Spain 3.98 | Austria 3.68
-- Marcadores de tanda más probables: 5-4 11.8%, 4-3 10.8%, 4-2 10.7%, 3-4 9.2%, 4-5 7.5%
-- Marcadores más probables: 2-0 18.4%, 1-0 17.1%, 3-0 13.8%, 0-0 9.9%, 4-0 7.2%, 1-1 6.4%, 2-1 5.8%, 3-1 4.5%
+- Marcador más probable de la tanda: 4-3
+- Marcador medio esperado en la tanda: Spain 4.03 | Austria 3.64
+- Marcadores de tanda más probables: 4-3 11.7%, 4-2 11.1%, 5-4 10.4%, 3-4 7.1%, 5-3 7.0%
+- Marcadores más probables: 2-0 18.2%, 1-0 15.8%, 3-0 14.4%, 0-0 9.1%, 4-0 8.0%, 1-1 6.2%, 2-1 5.7%, 3-1 4.6%
 
 ### Dieciseisavos 13: Switzerland vs Egypt
 - Etapa: Dieciseisavos de final
@@ -3317,37 +3290,37 @@ _El Brier 2026 se activa automáticamente con el primer partido terminado; antes
 - Sede: BC Place | Canada
 - Hora UTC: 2026-07-03T03:00:00Z
 - Clima estimado: 21.0 C | HR 71% | viento 10 km/h | estrés 0.02
-- Factores que más pesan ahora: Elo dinámico +237.000; Profundidad de banco +0.237
+- Factores que más pesan ahora: Valor bruto de plantilla +1013.609; Minutos Mundial de Clubes +882.681
 - Proyección automática: Cruce usado para este casillero hoy: Switzerland vs Egypt | probabilidad de que se dé 10.6% | ganador global del casillero: Switzerland 51.0% | si se juega exactamente este cruce: Switzerland 86.6%
 - Otras opciones de cruce: Switzerland vs New Zealand -> Switzerland 5.9%; Switzerland vs Iran -> Switzerland 5.9%
 - Marcador proyectado: 1-0
-- Marcador para cargar en Penca: 2-0 | 2.87 pts esp. | exacto 15.3% | diferencia 20.7%
-- Precisión de marcador: Marcador con precisión media | exacto más probable 1-0 17.0% | top-5 cubre 63.7%
-- Promedio estimado de goles del modelo: Switzerland 1.81 | Egypt 0.50
-- Probabilidades de resultado (90'): 66.7% / 24.2% / 9.1%
-- Lectura estadistica: Pick utilizable | pick actual Victoria Switzerland 66.7% | confianza 72.7%
-- Escenario de goles: ambos marcan 33.5% | más de 2.5 goles 40.1%
-- Goles totales esperados por el modelo: 2.30. Sin línea externa de goles cargada para ese partido.
-- Probabilidad de que no reciba goles: Switzerland 60.4% | Egypt 18.1%
-- Cuánta probabilidad cubren los 3 marcadores más probables: 44.3% | ventaja final más probable +1 (26.0%)
-- Qué tanto coinciden los modelos entre sí: 93.2%
+- Marcador para cargar en Penca: 2-0 | 2.96 pts esp. | exacto 15.4% | diferencia 21.2%
+- Precisión de marcador: Marcador con precisión media | exacto más probable 1-0 16.4% | top-5 cubre 62.0%
+- Promedio estimado de goles del modelo: Switzerland 1.90 | Egypt 0.51
+- Probabilidades de resultado (90'): 69.0% / 22.4% / 8.6%
+- Lectura estadistica: Pick fuerte | pick actual Victoria Switzerland 69.0% | confianza 75.2%
+- Escenario de goles: ambos marcan 34.1% | más de 2.5 goles 42.9%
+- Goles totales esperados por el modelo: 2.41. Sin línea externa de goles cargada para ese partido.
+- Probabilidad de que no reciba goles: Switzerland 60.3% | Egypt 16.4%
+- Cuánta probabilidad cubren los 3 marcadores más probables: 42.6% | ventaja final más probable +1 (25.6%)
+- Qué tanto coinciden los modelos entre sí: 93.6%
 - Stack estadístico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotación + Overdispersión calibrada + ML ligero regularizado + Predictivo bayesiano dinámico + Ensamble + asimetría histórica
-- Factores dominantes: Elo dinámico +237.000; Profundidad de banco +0.237; Defensa histórica desde 1950 -0.235
+- Factores dominantes: Valor bruto de plantilla +1013.609; Minutos Mundial de Clubes +882.681; Elo dinámico +237.000
 - Comparativa entre modelos:
-- Bivariante Poisson: victoria Switzerland 69.7% | empate 22.1% | victoria Egypt 8.2% | marcador más probable 1-0 (18.8%) | peso actual 36.0%
-- Poisson independiente: victoria Switzerland 65.5% | empate 27.3% | victoria Egypt 7.2% | marcador más probable 2-0 (16.0%) | peso actual 16.3%
-- Ajuste de baja anotación: victoria Switzerland 65.5% | empate 27.3% | victoria Egypt 7.2% | marcador más probable 2-0 (16.0%) | peso actual 16.7%
-- Overdispersión calibrada: victoria Switzerland 66.8% | empate 22.5% | victoria Egypt 10.7% | marcador más probable 1-0 (17.9%) | peso actual 7.3%
-- ML ligero regularizado: victoria Switzerland 68.7% | empate 22.1% | victoria Egypt 9.2% | marcador más probable 1-0 (18.2%) | peso actual 12.3%
-- Predictivo bayesiano dinámico: victoria Switzerland 54.5% | empate 26.8% | victoria Egypt 18.7% | marcador más probable 1-0 (14.8%) | peso actual 11.3%
-- Ensamble + asimetría histórica: victoria Switzerland 66.7% | empate 24.2% | victoria Egypt 9.1% | marcador más probable 1-0 (17.0%)
-- Quién tiene más probabilidad de avanzar: Switzerland 82.6% | Egypt 17.4%
-- Si empatan tras 90': gana en prórroga Switzerland 35.0% | siguen empatados 56.9% | Egypt 8.2%
-- Si llegan a penales: Switzerland 53.8% | Egypt 46.2%
-- Marcador más probable de la tanda: 4-3
-- Marcador medio esperado en la tanda: Switzerland 3.92 | Egypt 3.66
-- Marcadores de tanda más probables: 4-3 12.0%, 4-2 11.8%, 5-4 9.6%, 3-4 8.8%, 4-5 8.2%
-- Marcadores más probables: 1-0 17.0%, 2-0 15.3%, 0-0 12.0%, 1-1 9.9%, 3-0 9.6%, 2-1 7.6%, 3-1 4.7%, 0-1 4.4%
+- Bivariante Poisson: victoria Switzerland 71.9% | empate 20.6% | victoria Egypt 7.5% | marcador más probable 1-0 (18.0%) | peso actual 35.8%
+- Poisson independiente: victoria Switzerland 68.4% | empate 24.7% | victoria Egypt 6.9% | marcador más probable 2-0 (16.2%) | peso actual 16.4%
+- Ajuste de baja anotación: victoria Switzerland 68.4% | empate 24.7% | victoria Egypt 6.9% | marcador más probable 2-0 (16.2%) | peso actual 16.7%
+- Overdispersión calibrada: victoria Switzerland 68.6% | empate 21.3% | victoria Egypt 10.1% | marcador más probable 1-0 (17.2%) | peso actual 7.4%
+- ML ligero regularizado: victoria Switzerland 70.1% | empate 20.9% | victoria Egypt 9.0% | marcador más probable 1-0 (17.1%) | peso actual 12.6%
+- Predictivo bayesiano dinámico: victoria Switzerland 56.0% | empate 25.8% | victoria Egypt 18.2% | marcador más probable 1-0 (14.2%) | peso actual 11.1%
+- Ensamble + asimetría histórica: victoria Switzerland 69.0% | empate 22.4% | victoria Egypt 8.6% | marcador más probable 1-0 (16.4%)
+- Quién tiene más probabilidad de avanzar: Switzerland 83.9% | Egypt 16.1%
+- Si empatan tras 90': gana en prórroga Switzerland 36.8% | siguen empatados 55.2% | Egypt 8.0%
+- Si llegan a penales: Switzerland 54.2% | Egypt 45.8%
+- Marcador más probable de la tanda: 4-2
+- Marcador medio esperado en la tanda: Switzerland 3.89 | Egypt 3.64
+- Marcadores de tanda más probables: 4-2 11.2%, 4-3 10.6%, 5-4 10.4%, 3-4 9.5%, 4-5 8.7%
+- Marcadores más probables: 1-0 16.4%, 2-0 15.4%, 0-0 10.8%, 3-0 10.2%, 1-1 9.3%, 2-1 7.7%, 3-1 5.0%, 4-0 4.7%
 
 ### Dieciseisavos 14: Argentina vs Uruguay
 - Etapa: Dieciseisavos de final
@@ -3356,37 +3329,37 @@ _El Brier 2026 se activa automáticamente con el primer partido terminado; antes
 - Hora UTC: 2026-07-03T18:00:00Z
 - Clima estimado: 32.0 C | HR 55% | viento 15 km/h | estrés 0.20
 - Cambio por clima exigente: estrés climático 0.20.
-- Factores que más pesan ahora: Elo dinámico +223.000; Historia competitiva desde 1950 +0.285
+- Factores que más pesan ahora: Minutos Mundial de Clubes +1101.132; Valor bruto de plantilla +636.279
 - Proyección automática: Cruce usado para este casillero hoy: Argentina vs Uruguay | probabilidad de que se dé 64.2% | ganador global del casillero: Argentina 71.0% | si se juega exactamente este cruce: Argentina 83.7%
 - Otras opciones de cruce: Argentina vs Uruguay -> Uruguay 10.5%; Argentina vs Saudi Arabia -> Argentina 7.2%
-- Marcador proyectado: 1-0
-- Marcador para cargar en Penca: 2-0 | 2.89 pts esp. | exacto 15.7% | diferencia 20.9%
-- Precisión de marcador: Marcador con precisión media | exacto más probable 1-0 17.2% | top-5 cubre 63.9%
-- Promedio estimado de goles del modelo: Argentina 1.78 | Uruguay 0.51
-- Probabilidades de resultado (90'): 66.8% / 23.6% / 9.6%
-- Lectura estadistica: Pick utilizable | pick actual Victoria Argentina 66.8% | confianza 73.1%
-- Escenario de goles: ambos marcan 32.5% | más de 2.5 goles 39.8%
-- Goles totales esperados por el modelo: 2.28. Sin línea externa de goles cargada para ese partido.
-- Probabilidad de que no reciba goles: Argentina 61.1% | Uruguay 18.3%
-- Cuánta probabilidad cubren los 3 marcadores más probables: 44.7% | ventaja final más probable +1 (25.9%)
-- Qué tanto coinciden los modelos entre sí: 94.0%
+- Marcador proyectado: 2-0
+- Marcador para cargar en Penca: 2-0 | 2.96 pts esp. | exacto 15.8% | diferencia 21.4%
+- Precisión de marcador: Marcador con precisión media | exacto más probable 2-0 15.8% | top-5 cubre 62.6%
+- Promedio estimado de goles del modelo: Argentina 1.90 | Uruguay 0.51
+- Probabilidades de resultado (90'): 68.5% / 23.0% / 8.5%
+- Lectura estadistica: Pick utilizable | pick actual Victoria Argentina 68.5% | confianza 74.6%
+- Escenario de goles: ambos marcan 33.6% | más de 2.5 goles 42.7%
+- Goles totales esperados por el modelo: 2.40. Sin línea externa de goles cargada para ese partido.
+- Probabilidad de que no reciba goles: Argentina 61.0% | Uruguay 16.6%
+- Cuánta probabilidad cubren los 3 marcadores más probables: 42.7% | ventaja final más probable +1 (24.5%)
+- Qué tanto coinciden los modelos entre sí: 92.9%
 - Stack estadístico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotación + Overdispersión calibrada + ML ligero regularizado + Predictivo bayesiano dinámico + Ensamble + asimetría histórica
-- Factores dominantes: Elo dinámico +223.000; Historia competitiva desde 1950 +0.285; Ataque histórico desde 1950 +0.252
+- Factores dominantes: Minutos Mundial de Clubes +1101.132; Valor bruto de plantilla +636.279; Elo dinámico +223.000
 - Comparativa entre modelos:
-- Bivariante Poisson: victoria Argentina 69.3% | empate 22.4% | victoria Uruguay 8.3% | marcador más probable 1-0 (19.0%) | peso actual 35.9%
-- Poisson independiente: victoria Argentina 66.8% | empate 25.0% | victoria Uruguay 8.2% | marcador más probable 1-0 (16.5%) | peso actual 16.4%
-- Ajuste de baja anotación: victoria Argentina 66.8% | empate 25.0% | victoria Uruguay 8.2% | marcador más probable 1-0 (16.5%) | peso actual 16.9%
-- Overdispersión calibrada: victoria Argentina 66.4% | empate 22.8% | victoria Uruguay 10.8% | marcador más probable 1-0 (18.0%) | peso actual 7.3%
-- ML ligero regularizado: victoria Argentina 67.8% | empate 22.5% | victoria Uruguay 9.8% | marcador más probable 1-0 (18.0%) | peso actual 12.3%
-- Predictivo bayesiano dinámico: victoria Argentina 53.8% | empate 27.1% | victoria Uruguay 19.1% | marcador más probable 1-0 (14.9%) | peso actual 11.2%
-- Ensamble + asimetría histórica: victoria Argentina 66.8% | empate 23.6% | victoria Uruguay 9.6% | marcador más probable 1-0 (17.2%)
-- Quién tiene más probabilidad de avanzar: Argentina 82.2% | Uruguay 17.8%
-- Si empatan tras 90': gana en prórroga Argentina 34.7% | siguen empatados 57.2% | Uruguay 8.1%
-- Si llegan a penales: Argentina 53.6% | Uruguay 46.4%
-- Marcador más probable de la tanda: 5-4
-- Marcador medio esperado en la tanda: Argentina 3.92 | Uruguay 3.69
-- Marcadores de tanda más probables: 5-4 11.7%, 4-2 9.9%, 4-3 9.6%, 4-5 8.4%, 3-4 8.3%
-- Marcadores más probables: 1-0 17.2%, 2-0 15.7%, 0-0 11.9%, 3-0 9.8%, 1-1 9.4%, 2-1 7.3%, 0-1 4.8%, 3-1 4.6%
+- Bivariante Poisson: victoria Argentina 71.9% | empate 20.6% | victoria Uruguay 7.5% | marcador más probable 1-0 (18.0%) | peso actual 35.9%
+- Poisson independiente: victoria Argentina 67.2% | empate 26.4% | victoria Uruguay 6.4% | marcador más probable 2-0 (16.1%) | peso actual 16.3%
+- Ajuste de baja anotación: victoria Argentina 67.2% | empate 26.4% | victoria Uruguay 6.4% | marcador más probable 2-0 (16.1%) | peso actual 16.6%
+- Overdispersión calibrada: victoria Argentina 68.6% | empate 21.3% | victoria Uruguay 10.1% | marcador más probable 1-0 (17.2%) | peso actual 7.4%
+- ML ligero regularizado: victoria Argentina 70.1% | empate 20.9% | victoria Uruguay 9.0% | marcador más probable 1-0 (17.1%) | peso actual 12.6%
+- Predictivo bayesiano dinámico: victoria Argentina 56.0% | empate 25.8% | victoria Uruguay 18.3% | marcador más probable 1-0 (14.2%) | peso actual 11.3%
+- Ensamble + asimetría histórica: victoria Argentina 68.5% | empate 23.0% | victoria Uruguay 8.5% | marcador más probable 2-0 (15.8%)
+- Quién tiene más probabilidad de avanzar: Argentina 83.9% | Uruguay 16.1%
+- Si empatan tras 90': gana en prórroga Argentina 36.7% | siguen empatados 55.5% | Uruguay 7.9%
+- Si llegan a penales: Argentina 55.0% | Uruguay 45.0%
+- Marcador más probable de la tanda: 4-3
+- Marcador medio esperado en la tanda: Argentina 3.90 | Uruguay 3.62
+- Marcadores de tanda más probables: 4-3 11.1%, 4-2 10.9%, 5-4 10.6%, 4-5 9.6%, 3-4 8.1%
+- Marcadores más probables: 2-0 15.8%, 1-0 15.7%, 0-0 11.2%, 3-0 10.5%, 1-1 9.4%, 2-1 7.3%, 4-0 4.9%, 3-1 4.9%
 
 ### Dieciseisavos 15: Portugal vs Panama
 - Etapa: Dieciseisavos de final
@@ -3395,37 +3368,37 @@ _El Brier 2026 se activa automáticamente con el primer partido terminado; antes
 - Hora UTC: 2026-07-03T22:00:00Z
 - Clima estimado: 31.0 C | HR 74% | viento 15 km/h | estrés 0.28
 - Cambio por clima exigente: estrés climático 0.28.
-- Factores que más pesan ahora: Elo dinámico +243.000; Rendimiento competitivo desde 1950 +0.496
+- Factores que más pesan ahora: Valor bruto de plantilla +907.391; Minutos Mundial de Clubes +868.839
 - Proyección automática: Cruce usado para este casillero hoy: Portugal vs Panama | probabilidad de que se dé 22.2% | ganador global del casillero: Portugal 44.3% | si se juega exactamente este cruce: Portugal 89.2%
 - Otras opciones de cruce: Colombia vs Panama -> Colombia 17.4%; Portugal vs Ghana -> Portugal 3.9%
-- Marcador proyectado: 1-0
-- Marcador para cargar en Penca: 2-0 | 3.16 pts esp. | exacto 17.6% | diferencia 22.4%
-- Precisión de marcador: Marcador con precisión media | exacto más probable 1-0 17.7% | top-5 cubre 66.9%
-- Promedio estimado de goles del modelo: Portugal 1.90 | Panama 0.39
-- Probabilidades de resultado (90'): 72.7% / 20.7% / 6.6%
-- Lectura estadistica: Pick fuerte | pick actual Victoria Portugal 72.7% | confianza 79.9%
-- Escenario de goles: ambos marcan 26.9% | más de 2.5 goles 41.0%
-- Goles totales esperados por el modelo: 2.32. Sin línea externa de goles cargada para ese partido.
-- Probabilidad de que no reciba goles: Portugal 68.5% | Panama 16.2%
-- Cuánta probabilidad cubren los 3 marcadores más probables: 47.7% | ventaja final más probable +1 (24.9%)
+- Marcador proyectado: 2-0
+- Marcador para cargar en Penca: 2-0 | 3.21 pts esp. | exacto 17.4% | diferencia 22.7%
+- Precisión de marcador: Marcador con precisión media | exacto más probable 2-0 17.4% | top-5 cubre 64.3%
+- Promedio estimado de goles del modelo: Portugal 2.03 | Panama 0.39
+- Probabilidades de resultado (90'): 74.5% / 19.2% / 6.3%
+- Lectura estadistica: Pick fuerte | pick actual Victoria Portugal 74.5% | confianza 82.0%
+- Escenario de goles: ambos marcan 28.2% | más de 2.5 goles 44.6%
+- Goles totales esperados por el modelo: 2.46. Sin línea externa de goles cargada para ese partido.
+- Probabilidad de que no reciba goles: Portugal 67.6% | Panama 14.4%
+- Cuánta probabilidad cubren los 3 marcadores más probables: 46.8% | ventaja final más probable +1 (23.8%)
 - Qué tanto coinciden los modelos entre sí: 93.6%
 - Stack estadístico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotación + Overdispersión calibrada + ML ligero regularizado + Predictivo bayesiano dinámico + Ensamble + asimetría histórica
-- Factores dominantes: Elo dinámico +243.000; Rendimiento competitivo desde 1950 +0.496; Ataque histórico desde 1950 +0.490
+- Factores dominantes: Valor bruto de plantilla +907.391; Minutos Mundial de Clubes +868.839; Elo dinámico +243.000
 - Comparativa entre modelos:
-- Bivariante Poisson: victoria Portugal 75.2% | empate 19.6% | victoria Panama 5.2% | marcador más probable 1-0 (20.3%) | peso actual 36.4%
-- Poisson independiente: victoria Portugal 73.2% | empate 21.3% | victoria Panama 5.5% | marcador más probable 2-0 (18.4%) | peso actual 16.7%
-- Ajuste de baja anotación: victoria Portugal 73.2% | empate 21.3% | victoria Panama 5.5% | marcador más probable 2-0 (18.4%) | peso actual 16.4%
-- Overdispersión calibrada: victoria Portugal 71.8% | empate 20.7% | victoria Panama 7.4% | marcador más probable 1-0 (19.3%) | peso actual 7.5%
-- ML ligero regularizado: victoria Portugal 73.4% | empate 20.2% | victoria Panama 6.5% | marcador más probable 1-0 (19.1%) | peso actual 12.3%
-- Predictivo bayesiano dinámico: victoria Portugal 57.5% | empate 26.1% | victoria Panama 16.4% | marcador más probable 1-0 (15.4%) | peso actual 10.7%
-- Ensamble + asimetría histórica: victoria Portugal 72.7% | empate 20.7% | victoria Panama 6.6% | marcador más probable 1-0 (17.7%)
-- Quién tiene más probabilidad de avanzar: Portugal 87.1% | Panama 12.9%
-- Si empatan tras 90': gana en prórroga Portugal 37.8% | siguen empatados 55.2% | Panama 7.0%
-- Si llegan a penales: Portugal 58.0% | Panama 42.0%
+- Bivariante Poisson: victoria Portugal 77.0% | empate 18.1% | victoria Panama 4.9% | marcador más probable 1-0 (18.9%) | peso actual 36.3%
+- Poisson independiente: victoria Portugal 75.0% | empate 19.7% | victoria Panama 5.3% | marcador más probable 2-0 (18.1%) | peso actual 16.7%
+- Ajuste de baja anotación: victoria Portugal 75.0% | empate 19.7% | victoria Panama 5.3% | marcador más probable 2-0 (18.1%) | peso actual 16.3%
+- Overdispersión calibrada: victoria Portugal 73.3% | empate 19.4% | victoria Panama 7.3% | marcador más probable 1-0 (18.0%) | peso actual 7.6%
+- ML ligero regularizado: victoria Portugal 75.6% | empate 18.5% | victoria Panama 5.9% | marcador más probable 1-0 (18.0%) | peso actual 12.5%
+- Predictivo bayesiano dinámico: victoria Portugal 59.6% | empate 24.7% | victoria Panama 15.7% | marcador más probable 1-0 (14.8%) | peso actual 10.7%
+- Ensamble + asimetría histórica: victoria Portugal 74.5% | empate 19.2% | victoria Panama 6.3% | marcador más probable 2-0 (17.4%)
+- Quién tiene más probabilidad de avanzar: Portugal 88.2% | Panama 11.8%
+- Si empatan tras 90': gana en prórroga Portugal 38.9% | siguen empatados 54.0% | Panama 7.1%
+- Si llegan a penales: Portugal 60.4% | Panama 39.6%
 - Marcador más probable de la tanda: 4-3
-- Marcador medio esperado en la tanda: Portugal 3.83 | Panama 3.47
-- Marcadores de tanda más probables: 4-3 11.8%, 4-2 9.6%, 5-4 9.2%, 3-4 8.6%, 4-5 7.8%
-- Marcadores más probables: 1-0 17.7%, 2-0 17.6%, 3-0 12.4%, 0-0 11.6%, 1-1 7.6%, 2-1 6.3%, 4-0 5.8%, 3-1 4.3%
+- Marcador medio esperado en la tanda: Portugal 3.94 | Panama 3.40
+- Marcadores de tanda más probables: 4-3 14.2%, 4-2 12.1%, 5-4 10.5%, 3-4 7.2%, 4-5 5.9%
+- Marcadores más probables: 2-0 17.4%, 1-0 16.4%, 3-0 13.0%, 0-0 10.2%, 1-1 7.3%, 4-0 6.5%, 2-1 6.3%, 3-1 4.6%
 
 ### Dieciseisavos 16: Turkey vs Iran
 - Etapa: Dieciseisavos de final
@@ -3433,37 +3406,37 @@ _El Brier 2026 se activa automáticamente con el primer partido terminado; antes
 - Sede: GEHA Field at Arrowhead Stadium | United States
 - Hora UTC: 2026-07-04T01:30:00Z
 - Clima estimado: 30.0 C | HR 63% | viento 14 km/h | estrés 0.16
-- Factores que más pesan ahora: Elo dinámico +126.000; Rendimiento competitivo desde 1950 -0.417
+- Factores que más pesan ahora: Minutos Mundial de Clubes +844.057; Valor bruto de plantilla +731.090
 - Proyección automática: Cruce usado para este casillero hoy: Turkey vs Iran | probabilidad de que se dé 11.1% | ganador global del casillero: Turkey 18.8% | si se juega exactamente este cruce: Turkey 70.1%
 - Otras opciones de cruce: Paraguay vs Iran -> Paraguay 6.4%; Australia vs Iran -> Australia 5.8%
 - Marcador proyectado: 1-0
-- Marcador para cargar en Penca: 2-1 | 2.34 pts esp. | exacto 8.4% | diferencia 25.5%
-- Precisión de marcador: Marcador con precisión media | exacto más probable 1-0 15.1% | top-5 cubre 60.4%
-- Promedio estimado de goles del modelo: Turkey 1.48 | Iran 0.75
-- Probabilidades de resultado (90'): 52.6% / 29.4% / 17.9%
-- Lectura estadistica: Pronóstico parejo: sin favorito estadístico claro | pick actual Victoria Turkey 52.6% | confianza 57.7%
-- Escenario de goles: ambos marcan 40.7% | más de 2.5 goles 37.7%
-- Goles totales esperados por el modelo: 2.21. Sin línea externa de goles cargada para ese partido.
-- Probabilidad de que no reciba goles: Turkey 47.9% | Iran 24.7%
-- Cuánta probabilidad cubren los 3 marcadores más probables: 40.8% | ventaja final más probable +0 (29.4%)
-- Qué tanto coinciden los modelos entre sí: 94.6%
+- Marcador para cargar en Penca: 2-1 | 2.41 pts esp. | exacto 8.8% | diferencia 25.1%
+- Precisión de marcador: Marcador con precisión media | exacto más probable 1-0 14.0% | top-5 cubre 57.6%
+- Promedio estimado de goles del modelo: Turkey 1.59 | Iran 0.77
+- Probabilidades de resultado (90'): 54.8% / 27.7% / 17.5%
+- Lectura estadistica: Pronóstico parejo: sin favorito estadístico claro | pick actual Victoria Turkey 54.8% | confianza 59.8%
+- Escenario de goles: ambos marcan 43.3% | más de 2.5 goles 41.8%
+- Goles totales esperados por el modelo: 2.37. Sin línea externa de goles cargada para ese partido.
+- Probabilidad de que no reciba goles: Turkey 46.1% | Iran 22.1%
+- Cuánta probabilidad cubren los 3 marcadores más probables: 37.6% | ventaja final más probable +0 (27.7%)
+- Qué tanto coinciden los modelos entre sí: 94.7%
 - Stack estadístico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotación + Overdispersión calibrada + ML ligero regularizado + Predictivo bayesiano dinámico + Ensamble + asimetría histórica
-- Factores dominantes: Elo dinámico +126.000; Rendimiento competitivo desde 1950 -0.417; Defensa histórica desde 1950 -0.342
+- Factores dominantes: Minutos Mundial de Clubes +844.057; Valor bruto de plantilla +731.090; Elo dinámico +126.000
 - Comparativa entre modelos:
-- Bivariante Poisson: victoria Turkey 54.9% | empate 27.8% | victoria Iran 17.3% | marcador más probable 1-0 (16.6%) | peso actual 35.0%
-- Poisson independiente: victoria Turkey 51.5% | empate 32.7% | victoria Iran 15.8% | marcador más probable 1-1 (15.0%) | peso actual 15.7%
-- Ajuste de baja anotación: victoria Turkey 51.5% | empate 32.7% | victoria Iran 15.8% | marcador más probable 1-1 (15.0%) | peso actual 17.7%
-- Overdispersión calibrada: victoria Turkey 53.5% | empate 26.7% | victoria Iran 19.8% | marcador más probable 1-0 (15.8%) | peso actual 7.0%
-- ML ligero regularizado: victoria Turkey 53.1% | empate 27.8% | victoria Iran 19.0% | marcador más probable 1-0 (16.3%) | peso actual 12.4%
-- Predictivo bayesiano dinámico: victoria Turkey 45.5% | empate 29.2% | victoria Iran 25.3% | marcador más probable 1-0 (13.8%) | peso actual 12.3%
-- Ensamble + asimetría histórica: victoria Turkey 52.6% | empate 29.4% | victoria Iran 17.9% | marcador más probable 1-0 (15.1%)
-- Quién tiene más probabilidad de avanzar: Turkey 70.0% | Iran 30.0%
-- Si empatan tras 90': gana en prórroga Turkey 27.4% | siguen empatados 59.7% | Iran 12.9%
-- Si llegan a penales: Turkey 52.8% | Iran 47.2%
-- Marcador más probable de la tanda: 4-2
-- Marcador medio esperado en la tanda: Turkey 3.73 | Iran 3.52
-- Marcadores de tanda más probables: 4-2 11.4%, 4-3 10.9%, 5-4 10.1%, 2-4 8.4%, 3-4 8.2%
-- Marcadores más probables: 1-0 15.1%, 0-0 13.3%, 1-1 12.4%, 2-0 11.1%, 2-1 8.4%, 0-1 7.2%, 3-0 5.5%, 3-1 4.2%
+- Bivariante Poisson: victoria Turkey 57.0% | empate 26.1% | victoria Iran 16.9% | marcador más probable 1-0 (15.3%) | peso actual 34.9%
+- Poisson independiente: victoria Turkey 53.8% | empate 30.8% | victoria Iran 15.5% | marcador más probable 1-1 (14.5%) | peso actual 15.7%
+- Ajuste de baja anotación: victoria Turkey 53.8% | empate 30.8% | victoria Iran 15.5% | marcador más probable 1-1 (14.5%) | peso actual 17.6%
+- Overdispersión calibrada: victoria Turkey 55.4% | empate 25.2% | victoria Iran 19.4% | marcador más probable 1-0 (14.7%) | peso actual 7.0%
+- ML ligero regularizado: victoria Turkey 55.6% | empate 26.2% | victoria Iran 18.2% | marcador más probable 1-0 (15.5%) | peso actual 12.7%
+- Predictivo bayesiano dinámico: victoria Turkey 47.3% | empate 28.0% | victoria Iran 24.8% | marcador más probable 1-0 (13.2%) | peso actual 12.2%
+- Ensamble + asimetría histórica: victoria Turkey 54.8% | empate 27.7% | victoria Iran 17.5% | marcador más probable 1-0 (14.0%)
+- Quién tiene más probabilidad de avanzar: Turkey 71.6% | Iran 28.4%
+- Si empatan tras 90': gana en prórroga Turkey 29.4% | siguen empatados 58.0% | Iran 12.5%
+- Si llegan a penales: Turkey 53.7% | Iran 46.3%
+- Marcador más probable de la tanda: 4-3
+- Marcador medio esperado en la tanda: Turkey 3.85 | Iran 3.58
+- Marcadores de tanda más probables: 4-3 11.3%, 4-2 11.2%, 5-4 9.5%, 3-4 9.2%, 4-5 7.6%
+- Marcadores más probables: 1-0 14.0%, 1-1 12.1%, 0-0 11.5%, 2-0 11.2%, 2-1 8.8%, 0-1 6.5%, 3-0 5.9%, 3-1 4.8%
 
 ### Octavos 1: Canada vs Germany
 - Etapa: Octavos de final
@@ -3472,37 +3445,37 @@ _El Brier 2026 se activa automáticamente con el primer partido terminado; antes
 - Hora UTC: 2026-07-04T17:00:00Z
 - Clima estimado: 33.0 C | HR 73% | viento 12 km/h | estrés 0.33
 - Cambio por clima exigente: estrés climático 0.33.
-- Factores que más pesan ahora: Elo dinámico -104.000; Historia mundialista -0.822
+- Factores que más pesan ahora: Valor bruto de plantilla -851.400; Minutos Mundial de Clubes -142.683
 - Proyección automática: Cruce usado para este casillero hoy: Canada vs Germany | probabilidad de que se dé 14.3% | ganador global del casillero: Germany 41.8% | si se juega exactamente este cruce: Germany 81.2%
 - Otras opciones de cruce: South Korea vs Germany -> Germany 8.3%; Switzerland vs Germany -> Germany 6.8%
 - Marcador proyectado: 0-1
-- Marcador para cargar en Penca: 0-1 | 2.83 pts esp. | exacto 15.7% | diferencia 25.3%
-- Precisión de marcador: Marcador con precisión media | exacto más probable 0-1 15.7% | top-5 cubre 60.5%
-- Promedio estimado de goles del modelo: Canada 0.60 | Germany 1.67
-- Probabilidades de resultado (90'): 12.5% / 25.8% / 61.8%
-- Lectura estadistica: Pick utilizable | pick actual Victoria Germany 61.8% | confianza 67.3%
-- Escenario de goles: ambos marcan 37.2% | más de 2.5 goles 40.6%
-- Goles totales esperados por el modelo: 2.31. Sin línea externa de goles cargada para ese partido.
-- Probabilidad de que no reciba goles: Canada 19.7% | Germany 55.0%
-- Cuánta probabilidad cubren los 3 marcadores más probables: 41.3% | ventaja final más probable +0 (25.8%)
+- Marcador para cargar en Penca: 0-2 | 2.67 pts esp. | exacto 13.5% | diferencia 19.5%
+- Precisión de marcador: Marcador con precisión media | exacto más probable 0-1 14.5% | top-5 cubre 57.8%
+- Promedio estimado de goles del modelo: Canada 0.63 | Germany 1.76
+- Probabilidades de resultado (90'): 12.6% / 24.8% / 62.6%
+- Lectura estadistica: Pick utilizable | pick actual Victoria Germany 62.6% | confianza 68.0%
+- Escenario de goles: ambos marcan 39.4% | más de 2.5 goles 43.6%
+- Goles totales esperados por el modelo: 2.43. Sin línea externa de goles cargada para ese partido.
+- Probabilidad de que no reciba goles: Canada 18.2% | Germany 53.0%
+- Cuánta probabilidad cubren los 3 marcadores más probables: 38.7% | ventaja final más probable +0 (24.8%)
 - Qué tanto coinciden los modelos entre sí: 94.5%
 - Stack estadístico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotación + Overdispersión calibrada + ML ligero regularizado + Predictivo bayesiano dinámico + Ensamble + asimetría histórica
-- Factores dominantes: Elo dinámico -104.000; Historia mundialista -0.822; Rendimiento en Mundiales desde 1950 -0.729
+- Factores dominantes: Valor bruto de plantilla -851.400; Minutos Mundial de Clubes -142.683; Elo dinámico -104.000
 - Comparativa entre modelos:
-- Bivariante Poisson: victoria Canada 11.4% | empate 24.5% | victoria Germany 64.1% | marcador más probable 0-1 (17.9%) | peso actual 35.5%
-- Poisson independiente: victoria Canada 10.9% | empate 27.8% | victoria Germany 61.3% | marcador más probable 0-1 (15.1%) | peso actual 16.1%
-- Ajuste de baja anotación: victoria Canada 10.9% | empate 27.8% | victoria Germany 61.3% | marcador más probable 0-1 (15.1%) | peso actual 17.2%
-- Overdispersión calibrada: victoria Canada 14.0% | empate 24.3% | victoria Germany 61.7% | marcador más probable 0-1 (17.0%) | peso actual 7.2%
-- ML ligero regularizado: victoria Canada 12.6% | empate 24.4% | victoria Germany 63.0% | marcador más probable 0-1 (17.5%) | peso actual 12.3%
-- Predictivo bayesiano dinámico: victoria Canada 21.2% | empate 27.9% | victoria Germany 50.8% | marcador más probable 0-1 (14.5%) | peso actual 11.6%
-- Ensamble + asimetría histórica: victoria Canada 12.5% | empate 25.8% | victoria Germany 61.8% | marcador más probable 0-1 (15.7%)
-- Quién tiene más probabilidad de avanzar: Canada 20.6% | Germany 79.4%
-- Si empatan tras 90': gana en prórroga Canada 10.3% | siguen empatados 57.8% | Germany 31.8%
-- Si llegan a penales: Canada 36.5% | Germany 63.5%
+- Bivariante Poisson: victoria Canada 11.7% | empate 23.5% | victoria Germany 64.9% | marcador más probable 0-1 (16.6%) | peso actual 35.4%
+- Poisson independiente: victoria Canada 11.0% | empate 26.9% | victoria Germany 62.1% | marcador más probable 0-2 (14.0%) | peso actual 16.1%
+- Ajuste de baja anotación: victoria Canada 11.0% | empate 26.9% | victoria Germany 62.1% | marcador más probable 0-2 (14.0%) | peso actual 17.2%
+- Overdispersión calibrada: victoria Canada 14.3% | empate 23.4% | victoria Germany 62.3% | marcador más probable 0-1 (15.9%) | peso actual 7.2%
+- ML ligero regularizado: victoria Canada 12.9% | empate 23.4% | victoria Germany 63.7% | marcador más probable 0-1 (16.4%) | peso actual 12.6%
+- Predictivo bayesiano dinámico: victoria Canada 21.2% | empate 26.9% | victoria Germany 51.9% | marcador más probable 0-1 (13.7%) | peso actual 11.6%
+- Ensamble + asimetría histórica: victoria Canada 12.6% | empate 24.8% | victoria Germany 62.6% | marcador más probable 0-1 (14.5%)
+- Quién tiene más probabilidad de avanzar: Canada 20.3% | Germany 79.7%
+- Si empatan tras 90': gana en prórroga Canada 10.1% | siguen empatados 56.3% | Germany 33.6%
+- Si llegan a penales: Canada 37.2% | Germany 62.8%
 - Marcador más probable de la tanda: 2-4
-- Marcador medio esperado en la tanda: Canada 3.43 | Germany 3.99
-- Marcadores de tanda más probables: 2-4 13.7%, 4-5 10.7%, 3-4 10.4%, 5-4 7.9%, 4-3 6.8%
-- Marcadores más probables: 0-1 15.7%, 0-2 13.8%, 0-0 11.8%, 1-1 10.8%, 0-3 8.3%, 1-2 7.9%, 1-0 5.5%, 1-3 4.8%
+- Marcador medio esperado en la tanda: Canada 3.33 | Germany 3.97
+- Marcadores de tanda más probables: 2-4 13.9%, 3-4 12.4%, 4-5 10.9%, 4-3 6.4%, 5-4 6.2%
+- Marcadores más probables: 0-1 14.5%, 0-2 13.5%, 1-1 10.7%, 0-0 10.6%, 0-3 8.5%, 1-2 8.1%, 1-0 5.2%, 1-3 5.1%
 
 ### Octavos 2: Netherlands vs Brazil
 - Etapa: Octavos de final
@@ -3510,37 +3483,37 @@ _El Brier 2026 se activa automáticamente con el primer partido terminado; antes
 - Sede: Lincoln Financial Field | United States
 - Hora UTC: 2026-07-04T21:00:00Z
 - Clima estimado: 29.0 C | HR 66% | viento 12 km/h | estrés 0.08
-- Factores que más pesan ahora: Elo dinámico -19.000; Historia mundialista -0.390
+- Factores que más pesan ahora: Valor bruto de plantilla -619.072; Minutos Mundial de Clubes -33.802
 - Proyección automática: Cruce usado para este casillero hoy: Netherlands vs Brazil | probabilidad de que se dé 34.1% | ganador global del casillero: Brazil 48.3% | si se juega exactamente este cruce: Brazil 59.0%
 - Otras opciones de cruce: Netherlands vs Brazil -> Netherlands 14.0%; Japan vs Brazil -> Brazil 9.2%
 - Marcador proyectado: 1-1
-- Marcador para cargar en Penca: 1-1 | 2.05 pts esp. | exacto 14.4% | diferencia 32.2%
-- Precisión de marcador: Marcador con precisión media | exacto más probable 1-1 14.4% | top-5 cubre 56.4%
-- Promedio estimado de goles del modelo: Netherlands 0.97 | Brazil 1.27
-- Probabilidades de resultado (90'): 27.3% / 32.2% / 40.4%
-- Lectura estadistica: Pronóstico parejo: sin favorito estadístico claro | pick actual Victoria Brazil 40.4% | confianza 45.8%
-- Escenario de goles: ambos marcan 45.8% | más de 2.5 goles 38.7%
-- Goles totales esperados por el modelo: 2.25. Sin línea externa de goles cargada para ese partido.
-- Probabilidad de que no reciba goles: Netherlands 29.2% | Brazil 38.0%
-- Cuánta probabilidad cubren los 3 marcadores más probables: 39.3% | ventaja final más probable +0 (32.2%)
-- Qué tanto coinciden los modelos entre sí: 95.1%
+- Marcador para cargar en Penca: 1-1 | 1.97 pts esp. | exacto 14.1% | diferencia 31.0%
+- Precisión de marcador: Marcador con precisión media | exacto más probable 1-1 14.1% | top-5 cubre 53.6%
+- Promedio estimado de goles del modelo: Netherlands 1.01 | Brazil 1.36
+- Probabilidades de resultado (90'): 26.5% / 31.0% / 42.5%
+- Lectura estadistica: Pronóstico parejo: sin favorito estadístico claro | pick actual Victoria Brazil 42.5% | confianza 47.7%
+- Escenario de goles: ambos marcan 47.8% | más de 2.5 goles 41.8%
+- Goles totales esperados por el modelo: 2.37. Sin línea externa de goles cargada para ese partido.
+- Probabilidad de que no reciba goles: Netherlands 26.8% | Brazil 37.1%
+- Cuánta probabilidad cubren los 3 marcadores más probables: 37.1% | ventaja final más probable +0 (31.0%)
+- Qué tanto coinciden los modelos entre sí: 94.9%
 - Stack estadístico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotación + Overdispersión calibrada + ML ligero regularizado + Predictivo bayesiano dinámico + Ensamble + asimetría histórica
-- Factores dominantes: Elo dinámico -19.000; Historia mundialista -0.390; Rendimiento en Mundiales desde 1950 -0.175
+- Factores dominantes: Valor bruto de plantilla -619.072; Minutos Mundial de Clubes -33.802; Elo dinámico -19.000
 - Comparativa entre modelos:
-- Bivariante Poisson: victoria Netherlands 27.7% | empate 30.1% | victoria Brazil 42.2% | marcador más probable 0-1 (13.6%) | peso actual 34.3%
-- Poisson independiente: victoria Netherlands 24.7% | empate 37.0% | victoria Brazil 38.3% | marcador más probable 1-1 (17.4%) | peso actual 15.0%
-- Ajuste de baja anotación: victoria Netherlands 24.7% | empate 37.0% | victoria Brazil 38.3% | marcador más probable 1-1 (17.4%) | peso actual 18.3%
-- Overdispersión calibrada: victoria Netherlands 29.5% | empate 28.2% | victoria Brazil 42.4% | marcador más probable 0-1 (13.4%) | peso actual 6.7%
-- ML ligero regularizado: victoria Netherlands 28.2% | empate 30.0% | victoria Brazil 41.8% | marcador más probable 0-0 (14.3%) | peso actual 12.6%
-- Predictivo bayesiano dinámico: victoria Netherlands 31.0% | empate 30.1% | victoria Brazil 38.9% | marcador más probable 0-0 (13.7%) | peso actual 13.1%
-- Ensamble + asimetría histórica: victoria Netherlands 27.3% | empate 32.2% | victoria Brazil 40.4% | marcador más probable 1-1 (14.4%)
-- Quién tiene más probabilidad de avanzar: Netherlands 41.5% | Brazil 58.5%
-- Si empatan tras 90': gana en prórroga Netherlands 16.6% | siguen empatados 60.9% | Brazil 22.5%
-- Si llegan a penales: Netherlands 45.1% | Brazil 54.9%
+- Bivariante Poisson: victoria Netherlands 26.5% | empate 28.8% | victoria Brazil 44.7% | marcador más probable 0-1 (13.1%) | peso actual 34.3%
+- Poisson independiente: victoria Netherlands 23.6% | empate 35.7% | victoria Brazil 40.7% | marcador más probable 1-1 (16.9%) | peso actual 15.0%
+- Ajuste de baja anotación: victoria Netherlands 23.6% | empate 35.7% | victoria Brazil 40.7% | marcador más probable 1-1 (16.9%) | peso actual 18.2%
+- Overdispersión calibrada: victoria Netherlands 28.4% | empate 27.1% | victoria Brazil 44.5% | marcador más probable 0-1 (12.9%) | peso actual 6.7%
+- ML ligero regularizado: victoria Netherlands 28.1% | empate 28.8% | victoria Brazil 43.1% | marcador más probable 0-1 (13.5%) | peso actual 12.8%
+- Predictivo bayesiano dinámico: victoria Netherlands 30.9% | empate 29.0% | victoria Brazil 40.1% | marcador más probable 0-0 (12.5%) | peso actual 12.9%
+- Ensamble + asimetría histórica: victoria Netherlands 26.5% | empate 31.0% | victoria Brazil 42.5% | marcador más probable 1-1 (14.1%)
+- Quién tiene más probabilidad de avanzar: Netherlands 39.8% | Brazil 60.2%
+- Si empatan tras 90': gana en prórroga Netherlands 16.5% | siguen empatados 60.1% | Brazil 23.4%
+- Si llegan a penales: Netherlands 44.0% | Brazil 56.0%
 - Marcador más probable de la tanda: 3-4
-- Marcador medio esperado en la tanda: Netherlands 3.75 | Brazil 4.09
-- Marcadores de tanda más probables: 3-4 11.5%, 2-4 10.1%, 4-5 9.8%, 4-3 8.3%, 5-4 7.4%
-- Marcadores más probables: 1-1 14.4%, 0-0 13.0%, 0-1 11.8%, 1-0 9.1%, 0-2 8.0%, 1-2 7.6%, 2-1 6.1%, 2-0 4.9%
+- Marcador medio esperado en la tanda: Netherlands 3.75 | Brazil 4.08
+- Marcadores de tanda más probables: 3-4 12.1%, 2-4 11.0%, 4-5 10.4%, 5-4 7.6%, 4-3 6.9%
+- Marcadores más probables: 1-1 14.1%, 0-0 11.7%, 0-1 11.3%, 0-2 8.3%, 1-0 8.3%, 1-2 8.0%, 2-1 6.1%, 2-0 4.6%
 
 ### Octavos 3: France vs Norway
 - Etapa: Octavos de final
@@ -3548,37 +3521,37 @@ _El Brier 2026 se activa automáticamente con el primer partido terminado; antes
 - Sede: MetLife Stadium | United States
 - Hora UTC: 2026-07-05T20:00:00Z
 - Clima estimado: 29.0 C | HR 68% | viento 13 km/h | estrés 0.08
-- Factores que más pesan ahora: Elo dinámico +141.000; Rendimiento competitivo desde 1950 +0.443
+- Factores que más pesan ahora: Valor bruto de plantilla +620.228; Elo dinámico +141.000
 - Proyección automática: Cruce usado para este casillero hoy: France vs Norway | probabilidad de que se dé 19.8% | ganador global del casillero: France 64.9% | si se juega exactamente este cruce: France 79.5%
 - Otras opciones de cruce: France vs Ecuador -> France 14.0%; France vs Senegal -> France 10.9%
 - Marcador proyectado: 1-0
-- Marcador para cargar en Penca: 1-0 | 2.83 pts esp. | exacto 15.7% | diferencia 25.3%
-- Precisión de marcador: Marcador con precisión media | exacto más probable 1-0 15.7% | top-5 cubre 60.6%
-- Promedio estimado de goles del modelo: France 1.68 | Norway 0.61
-- Probabilidades de resultado (90'): 61.7% / 25.8% / 12.5%
-- Lectura estadistica: Pick utilizable | pick actual Victoria France 61.7% | confianza 67.2%
-- Escenario de goles: ambos marcan 37.1% | más de 2.5 goles 40.2%
-- Goles totales esperados por el modelo: 2.30. Sin línea externa de goles cargada para ese partido.
-- Probabilidad de que no reciba goles: France 55.0% | Norway 19.9%
-- Cuánta probabilidad cubren los 3 marcadores más probables: 41.5% | ventaja final más probable +0 (25.8%)
+- Marcador para cargar en Penca: 2-0 | 2.74 pts esp. | exacto 14.0% | diferencia 20.1%
+- Precisión de marcador: Marcador con precisión media | exacto más probable 1-0 14.6% | top-5 cubre 58.4%
+- Promedio estimado de goles del modelo: France 1.80 | Norway 0.62
+- Probabilidades de resultado (90'): 64.1% / 24.1% / 11.9%
+- Lectura estadistica: Pick utilizable | pick actual Victoria France 64.1% | confianza 69.6%
+- Escenario de goles: ambos marcan 38.6% | más de 2.5 goles 43.8%
+- Goles totales esperados por el modelo: 2.44. Sin línea externa de goles cargada para ese partido.
+- Probabilidad de que no reciba goles: France 54.2% | Norway 17.7%
+- Cuánta probabilidad cubren los 3 marcadores más probables: 39.1% | ventaja final más probable +1 (24.5%)
 - Qué tanto coinciden los modelos entre sí: 94.4%
 - Stack estadístico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotación + Overdispersión calibrada + ML ligero regularizado + Predictivo bayesiano dinámico + Ensamble + asimetría histórica
-- Factores dominantes: Elo dinámico +141.000; Rendimiento competitivo desde 1950 +0.443; Rendimiento en Mundiales desde 1950 +0.420
+- Factores dominantes: Valor bruto de plantilla +620.228; Elo dinámico +141.000; Minutos Mundial de Clubes +95.119
 - Comparativa entre modelos:
-- Bivariante Poisson: victoria France 64.1% | empate 24.5% | victoria Norway 11.4% | marcador más probable 1-0 (17.9%) | peso actual 35.5%
-- Poisson independiente: victoria France 61.2% | empate 27.9% | victoria Norway 10.9% | marcador más probable 1-0 (15.0%) | peso actual 16.1%
-- Ajuste de baja anotación: victoria France 61.2% | empate 27.9% | victoria Norway 10.9% | marcador más probable 1-0 (15.0%) | peso actual 17.2%
-- Overdispersión calibrada: victoria France 61.7% | empate 24.3% | victoria Norway 14.1% | marcador más probable 1-0 (17.0%) | peso actual 7.2%
-- ML ligero regularizado: victoria France 62.5% | empate 24.5% | victoria Norway 13.1% | marcador más probable 1-0 (17.2%) | peso actual 12.4%
-- Predictivo bayesiano dinámico: victoria France 50.8% | empate 27.8% | victoria Norway 21.4% | marcador más probable 1-0 (14.3%) | peso actual 11.6%
-- Ensamble + asimetría histórica: victoria France 61.7% | empate 25.8% | victoria Norway 12.5% | marcador más probable 1-0 (15.7%)
-- Quién tiene más probabilidad de avanzar: France 78.1% | Norway 21.9%
-- Si empatan tras 90': gana en prórroga France 31.4% | siguen empatados 58.5% | Norway 10.1%
-- Si llegan a penales: France 55.3% | Norway 44.7%
+- Bivariante Poisson: victoria France 66.3% | empate 22.8% | victoria Norway 10.9% | marcador más probable 1-0 (16.7%) | peso actual 35.4%
+- Poisson independiente: victoria France 63.6% | empate 26.1% | victoria Norway 10.3% | marcador más probable 2-0 (14.3%) | peso actual 16.1%
+- Ajuste de baja anotación: victoria France 63.6% | empate 26.1% | victoria Norway 10.3% | marcador más probable 2-0 (14.3%) | peso actual 17.1%
+- Overdispersión calibrada: victoria France 63.6% | empate 22.9% | victoria Norway 13.5% | marcador más probable 1-0 (16.0%) | peso actual 7.3%
+- ML ligero regularizado: victoria France 65.4% | empate 22.6% | victoria Norway 11.9% | marcador más probable 1-0 (16.3%) | peso actual 12.6%
+- Predictivo bayesiano dinámico: victoria France 52.8% | empate 26.5% | victoria Norway 20.7% | marcador más probable 1-0 (13.6%) | peso actual 11.5%
+- Ensamble + asimetría histórica: victoria France 64.1% | empate 24.1% | victoria Norway 11.9% | marcador más probable 1-0 (14.6%)
+- Quién tiene más probabilidad de avanzar: France 79.8% | Norway 20.2%
+- Si empatan tras 90': gana en prórroga France 33.8% | siguen empatados 56.1% | Norway 10.1%
+- Si llegan a penales: France 56.5% | Norway 43.5%
 - Marcador más probable de la tanda: 4-2
-- Marcador medio esperado en la tanda: France 3.98 | Norway 3.72
-- Marcadores de tanda más probables: 4-2 11.8%, 4-3 10.2%, 5-4 9.7%, 4-5 8.3%, 3-4 7.8%
-- Marcadores más probables: 1-0 15.7%, 2-0 13.9%, 0-0 11.9%, 1-1 10.9%, 3-0 8.2%, 2-1 8.0%, 0-1 5.6%, 3-1 4.7%
+- Marcador medio esperado en la tanda: France 4.02 | Norway 3.63
+- Marcadores de tanda más probables: 4-2 11.2%, 4-3 11.1%, 5-4 9.9%, 3-4 8.2%, 4-5 7.2%
+- Marcadores más probables: 1-0 14.6%, 2-0 14.0%, 0-0 10.5%, 1-1 10.4%, 3-0 8.9%, 2-1 8.1%, 3-1 5.2%, 0-1 5.0%
 
 ### Octavos 4: Mexico vs England
 - Etapa: Octavos de final
@@ -3586,37 +3559,37 @@ _El Brier 2026 se activa automáticamente con el primer partido terminado; antes
 - Sede: Estadio Banorte | Mexico
 - Hora UTC: 2026-07-06T00:00:00Z
 - Clima estimado: 22.0 C | HR 56% | viento 12 km/h | estrés 0.02
-- Factores que más pesan ahora: Elo dinámico -189.000; Historia mundialista -0.339
+- Factores que más pesan ahora: Valor bruto de plantilla -475.764; Elo dinámico -189.000
 - Proyección automática: Cruce usado para este casillero hoy: Mexico vs England | probabilidad de que se dé 25.7% | ganador global del casillero: England 48.7% | si se juega exactamente este cruce: England 76.8%
 - Otras opciones de cruce: South Korea vs England -> England 8.8%; Mexico vs Croatia -> Croatia 7.4%
 - Marcador proyectado: 0-1
-- Marcador para cargar en Penca: 0-2 | 2.72 pts esp. | exacto 13.9% | diferencia 19.8%
-- Precisión de marcador: Marcador con precisión media | exacto más probable 0-1 15.3% | top-5 cubre 59.1%
-- Promedio estimado de goles del modelo: Mexico 0.61 | England 1.77
-- Probabilidades de resultado (90'): 12.1% / 24.4% / 63.6%
-- Lectura estadistica: Pick utilizable | pick actual Victoria England 63.6% | confianza 69.2%
-- Escenario de goles: ambos marcan 37.7% | más de 2.5 goles 42.6%
-- Goles totales esperados por el modelo: 2.39. Sin línea externa de goles cargada para ese partido.
-- Probabilidad de que no reciba goles: Mexico 18.5% | England 54.8%
-- Cuánta probabilidad cubren los 3 marcadores más probables: 40.2% | ventaja final más probable -1 (25.1%)
-- Qué tanto coinciden los modelos entre sí: 94.5%
+- Marcador para cargar en Penca: 0-2 | 2.81 pts esp. | exacto 14.1% | diferencia 20.4%
+- Precisión de marcador: Marcador con precisión media | exacto más probable 0-1 14.6% | top-5 cubre 57.8%
+- Promedio estimado de goles del modelo: Mexico 0.61 | England 1.89
+- Probabilidades de resultado (90'): 11.2% / 22.9% / 65.8%
+- Lectura estadistica: Pick utilizable | pick actual Victoria England 65.8% | confianza 71.6%
+- Escenario de goles: ambos marcan 38.3% | más de 2.5 goles 45.2%
+- Goles totales esperados por el modelo: 2.50. Sin línea externa de goles cargada para ese partido.
+- Probabilidad de que no reciba goles: Mexico 16.8% | England 54.9%
+- Cuánta probabilidad cubren los 3 marcadores más probables: 38.7% | ventaja final más probable -1 (24.5%)
+- Qué tanto coinciden los modelos entre sí: 94.4%
 - Stack estadístico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotación + Overdispersión calibrada + ML ligero regularizado + Predictivo bayesiano dinámico + Ensamble + asimetría histórica
-- Factores dominantes: Elo dinámico -189.000; Historia mundialista -0.339; Rendimiento en Mundiales desde 1950 -0.252
+- Factores dominantes: Valor bruto de plantilla -475.764; Elo dinámico -189.000; Minutos Mundial de Clubes +138.944
 - Comparativa entre modelos:
-- Bivariante Poisson: victoria Mexico 11.0% | empate 23.1% | victoria England 65.9% | marcador más probable 0-1 (16.8%) | peso actual 35.5%
-- Poisson independiente: victoria Mexico 10.5% | empate 26.4% | victoria England 63.2% | marcador más probable 0-2 (14.3%) | peso actual 16.1%
-- Ajuste de baja anotación: victoria Mexico 10.5% | empate 26.4% | victoria England 63.2% | marcador más probable 0-2 (14.3%) | peso actual 17.1%
-- Overdispersión calibrada: victoria Mexico 13.7% | empate 23.1% | victoria England 63.2% | marcador más probable 0-1 (16.1%) | peso actual 7.2%
-- ML ligero regularizado: victoria Mexico 12.2% | empate 23.1% | victoria England 64.6% | marcador más probable 0-1 (16.5%) | peso actual 12.6%
-- Predictivo bayesiano dinámico: victoria Mexico 20.8% | empate 26.8% | victoria England 52.4% | marcador más probable 0-1 (13.9%) | peso actual 11.5%
-- Ensamble + asimetría histórica: victoria Mexico 12.1% | empate 24.4% | victoria England 63.6% | marcador más probable 0-1 (15.3%)
-- Quién tiene más probabilidad de avanzar: Mexico 21.1% | England 78.9%
-- Si empatan tras 90': gana en prórroga Mexico 10.1% | siguen empatados 56.2% | England 33.7%
-- Si llegan a penales: Mexico 48.2% | England 51.8%
-- Marcador más probable de la tanda: 5-4
-- Marcador medio esperado en la tanda: Mexico 3.93 | England 4.00
-- Marcadores de tanda más probables: 5-4 10.5%, 4-5 10.2%, 4-3 9.8%, 2-4 9.6%, 3-4 8.8%
-- Marcadores más probables: 0-1 15.3%, 0-2 13.9%, 0-0 11.0%, 1-1 10.3%, 0-3 8.7%, 1-2 8.0%, 1-0 5.2%, 1-3 5.0%
+- Bivariante Poisson: victoria Mexico 10.2% | empate 21.7% | victoria England 68.1% | marcador más probable 0-1 (16.1%) | peso actual 35.3%
+- Poisson independiente: victoria Mexico 9.7% | empate 24.8% | victoria England 65.5% | marcador más probable 0-2 (14.4%) | peso actual 16.1%
+- Ajuste de baja anotación: victoria Mexico 9.7% | empate 24.8% | victoria England 65.5% | marcador más probable 0-2 (14.4%) | peso actual 16.9%
+- Overdispersión calibrada: victoria Mexico 12.9% | empate 22.0% | victoria England 65.2% | marcador más probable 0-1 (15.5%) | peso actual 7.7%
+- ML ligero regularizado: victoria Mexico 11.3% | empate 21.6% | victoria England 67.0% | marcador más probable 0-1 (15.8%) | peso actual 12.7%
+- Predictivo bayesiano dinámico: victoria Mexico 20.0% | empate 25.7% | victoria England 54.4% | marcador más probable 0-1 (13.3%) | peso actual 11.3%
+- Ensamble + asimetría histórica: victoria Mexico 11.2% | empate 22.9% | victoria England 65.8% | marcador más probable 0-1 (14.6%)
+- Quién tiene más probabilidad de avanzar: Mexico 19.1% | England 80.9%
+- Si empatan tras 90': gana en prórroga Mexico 9.8% | siguen empatados 55.4% | England 34.8%
+- Si llegan a penales: Mexico 44.5% | England 55.5%
+- Marcador más probable de la tanda: 4-5
+- Marcador medio esperado en la tanda: Mexico 3.61 | England 3.99
+- Marcadores de tanda más probables: 4-5 11.9%, 3-4 11.7%, 2-4 9.7%, 4-3 8.3%, 5-4 7.5%
+- Marcadores más probables: 0-1 14.6%, 0-2 14.1%, 0-0 10.0%, 1-1 9.8%, 0-3 9.3%, 1-2 8.0%, 1-3 5.3%, 1-0 4.7%
 
 ### Octavos 5: Turkey vs Belgium
 - Etapa: Octavos de final
@@ -3625,37 +3598,37 @@ _El Brier 2026 se activa automáticamente con el primer partido terminado; antes
 - Hora UTC: 2026-07-06T19:00:00Z
 - Clima estimado: 32.0 C | HR 55% | viento 15 km/h | estrés 0.20
 - Cambio por clima exigente: estrés climático 0.20.
-- Factores que más pesan ahora: Elo dinámico +31.000; Rendimiento competitivo desde 1950 -0.278
+- Factores que más pesan ahora: Minutos Mundial de Clubes -155.328; Valor bruto de plantilla -61.422
 - Proyección automática: Cruce usado para este casillero hoy: Turkey vs Belgium | probabilidad de que se dé 17.8% | ganador global del casillero: Belgium 29.1% | si se juega exactamente este cruce: Turkey 51.1%
 - Otras opciones de cruce: Turkey vs Belgium -> Belgium 8.7%; Paraguay vs Belgium -> Belgium 4.8%
 - Marcador proyectado: 1-1
-- Marcador para cargar en Penca: 1-1 | 2.10 pts esp. | exacto 14.7% | diferencia 33.1%
-- Precisión de marcador: Marcador con precisión media | exacto más probable 1-1 14.7% | top-5 cubre 55.7%
-- Promedio estimado de goles del modelo: Turkey 1.12 | Belgium 1.11
-- Probabilidades de resultado (90'): 33.5% / 33.1% / 33.4%
-- Lectura estadistica: Pronóstico parejo: sin favorito estadístico claro | pick actual Victoria Turkey 33.5% | confianza 39.4%
-- Escenario de goles: ambos marcan 46.5% | más de 2.5 goles 38.7%
-- Goles totales esperados por el modelo: 2.24. Sin línea externa de goles cargada para ese partido.
-- Probabilidad de que no reciba goles: Turkey 33.3% | Belgium 33.6%
-- Cuánta probabilidad cubren los 3 marcadores más probables: 38.4% | ventaja final más probable +0 (33.1%)
+- Marcador para cargar en Penca: 1-1 | 2.04 pts esp. | exacto 14.5% | diferencia 32.1%
+- Precisión de marcador: Marcador con precisión media | exacto más probable 1-1 14.5% | top-5 cubre 53.1%
+- Promedio estimado de goles del modelo: Turkey 1.18 | Belgium 1.17
+- Probabilidades de resultado (90'): 34.0% / 32.1% / 33.9%
+- Lectura estadistica: Pronóstico parejo: sin favorito estadístico claro | pick actual Victoria Turkey 34.0% | confianza 39.5%
+- Escenario de goles: ambos marcan 48.8% | más de 2.5 goles 41.7%
+- Goles totales esperados por el modelo: 2.36. Sin línea externa de goles cargada para ese partido.
+- Probabilidad de que no reciba goles: Turkey 31.5% | Belgium 31.8%
+- Cuánta probabilidad cubren los 3 marcadores más probables: 36.2% | ventaja final más probable +0 (32.1%)
 - Qué tanto coinciden los modelos entre sí: 94.9%
 - Stack estadístico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotación + Overdispersión calibrada + ML ligero regularizado + Predictivo bayesiano dinámico + Ensamble + asimetría histórica
-- Factores dominantes: Elo dinámico +31.000; Rendimiento competitivo desde 1950 -0.278; Ataque histórico desde 1950 -0.229
+- Factores dominantes: Minutos Mundial de Clubes -155.328; Valor bruto de plantilla -61.422; Elo dinámico +31.000
 - Comparativa entre modelos:
-- Bivariante Poisson: victoria Turkey 34.8% | empate 30.5% | victoria Belgium 34.8% | marcador más probable 1-1 (13.4%) | peso actual 33.7%
-- Poisson independiente: victoria Turkey 30.7% | empate 38.6% | victoria Belgium 30.7% | marcador más probable 1-1 (18.2%) | peso actual 14.7%
-- Ajuste de baja anotación: victoria Turkey 30.7% | empate 38.6% | victoria Belgium 30.7% | marcador más probable 1-1 (18.2%) | peso actual 18.8%
-- Overdispersión calibrada: victoria Turkey 35.8% | empate 28.4% | victoria Belgium 35.8% | marcador más probable 0-0 (12.4%) | peso actual 6.6%
-- ML ligero regularizado: victoria Turkey 35.1% | empate 30.8% | victoria Belgium 34.2% | marcador más probable 0-0 (14.8%) | peso actual 12.7%
-- Predictivo bayesiano dinámico: victoria Turkey 35.0% | empate 30.3% | victoria Belgium 34.7% | marcador más probable 0-0 (13.8%) | peso actual 13.4%
-- Ensamble + asimetría histórica: victoria Turkey 33.5% | empate 33.1% | victoria Belgium 33.4% | marcador más probable 1-1 (14.7%)
-- Quién tiene más probabilidad de avanzar: Turkey 50.0% | Belgium 50.0%
-- Si empatan tras 90': gana en prórroga Turkey 18.7% | siguen empatados 62.6% | Belgium 18.7%
-- Si llegan a penales: Turkey 49.4% | Belgium 50.6%
-- Marcador más probable de la tanda: 5-4
-- Marcador medio esperado en la tanda: Turkey 3.75 | Belgium 3.77
-- Marcadores de tanda más probables: 5-4 10.3%, 2-4 10.2%, 4-5 9.5%, 4-2 9.2%, 3-4 8.6%
-- Marcadores más probables: 1-1 14.7%, 0-0 13.4%, 1-0 10.3%, 0-1 10.2%, 2-1 7.1%, 1-2 6.9%, 0-2 6.4%, 2-0 6.3%
+- Bivariante Poisson: victoria Turkey 35.3% | empate 29.5% | victoria Belgium 35.3% | marcador más probable 1-1 (13.2%) | peso actual 33.6%
+- Poisson independiente: victoria Turkey 31.2% | empate 37.6% | victoria Belgium 31.2% | marcador más probable 1-1 (17.9%) | peso actual 14.7%
+- Ajuste de baja anotación: victoria Turkey 31.2% | empate 37.6% | victoria Belgium 31.2% | marcador más probable 1-1 (17.9%) | peso actual 18.7%
+- Overdispersión calibrada: victoria Turkey 36.3% | empate 27.5% | victoria Belgium 36.3% | marcador más probable 1-1 (11.6%) | peso actual 6.6%
+- ML ligero regularizado: victoria Turkey 35.6% | empate 29.7% | victoria Belgium 34.7% | marcador más probable 0-0 (13.4%) | peso actual 13.0%
+- Predictivo bayesiano dinámico: victoria Turkey 35.4% | empate 29.4% | victoria Belgium 35.2% | marcador más probable 0-0 (12.6%) | peso actual 13.4%
+- Ensamble + asimetría histórica: victoria Turkey 34.0% | empate 32.1% | victoria Belgium 33.9% | marcador más probable 1-1 (14.5%)
+- Quién tiene más probabilidad de avanzar: Turkey 49.8% | Belgium 50.2%
+- Si empatan tras 90': gana en prórroga Turkey 19.3% | siguen empatados 61.4% | Belgium 19.3%
+- Si llegan a penales: Turkey 48.4% | Belgium 51.6%
+- Marcador más probable de la tanda: 3-4
+- Marcador medio esperado en la tanda: Turkey 3.65 | Belgium 3.77
+- Marcadores de tanda más probables: 3-4 10.6%, 2-4 10.2%, 4-5 10.1%, 4-3 9.2%, 4-2 8.6%
+- Marcadores más probables: 1-1 14.5%, 0-0 12.1%, 1-0 9.6%, 0-1 9.5%, 2-1 7.4%, 1-2 7.1%, 0-2 6.4%, 2-0 6.2%
 
 ### Octavos 6: Croatia vs Spain
 - Etapa: Octavos de final
@@ -3663,37 +3636,37 @@ _El Brier 2026 se activa automáticamente con el primer partido terminado; antes
 - Sede: Lumen Field | United States
 - Hora UTC: 2026-07-07T00:00:00Z
 - Clima estimado: 23.0 C | HR 65% | viento 10 km/h | estrés 0.02
-- Factores que más pesan ahora: Elo dinámico -239.000; Ataque histórico desde 1950 -0.279
+- Factores que más pesan ahora: Minutos Mundial de Clubes +309.415; Valor bruto de plantilla -288.818
 - Proyección automática: Cruce usado para este casillero hoy: Croatia vs Spain | probabilidad de que se dé 21.6% | ganador global del casillero: Spain 62.2% | si se juega exactamente este cruce: Spain 82.6%
 - Otras opciones de cruce: Colombia vs Spain -> Spain 14.8%; Portugal vs Spain -> Spain 14.1%
 - Marcador proyectado: 0-1
-- Marcador para cargar en Penca: 0-2 | 2.92 pts esp. | exacto 15.3% | diferencia 21.1%
-- Precisión de marcador: Marcador con precisión media | exacto más probable 0-1 16.4% | top-5 cubre 62.0%
-- Promedio estimado de goles del modelo: Croatia 0.51 | Spain 1.83
-- Probabilidades de resultado (90'): 9.2% / 22.7% / 68.1%
-- Lectura estadistica: Pick utilizable | pick actual Victoria Spain 68.1% | confianza 74.3%
-- Escenario de goles: ambos marcan 34.2% | más de 2.5 goles 42.4%
-- Goles totales esperados por el modelo: 2.38. Sin línea externa de goles cargada para ese partido.
-- Probabilidad de que no reciba goles: Croatia 16.9% | Spain 59.9%
-- Cuánta probabilidad cubren los 3 marcadores más probables: 42.6% | ventaja final más probable -1 (25.5%)
+- Marcador para cargar en Penca: 0-2 | 2.97 pts esp. | exacto 15.2% | diferencia 21.4%
+- Precisión de marcador: Marcador con precisión media | exacto más probable 0-1 15.3% | top-5 cubre 59.8%
+- Promedio estimado de goles del modelo: Croatia 0.52 | Spain 1.93
+- Probabilidades de resultado (90'): 8.9% / 21.4% / 69.7%
+- Lectura estadistica: Pick fuerte | pick actual Victoria Spain 69.7% | confianza 76.0%
+- Escenario de goles: ambos marcan 35.4% | más de 2.5 goles 45.4%
+- Goles totales esperados por el modelo: 2.50. Sin línea externa de goles cargada para ese partido.
+- Probabilidad de que no reciba goles: Croatia 15.4% | Spain 59.0%
+- Cuánta probabilidad cubren los 3 marcadores más probables: 41.0% | ventaja final más probable -1 (24.7%)
 - Qué tanto coinciden los modelos entre sí: 93.9%
 - Stack estadístico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotación + Overdispersión calibrada + ML ligero regularizado + Predictivo bayesiano dinámico + Ensamble + asimetría histórica
-- Factores dominantes: Elo dinámico -239.000; Ataque histórico desde 1950 -0.279; Historia competitiva desde 1950 -0.207
+- Factores dominantes: Minutos Mundial de Clubes +309.415; Valor bruto de plantilla -288.818; Elo dinámico -239.000
 - Comparativa entre modelos:
-- Bivariante Poisson: victoria Croatia 7.9% | empate 21.5% | victoria Spain 70.6% | marcador más probable 0-1 (18.5%) | peso actual 35.9%
-- Poisson independiente: victoria Croatia 7.8% | empate 24.0% | victoria Spain 68.2% | marcador más probable 0-2 (16.3%) | peso actual 16.4%
-- Ajuste de baja anotación: victoria Croatia 7.8% | empate 24.0% | victoria Spain 68.2% | marcador más probable 0-2 (16.3%) | peso actual 16.8%
-- Overdispersión calibrada: victoria Croatia 10.4% | empate 22.0% | victoria Spain 67.5% | marcador más probable 0-1 (17.6%) | peso actual 7.3%
-- ML ligero regularizado: victoria Croatia 9.4% | empate 21.7% | victoria Spain 68.9% | marcador más probable 0-1 (17.6%) | peso actual 12.5%
-- Predictivo bayesiano dinámico: victoria Croatia 18.7% | empate 26.5% | victoria Spain 54.7% | marcador más probable 0-1 (14.6%) | peso actual 11.1%
-- Ensamble + asimetría histórica: victoria Croatia 9.2% | empate 22.7% | victoria Spain 68.1% | marcador más probable 0-1 (16.4%)
-- Quién tiene más probabilidad de avanzar: Croatia 17.0% | Spain 83.0%
-- Si empatan tras 90': gana en prórroga Croatia 8.2% | siguen empatados 55.9% | Spain 35.9%
-- Si llegan a penales: Croatia 46.9% | Spain 53.1%
-- Marcador más probable de la tanda: 3-4
-- Marcador medio esperado en la tanda: Croatia 3.91 | Spain 3.98
-- Marcadores de tanda más probables: 3-4 9.9%, 2-4 9.6%, 4-5 9.6%, 5-4 9.3%, 4-3 8.9%
-- Marcadores más probables: 0-1 16.4%, 0-2 15.3%, 0-0 10.9%, 0-3 10.0%, 1-1 9.4%, 1-2 7.6%, 1-3 5.0%, 0-4 4.6%
+- Bivariante Poisson: victoria Croatia 7.7% | empate 20.2% | victoria Spain 72.1% | marcador más probable 0-1 (17.4%) | peso actual 35.7%
+- Poisson independiente: victoria Croatia 7.6% | empate 22.7% | victoria Spain 69.7% | marcador más probable 0-2 (16.0%) | peso actual 16.3%
+- Ajuste de baja anotación: victoria Croatia 7.6% | empate 22.7% | victoria Spain 69.7% | marcador más probable 0-2 (16.0%) | peso actual 16.7%
+- Overdispersión calibrada: victoria Croatia 10.2% | empate 21.0% | victoria Spain 68.8% | marcador más probable 0-1 (16.6%) | peso actual 7.6%
+- ML ligero regularizado: victoria Croatia 8.8% | empate 20.4% | victoria Spain 70.8% | marcador más probable 0-1 (16.8%) | peso actual 12.6%
+- Predictivo bayesiano dinámico: victoria Croatia 18.3% | empate 25.4% | victoria Spain 56.3% | marcador más probable 0-1 (13.9%) | peso actual 11.0%
+- Ensamble + asimetría histórica: victoria Croatia 8.9% | empate 21.4% | victoria Spain 69.7% | marcador más probable 0-1 (15.3%)
+- Quién tiene más probabilidad de avanzar: Croatia 16.3% | Spain 83.7%
+- Si empatan tras 90': gana en prórroga Croatia 8.7% | siguen empatados 55.0% | Spain 36.4%
+- Si llegan a penales: Croatia 46.7% | Spain 53.3%
+- Marcador más probable de la tanda: 4-5
+- Marcador medio esperado en la tanda: Croatia 3.85 | Spain 3.98
+- Marcadores de tanda más probables: 4-5 11.1%, 3-4 10.0%, 5-4 9.8%, 4-3 9.1%, 2-4 8.7%
+- Marcadores más probables: 0-1 15.3%, 0-2 15.2%, 0-3 10.5%, 0-0 9.8%, 1-1 9.0%, 1-2 7.7%, 1-3 5.4%, 0-4 5.1%
 
 ### Octavos 7: Switzerland vs Argentina
 - Etapa: Octavos de final
@@ -3702,37 +3675,37 @@ _El Brier 2026 se activa automáticamente con el primer partido terminado; antes
 - Hora UTC: 2026-07-07T16:00:00Z
 - Clima estimado: 30.0 C | HR 70% | viento 11 km/h | estrés 0.23
 - Cambio por clima exigente: estrés climático 0.23.
-- Factores que más pesan ahora: Elo dinámico -216.000; Historia mundialista -0.451
+- Factores que más pesan ahora: Valor bruto de plantilla -316.379; Minutos Mundial de Clubes -265.725
 - Proyección automática: Cruce usado para este casillero hoy: Switzerland vs Argentina | probabilidad de que se dé 36.2% | ganador global del casillero: Argentina 60.6% | si se juega exactamente este cruce: Argentina 81.4%
 - Otras opciones de cruce: Canada vs Argentina -> Argentina 14.7%; Switzerland vs Argentina -> Switzerland 6.7%
 - Marcador proyectado: 0-1
-- Marcador para cargar en Penca: 0-2 | 2.91 pts esp. | exacto 15.6% | diferencia 21.1%
-- Precisión de marcador: Marcador con precisión media | exacto más probable 0-1 16.8% | top-5 cubre 63.1%
-- Promedio estimado de goles del modelo: Switzerland 0.50 | Argentina 1.79
-- Probabilidades de resultado (90'): 9.5% / 23.3% / 67.2%
-- Lectura estadistica: Pick utilizable | pick actual Victoria Argentina 67.2% | confianza 73.4%
-- Escenario de goles: ambos marcan 33.4% | más de 2.5 goles 40.8%
-- Goles totales esperados por el modelo: 2.33. Sin línea externa de goles cargada para ese partido.
-- Probabilidad de que no reciba goles: Switzerland 17.6% | Argentina 60.4%
-- Cuánta probabilidad cubren los 3 marcadores más probables: 43.8% | ventaja final más probable -1 (25.6%)
-- Qué tanto coinciden los modelos entre sí: 94.1%
+- Marcador para cargar en Penca: 0-2 | 2.97 pts esp. | exacto 15.5% | diferencia 21.5%
+- Precisión de marcador: Marcador con precisión media | exacto más probable 0-1 15.5% | top-5 cubre 60.7%
+- Promedio estimado de goles del modelo: Switzerland 0.52 | Argentina 1.91
+- Probabilidades de resultado (90'): 9.0% / 21.7% / 69.3%
+- Lectura estadistica: Pick fuerte | pick actual Victoria Argentina 69.3% | confianza 75.6%
+- Escenario de goles: ambos marcan 34.8% | más de 2.5 goles 44.4%
+- Goles totales esperados por el modelo: 2.47. Sin línea externa de goles cargada para ese partido.
+- Probabilidad de que no reciba goles: Switzerland 15.7% | Argentina 59.5%
+- Cuánta probabilidad cubren los 3 marcadores más probables: 41.5% | ventaja final más probable -1 (24.7%)
+- Qué tanto coinciden los modelos entre sí: 93.9%
 - Stack estadístico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotación + Overdispersión calibrada + ML ligero regularizado + Predictivo bayesiano dinámico + Ensamble + asimetría histórica
-- Factores dominantes: Elo dinámico -216.000; Historia mundialista -0.451; Rendimiento en Mundiales desde 1950 -0.328
+- Factores dominantes: Valor bruto de plantilla -316.379; Minutos Mundial de Clubes -265.725; Elo dinámico -216.000
 - Comparativa entre modelos:
-- Bivariante Poisson: victoria Switzerland 8.2% | empate 22.1% | victoria Argentina 69.7% | marcador más probable 0-1 (18.8%) | peso actual 35.9%
-- Poisson independiente: victoria Switzerland 8.1% | empate 24.6% | victoria Argentina 67.3% | marcador más probable 0-1 (16.4%) | peso actual 16.4%
-- Ajuste de baja anotación: victoria Switzerland 8.1% | empate 24.6% | victoria Argentina 67.3% | marcador más probable 0-1 (16.4%) | peso actual 16.9%
-- Overdispersión calibrada: victoria Switzerland 10.7% | empate 22.5% | victoria Argentina 66.8% | marcador más probable 0-1 (17.9%) | peso actual 7.3%
-- ML ligero regularizado: victoria Switzerland 9.8% | empate 22.5% | victoria Argentina 67.8% | marcador más probable 0-1 (18.0%) | peso actual 12.4%
-- Predictivo bayesiano dinámico: victoria Switzerland 18.9% | empate 27.0% | victoria Argentina 54.1% | marcador más probable 0-1 (14.8%) | peso actual 11.2%
-- Ensamble + asimetría histórica: victoria Switzerland 9.5% | empate 23.3% | victoria Argentina 67.2% | marcador más probable 0-1 (16.8%)
-- Quién tiene más probabilidad de avanzar: Switzerland 17.1% | Argentina 82.9%
-- Si empatan tras 90': gana en prórroga Switzerland 8.3% | siguen empatados 56.7% | Argentina 35.0%
-- Si llegan a penales: Switzerland 42.7% | Argentina 57.3%
+- Bivariante Poisson: victoria Switzerland 7.8% | empate 20.5% | victoria Argentina 71.7% | marcador más probable 0-1 (17.5%) | peso actual 35.8%
+- Poisson independiente: victoria Switzerland 7.7% | empate 23.0% | victoria Argentina 69.3% | marcador más probable 0-2 (16.0%) | peso actual 16.3%
+- Ajuste de baja anotación: victoria Switzerland 7.7% | empate 23.0% | victoria Argentina 69.3% | marcador más probable 0-2 (16.0%) | peso actual 16.7%
+- Overdispersión calibrada: victoria Switzerland 10.4% | empate 21.2% | victoria Argentina 68.5% | marcador más probable 0-1 (16.7%) | peso actual 7.5%
+- ML ligero regularizado: victoria Switzerland 8.9% | empate 20.7% | victoria Argentina 70.4% | marcador más probable 0-1 (17.0%) | peso actual 12.6%
+- Predictivo bayesiano dinámico: victoria Switzerland 18.4% | empate 25.6% | victoria Argentina 56.0% | marcador más probable 0-1 (14.0%) | peso actual 11.1%
+- Ensamble + asimetría histórica: victoria Switzerland 9.0% | empate 21.7% | victoria Argentina 69.3% | marcador más probable 0-1 (15.5%)
+- Quién tiene más probabilidad de avanzar: Switzerland 16.0% | Argentina 84.0%
+- Si empatan tras 90': gana en prórroga Switzerland 8.6% | siguen empatados 55.3% | Argentina 36.2%
+- Si llegan a penales: Switzerland 42.6% | Argentina 57.4%
 - Marcador más probable de la tanda: 3-4
-- Marcador medio esperado en la tanda: Switzerland 3.62 | Argentina 3.94
-- Marcadores de tanda más probables: 3-4 11.8%, 4-5 11.8%, 2-4 9.3%, 4-3 8.6%, 5-4 7.5%
-- Marcadores más probables: 0-1 16.8%, 0-2 15.6%, 0-0 11.4%, 0-3 9.8%, 1-1 9.5%, 1-2 7.5%, 1-3 4.8%, 1-0 4.6%
+- Marcador medio esperado en la tanda: Switzerland 3.60 | Argentina 4.04
+- Marcadores de tanda más probables: 3-4 12.4%, 2-4 11.9%, 4-5 10.5%, 4-3 7.7%, 5-4 7.2%
+- Marcadores más probables: 0-1 15.5%, 0-2 15.5%, 0-3 10.4%, 0-0 10.0%, 1-1 9.1%, 1-2 7.6%, 1-3 5.2%, 0-4 5.0%
 
 ### Octavos 8: Portugal vs Turkey
 - Etapa: Octavos de final
@@ -3740,37 +3713,37 @@ _El Brier 2026 se activa automáticamente con el primer partido terminado; antes
 - Sede: BC Place | Canada
 - Hora UTC: 2026-07-07T20:00:00Z
 - Clima estimado: 21.0 C | HR 71% | viento 10 km/h | estrés 0.02
-- Factores que más pesan ahora: Elo dinámico +96.000; Rendimiento competitivo desde 1950 +0.370
+- Factores que más pesan ahora: Elo dinámico +96.000; Minutos Mundial de Clubes -57.377
 - Proyección automática: Cruce usado para este casillero hoy: Portugal vs Turkey | probabilidad de que se dé 8.5% | ganador global del casillero: Portugal 35.8% | si se juega exactamente este cruce: Portugal 74.5%
 - Otras opciones de cruce: Portugal vs Iran -> Portugal 5.8%; Portugal vs Paraguay -> Portugal 5.7%
 - Marcador proyectado: 1-0
-- Marcador para cargar en Penca: 2-1 | 2.27 pts esp. | exacto 8.1% | diferencia 24.0%
-- Precisión de marcador: Marcador con precisión media | exacto más probable 1-0 14.0% | top-5 cubre 58.4%
-- Promedio estimado de goles del modelo: Portugal 1.49 | Turkey 0.77
-- Probabilidades de resultado (90'): 51.7% / 29.5% / 18.9%
-- Lectura estadistica: Pronóstico parejo: sin favorito estadístico claro | pick actual Victoria Portugal 51.7% | confianza 56.6%
-- Escenario de goles: ambos marcan 41.9% | más de 2.5 goles 39.3%
-- Goles totales esperados por el modelo: 2.26. Sin línea externa de goles cargada para ese partido.
-- Probabilidad de que no reciba goles: Portugal 46.7% | Turkey 24.1%
-- Cuánta probabilidad cubren los 3 marcadores más probables: 39.4% | ventaja final más probable +0 (29.5%)
+- Marcador para cargar en Penca: 2-1 | 2.32 pts esp. | exacto 8.3% | diferencia 23.5%
+- Precisión de marcador: Marcador frágil | exacto más probable 1-0 13.0% | top-5 cubre 55.8%
+- Promedio estimado de goles del modelo: Portugal 1.58 | Turkey 0.82
+- Probabilidades de resultado (90'): 53.3% / 28.1% / 18.7%
+- Lectura estadistica: Pronóstico parejo: sin favorito estadístico claro | pick actual Victoria Portugal 53.3% | confianza 58.1%
+- Escenario de goles: ambos marcan 44.2% | más de 2.5 goles 42.9%
+- Goles totales esperados por el modelo: 2.41. Sin línea externa de goles cargada para ese partido.
+- Probabilidad de que no reciba goles: Portugal 45.0% | Turkey 21.9%
+- Cuánta probabilidad cubren los 3 marcadores más probables: 36.5% | ventaja final más probable +0 (28.1%)
 - Qué tanto coinciden los modelos entre sí: 94.7%
 - Stack estadístico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotación + Overdispersión calibrada + ML ligero regularizado + Predictivo bayesiano dinámico + Ensamble + asimetría histórica
-- Factores dominantes: Elo dinámico +96.000; Rendimiento competitivo desde 1950 +0.370; Defensa histórica desde 1950 +0.310
+- Factores dominantes: Elo dinámico +96.000; Minutos Mundial de Clubes -57.377; Valor bruto de plantilla -39.456
 - Comparativa entre modelos:
-- Bivariante Poisson: victoria Portugal 53.8% | empate 27.8% | victoria Turkey 18.4% | marcador más probable 1-0 (15.9%) | peso actual 34.9%
-- Poisson independiente: victoria Portugal 50.4% | empate 32.8% | victoria Turkey 16.8% | marcador más probable 1-1 (15.2%) | peso actual 15.6%
-- Ajuste de baja anotación: victoria Portugal 50.4% | empate 32.8% | victoria Turkey 16.8% | marcador más probable 1-1 (15.2%) | peso actual 17.7%
-- Overdispersión calibrada: victoria Portugal 52.6% | empate 26.6% | victoria Turkey 20.8% | marcador más probable 1-0 (15.3%) | peso actual 7.0%
-- ML ligero regularizado: victoria Portugal 52.6% | empate 27.8% | victoria Turkey 19.6% | marcador más probable 1-0 (16.1%) | peso actual 12.5%
-- Predictivo bayesiano dinámico: victoria Portugal 44.9% | empate 29.2% | victoria Turkey 25.8% | marcador más probable 1-0 (13.7%) | peso actual 12.3%
-- Ensamble + asimetría histórica: victoria Portugal 51.7% | empate 29.5% | victoria Turkey 18.9% | marcador más probable 1-0 (14.0%)
-- Quién tiene más probabilidad de avanzar: Portugal 69.2% | Turkey 30.8%
-- Si empatan tras 90': gana en prórroga Portugal 27.8% | siguen empatados 59.8% | Turkey 12.4%
-- Si llegan a penales: Portugal 52.7% | Turkey 47.3%
-- Marcador más probable de la tanda: 4-3
-- Marcador medio esperado en la tanda: Portugal 3.88 | Turkey 3.77
-- Marcadores de tanda más probables: 4-3 10.5%, 3-4 10.4%, 4-2 10.0%, 5-4 9.9%, 4-5 8.9%
-- Marcadores más probables: 1-0 14.0%, 0-0 12.7%, 1-1 12.7%, 2-0 11.0%, 2-1 8.1%, 0-1 7.2%, 3-0 5.9%, 1-2 4.5%
+- Bivariante Poisson: victoria Portugal 55.4% | empate 26.4% | victoria Turkey 18.2% | marcador más probable 1-0 (14.8%) | peso actual 34.8%
+- Poisson independiente: victoria Portugal 52.0% | empate 31.5% | victoria Turkey 16.5% | marcador más probable 1-1 (14.9%) | peso actual 15.5%
+- Ajuste de baja anotación: victoria Portugal 52.0% | empate 31.5% | victoria Turkey 16.5% | marcador más probable 1-1 (14.9%) | peso actual 17.7%
+- Overdispersión calibrada: victoria Portugal 53.9% | empate 25.4% | victoria Turkey 20.7% | marcador más probable 1-0 (14.3%) | peso actual 6.9%
+- ML ligero regularizado: victoria Portugal 54.1% | empate 26.4% | victoria Turkey 19.5% | marcador más probable 1-0 (15.1%) | peso actual 12.8%
+- Predictivo bayesiano dinámico: victoria Portugal 46.4% | empate 27.9% | victoria Turkey 25.7% | marcador más probable 1-0 (12.8%) | peso actual 12.3%
+- Ensamble + asimetría histórica: victoria Portugal 53.3% | empate 28.1% | victoria Turkey 18.7% | marcador más probable 1-0 (13.0%)
+- Quién tiene más probabilidad de avanzar: Portugal 70.0% | Turkey 30.0%
+- Si empatan tras 90': gana en prórroga Portugal 28.8% | siguen empatados 57.8% | Turkey 13.4%
+- Si llegan a penales: Portugal 53.5% | Turkey 46.5%
+- Marcador más probable de la tanda: 4-2
+- Marcador medio esperado en la tanda: Portugal 3.89 | Turkey 3.70
+- Marcadores de tanda más probables: 4-2 10.9%, 4-5 10.1%, 4-3 9.9%, 5-4 9.9%, 2-4 8.3%
+- Marcadores más probables: 1-0 13.0%, 1-1 12.3%, 0-0 11.2%, 2-0 10.9%, 2-1 8.3%, 0-1 6.6%, 3-0 6.2%, 3-1 4.7%
 
 ### Cuartos 1: Germany vs Brazil
 - Etapa: Cuartos de final
@@ -3778,37 +3751,37 @@ _El Brier 2026 se activa automáticamente con el primer partido terminado; antes
 - Sede: Gillette Stadium | United States
 - Hora UTC: 2026-07-09T20:00:00Z
 - Clima estimado: 26.0 C | HR 67% | viento 12 km/h | estrés 0.02
-- Factores que más pesan ahora: Elo dinámico -68.000; Defensa histórica desde 1950 -0.202
+- Factores que más pesan ahora: Minutos Mundial de Clubes +172.501; Valor bruto de plantilla -117.217
 - Proyección automática: Cruce usado para este casillero hoy: Germany vs Brazil | probabilidad de que se dé 20.1% | ganador global del casillero: Brazil 34.2% | si se juega exactamente este cruce: Brazil 58.6%
 - Otras opciones de cruce: Germany vs Brazil -> Germany 8.3%; Germany vs Netherlands -> Netherlands 6.8%
 - Marcador proyectado: 1-1
-- Marcador para cargar en Penca: 1-1 | 2.01 pts esp. | exacto 14.3% | diferencia 31.6%
-- Precisión de marcador: Marcador con precisión media | exacto más probable 1-1 14.3% | top-5 cubre 55.3%
-- Promedio estimado de goles del modelo: Germany 0.96 | Brazil 1.31
-- Probabilidades de resultado (90'): 25.9% / 31.6% / 42.4%
-- Lectura estadistica: Pronóstico parejo: sin favorito estadístico claro | pick actual Victoria Brazil 42.4% | confianza 47.6%
-- Escenario de goles: ambos marcan 46.7% | más de 2.5 goles 40.2%
-- Goles totales esperados por el modelo: 2.31. Sin línea externa de goles cargada para ese partido.
-- Probabilidad de que no reciba goles: Germany 27.4% | Brazil 38.2%
-- Cuánta probabilidad cubren los 3 marcadores más probables: 38.4% | ventaja final más probable +0 (31.6%)
-- Qué tanto coinciden los modelos entre sí: 95.0%
+- Marcador para cargar en Penca: 1-1 | 1.93 pts esp. | exacto 13.9% | diferencia 30.3%
+- Precisión de marcador: Marcador con precisión media | exacto más probable 1-1 13.9% | top-5 cubre 52.4%
+- Promedio estimado de goles del modelo: Germany 1.01 | Brazil 1.41
+- Probabilidades de resultado (90'): 25.6% / 30.3% / 44.1%
+- Lectura estadistica: Pronóstico parejo: sin favorito estadístico claro | pick actual Victoria Brazil 44.1% | confianza 49.2%
+- Escenario de goles: ambos marcan 49.2% | más de 2.5 goles 43.8%
+- Goles totales esperados por el modelo: 2.45. Sin línea externa de goles cargada para ese partido.
+- Probabilidad de que no reciba goles: Germany 25.0% | Brazil 36.7%
+- Cuánta probabilidad cubren los 3 marcadores más probables: 35.8% | ventaja final más probable +0 (30.3%)
+- Qué tanto coinciden los modelos entre sí: 94.9%
 - Stack estadístico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotación + Overdispersión calibrada + ML ligero regularizado + Predictivo bayesiano dinámico + Ensamble + asimetría histórica
-- Factores dominantes: Elo dinámico -68.000; Defensa histórica desde 1950 -0.202; Disciplina estructural +0.115
+- Factores dominantes: Minutos Mundial de Clubes +172.501; Valor bruto de plantilla -117.217; Elo dinámico -68.000
 - Comparativa entre modelos:
-- Bivariante Poisson: victoria Germany 26.0% | empate 29.5% | victoria Brazil 44.5% | marcador más probable 0-1 (13.8%) | peso actual 34.4%
-- Poisson independiente: victoria Germany 23.2% | empate 36.1% | victoria Brazil 40.6% | marcador más probable 1-1 (17.1%) | peso actual 15.1%
-- Ajuste de baja anotación: victoria Germany 23.2% | empate 36.1% | victoria Brazil 40.6% | marcador más probable 1-1 (17.1%) | peso actual 18.2%
-- Overdispersión calibrada: victoria Germany 27.9% | empate 27.7% | victoria Brazil 44.4% | marcador más probable 0-1 (13.5%) | peso actual 6.7%
-- ML ligero regularizado: victoria Germany 27.1% | empate 29.6% | victoria Brazil 43.3% | marcador más probable 0-1 (14.3%) | peso actual 12.7%
-- Predictivo bayesiano dinámico: victoria Germany 30.4% | empate 29.7% | victoria Brazil 39.9% | marcador más probable 0-0 (13.4%) | peso actual 12.9%
-- Ensamble + asimetría histórica: victoria Germany 25.9% | empate 31.6% | victoria Brazil 42.4% | marcador más probable 1-1 (14.3%)
-- Quién tiene más probabilidad de avanzar: Germany 40.8% | Brazil 59.2%
-- Si empatan tras 90': gana en prórroga Germany 16.1% | siguen empatados 60.6% | Brazil 23.3%
-- Si llegan a penales: Germany 51.1% | Brazil 48.9%
+- Bivariante Poisson: victoria Germany 25.5% | empate 28.1% | victoria Brazil 46.4% | marcador más probable 0-1 (13.0%) | peso actual 34.3%
+- Poisson independiente: victoria Germany 22.8% | empate 34.7% | victoria Brazil 42.5% | marcador más probable 1-1 (16.6%) | peso actual 15.1%
+- Ajuste de baja anotación: victoria Germany 22.8% | empate 34.7% | victoria Brazil 42.5% | marcador más probable 1-1 (16.6%) | peso actual 18.1%
+- Overdispersión calibrada: victoria Germany 27.5% | empate 26.5% | victoria Brazil 46.0% | marcador más probable 0-1 (12.7%) | peso actual 6.8%
+- ML ligero regularizado: victoria Germany 27.2% | empate 28.2% | victoria Brazil 44.6% | marcador más probable 0-1 (13.4%) | peso actual 12.9%
+- Predictivo bayesiano dinámico: victoria Germany 30.3% | empate 28.6% | victoria Brazil 41.1% | marcador más probable 0-0 (12.0%) | peso actual 12.8%
+- Ensamble + asimetría histórica: victoria Germany 25.6% | empate 30.3% | victoria Brazil 44.1% | marcador más probable 1-1 (13.9%)
+- Quién tiene más probabilidad de avanzar: Germany 39.7% | Brazil 60.3%
+- Si empatan tras 90': gana en prórroga Germany 16.2% | siguen empatados 60.5% | Brazil 23.3%
+- Si llegan a penales: Germany 50.6% | Brazil 49.4%
 - Marcador más probable de la tanda: 5-4
-- Marcador medio esperado en la tanda: Germany 4.00 | Brazil 3.96
-- Marcadores de tanda más probables: 5-4 10.3%, 4-5 10.1%, 4-3 9.1%, 4-2 8.8%, 3-4 8.4%
-- Marcadores más probables: 1-1 14.3%, 0-0 12.3%, 0-1 11.8%, 1-0 8.5%, 0-2 8.4%, 1-2 7.9%, 2-1 6.0%, 2-0 4.5%
+- Marcador medio esperado en la tanda: Germany 4.10 | Brazil 4.01
+- Marcadores de tanda más probables: 5-4 11.0%, 4-3 9.7%, 4-2 9.3%, 4-5 8.9%, 3-4 8.2%
+- Marcadores más probables: 1-1 13.9%, 0-1 11.0%, 0-0 10.9%, 0-2 8.4%, 1-2 8.2%, 1-0 7.7%, 2-1 6.1%, 2-2 4.6%
 
 ### Cuartos 2: France vs England
 - Etapa: Cuartos de final
@@ -3816,37 +3789,37 @@ _El Brier 2026 se activa automáticamente con el primer partido terminado; antes
 - Sede: SoFi Stadium | United States
 - Hora UTC: 2026-07-10T19:00:00Z
 - Clima estimado: 26.0 C | HR 70% | viento 11 km/h | estrés 0.06
-- Factores que más pesan ahora: Elo dinámico +21.000; Rendimiento en Mundiales desde 1950 +0.115
+- Factores que más pesan ahora: Valor bruto de plantilla +154.374; Minutos Mundial de Clubes +64.131
 - Proyección automática: Cruce usado para este casillero hoy: France vs England | probabilidad de que se dé 31.8% | ganador global del casillero: France 43.4% | si se juega exactamente este cruce: France 54.3%
 - Otras opciones de cruce: France vs England -> England 14.5%; France vs Croatia -> France 8.3%
 - Marcador proyectado: 1-1
-- Marcador para cargar en Penca: 1-1 | 2.07 pts esp. | exacto 14.5% | diferencia 32.8%
-- Precisión de marcador: Marcador con precisión media | exacto más probable 1-1 14.5% | top-5 cubre 56.8%
-- Promedio estimado de goles del modelo: France 1.21 | England 1.03
-- Probabilidades de resultado (90'): 37.8% / 32.8% / 29.5%
-- Lectura estadistica: Pronóstico parejo: sin favorito estadístico claro | pick actual Victoria France 37.8% | confianza 43.3%
-- Escenario de goles: ambos marcan 45.2% | más de 2.5 goles 37.7%
-- Goles totales esperados por el modelo: 2.21. Sin línea externa de goles cargada para ese partido.
-- Probabilidad de que no reciba goles: France 36.8% | England 31.6%
-- Cuánta probabilidad cubren los 3 marcadores más probables: 39.6% | ventaja final más probable +0 (32.8%)
-- Qué tanto coinciden los modelos entre sí: 94.9%
+- Marcador para cargar en Penca: 1-1 | 2.00 pts esp. | exacto 14.2% | diferencia 31.5%
+- Precisión de marcador: Marcador con precisión media | exacto más probable 1-1 14.2% | top-5 cubre 53.5%
+- Promedio estimado de goles del modelo: France 1.28 | England 1.10
+- Probabilidades de resultado (90'): 38.3% / 31.5% / 30.2%
+- Lectura estadistica: Pronóstico parejo: sin favorito estadístico claro | pick actual Victoria France 38.3% | confianza 43.8%
+- Escenario de goles: ambos marcan 48.2% | más de 2.5 goles 41.5%
+- Goles totales esperados por el modelo: 2.36. Sin línea externa de goles cargada para ese partido.
+- Probabilidad de que no reciba goles: France 34.4% | England 29.5%
+- Cuánta probabilidad cubren los 3 marcadores más probables: 36.7% | ventaja final más probable +0 (31.5%)
+- Qué tanto coinciden los modelos entre sí: 95.0%
 - Stack estadístico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotación + Overdispersión calibrada + ML ligero regularizado + Predictivo bayesiano dinámico + Ensamble + asimetría histórica
-- Factores dominantes: Elo dinámico +21.000; Rendimiento en Mundiales desde 1950 +0.115; Historia mundialista +0.105
+- Factores dominantes: Valor bruto de plantilla +154.374; Minutos Mundial de Clubes +64.131; Elo dinámico +21.000
 - Comparativa entre modelos:
-- Bivariante Poisson: victoria France 39.4% | empate 30.5% | victoria England 30.1% | marcador más probable 1-1 (13.3%) | peso actual 34.1%
-- Poisson independiente: victoria France 35.4% | empate 38.0% | victoria England 26.6% | marcador más probable 1-1 (17.8%) | peso actual 14.9%
-- Ajuste de baja anotación: victoria France 35.4% | empate 38.0% | victoria England 26.6% | marcador más probable 1-1 (17.8%) | peso actual 18.5%
-- Overdispersión calibrada: victoria France 39.9% | empate 28.5% | victoria England 31.6% | marcador más probable 1-0 (13.1%) | peso actual 6.7%
-- ML ligero regularizado: victoria France 39.0% | empate 30.2% | victoria England 30.8% | marcador más probable 0-0 (14.3%) | peso actual 12.6%
-- Predictivo bayesiano dinámico: victoria France 37.3% | empate 30.2% | victoria England 32.4% | marcador más probable 0-0 (13.8%) | peso actual 13.3%
-- Ensamble + asimetría histórica: victoria France 37.8% | empate 32.8% | victoria England 29.5% | marcador más probable 1-1 (14.5%)
-- Quién tiene más probabilidad de avanzar: France 55.5% | England 44.5%
-- Si empatan tras 90': gana en prórroga France 21.3% | siguen empatados 61.6% | England 17.1%
-- Si llegan a penales: France 53.1% | England 46.9%
-- Marcador más probable de la tanda: 5-4
-- Marcador medio esperado en la tanda: France 4.12 | England 3.90
-- Marcadores de tanda más probables: 5-4 11.8%, 4-5 10.1%, 4-3 10.0%, 4-2 9.4%, 3-4 7.6%
-- Marcadores más probables: 1-1 14.5%, 0-0 13.6%, 1-0 11.5%, 0-1 9.8%, 2-1 7.4%, 2-0 7.4%, 1-2 6.3%, 0-2 5.5%
+- Bivariante Poisson: victoria France 40.0% | empate 29.1% | victoria England 30.9% | marcador más probable 1-1 (13.1%) | peso actual 33.9%
+- Poisson independiente: victoria France 35.9% | empate 36.7% | victoria England 27.4% | marcador más probable 1-1 (17.5%) | peso actual 14.8%
+- Ajuste de baja anotación: victoria France 35.9% | empate 36.7% | victoria England 27.4% | marcador más probable 1-1 (17.5%) | peso actual 18.5%
+- Overdispersión calibrada: victoria France 40.4% | empate 27.2% | victoria England 32.4% | marcador más probable 1-0 (12.0%) | peso actual 6.6%
+- ML ligero regularizado: victoria France 39.4% | empate 29.2% | victoria England 31.4% | marcador más probable 0-0 (12.9%) | peso actual 12.9%
+- Predictivo bayesiano dinámico: victoria France 37.8% | empate 29.1% | victoria England 33.1% | marcador más probable 0-0 (12.3%) | peso actual 13.2%
+- Ensamble + asimetría histórica: victoria France 38.3% | empate 31.5% | victoria England 30.2% | marcador más probable 1-1 (14.2%)
+- Quién tiene más probabilidad de avanzar: France 55.1% | England 44.9%
+- Si empatan tras 90': gana en prórroga France 22.4% | siguen empatados 59.2% | England 18.3%
+- Si llegan a penales: France 52.0% | England 48.0%
+- Marcador más probable de la tanda: 4-2
+- Marcador medio esperado en la tanda: France 3.97 | England 3.87
+- Marcadores de tanda más probables: 4-2 11.2%, 4-3 9.8%, 5-4 9.4%, 3-4 9.1%, 2-4 8.5%
+- Marcadores más probables: 1-1 14.2%, 0-0 12.0%, 1-0 10.5%, 0-1 9.0%, 2-1 7.7%, 2-0 7.2%, 1-2 6.6%, 0-2 5.5%
 
 ### Cuartos 3: Belgium vs Spain
 - Etapa: Cuartos de final
@@ -3855,37 +3828,37 @@ _El Brier 2026 se activa automáticamente con el primer partido terminado; antes
 - Hora UTC: 2026-07-11T21:00:00Z
 - Clima estimado: 31.0 C | HR 74% | viento 15 km/h | estrés 0.28
 - Cambio por clima exigente: estrés climático 0.28.
-- Factores que más pesan ahora: Elo dinámico -322.000; Rendimiento competitivo desde 1950 -0.237
+- Factores que más pesan ahora: Elo dinámico -322.000; Minutos Mundial de Clubes +298.846
 - Proyección automática: Cruce usado para este casillero hoy: Belgium vs Spain | probabilidad de que se dé 18.1% | ganador global del casillero: Spain 54.6% | si se juega exactamente este cruce: Spain 86.6%
 - Otras opciones de cruce: Turkey vs Spain -> Spain 11.2%; Paraguay vs Spain -> Spain 4.6%
-- Marcador proyectado: 0-1
-- Marcador para cargar en Penca: 0-2 | 3.19 pts esp. | exacto 17.3% | diferencia 22.6%
-- Precisión de marcador: Marcador con precisión media | exacto más probable 0-1 17.5% | top-5 cubre 64.9%
-- Promedio estimado de goles del modelo: Belgium 0.38 | Spain 1.97
-- Probabilidades de resultado (90'): 6.3% / 19.8% / 73.9%
-- Lectura estadistica: Pick fuerte | pick actual Victoria Spain 73.9% | confianza 81.2%
-- Escenario de goles: ambos marcan 28.7% | más de 2.5 goles 42.9%
-- Goles totales esperados por el modelo: 2.40. Sin línea externa de goles cargada para ese partido.
-- Probabilidad de que no reciba goles: Belgium 14.9% | Spain 67.0%
-- Cuánta probabilidad cubren los 3 marcadores más probables: 46.8% | ventaja final más probable -1 (25.2%)
-- Qué tanto coinciden los modelos entre sí: 93.6%
+- Marcador proyectado: 0-2
+- Marcador para cargar en Penca: 0-2 | 3.22 pts esp. | exacto 16.9% | diferencia 22.7%
+- Precisión de marcador: Marcador con precisión media | exacto más probable 0-2 16.9% | top-5 cubre 62.5%
+- Promedio estimado de goles del modelo: Belgium 0.39 | Spain 2.07
+- Probabilidades de resultado (90'): 5.9% / 19.0% / 75.1%
+- Lectura estadistica: Pick fuerte | pick actual Victoria Spain 75.1% | confianza 82.4%
+- Escenario de goles: ambos marcan 30.3% | más de 2.5 goles 46.2%
+- Goles totales esperados por el modelo: 2.54. Sin línea externa de goles cargada para ese partido.
+- Probabilidad de que no reciba goles: Belgium 13.5% | Spain 65.9%
+- Cuánta probabilidad cubren los 3 marcadores más probables: 45.3% | ventaja final más probable -1 (23.9%)
+- Qué tanto coinciden los modelos entre sí: 93.3%
 - Stack estadístico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotación + Overdispersión calibrada + ML ligero regularizado + Predictivo bayesiano dinámico + Ensamble + asimetría histórica
-- Factores dominantes: Elo dinámico -322.000; Rendimiento competitivo desde 1950 -0.237; Carga reciente del portero +0.212
+- Factores dominantes: Elo dinámico -322.000; Minutos Mundial de Clubes +298.846; Valor bruto de plantilla -268.706
 - Comparativa entre modelos:
-- Bivariante Poisson: victoria Belgium 4.9% | empate 18.7% | victoria Spain 76.4% | marcador más probable 0-1 (19.8%) | peso actual 36.4%
-- Poisson independiente: victoria Belgium 5.2% | empate 20.4% | victoria Spain 74.4% | marcador más probable 0-2 (18.5%) | peso actual 16.7%
-- Ajuste de baja anotación: victoria Belgium 5.2% | empate 20.4% | victoria Spain 74.4% | marcador más probable 0-2 (18.5%) | peso actual 16.3%
-- Overdispersión calibrada: victoria Belgium 7.2% | empate 20.0% | victoria Spain 72.9% | marcador más probable 0-1 (18.8%) | peso actual 7.5%
-- ML ligero regularizado: victoria Belgium 6.1% | empate 19.2% | victoria Spain 74.7% | marcador más probable 0-1 (18.5%) | peso actual 12.4%
-- Predictivo bayesiano dinámico: victoria Belgium 15.9% | empate 25.4% | victoria Spain 58.7% | marcador más probable 0-1 (15.2%) | peso actual 10.7%
-- Ensamble + asimetría histórica: victoria Belgium 6.3% | empate 19.8% | victoria Spain 73.9% | marcador más probable 0-1 (17.5%)
-- Quién tiene más probabilidad de avanzar: Belgium 12.7% | Spain 87.3%
-- Si empatan tras 90': gana en prórroga Belgium 7.1% | siguen empatados 54.0% | Spain 38.8%
-- Si llegan a penales: Belgium 46.3% | Spain 53.7%
-- Marcador más probable de la tanda: 4-5
-- Marcador medio esperado en la tanda: Belgium 3.62 | Spain 3.85
-- Marcadores de tanda más probables: 4-5 10.9%, 3-4 10.8%, 4-3 9.9%, 2-4 9.7%, 4-2 8.6%
-- Marcadores más probables: 0-1 17.5%, 0-2 17.3%, 0-3 12.0%, 0-0 10.6%, 1-1 7.6%, 1-2 6.6%, 0-4 6.0%, 1-3 4.8%
+- Bivariante Poisson: victoria Belgium 4.7% | empate 17.3% | victoria Spain 78.0% | marcador más probable 0-1 (18.3%) | peso actual 36.1%
+- Poisson independiente: victoria Belgium 4.5% | empate 20.5% | victoria Spain 75.0% | marcador más probable 0-2 (18.0%) | peso actual 16.6%
+- Ajuste de baja anotación: victoria Belgium 4.5% | empate 20.5% | victoria Spain 75.0% | marcador más probable 0-2 (18.0%) | peso actual 16.2%
+- Overdispersión calibrada: victoria Belgium 7.0% | empate 18.8% | victoria Spain 74.2% | marcador más probable 0-1 (17.6%) | peso actual 7.8%
+- ML ligero regularizado: victoria Belgium 5.7% | empate 18.1% | victoria Spain 76.2% | marcador más probable 0-2 (17.8%) | peso actual 12.6%
+- Predictivo bayesiano dinámico: victoria Belgium 15.5% | empate 24.3% | victoria Spain 60.3% | marcador más probable 0-1 (14.5%) | peso actual 10.7%
+- Ensamble + asimetría histórica: victoria Belgium 5.9% | empate 19.0% | victoria Spain 75.1% | marcador más probable 0-2 (16.9%)
+- Quién tiene más probabilidad de avanzar: Belgium 11.9% | Spain 88.1%
+- Si empatan tras 90': gana en prórroga Belgium 7.1% | siguen empatados 53.2% | Spain 39.8%
+- Si llegan a penales: Belgium 45.9% | Spain 54.1%
+- Marcador más probable de la tanda: 3-4
+- Marcador medio esperado en la tanda: Belgium 3.74 | Spain 3.94
+- Marcadores de tanda más probables: 3-4 11.5%, 2-4 9.7%, 4-5 9.6%, 4-3 8.9%, 5-4 8.8%
+- Marcadores más probables: 0-2 16.9%, 0-1 15.9%, 0-3 12.4%, 0-0 9.7%, 1-1 7.6%, 1-2 6.7%, 0-4 6.5%, 1-3 5.1%
 
 ### Cuartos 4: Argentina vs Portugal
 - Etapa: Cuartos de final
@@ -3893,37 +3866,37 @@ _El Brier 2026 se activa automáticamente con el primer partido terminado; antes
 - Sede: GEHA Field at Arrowhead Stadium | United States
 - Hora UTC: 2026-07-12T01:00:00Z
 - Clima estimado: 30.0 C | HR 63% | viento 14 km/h | estrés 0.16
-- Factores que más pesan ahora: Elo dinámico +137.000; Historia mundialista +0.270
+- Factores que más pesan ahora: Valor bruto de plantilla +432.399; Minutos Mundial de Clubes +311.490
 - Proyección automática: Cruce usado para este casillero hoy: Argentina vs Portugal | probabilidad de que se dé 22.0% | ganador global del casillero: Argentina 46.1% | si se juega exactamente este cruce: Argentina 68.4%
 - Otras opciones de cruce: Argentina vs Colombia -> Argentina 12.5%; Argentina vs Portugal -> Portugal 6.9%
 - Marcador proyectado: 1-0
-- Marcador para cargar en Penca: 1-0 | 2.60 pts esp. | exacto 15.0% | diferencia 25.1%
-- Precisión de marcador: Marcador con precisión media | exacto más probable 1-0 15.0% | top-5 cubre 59.8%
-- Promedio estimado de goles del modelo: Argentina 1.53 | Portugal 0.72
-- Probabilidades de resultado (90'): 54.8% / 28.5% / 16.8%
-- Lectura estadistica: Pronóstico parejo: sin favorito estadístico claro | pick actual Victoria Argentina 54.8% | confianza 59.8%
-- Escenario de goles: ambos marcan 40.5% | más de 2.5 goles 38.9%
-- Goles totales esperados por el modelo: 2.26. Sin línea externa de goles cargada para ese partido.
-- Probabilidad de que no reciba goles: Argentina 49.1% | Portugal 23.0%
-- Cuánta probabilidad cubren los 3 marcadores más probables: 39.8% | ventaja final más probable +0 (28.5%)
-- Qué tanto coinciden los modelos entre sí: 94.6%
+- Marcador para cargar en Penca: 2-1 | 2.41 pts esp. | exacto 8.4% | diferencia 23.9%
+- Precisión de marcador: Marcador frágil | exacto más probable 1-0 13.4% | top-5 cubre 58.0%
+- Promedio estimado de goles del modelo: Argentina 1.65 | Portugal 0.74
+- Probabilidades de resultado (90'): 56.1% / 28.4% / 15.5%
+- Lectura estadistica: Pick utilizable | pick actual Victoria Argentina 56.1% | confianza 60.6%
+- Escenario de goles: ambos marcan 42.8% | más de 2.5 goles 42.2%
+- Goles totales esperados por el modelo: 2.38. Sin línea externa de goles cargada para ese partido.
+- Probabilidad de que no reciba goles: Argentina 48.1% | Portugal 21.0%
+- Cuánta probabilidad cubren los 3 marcadores más probables: 37.8% | ventaja final más probable +0 (28.4%)
+- Qué tanto coinciden los modelos entre sí: 92.4%
 - Stack estadístico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotación + Overdispersión calibrada + ML ligero regularizado + Predictivo bayesiano dinámico + Ensamble + asimetría histórica
-- Factores dominantes: Elo dinámico +137.000; Historia mundialista +0.270; Disciplina estructural -0.153
+- Factores dominantes: Valor bruto de plantilla +432.399; Minutos Mundial de Clubes +311.490; Elo dinámico +137.000
 - Comparativa entre modelos:
-- Bivariante Poisson: victoria Argentina 57.1% | empate 26.9% | victoria Portugal 16.0% | marcador más probable 1-0 (16.6%) | peso actual 35.1%
-- Poisson independiente: victoria Argentina 53.9% | empate 31.4% | victoria Portugal 14.7% | marcador más probable 1-1 (14.5%) | peso actual 15.8%
-- Ajuste de baja anotación: victoria Argentina 53.9% | empate 31.4% | victoria Portugal 14.7% | marcador más probable 1-1 (14.5%) | peso actual 17.6%
-- Overdispersión calibrada: victoria Argentina 55.5% | empate 26.0% | victoria Portugal 18.5% | marcador más probable 1-0 (15.9%) | peso actual 7.0%
-- ML ligero regularizado: victoria Argentina 55.2% | empate 27.0% | victoria Portugal 17.8% | marcador más probable 1-0 (16.4%) | peso actual 12.4%
-- Predictivo bayesiano dinámico: victoria Argentina 46.8% | empate 28.9% | victoria Portugal 24.3% | marcador más probable 1-0 (13.9%) | peso actual 12.1%
-- Ensamble + asimetría histórica: victoria Argentina 54.8% | empate 28.5% | victoria Portugal 16.8% | marcador más probable 1-0 (15.0%)
-- Quién tiene más probabilidad de avanzar: Argentina 72.1% | Portugal 27.9%
-- Si empatan tras 90': gana en prórroga Argentina 28.9% | siguen empatados 59.3% | Portugal 11.8%
-- Si llegan a penales: Argentina 54.1% | Portugal 45.9%
-- Marcador más probable de la tanda: 4-3
-- Marcador medio esperado en la tanda: Argentina 3.94 | Portugal 3.74
-- Marcadores de tanda más probables: 4-3 10.6%, 4-2 10.4%, 5-4 9.7%, 3-4 8.8%, 4-5 8.0%
-- Marcadores más probables: 1-0 15.0%, 0-0 12.6%, 1-1 12.2%, 2-0 11.8%, 2-1 8.2%, 0-1 6.8%, 3-0 6.2%, 3-1 4.4%
+- Bivariante Poisson: victoria Argentina 59.6% | empate 25.2% | victoria Portugal 15.1% | marcador más probable 1-0 (15.6%) | peso actual 35.2%
+- Poisson independiente: victoria Argentina 53.2% | empate 34.5% | victoria Portugal 12.3% | marcador más probable 1-1 (16.3%) | peso actual 15.5%
+- Ajuste de baja anotación: victoria Argentina 53.2% | empate 34.5% | victoria Portugal 12.3% | marcador más probable 1-1 (16.3%) | peso actual 17.2%
+- Overdispersión calibrada: victoria Argentina 57.7% | empate 24.6% | victoria Portugal 17.7% | marcador más probable 1-0 (15.0%) | peso actual 7.0%
+- ML ligero regularizado: victoria Argentina 57.5% | empate 25.4% | victoria Portugal 17.0% | marcador más probable 1-0 (15.5%) | peso actual 12.7%
+- Predictivo bayesiano dinámico: victoria Argentina 48.6% | empate 27.5% | victoria Portugal 23.8% | marcador más probable 1-0 (13.2%) | peso actual 12.2%
+- Ensamble + asimetría histórica: victoria Argentina 56.1% | empate 28.4% | victoria Portugal 15.5% | marcador más probable 1-0 (13.4%)
+- Quién tiene más probabilidad de avanzar: Argentina 73.7% | Portugal 26.3%
+- Si empatan tras 90': gana en prórroga Argentina 30.0% | siguen empatados 58.1% | Portugal 11.9%
+- Si llegan a penales: Argentina 54.9% | Portugal 45.1%
+- Marcador más probable de la tanda: 4-2
+- Marcador medio esperado en la tanda: Argentina 4.03 | Portugal 3.73
+- Marcadores de tanda más probables: 4-2 10.9%, 5-4 10.6%, 4-3 10.3%, 4-5 8.6%, 3-4 8.2%
+- Marcadores más probables: 1-0 13.4%, 1-1 12.5%, 0-0 11.9%, 2-0 11.8%, 2-1 8.4%, 3-0 6.7%, 0-1 5.7%, 3-1 4.9%
 
 ### Semifinal 1: Brazil vs France
 - Etapa: Semifinal
@@ -3932,37 +3905,37 @@ _El Brier 2026 se activa automáticamente con el primer partido terminado; antes
 - Hora UTC: 2026-07-14T19:00:00Z
 - Clima estimado: 32.0 C | HR 55% | viento 15 km/h | estrés 0.20
 - Cambio por clima exigente: estrés climático 0.20.
-- Factores que más pesan ahora: Elo dinámico -85.000; Historia mundialista +0.253
+- Factores que más pesan ahora: Valor bruto de plantilla +95.080; Elo dinámico -85.000
 - Proyección automática: Cruce usado para este casillero hoy: Brazil vs France | probabilidad de que se dé 14.7% | ganador global del casillero: France 28.6% | si se juega exactamente este cruce: France 55.4%
 - Otras opciones de cruce: Brazil vs France -> Brazil 6.6%; Germany vs France -> France 6.1%
 - Marcador proyectado: 1-1
-- Marcador para cargar en Penca: 1-1 | 2.02 pts esp. | exacto 14.1% | diferencia 31.9%
-- Precisión de marcador: Marcador con precisión media | exacto más probable 1-1 14.1% | top-5 cubre 57.0%
-- Promedio estimado de goles del modelo: Brazil 0.94 | France 1.30
-- Probabilidades de resultado (90'): 25.7% / 31.9% / 42.4%
-- Lectura estadistica: Pronóstico parejo: sin favorito estadístico claro | pick actual Victoria France 42.4% | confianza 47.6%
-- Escenario de goles: ambos marcan 44.9% | más de 2.5 goles 38.4%
-- Goles totales esperados por el modelo: 2.24. Sin línea externa de goles cargada para ese partido.
-- Probabilidad de que no reciba goles: Brazil 28.8% | France 39.4%
-- Cuánta probabilidad cubren los 3 marcadores más probables: 39.6% | ventaja final más probable +0 (31.9%)
+- Marcador para cargar en Penca: 1-1 | 1.95 pts esp. | exacto 13.8% | diferencia 30.7%
+- Precisión de marcador: Marcador con precisión media | exacto más probable 1-1 13.8% | top-5 cubre 53.6%
+- Promedio estimado de goles del modelo: Brazil 1.00 | France 1.39
+- Probabilidades de resultado (90'): 26.0% / 30.7% / 43.3%
+- Lectura estadistica: Pronóstico parejo: sin favorito estadístico claro | pick actual Victoria France 43.3% | confianza 48.4%
+- Escenario de goles: ambos marcan 47.6% | más de 2.5 goles 41.8%
+- Goles totales esperados por el modelo: 2.37. Sin línea externa de goles cargada para ese partido.
+- Probabilidad de que no reciba goles: Brazil 26.9% | France 37.4%
+- Cuánta probabilidad cubren los 3 marcadores más probables: 37.0% | ventaja final más probable +0 (30.7%)
 - Qué tanto coinciden los modelos entre sí: 95.0%
 - Stack estadístico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotación + Overdispersión calibrada + ML ligero regularizado + Predictivo bayesiano dinámico + Ensamble + asimetría histórica
-- Factores dominantes: Elo dinámico -85.000; Historia mundialista +0.253; Carga reciente del portero +0.203
+- Factores dominantes: Valor bruto de plantilla +95.080; Elo dinámico -85.000; Minutos Mundial de Clubes -39.412
 - Comparativa entre modelos:
-- Bivariante Poisson: victoria Brazil 25.8% | empate 29.8% | victoria France 44.4% | marcador más probable 0-1 (14.1%) | peso actual 34.4%
-- Poisson independiente: victoria Brazil 23.0% | empate 36.5% | victoria France 40.5% | marcador más probable 1-1 (17.1%) | peso actual 15.1%
-- Ajuste de baja anotación: victoria Brazil 23.0% | empate 36.5% | victoria France 40.5% | marcador más probable 1-1 (17.1%) | peso actual 18.2%
-- Overdispersión calibrada: victoria Brazil 27.7% | empate 28.0% | victoria France 44.3% | marcador más probable 0-1 (13.8%) | peso actual 6.8%
-- ML ligero regularizado: victoria Brazil 27.1% | empate 29.6% | victoria France 43.3% | marcador más probable 0-1 (14.3%) | peso actual 12.6%
-- Predictivo bayesiano dinámico: victoria Brazil 30.2% | empate 29.9% | victoria France 39.8% | marcador más probable 0-0 (13.7%) | peso actual 12.9%
-- Ensamble + asimetría histórica: victoria Brazil 25.7% | empate 31.9% | victoria France 42.4% | marcador más probable 1-1 (14.1%)
-- Quién tiene más probabilidad de avanzar: Brazil 41.1% | France 58.9%
-- Si empatan tras 90': gana en prórroga Brazil 15.8% | siguen empatados 61.1% | France 23.0%
-- Si llegan a penales: Brazil 52.8% | France 47.2%
-- Marcador más probable de la tanda: 5-4
-- Marcador medio esperado en la tanda: Brazil 3.99 | France 3.90
-- Marcadores de tanda más probables: 5-4 11.3%, 3-4 10.9%, 4-5 9.5%, 4-2 9.1%, 4-3 9.0%
-- Marcadores más probables: 1-1 14.1%, 0-0 13.2%, 0-1 12.3%, 1-0 8.9%, 0-2 8.4%, 1-2 7.9%, 2-1 5.7%, 2-0 4.7%
+- Bivariante Poisson: victoria Brazil 26.2% | empate 28.6% | victoria France 45.2% | marcador más probable 0-1 (13.1%) | peso actual 34.3%
+- Poisson independiente: victoria Brazil 23.3% | empate 35.3% | victoria France 41.4% | marcador más probable 1-1 (16.8%) | peso actual 15.1%
+- Ajuste de baja anotación: victoria Brazil 23.3% | empate 35.3% | victoria France 41.4% | marcador más probable 1-1 (16.8%) | peso actual 18.2%
+- Overdispersión calibrada: victoria Brazil 28.1% | empate 26.9% | victoria France 45.0% | marcador más probable 0-1 (12.8%) | peso actual 6.7%
+- ML ligero regularizado: victoria Brazil 27.0% | empate 28.5% | victoria France 44.5% | marcador más probable 0-1 (13.6%) | peso actual 12.8%
+- Predictivo bayesiano dinámico: victoria Brazil 30.5% | empate 28.8% | victoria France 40.7% | marcador más probable 0-0 (12.3%) | peso actual 12.9%
+- Ensamble + asimetría histórica: victoria Brazil 26.0% | empate 30.7% | victoria France 43.3% | marcador más probable 1-1 (13.8%)
+- Quién tiene más probabilidad de avanzar: Brazil 40.9% | France 59.1%
+- Si empatan tras 90': gana en prórroga Brazil 15.9% | siguen empatados 61.0% | France 23.0%
+- Si llegan a penales: Brazil 53.0% | France 47.0%
+- Marcador más probable de la tanda: 3-4
+- Marcador medio esperado en la tanda: Brazil 3.90 | France 3.79
+- Marcadores de tanda más probables: 3-4 11.1%, 5-4 10.6%, 4-3 9.8%, 4-5 9.3%, 4-2 8.2%
+- Marcadores más probables: 1-1 13.8%, 0-0 11.8%, 0-1 11.4%, 0-2 8.3%, 1-0 8.3%, 1-2 8.2%, 2-1 5.9%, 2-0 4.6%
 
 ### Semifinal 2: Spain vs Argentina
 - Etapa: Semifinal
@@ -3971,37 +3944,37 @@ _El Brier 2026 se activa automáticamente con el primer partido terminado; antes
 - Hora UTC: 2026-07-15T19:00:00Z
 - Clima estimado: 30.0 C | HR 70% | viento 11 km/h | estrés 0.23
 - Cambio por clima exigente: estrés climático 0.23.
-- Factores que más pesan ahora: Elo dinámico +58.000; Disciplina estructural +0.214
+- Factores que más pesan ahora: Minutos Mundial de Clubes -397.631; Valor bruto de plantilla -62.815
 - Proyección automática: Cruce usado para este casillero hoy: Spain vs Argentina | probabilidad de que se dé 27.0% | ganador global del casillero: Spain 41.7% | si se juega exactamente este cruce: Spain 58.1%
 - Otras opciones de cruce: Spain vs Argentina -> Argentina 11.3%; Spain vs Portugal -> Spain 6.3%
 - Marcador proyectado: 1-1
-- Marcador para cargar en Penca: 1-1 | 2.05 pts esp. | exacto 14.3% | diferencia 32.4%
-- Precisión de marcador: Marcador con precisión media | exacto más probable 1-1 14.3% | top-5 cubre 57.8%
-- Promedio estimado de goles del modelo: Spain 1.27 | Argentina 0.95
-- Probabilidades de resultado (90'): 41.2% / 32.4% / 26.3%
-- Lectura estadistica: Pronóstico parejo: sin favorito estadístico claro | pick actual Victoria Spain 41.2% | confianza 46.5%
-- Escenario de goles: ambos marcan 44.3% | más de 2.5 goles 37.5%
-- Goles totales esperados por el modelo: 2.20. Sin línea externa de goles cargada para ese partido.
-- Probabilidad de que no reciba goles: Spain 39.6% | Argentina 29.7%
-- Cuánta probabilidad cubren los 3 marcadores más probables: 40.3% | ventaja final más probable +0 (32.4%)
-- Qué tanto coinciden los modelos entre sí: 95.0%
+- Marcador para cargar en Penca: 1-1 | 1.98 pts esp. | exacto 14.0% | diferencia 31.2%
+- Precisión de marcador: Marcador con precisión media | exacto más probable 1-1 14.0% | top-5 cubre 53.8%
+- Promedio estimado de goles del modelo: Spain 1.34 | Argentina 1.02
+- Probabilidades de resultado (90'): 41.6% / 31.2% / 27.2%
+- Lectura estadistica: Pronóstico parejo: sin favorito estadístico claro | pick actual Victoria Spain 41.6% | confianza 46.9%
+- Escenario de goles: ambos marcan 47.5% | más de 2.5 goles 41.3%
+- Goles totales esperados por el modelo: 2.35. Sin línea externa de goles cargada para ese partido.
+- Probabilidad de que no reciba goles: Spain 36.8% | Argentina 27.7%
+- Cuánta probabilidad cubren los 3 marcadores más probables: 37.3% | ventaja final más probable +0 (31.2%)
+- Qué tanto coinciden los modelos entre sí: 95.1%
 - Stack estadístico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotación + Overdispersión calibrada + ML ligero regularizado + Predictivo bayesiano dinámico + Ensamble + asimetría histórica
-- Factores dominantes: Elo dinámico +58.000; Disciplina estructural +0.214; Ataque histórico desde 1950 +0.189
+- Factores dominantes: Minutos Mundial de Clubes -397.631; Valor bruto de plantilla -62.815; Elo dinámico +58.000
 - Comparativa entre modelos:
-- Bivariante Poisson: victoria Spain 43.2% | empate 30.3% | victoria Argentina 26.5% | marcador más probable 1-0 (14.2%) | peso actual 34.4%
-- Poisson independiente: victoria Spain 39.3% | empate 37.1% | victoria Argentina 23.6% | marcador más probable 1-1 (17.3%) | peso actual 15.1%
-- Ajuste de baja anotación: victoria Spain 39.3% | empate 37.1% | victoria Argentina 23.6% | marcador más probable 1-1 (17.3%) | peso actual 18.3%
-- Overdispersión calibrada: victoria Spain 43.2% | empate 28.4% | victoria Argentina 28.4% | marcador más probable 1-0 (13.9%) | peso actual 6.7%
-- ML ligero regularizado: victoria Spain 42.2% | empate 30.1% | victoria Argentina 27.7% | marcador más probable 0-0 (14.5%) | peso actual 12.5%
-- Predictivo bayesiano dinámico: victoria Spain 39.1% | empate 30.3% | victoria Argentina 30.6% | marcador más probable 0-0 (14.0%) | peso actual 13.0%
-- Ensamble + asimetría histórica: victoria Spain 41.2% | empate 32.4% | victoria Argentina 26.3% | marcador más probable 1-1 (14.3%)
-- Quién tiene más probabilidad de avanzar: Spain 57.9% | Argentina 42.1%
-- Si empatan tras 90': gana en prórroga Spain 22.5% | siguen empatados 60.9% | Argentina 16.6%
-- Si llegan a penales: Spain 47.6% | Argentina 52.4%
+- Bivariante Poisson: victoria Spain 43.6% | empate 29.0% | victoria Argentina 27.4% | marcador más probable 1-1 (12.9%) | peso actual 34.2%
+- Poisson independiente: victoria Spain 39.7% | empate 35.9% | victoria Argentina 24.4% | marcador más probable 1-1 (17.1%) | peso actual 15.0%
+- Ajuste de baja anotación: victoria Spain 39.7% | empate 35.9% | victoria Argentina 24.4% | marcador más probable 1-1 (17.1%) | peso actual 18.3%
+- Overdispersión calibrada: victoria Spain 43.6% | empate 27.2% | victoria Argentina 29.3% | marcador más probable 1-0 (12.7%) | peso actual 6.7%
+- ML ligero regularizado: victoria Spain 42.5% | empate 29.1% | victoria Argentina 28.4% | marcador más probable 1-0 (13.6%) | peso actual 12.8%
+- Predictivo bayesiano dinámico: victoria Spain 39.6% | empate 29.1% | victoria Argentina 31.2% | marcador más probable 0-0 (12.6%) | peso actual 13.0%
+- Ensamble + asimetría histórica: victoria Spain 41.6% | empate 31.2% | victoria Argentina 27.2% | marcador más probable 1-1 (14.0%)
+- Quién tiene más probabilidad de avanzar: Spain 57.6% | Argentina 42.4%
+- Si empatan tras 90': gana en prórroga Spain 23.1% | siguen empatados 59.7% | Argentina 17.2%
+- Si llegan a penales: Spain 47.3% | Argentina 52.7%
 - Marcador más probable de la tanda: 4-5
-- Marcador medio esperado en la tanda: Spain 3.82 | Argentina 3.92
-- Marcadores de tanda más probables: 4-5 10.2%, 3-4 9.8%, 2-4 9.6%, 4-3 9.1%, 4-2 8.8%
-- Marcadores más probables: 1-1 14.3%, 0-0 13.6%, 1-0 12.5%, 0-1 9.2%, 2-0 8.2%, 2-1 7.6%, 1-2 5.8%, 0-2 4.8%
+- Marcador medio esperado en la tanda: Spain 3.84 | Argentina 3.98
+- Marcadores de tanda más probables: 4-5 10.0%, 2-4 9.8%, 3-4 9.8%, 5-4 8.9%, 4-3 8.8%
+- Marcadores más probables: 1-1 14.0%, 0-0 12.0%, 1-0 11.3%, 0-1 8.6%, 2-0 8.0%, 2-1 7.9%, 1-2 6.1%, 0-2 4.8%
 
 ### Final: France vs Spain
 - Etapa: Final
@@ -4009,37 +3982,37 @@ _El Brier 2026 se activa automáticamente con el primer partido terminado; antes
 - Sede: MetLife Stadium | United States
 - Hora UTC: 2026-07-19T19:00:00Z
 - Clima estimado: 29.0 C | HR 68% | viento 13 km/h | estrés 0.08
-- Factores que más pesan ahora: Elo dinámico -108.000; Ataque histórico desde 1950 -0.145
+- Factores que más pesan ahora: Valor bruto de plantilla +267.685; Minutos Mundial de Clubes +231.258
 - Proyección automática: Cruce usado para este casillero hoy: France vs Spain | probabilidad de que se dé 11.8% | ganador global del casillero: Spain 28.9% | si se juega exactamente este cruce: Spain 60.9%
 - Otras opciones de cruce: Brazil vs Spain -> Spain 5.2%; France vs Spain -> France 4.6%
 - Marcador proyectado: 1-1
-- Marcador para cargar en Penca: 1-2 | 2.12 pts esp. | exacto 8.2% | diferencia 23.4%
-- Precisión de marcador: Marcador frágil | exacto más probable 1-1 13.6% | top-5 cubre 57.1%
-- Promedio estimado de goles del modelo: France 0.86 | Spain 1.40
-- Probabilidades de resultado (90'): 22.2% / 30.8% / 47.0%
-- Lectura estadistica: Pronóstico parejo: sin favorito estadístico claro | pick actual Victoria Spain 47.0% | confianza 52.0%
-- Escenario de goles: ambos marcan 44.3% | más de 2.5 goles 39.3%
-- Goles totales esperados por el modelo: 2.27. Sin línea externa de goles cargada para ese partido.
-- Probabilidad de que no reciba goles: France 26.0% | Spain 42.4%
-- Cuánta probabilidad cubren los 3 marcadores más probables: 39.5% | ventaja final más probable +0 (30.8%)
+- Marcador para cargar en Penca: 1-2 | 2.14 pts esp. | exacto 8.4% | diferencia 22.9%
+- Precisión de marcador: Marcador frágil | exacto más probable 1-1 13.3% | top-5 cubre 54.5%
+- Promedio estimado de goles del modelo: France 0.93 | Spain 1.47
+- Probabilidades de resultado (90'): 22.7% / 29.7% / 47.6%
+- Lectura estadistica: Pronóstico parejo: sin favorito estadístico claro | pick actual Victoria Spain 47.6% | confianza 52.5%
+- Escenario de goles: ambos marcan 47.0% | más de 2.5 goles 42.7%
+- Goles totales esperados por el modelo: 2.40. Sin línea externa de goles cargada para ese partido.
+- Probabilidad de que no reciba goles: France 24.2% | Spain 40.1%
+- Cuánta probabilidad cubren los 3 marcadores más probables: 36.8% | ventaja final más probable +0 (29.7%)
 - Qué tanto coinciden los modelos entre sí: 94.7%
 - Stack estadístico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotación + Overdispersión calibrada + ML ligero regularizado + Predictivo bayesiano dinámico + Ensamble + asimetría histórica
-- Factores dominantes: Elo dinámico -108.000; Ataque histórico desde 1950 -0.145; Rendimiento en Mundiales desde 1950 +0.096
+- Factores dominantes: Valor bruto de plantilla +267.685; Minutos Mundial de Clubes +231.258; Elo dinámico -108.000
 - Comparativa entre modelos:
-- Bivariante Poisson: victoria France 21.8% | empate 28.8% | victoria Spain 49.4% | marcador más probable 0-1 (15.0%) | peso actual 34.6%
-- Poisson independiente: victoria France 19.6% | empate 34.6% | victoria Spain 45.7% | marcador más probable 1-1 (16.2%) | peso actual 15.4%
-- Ajuste de baja anotación: victoria France 19.6% | empate 34.6% | victoria Spain 45.7% | marcador más probable 1-1 (16.2%) | peso actual 18.0%
-- Overdispersión calibrada: victoria France 24.0% | empate 27.3% | victoria Spain 48.7% | marcador más probable 0-1 (14.5%) | peso actual 6.9%
-- ML ligero regularizado: victoria France 23.5% | empate 28.8% | victoria Spain 47.7% | marcador más probable 0-1 (15.1%) | peso actual 12.6%
-- Predictivo bayesiano dinámico: victoria France 28.1% | empate 29.6% | victoria Spain 42.3% | marcador más probable 0-0 (13.5%) | peso actual 12.6%
-- Ensamble + asimetría histórica: victoria France 22.2% | empate 30.8% | victoria Spain 47.0% | marcador más probable 1-1 (13.6%)
+- Bivariante Poisson: victoria France 22.3% | empate 27.6% | victoria Spain 50.1% | marcador más probable 0-1 (13.8%) | peso actual 34.5%
+- Poisson independiente: victoria France 20.0% | empate 33.6% | victoria Spain 46.3% | marcador más probable 1-1 (16.0%) | peso actual 15.3%
+- Ajuste de baja anotación: victoria France 20.0% | empate 33.6% | victoria Spain 46.3% | marcador más probable 1-1 (16.0%) | peso actual 18.0%
+- Overdispersión calibrada: victoria France 24.5% | empate 26.2% | victoria Spain 49.2% | marcador más probable 0-1 (13.4%) | peso actual 6.8%
+- ML ligero regularizado: victoria France 24.3% | empate 27.9% | victoria Spain 47.8% | marcador más probable 0-1 (14.1%) | peso actual 12.9%
+- Predictivo bayesiano dinámico: victoria France 28.5% | empate 28.5% | victoria Spain 43.0% | marcador más probable 0-1 (12.3%) | peso actual 12.6%
+- Ensamble + asimetría histórica: victoria France 22.7% | empate 29.7% | victoria Spain 47.6% | marcador más probable 1-1 (13.3%)
 - Quién tiene más probabilidad de avanzar: France 36.2% | Spain 63.8%
-- Si empatan tras 90': gana en prórroga France 15.0% | siguen empatados 59.8% | Spain 25.2%
-- Si llegan a penales: France 50.7% | Spain 49.3%
-- Marcador más probable de la tanda: 4-3
-- Marcador medio esperado en la tanda: France 4.00 | Spain 3.93
-- Marcadores de tanda más probables: 4-3 10.9%, 5-4 9.4%, 4-5 8.6%, 3-4 8.6%, 2-4 8.6%
-- Marcadores más probables: 1-1 13.6%, 0-1 13.2%, 0-0 12.7%, 0-2 9.5%, 1-2 8.2%, 1-0 8.0%, 2-1 5.2%, 0-3 4.6%
+- Si empatan tras 90': gana en prórroga France 14.9% | siguen empatados 59.0% | Spain 26.2%
+- Si llegan a penales: France 51.5% | Spain 48.5%
+- Marcador más probable de la tanda: 5-4
+- Marcador medio esperado en la tanda: France 3.97 | Spain 3.87
+- Marcadores de tanda más probables: 5-4 11.1%, 4-3 9.4%, 2-4 8.8%, 4-2 8.3%, 3-4 8.3%
+- Marcadores más probables: 1-1 13.3%, 0-1 12.1%, 0-0 11.3%, 0-2 9.3%, 1-2 8.4%, 1-0 7.4%, 2-1 5.4%, 0-3 4.8%
 
 ### Tercer puesto: Brazil vs Argentina
 - Etapa: Tercer puesto
@@ -4048,34 +4021,34 @@ _El Brier 2026 se activa automáticamente con el primer partido terminado; antes
 - Hora UTC: 2026-07-18T21:00:00Z
 - Clima estimado: 31.0 C | HR 74% | viento 15 km/h | estrés 0.28
 - Cambio por clima exigente: estrés climático 0.28.
-- Factores que más pesan ahora: Elo dinámico -135.000; Rendimiento en Mundiales desde 1950 +0.223
+- Factores que más pesan ahora: Valor bruto de plantilla +299.949; Minutos Mundial de Clubes -205.785
 - Proyección automática: Cruce usado para este casillero hoy: Brazil vs Argentina | probabilidad de que se dé 3.5% | ganador global del casillero: Argentina 14.5% | si se juega exactamente este cruce: Argentina 62.8%
 - Otras opciones de cruce: Brazil vs Spain -> Spain 2.1%; Germany vs Argentina -> Argentina 2.0%
-- Marcador proyectado: 0-1
-- Marcador para cargar en Penca: 1-2 | 2.18 pts esp. | exacto 8.2% | diferencia 23.9%
-- Precisión de marcador: Marcador frágil | exacto más probable 0-1 13.7% | top-5 cubre 58.0%
-- Promedio estimado de goles del modelo: Brazil 0.84 | Argentina 1.42
-- Probabilidades de resultado (90'): 21.3% / 30.4% / 48.4%
-- Lectura estadistica: Pronóstico parejo: sin favorito estadístico claro | pick actual Victoria Argentina 48.4% | confianza 53.4%
-- Escenario de goles: ambos marcan 43.3% | más de 2.5 goles 38.7%
-- Goles totales esperados por el modelo: 2.25. Sin línea externa de goles cargada para ese partido.
-- Probabilidad de que no reciba goles: Brazil 25.8% | Argentina 43.7%
-- Cuánta probabilidad cubren los 3 marcadores más probables: 39.8% | ventaja final más probable +0 (30.4%)
-- Qué tanto coinciden los modelos entre sí: 94.7%
+- Marcador proyectado: 1-1
+- Marcador para cargar en Penca: 1-2 | 2.20 pts esp. | exacto 8.5% | diferencia 23.4%
+- Precisión de marcador: Marcador frágil | exacto más probable 1-1 13.1% | top-5 cubre 55.3%
+- Promedio estimado de goles del modelo: Brazil 0.89 | Argentina 1.51
+- Probabilidades de resultado (90'): 21.6% / 29.2% / 49.1%
+- Lectura estadistica: Pronóstico parejo: sin favorito estadístico claro | pick actual Victoria Argentina 49.1% | confianza 54.1%
+- Escenario de goles: ambos marcan 46.0% | más de 2.5 goles 42.2%
+- Goles totales esperados por el modelo: 2.39. Sin línea externa de goles cargada para ese partido.
+- Probabilidad de que no reciba goles: Brazil 24.0% | Argentina 41.4%
+- Cuánta probabilidad cubren los 3 marcadores más probables: 37.0% | ventaja final más probable +0 (29.2%)
+- Qué tanto coinciden los modelos entre sí: 94.8%
 - Stack estadístico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotación + Overdispersión calibrada + ML ligero regularizado + Predictivo bayesiano dinámico + Ensamble + asimetría histórica
-- Factores dominantes: Elo dinámico -135.000; Rendimiento en Mundiales desde 1950 +0.223; Carga reciente del portero +0.196
+- Factores dominantes: Valor bruto de plantilla +299.949; Minutos Mundial de Clubes -205.785; Elo dinámico -135.000
 - Comparativa entre modelos:
-- Bivariante Poisson: victoria Brazil 20.9% | empate 28.6% | victoria Argentina 50.5% | marcador más probable 0-1 (15.2%) | peso actual 34.7%
-- Poisson independiente: victoria Brazil 18.9% | empate 34.2% | victoria Argentina 46.9% | marcador más probable 1-1 (16.0%) | peso actual 15.4%
-- Ajuste de baja anotación: victoria Brazil 18.9% | empate 34.2% | victoria Argentina 46.9% | marcador más probable 1-1 (16.0%) | peso actual 17.9%
-- Overdispersión calibrada: victoria Brazil 23.2% | empate 27.1% | victoria Argentina 49.6% | marcador más probable 0-1 (14.7%) | peso actual 6.9%
-- ML ligero regularizado: victoria Brazil 22.5% | empate 28.4% | victoria Argentina 49.1% | marcador más probable 0-1 (15.2%) | peso actual 12.5%
-- Predictivo bayesiano dinámico: victoria Brazil 27.6% | empate 29.5% | victoria Argentina 42.9% | marcador más probable 0-0 (13.5%) | peso actual 12.5%
-- Ensamble + asimetría histórica: victoria Brazil 21.3% | empate 30.4% | victoria Argentina 48.4% | marcador más probable 0-1 (13.7%)
+- Bivariante Poisson: victoria Brazil 21.4% | empate 27.4% | victoria Argentina 51.1% | marcador más probable 0-1 (14.0%) | peso actual 34.6%
+- Poisson independiente: victoria Brazil 19.3% | empate 33.1% | victoria Argentina 47.6% | marcador más probable 1-1 (15.7%) | peso actual 15.3%
+- Ajuste de baja anotación: victoria Brazil 19.3% | empate 33.1% | victoria Argentina 47.6% | marcador más probable 1-1 (15.7%) | peso actual 17.9%
+- Overdispersión calibrada: victoria Brazil 23.8% | empate 26.1% | victoria Argentina 50.2% | marcador más probable 0-1 (13.6%) | peso actual 6.9%
+- ML ligero regularizado: victoria Brazil 22.5% | empate 27.3% | victoria Argentina 50.2% | marcador más probable 0-1 (14.4%) | peso actual 12.8%
+- Predictivo bayesiano dinámico: victoria Brazil 27.7% | empate 28.4% | victoria Argentina 43.9% | marcador más probable 0-1 (12.5%) | peso actual 12.5%
+- Ensamble + asimetría histórica: victoria Brazil 21.6% | empate 29.2% | victoria Argentina 49.1% | marcador más probable 1-1 (13.1%)
 - Quién tiene más probabilidad de avanzar: Brazil 34.7% | Argentina 65.3%
-- Si empatan tras 90': gana en prórroga Brazil 14.0% | siguen empatados 59.4% | Argentina 26.6%
-- Si llegan a penales: Brazil 51.1% | Argentina 48.9%
-- Marcador más probable de la tanda: 4-3
-- Marcador medio esperado en la tanda: Brazil 3.99 | Argentina 3.86
-- Marcadores de tanda más probables: 4-3 10.2%, 5-4 10.1%, 3-4 9.4%, 4-5 8.7%, 4-2 8.5%
-- Marcadores más probables: 0-1 13.7%, 1-1 13.4%, 0-0 12.8%, 0-2 10.0%, 1-2 8.2%, 1-0 7.9%, 2-1 4.8%, 0-3 4.8%
+- Si empatan tras 90': gana en prórroga Brazil 14.6% | siguen empatados 58.2% | Argentina 27.2%
+- Si llegan a penales: Brazil 51.8% | Argentina 48.2%
+- Marcador más probable de la tanda: 5-4
+- Marcador medio esperado en la tanda: Brazil 3.92 | Argentina 3.87
+- Marcadores de tanda más probables: 5-4 10.2%, 3-4 9.9%, 4-5 9.8%, 4-3 8.8%, 2-4 8.3%
+- Marcadores más probables: 1-1 13.1%, 0-1 12.6%, 0-0 11.4%, 0-2 9.7%, 1-2 8.5%, 1-0 7.3%, 2-1 5.1%, 0-3 5.0%

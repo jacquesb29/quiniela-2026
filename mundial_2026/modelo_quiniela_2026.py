@@ -170,8 +170,13 @@ from worldcup2026.profiles.indices import (
     chemistry_index as calculate_chemistry_index,
     coach_index as calculate_coach_index,
     discipline_proxy as calculate_discipline_proxy,
+    gdp_index as calculate_gdp_index,
+    geography_2026_index as calculate_geography_2026_index,
     heritage_index as calculate_heritage_index,
+    league_strength_index as calculate_league_strength_index,
+    macro_resource_index as calculate_macro_resource_index,
     morale_base as calculate_morale_base,
+    population_index as calculate_population_index,
     resource_index as calculate_resource_index,
     tactical_flexibility as calculate_tactical_flexibility,
     tempo_proxy as calculate_tempo_proxy,
@@ -387,6 +392,19 @@ class Player:
     yellow_rate: float
     red_rate: float
     availability: float
+    market_value_eur_m: float = 0.0
+    total_minutes_last_12_months: float = 0.0
+    club_world_cup_minutes: float = 0.0
+    days_since_last_match: float = 14.0
+    injury_proneness: float = 0.0
+    expected_threat: float = 0.0
+    progressive_passes: float = 0.0
+    progressive_carries: float = 0.0
+    ppda: float = 0.0
+    field_tilt: float = 0.0
+    penalty_taker_quality: float = 0.0
+    goalkeeper_penalty_save_rate: float = 0.0
+    shootout_pressure_experience: float = 0.0
 
 
 @dataclass(frozen=True)
@@ -405,6 +423,30 @@ class Team:
     chemistry_bias: float = 0.0
     attack_bias: float = 0.0
     defense_bias: float = 0.0
+    population_millions: Optional[float] = None
+    gdp_per_capita_usd: Optional[float] = None
+    gdp_ppp_usd_billion: Optional[float] = None
+    league_strength_index: Optional[float] = None
+    top_league_minutes_share: Optional[float] = None
+    avg_age: Optional[float] = None
+    squad_market_value_eur_m: Optional[float] = None
+    heat_humidity_load: float = 0.0
+    time_zone_shift: float = 0.0
+    venue_surface_adjustment: float = 0.0
+    travel_cluster_difficulty: float = 0.0
+    expected_threat: float = 0.0
+    progressive_passes: float = 0.0
+    progressive_carries: float = 0.0
+    ppda: float = 0.0
+    field_tilt: float = 0.0
+    high_press_resistance: float = 0.0
+    low_block_breaking: float = 0.0
+    transition_defense: float = 0.0
+    aerial_matchup_advantage: float = 0.0
+    penalty_taker_quality: float = 0.0
+    goalkeeper_penalty_save_rate: float = 0.0
+    shootout_pressure_experience: float = 0.0
+    keeper_taker_strategy_matchup: float = 0.0
     players: Tuple[Player, ...] = ()
 
     @property
@@ -433,6 +475,31 @@ class SquadAggregate:
     recent_minutes_load: float
     goalkeeper_minutes_load: float
     bench_impact: float
+    squad_market_value: float
+    top_5_players_value_share: float
+    value_depth_ratio: float
+    talent_market_index: float
+    total_minutes_last_12_months: float
+    club_world_cup_minutes: float
+    days_since_last_match: float
+    injury_proneness: float
+    physical_load_index: float
+    expected_threat: float
+    progressive_passes: float
+    progressive_carries: float
+    ppda: float
+    field_tilt: float
+    advanced_style_index: float
+    high_press_resistance: float
+    low_block_breaking: float
+    transition_defense: float
+    aerial_matchup_advantage: float
+    tactical_matchup_index: float
+    penalty_taker_quality: float
+    goalkeeper_penalty_save_rate: float
+    shootout_pressure_experience: float
+    keeper_taker_strategy_matchup: float
+    penalty_granular_index: float
 
 
 @dataclass(frozen=True)
@@ -474,6 +541,10 @@ class TeamProfile:
     fifa_rank: int
     fifa_strength_index: float
     resource_index: float
+    population_index: float
+    gdp_index: float
+    league_strength_index: float
+    macro_resource_index: float
     heritage_index: float
     world_cup_titles: int
     trajectory_index: float
@@ -482,6 +553,7 @@ class TeamProfile:
     morale_base: float
     tactical_flexibility: float
     travel_resilience: float
+    geography_2026_index: float
     tempo: float
     squad: SquadAggregate
     history: HistoricalSnapshot
@@ -499,6 +571,13 @@ class MatchContext:
     altitude_m: int = 0
     travel_km_a: float = 0.0
     travel_km_b: float = 0.0
+    heat_humidity_load: float = 0.0
+    time_zone_shift_a: float = 0.0
+    time_zone_shift_b: float = 0.0
+    venue_surface_adjustment_a: float = 0.0
+    venue_surface_adjustment_b: float = 0.0
+    travel_cluster_difficulty_a: float = 0.0
+    travel_cluster_difficulty_b: float = 0.0
     knockout: bool = False
     morale_a: float = 0.0
     morale_b: float = 0.0
@@ -845,6 +924,10 @@ def top_factor_drivers(factors: Optional[Dict[str, float]], limit: int = 3) -> L
         "elo_diff": "Elo dinámico",
         "fifa_strength_diff": "Ranking FIFA / puntos FIFA",
         "resource_diff": "Recursos/PIB proxy",
+        "population_diff": "Población futbolística/económica",
+        "gdp_diff": "PIB explícito",
+        "league_strength_diff": "Ranking/fuerza de liga",
+        "macro_resource_diff": "Recursos macro explícitos",
         "heritage_diff": "Historia mundialista",
         "historical_strength_diff": "Historia competitiva desde 1950",
         "historical_attack_diff": "Ataque histórico desde 1950",
@@ -858,11 +941,16 @@ def top_factor_drivers(factors: Optional[Dict[str, float]], limit: int = 3) -> L
         "defense_diff": "Defensa",
         "goalkeeper_diff": "Portero",
         "bench_depth_diff": "Profundidad de banco",
+        "market_value_diff": "Valor de plantilla",
+        "squad_market_value_raw_diff": "Valor bruto de plantilla",
+        "top5_value_share_diff": "Concentración de valor top-5",
+        "value_depth_ratio_diff": "Profundidad de valor de plantilla",
         "discipline_diff": "Disciplina estructural",
         "experience_diff": "Experiencia de plantilla",
         "morale_diff": "Moral",
         "home_diff": "Localía/sede",
         "travel_diff": "Viaje",
+        "geography_2026_diff": "Geografía 2026: calor, huso y sedes",
         "injury_diff": "Bajas/lesiones",
         "cards_diff": "Tarjetas y suspensiones",
         "group_pressure_diff": "Presión de grupo",
@@ -885,12 +973,31 @@ def top_factor_drivers(factors: Optional[Dict[str, float]], limit: int = 3) -> L
         "recent_xga_adj_diff": "xGA reciente ajustado por rival",
         "recent_opponent_strength_diff": "Fortaleza reciente de rivales",
         "recent_minutes_load_diff": "Carga reciente de minutos",
+        "physical_load_diff": "Carga física pre-Mundial",
+        "club_world_cup_minutes_diff": "Minutos Mundial de Clubes",
+        "days_since_last_match_diff": "Días desde último partido",
+        "injury_proneness_diff": "Riesgo físico/lesiones",
         "goalkeeper_minutes_load_diff": "Carga reciente del portero",
         "bench_impact_diff": "Impacto del banquillo",
         "goalkeeper_context_diff": "Portero confirmado / cambio de portero",
         "substitution_diff": "Cambios en vivo y banco restante",
         "market_move_diff": "Movimiento reciente de cuotas",
         "referee_profile_diff": "Perfil del árbitro",
+        "expected_threat_diff": "xT / amenaza esperada",
+        "progressive_passes_diff": "Pases progresivos",
+        "progressive_carries_diff": "Conducciones progresivas",
+        "ppda_pressing_diff": "Intensidad de presión / PPDA",
+        "field_tilt_diff": "Dominio territorial / field tilt",
+        "advanced_style_diff": "Estilo avanzado",
+        "high_press_resistance_diff": "Resistencia a presión alta",
+        "low_block_breaking_diff": "Capacidad contra bloque bajo",
+        "transition_defense_diff": "Defensa de transiciones",
+        "aerial_matchup_diff": "Ventaja aérea",
+        "tactical_matchup_diff": "Compatibilidad táctica rival",
+        "penalty_taker_quality_diff": "Calidad de cobradores",
+        "goalkeeper_penalty_save_rate_diff": "Portero atajando penales",
+        "shootout_pressure_experience_diff": "Experiencia bajo presión en tanda",
+        "penalty_granular_diff": "Penales granulares",
         "rivalry": "Rivalidad",
     }
     ranked = sorted(
@@ -1045,6 +1152,45 @@ def resource_index(team: Team) -> float:
 
 
 @lru_cache(maxsize=None)
+def population_index(team: Team) -> float:
+    return calculate_population_index(
+        team,
+        resource_index_value=resource_index(team),
+        clamp=clamp,
+    )
+
+
+@lru_cache(maxsize=None)
+def gdp_index(team: Team) -> float:
+    return calculate_gdp_index(
+        team,
+        resource_index_value=resource_index(team),
+        clamp=clamp,
+    )
+
+
+@lru_cache(maxsize=None)
+def league_strength_index(team: Team) -> float:
+    return calculate_league_strength_index(
+        team,
+        resource_index_value=resource_index(team),
+        fifa_strength_index_value=fifa_strength_index(team),
+        clamp=clamp,
+    )
+
+
+@lru_cache(maxsize=None)
+def macro_resource_index(team: Team) -> float:
+    return calculate_macro_resource_index(
+        resource_index_value=resource_index(team),
+        population_index_value=population_index(team),
+        gdp_index_value=gdp_index(team),
+        league_strength_index_value=league_strength_index(team),
+        clamp=clamp,
+    )
+
+
+@lru_cache(maxsize=None)
 def heritage_index(team: Team) -> float:
     return calculate_heritage_index(
         team,
@@ -1118,6 +1264,16 @@ def travel_resilience(team: Team) -> float:
         team,
         resource_index_value=resource_index(team),
         chemistry_index_value=chemistry_index(team),
+        clamp=clamp,
+    )
+
+
+@lru_cache(maxsize=None)
+def geography_2026_index(team: Team) -> float:
+    return calculate_geography_2026_index(
+        team,
+        travel_resilience_value=travel_resilience(team),
+        resource_index_value=resource_index(team),
         clamp=clamp,
     )
 
@@ -1203,6 +1359,42 @@ def proxy_players(team: Team) -> Tuple[Player, ...]:
             0.001,
             0.05,
         )
+        position_value_multiplier = {"GK": 0.70, "DF": 0.86, "MF": 1.06, "FW": 1.18}[position]
+        market_value_eur_m = clamp(
+            (2.0 + 135.0 * (quality ** 2.55)) * position_value_multiplier * (0.72 + 0.38 * resource),
+            0.35,
+            210.0,
+        )
+        total_minutes_last_12_months = clamp(
+            850.0 + 2750.0 * minutes_share + 280.0 * chemistry + rng.uniform(-260.0, 260.0),
+            280.0,
+            5200.0,
+        )
+        club_world_cup_minutes = clamp(
+            (190.0 if resource > 0.72 and position in {"MF", "FW", "DF"} else 70.0 * resource)
+            * minutes_share
+            + rng.uniform(0.0, 80.0),
+            0.0,
+            720.0,
+        )
+        days_since_last_match = clamp(10.0 + rng.uniform(-4.0, 9.0) - 2.0 * minutes_share, 2.0, 38.0)
+        injury_proneness = clamp(0.16 + 0.20 * minutes_share - 0.18 * availability + rng.uniform(-0.04, 0.08), 0.02, 0.64)
+        expected_threat = clamp(0.46 * attack + 0.38 * creation + 0.10 * quality + 0.06 * trajectory, 0.02, 0.98)
+        progressive_passes = clamp(0.54 * creation + 0.20 * defense + 0.16 * quality + 0.10 * coach, 0.02, 0.98)
+        progressive_carries = clamp(0.42 * attack + 0.30 * creation + 0.18 * quality + 0.10 * chemistry, 0.02, 0.98)
+        ppda = clamp(0.42 * defense + 0.24 * quality + 0.20 * coach + 0.14 * chemistry, 0.02, 0.98)
+        field_tilt = clamp(0.36 * attack + 0.26 * creation + 0.20 * quality + 0.18 * resource, 0.02, 0.98)
+        penalty_taker_quality = 0.0
+        if position in {"FW", "MF"}:
+            penalty_taker_quality = clamp(0.50 * attack + 0.22 * creation + 0.18 * quality + 0.10 * caps / 120.0, 0.05, 0.98)
+        elif position == "DF":
+            penalty_taker_quality = clamp(0.18 * attack + 0.18 * creation + 0.36 * quality + 0.28 * caps / 120.0, 0.03, 0.86)
+        goalkeeper_penalty_save_rate = clamp(
+            (0.45 * goalkeeping + 0.20 * defense + 0.20 * caps / 120.0 + 0.15 * coach) if position == "GK" else 0.0,
+            0.0,
+            0.92,
+        )
+        shootout_pressure_experience = clamp(0.42 * caps / 120.0 + 0.22 * heritage + 0.18 * quality + 0.18 * discipline_player, 0.04, 0.98)
 
         players.append(
             Player(
@@ -1220,6 +1412,19 @@ def proxy_players(team: Team) -> Tuple[Player, ...]:
                 yellow_rate=yellow_rate,
                 red_rate=red_rate,
                 availability=availability,
+                market_value_eur_m=market_value_eur_m,
+                total_minutes_last_12_months=total_minutes_last_12_months,
+                club_world_cup_minutes=club_world_cup_minutes,
+                days_since_last_match=days_since_last_match,
+                injury_proneness=injury_proneness,
+                expected_threat=expected_threat,
+                progressive_passes=progressive_passes,
+                progressive_carries=progressive_carries,
+                ppda=ppda,
+                field_tilt=field_tilt,
+                penalty_taker_quality=penalty_taker_quality,
+                goalkeeper_penalty_save_rate=goalkeeper_penalty_save_rate,
+                shootout_pressure_experience=shootout_pressure_experience,
             )
         )
     return tuple(players)
@@ -1248,6 +1453,10 @@ def profile_for(team: Team) -> TeamProfile:
         fifa_rank_value_fn=fifa_rank_value,
         fifa_strength_index_fn=fifa_strength_index,
         resource_index_fn=resource_index,
+        population_index_fn=population_index,
+        gdp_index_fn=gdp_index,
+        league_strength_index_fn=league_strength_index,
+        macro_resource_index_fn=macro_resource_index,
         heritage_index_fn=heritage_index,
         world_cup_titles=WORLD_CUP_TITLES,
         trajectory_index_fn=trajectory_index,
@@ -1256,6 +1465,7 @@ def profile_for(team: Team) -> TeamProfile:
         morale_base_fn=morale_base,
         tactical_flexibility_fn=tactical_flexibility,
         travel_resilience_fn=travel_resilience,
+        geography_2026_index_fn=geography_2026_index,
         tempo_proxy_fn=tempo_proxy,
         aggregate_squad_fn=aggregate_squad,
         historical_snapshot_fn=historical_snapshot,
@@ -1902,35 +2112,40 @@ def simulation_state_signature(state: Optional[dict]) -> Tuple[float, ...]:
 
 
 def simulation_state_from_signature(signature: Tuple[float, ...]) -> dict:
-    (
-        elo_shift,
-        recent_form,
-        attack_form,
-        defense_form,
-        fatigue,
-        availability,
-        discipline_drift,
-        recent_xg_for_adj,
-        recent_xga_adj,
-        recent_opponent_strength,
-        style_attack_bias,
-        style_defense_bias,
-        style_tempo,
-    ) = signature
+    fields = (
+        "elo_shift",
+        "recent_form",
+        "attack_form",
+        "defense_form",
+        "fatigue",
+        "availability",
+        "discipline_drift",
+        "recent_xg_for_adj",
+        "recent_xga_adj",
+        "recent_opponent_strength",
+        "style_attack_bias",
+        "style_defense_bias",
+        "style_tempo",
+        "expected_threat_live",
+        "progressive_passes_live",
+        "progressive_carries_live",
+        "ppda_live",
+        "field_tilt_live",
+        "high_press_resistance_live",
+        "low_block_breaking_live",
+        "transition_defense_live",
+        "aerial_matchup_advantage_live",
+    )
+    defaults = {
+        "availability": 1.0,
+    }
+    reconstructed = {
+        field: float(signature[index]) if index < len(signature) else float(defaults.get(field, 0.0))
+        for index, field in enumerate(fields)
+    }
     return {
-        "elo_shift": float(elo_shift),
-        "recent_form": float(recent_form),
-        "attack_form": float(attack_form),
-        "defense_form": float(defense_form),
-        "fatigue": float(fatigue),
-        "availability": float(availability),
-        "discipline_drift": float(discipline_drift),
-        "recent_xg_for_adj": float(recent_xg_for_adj),
-        "recent_xga_adj": float(recent_xga_adj),
-        "recent_opponent_strength": float(recent_opponent_strength),
-        "style_attack_bias": float(style_attack_bias),
-        "style_defense_bias": float(style_defense_bias),
-        "style_tempo": float(style_tempo),
+        key: value
+        for key, value in reconstructed.items()
     }
 
 
@@ -7984,6 +8199,12 @@ def external_estimator_methodology_items() -> List[dict]:
 def statistical_upgrade_recommendations() -> List[dict]:
     return [
         {
+            "name": "Variables explícitas de plantilla, macro, estilo, carga, geografía y penales",
+            "status": "Implementado",
+            "why": "PIB, población, valor de plantilla, edad/media de liga, minutos top, carga física, xT, progresión, PPDA, compatibilidad táctica, geografía 2026 y penales granulares ya entran como señales separadas.",
+            "impact": "Permite auditar qué mueve cada pick y evita que todo quede escondido dentro de un resource_index genérico.",
+        },
+        {
             "name": "Agregar Bradley-Terry jerárquico dinámico",
             "status": "Recomendado",
             "why": "Es el mejor siguiente modelo estadístico porque estima fuerza relativa partido a partido y se integra bien con Elo, FIFA, plantilla, mercado y ruta Monte Carlo.",
@@ -12144,6 +12365,14 @@ def print_state(state_name: str, state: dict) -> None:
         f"  Rasgos tacticos: posesion {state['style_possession']:+.2f} | verticalidad {state['style_verticality']:+.2f} | "
         f"presion {state['style_pressure']:+.2f} | calidad {state['style_chance_quality']:+.2f} | ritmo {state['style_tempo']:+.2f}"
     )
+    print(
+        f"  Rasgos avanzados live: xT {state['expected_threat_live']:+.2f} | pases prog {state['progressive_passes_live']:+.2f} | "
+        f"conducciones prog {state['progressive_carries_live']:+.2f} | PPDA {state['ppda_live']:+.2f} | field tilt {state['field_tilt_live']:+.2f}"
+    )
+    print(
+        f"  Matchup tactico live: presion {state['high_press_resistance_live']:+.2f} | bloque bajo {state['low_block_breaking_live']:+.2f} | "
+        f"transicion defensiva {state['transition_defense_live']:+.2f} | aereo {state['aerial_matchup_advantage_live']:+.2f}"
+    )
     print(f"  Muestra tactica acumulada: {state['tactical_sample_matches']}")
     print(f"  Amarillas acumuladas: {state['yellow_cards']}")
     print(f"  Carga disciplinaria reciente: {state['yellow_load']:.2f}")
@@ -12168,15 +12397,42 @@ def tactical_state_value(state: Optional[dict], key: str, default: float = 0.0) 
 
 
 def tactical_attack_signal(state: Optional[dict]) -> float:
-    return tactical_state_value(state, "style_attack_bias", 0.0)
+    normalized = normalize_team_state(state) if state else {}
+    return clamp(
+        0.44 * float(normalized.get("style_attack_bias", 0.0))
+        + 0.20 * float(normalized.get("expected_threat_live", 0.0))
+        + 0.12 * float(normalized.get("progressive_passes_live", 0.0))
+        + 0.10 * float(normalized.get("progressive_carries_live", 0.0))
+        + 0.08 * float(normalized.get("low_block_breaking_live", 0.0))
+        + 0.06 * float(normalized.get("high_press_resistance_live", 0.0)),
+        -1.0,
+        1.0,
+    )
 
 
 def tactical_defense_signal(state: Optional[dict]) -> float:
-    return tactical_state_value(state, "style_defense_bias", 0.0)
+    normalized = normalize_team_state(state) if state else {}
+    return clamp(
+        0.48 * float(normalized.get("style_defense_bias", 0.0))
+        + 0.24 * float(normalized.get("transition_defense_live", 0.0))
+        + 0.12 * float(normalized.get("high_press_resistance_live", 0.0))
+        + 0.10 * float(normalized.get("aerial_matchup_advantage_live", 0.0))
+        - 0.06 * float(normalized.get("field_tilt_live", 0.0)),
+        -1.0,
+        1.0,
+    )
 
 
 def tactical_tempo_signal(state: Optional[dict]) -> float:
-    return tactical_state_value(state, "style_tempo", 0.0)
+    normalized = normalize_team_state(state) if state else {}
+    return clamp(
+        0.55 * float(normalized.get("style_tempo", 0.0))
+        + 0.20 * float(normalized.get("ppda_live", 0.0))
+        + 0.15 * float(normalized.get("field_tilt_live", 0.0))
+        + 0.10 * float(normalized.get("progressive_carries_live", 0.0)),
+        -1.0,
+        1.0,
+    )
 
 
 def tactical_signature_text(state: Optional[dict]) -> str:
@@ -12358,6 +12614,13 @@ def context_from_fixture(
         altitude_m=int(fixture.get("altitude_m", 0)),
         travel_km_a=float(fixture.get("travel_km_a", 0.0)),
         travel_km_b=float(fixture.get("travel_km_b", 0.0)),
+        heat_humidity_load=float(fixture.get("heat_humidity_load", fixture.get("weather_heat_humidity_load", 0.0)) or 0.0),
+        time_zone_shift_a=float(fixture.get("time_zone_shift_a", teams[team_a_name].time_zone_shift) or 0.0),
+        time_zone_shift_b=float(fixture.get("time_zone_shift_b", teams[team_b_name].time_zone_shift) or 0.0),
+        venue_surface_adjustment_a=float(fixture.get("venue_surface_adjustment_a", teams[team_a_name].venue_surface_adjustment) or 0.0),
+        venue_surface_adjustment_b=float(fixture.get("venue_surface_adjustment_b", teams[team_b_name].venue_surface_adjustment) or 0.0),
+        travel_cluster_difficulty_a=float(fixture.get("travel_cluster_difficulty_a", teams[team_a_name].travel_cluster_difficulty) or 0.0),
+        travel_cluster_difficulty_b=float(fixture.get("travel_cluster_difficulty_b", teams[team_b_name].travel_cluster_difficulty) or 0.0),
         knockout=knockout,
         morale_a=float(fixture.get("morale_a", state_a.get("morale", 0.0))),
         morale_b=float(fixture.get("morale_b", state_b.get("morale", 0.0))),
@@ -12601,17 +12864,22 @@ def print_team_profile(team: Team) -> None:
     print(f"  Elo: {team.elo:.0f}")
     print(f"  Puntos FIFA{fifa_note}: {profile.fifa_points:.1f}")
     print(f"  Ranking FIFA{fifa_note}: {profile.fifa_rank}")
-    print(f"  PIB/recursos proxy: {profile.resource_index:.2f}")
+    print(f"  Recursos base: {profile.resource_index:.2f}")
+    print(f"  Población explícita: {team.population_millions if team.population_millions is not None else 'proxy'} | índice {profile.population_index:.2f}")
+    print(f"  PIB explícito: {team.gdp_ppp_usd_billion if team.gdp_ppp_usd_billion is not None else 'proxy'} | índice {profile.gdp_index:.2f}")
+    print(f"  Liga/minutos top: liga {profile.league_strength_index:.2f} | minutos top {team.top_league_minutes_share if team.top_league_minutes_share is not None else 'proxy'}")
+    print(f"  Macro-recursos auditables: {profile.macro_resource_index:.2f}")
     print(f"  Historia mundialista: {profile.heritage_index:.2f}")
-    print(f"  Titulos del mundo: {profile.world_cup_titles}")
-    print(f"  Trayectoria futbolistica: {profile.trajectory_index:.2f}")
+    print(f"  Títulos del mundo: {profile.world_cup_titles}")
+    print(f"  Trayectoria futbolística: {profile.trajectory_index:.2f}")
     print(f"  Experiencia proxy del entrenador: {profile.coach_index:.2f}")
-    print(f"  Quimica/cohesion: {profile.chemistry_index:.2f}")
+    print(f"  Química/cohesión: {profile.chemistry_index:.2f}")
     print(f"  Moral base: {profile.morale_base:.2f}")
-    print(f"  Flexibilidad tactica: {profile.tactical_flexibility:.2f}")
+    print(f"  Flexibilidad táctica: {profile.tactical_flexibility:.2f}")
     print(f"  Resiliencia de viaje: {profile.travel_resilience:.2f}")
+    print(f"  Geografía 2026: {profile.geography_2026_index:.2f}")
     print(f"  Ritmo de juego: {profile.tempo:.2f}")
-    print(f"  Partidos historicos desde {history.history_start_year}: {history.matches_since_start}")
+    print(f"  Partidos históricos desde {history.history_start_year}: {history.matches_since_start}")
     print(f"  Puntos por partido desde {history.history_start_year}: {history.points_per_match:.2f}")
     print(f"  Puntos ponderados recientes desde {history.history_start_year}: {history.weighted_points_per_match:.2f}")
     print(f"  Rendimiento competitivo desde {history.history_start_year}: {history.competitive_points_per_match:.2f}")
@@ -12619,10 +12887,10 @@ def print_team_profile(team: Team) -> None:
     print(f"  Rendimiento en Mundiales desde {history.history_start_year}: {history.world_cup_points_per_match:.2f}")
     print(f"  Tandas de penales desde {history.history_start_year}: {history.shootout_matches_since_start}")
     print(f"  Eficacia en penales desde {history.history_start_year}: {history.shootout_win_rate:.2f}")
-    print(f"  Fuerza historica desde {history.history_start_year}: {history.strength_index:.2f}")
-    print(f"  Ataque historico desde {history.history_start_year}: {history.attack_index:.2f}")
-    print(f"  Defensa historica desde {history.history_start_year}: {history.defense_index:.2f}")
-    print(f"  Rendimiento competitivo historico: {history.competitive_index:.2f}")
+    print(f"  Fuerza histórica desde {history.history_start_year}: {history.strength_index:.2f}")
+    print(f"  Ataque histórico desde {history.history_start_year}: {history.attack_index:.2f}")
+    print(f"  Defensa histórica desde {history.history_start_year}: {history.defense_index:.2f}")
+    print(f"  Rendimiento competitivo histórico: {history.competitive_index:.2f}")
     print(f"  Rendimiento mundialista moderno: {history.world_cup_index:.2f}")
     print(f"  Solidez historica en penales: {history.shootout_index:.2f}")
     print(f"  Calidad global de plantilla: {squad.squad_quality:.2f}")
@@ -12638,12 +12906,19 @@ def print_team_profile(team: Team) -> None:
     print(f"  Amarillas proxy por jugador: {squad.yellow_rate:.2f}")
     print(f"  Rojas proxy por jugador: {squad.red_rate:.3f}")
     print(f"  Disponibilidad: {squad.availability:.2f}")
-    print(f"  Definicion: {squad.finishing:.2f}")
-    print(f"  Generacion de ocasiones: {squad.shot_creation:.2f}")
-    print(f"  Presion/recuperacion: {squad.pressing:.2f}")
+    print(f"  Definición: {squad.finishing:.2f}")
+    print(f"  Generación de ocasiones: {squad.shot_creation:.2f}")
+    print(f"  Presión/recuperación: {squad.pressing:.2f}")
     print(f"  Carga reciente de minutos del XI: {squad.recent_minutes_load:.2f}")
     print(f"  Carga reciente de minutos del portero: {squad.goalkeeper_minutes_load:.2f}")
     print(f"  Impacto estimado del banquillo: {squad.bench_impact:.2f}")
+    print(f"  Valor de plantilla explícito: {squad.squad_market_value:.1f} M EUR | índice mercado {squad.talent_market_index:.2f}")
+    print(f"  Concentración top-5 valor: {squad.top_5_players_value_share:.2f} | profundidad valor banco/XI {squad.value_depth_ratio:.2f}")
+    print(f"  Carga física pre-Mundial: {squad.physical_load_index:.2f} | minutos XI 12m {squad.total_minutes_last_12_months:.0f} | Mundial Clubes {squad.club_world_cup_minutes:.0f}")
+    print(f"  Descanso medio último partido: {squad.days_since_last_match:.1f} días | propensión lesión {squad.injury_proneness:.2f}")
+    print(f"  Estilo avanzado: xT {squad.expected_threat:.2f} | pases prog {squad.progressive_passes:.2f} | conducciones prog {squad.progressive_carries:.2f} | PPDA {squad.ppda:.2f} | field tilt {squad.field_tilt:.2f}")
+    print(f"  Compatibilidad táctica: presión {squad.high_press_resistance:.2f} | bloque bajo {squad.low_block_breaking:.2f} | transición defensiva {squad.transition_defense:.2f} | aéreo {squad.aerial_matchup_advantage:.2f}")
+    print(f"  Penales granulares: lanzadores {squad.penalty_taker_quality:.2f} | arquero penales {squad.goalkeeper_penalty_save_rate:.2f} | experiencia tanda {squad.shootout_pressure_experience:.2f} | matchup {squad.keeper_taker_strategy_matchup:.2f}")
 
 
 def coalesce(value: Optional[float], fallback: float) -> float:
@@ -12674,6 +12949,13 @@ def command_predict(args: argparse.Namespace, teams: Dict[str, Team]) -> None:
         altitude_m=coalesce_int(args.altitude, 0),
         travel_km_a=coalesce(args.travel_a, 0.0),
         travel_km_b=coalesce(args.travel_b, 0.0),
+        heat_humidity_load=max(teams[team_a_name].heat_humidity_load, teams[team_b_name].heat_humidity_load),
+        time_zone_shift_a=teams[team_a_name].time_zone_shift,
+        time_zone_shift_b=teams[team_b_name].time_zone_shift,
+        venue_surface_adjustment_a=teams[team_a_name].venue_surface_adjustment,
+        venue_surface_adjustment_b=teams[team_b_name].venue_surface_adjustment,
+        travel_cluster_difficulty_a=teams[team_a_name].travel_cluster_difficulty,
+        travel_cluster_difficulty_b=teams[team_b_name].travel_cluster_difficulty,
         knockout=stage != "group",
         morale_a=coalesce(args.morale_a, float(state_a["morale"])),
         morale_b=coalesce(args.morale_b, float(state_b["morale"])),
@@ -12741,6 +13023,13 @@ def command_score_prob(args: argparse.Namespace, teams: Dict[str, Team]) -> None
         altitude_m=0,
         travel_km_a=0.0,
         travel_km_b=0.0,
+        heat_humidity_load=max(teams[team_a_name].heat_humidity_load, teams[team_b_name].heat_humidity_load),
+        time_zone_shift_a=teams[team_a_name].time_zone_shift,
+        time_zone_shift_b=teams[team_b_name].time_zone_shift,
+        venue_surface_adjustment_a=teams[team_a_name].venue_surface_adjustment,
+        venue_surface_adjustment_b=teams[team_b_name].venue_surface_adjustment,
+        travel_cluster_difficulty_a=teams[team_a_name].travel_cluster_difficulty,
+        travel_cluster_difficulty_b=teams[team_b_name].travel_cluster_difficulty,
         knockout=stage != "group",
         morale_a=float(state_a["morale"]),
         morale_b=float(state_b["morale"]),

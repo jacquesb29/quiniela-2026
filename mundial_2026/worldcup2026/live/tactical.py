@@ -62,6 +62,7 @@ def live_signature_metrics(side: str, live_stats: dict, *, clamp):
     corner_share = clamp((_stat_share(corners, corners_opp) - 0.5) * 2.0, -1.0, 1.0)
     xg_per_shot = xg / max(shots, 1.0)
     chance_quality = clamp((xg_per_shot - 0.11) / 0.09, -1.0, 1.0)
+    xg_share = clamp((_stat_share(xg, xg_opp) - 0.5) * 2.0, -1.0, 1.0)
     verticality = clamp(0.48 * (-poss_norm) + 0.32 * chance_quality + 0.20 * shot_share, -1.0, 1.0)
     pressure = clamp(0.45 * shot_share + 0.30 * corner_share + 0.25 * sot_share, -1.0, 1.0)
     match_intensity = clamp(((shots + shots_opp) + 0.8 * (corners + corners_opp) + 3.0 * (xg + xg_opp)) / 24.0 - 1.0, -1.0, 1.0)
@@ -69,6 +70,15 @@ def live_signature_metrics(side: str, live_stats: dict, *, clamp):
     attack_bias = clamp(0.40 * pressure + 0.35 * chance_quality + 0.25 * verticality, -1.0, 1.0)
     card_swing = 1.0 if reds_opp > reds else -1.0 if reds > reds_opp else 0.0
     defense_bias = clamp(0.35 * poss_norm + 0.35 * pressure - 0.18 * tempo + 0.18 * card_swing, -1.0, 1.0)
+    expected_threat_live = clamp(0.54 * xg_share + 0.22 * shot_share + 0.14 * corner_share + 0.10 * poss_norm, -1.0, 1.0)
+    progressive_passes_live = clamp(0.48 * poss_norm + 0.30 * corner_share + 0.22 * pressure, -1.0, 1.0)
+    progressive_carries_live = clamp(0.50 * verticality + 0.25 * shot_share + 0.25 * chance_quality, -1.0, 1.0)
+    ppda_live = pressure
+    field_tilt_live = clamp(0.46 * poss_norm + 0.34 * corner_share + 0.20 * shot_share, -1.0, 1.0)
+    high_press_resistance_live = clamp(0.42 * poss_norm + 0.28 * (1.0 - abs(pressure)) + 0.30 * chance_quality, -1.0, 1.0)
+    low_block_breaking_live = clamp(0.45 * expected_threat_live + 0.30 * chance_quality + 0.25 * field_tilt_live, -1.0, 1.0)
+    transition_defense_live = clamp(0.36 * defense_bias + 0.24 * pressure - 0.24 * verticality + 0.16 * card_swing, -1.0, 1.0)
+    aerial_matchup_advantage_live = clamp(0.58 * corner_share + 0.24 * shot_share + 0.18 * sot_share, -1.0, 1.0)
     return {
         "style_possession": poss_norm,
         "style_verticality": verticality,
@@ -77,6 +87,15 @@ def live_signature_metrics(side: str, live_stats: dict, *, clamp):
         "style_tempo": tempo,
         "style_attack_bias": attack_bias,
         "style_defense_bias": defense_bias,
+        "expected_threat_live": expected_threat_live,
+        "progressive_passes_live": progressive_passes_live,
+        "progressive_carries_live": progressive_carries_live,
+        "ppda_live": ppda_live,
+        "field_tilt_live": field_tilt_live,
+        "high_press_resistance_live": high_press_resistance_live,
+        "low_block_breaking_live": low_block_breaking_live,
+        "transition_defense_live": transition_defense_live,
+        "aerial_matchup_advantage_live": aerial_matchup_advantage_live,
     }
 
 

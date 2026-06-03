@@ -27,6 +27,9 @@ def context_components(
         injuries = ctx.injuries_a
         travel = ctx.travel_km_a
         other_travel = ctx.travel_km_b
+        time_zone_shift = float(getattr(ctx, "time_zone_shift_a", 0.0) or 0.0)
+        surface_adjustment = float(getattr(ctx, "venue_surface_adjustment_a", 0.0) or 0.0)
+        travel_cluster = float(getattr(ctx, "travel_cluster_difficulty_a", 0.0) or 0.0)
         morale_signal = ctx.morale_a
         yellow_cards = ctx.yellow_cards_a
         red_suspensions = ctx.red_suspensions_a
@@ -53,6 +56,9 @@ def context_components(
         injuries = ctx.injuries_b
         travel = ctx.travel_km_b
         other_travel = ctx.travel_km_a
+        time_zone_shift = float(getattr(ctx, "time_zone_shift_b", 0.0) or 0.0)
+        surface_adjustment = float(getattr(ctx, "venue_surface_adjustment_b", 0.0) or 0.0)
+        travel_cluster = float(getattr(ctx, "travel_cluster_difficulty_b", 0.0) or 0.0)
         morale_signal = ctx.morale_b
         yellow_cards = ctx.yellow_cards_b
         red_suspensions = ctx.red_suspensions_b
@@ -83,6 +89,13 @@ def context_components(
         "cards": -discipline_absence_penalty(profile, yellow_cards, red_suspensions),
         "group_pressure": 0.0,
         "weather": -0.08 * clamp(ctx.weather_stress, 0.0, 1.0),
+        "geography_2026": (
+            -0.070 * clamp(float(getattr(ctx, "heat_humidity_load", 0.0) or 0.0), 0.0, 1.0)
+            -0.040 * clamp(abs(time_zone_shift) / 8.0, 0.0, 1.0)
+            -0.050 * clamp(abs(surface_adjustment), 0.0, 1.0)
+            -0.060 * clamp(travel_cluster, 0.0, 1.0)
+            +0.045 * (profile.geography_2026_index - 0.50)
+        ),
         "altitude": 0.0,
         "rivalry": rivalry_intensity(team, opponent),
         "lineup": (0.01 if lineup_confirmed else 0.0) - 0.018 * clamp(lineup_changes, 0, 6),
@@ -142,14 +155,21 @@ def attack_metric(team, profile, *, state=None, effective_elo, centered, attack_
     value += 0.10 * centered(profile.squad.set_piece_attack)
     value += 0.06 * centered(profile.squad.recent_minutes_load)
     value += 0.06 * centered(profile.squad.bench_impact)
+    value += 0.08 * centered(profile.squad.talent_market_index)
+    value += 0.07 * centered(profile.squad.advanced_style_index)
+    value += 0.04 * centered(profile.squad.low_block_breaking)
+    value += 0.03 * centered(profile.squad.high_press_resistance)
     value += 0.08 * centered(profile.coach_index)
-    value += 0.06 * centered(profile.resource_index)
+    value += 0.04 * centered(profile.resource_index)
+    value += 0.05 * centered(profile.macro_resource_index)
+    value += 0.04 * centered(profile.league_strength_index)
     value += 0.06 * centered(profile.trajectory_index)
     value += team.attack_bias
     value += 0.28 * attack_form_signal(state)
     value += 0.16 * recent_form_signal(state)
     value += 0.10 * tactical_attack_signal(state)
     value += 0.04 * tactical_tempo_signal(state)
+    value -= 0.09 * centered(profile.squad.physical_load_index)
     value -= 0.12 * fatigue_level(state)
     value -= 0.22 * (1.0 - availability_level(state))
     return value
@@ -171,12 +191,18 @@ def defense_metric(team, profile, *, state=None, effective_elo, centered, defens
     value += 0.04 * centered(profile.squad.recent_minutes_load)
     value += 0.05 * centered(profile.squad.goalkeeper_minutes_load)
     value += 0.05 * centered(profile.squad.bench_impact)
+    value += 0.05 * centered(profile.squad.talent_market_index)
+    value += 0.06 * centered(profile.squad.transition_defense)
+    value += 0.04 * centered(profile.squad.high_press_resistance)
+    value += 0.04 * centered(profile.squad.aerial_matchup_advantage)
+    value += 0.04 * centered(profile.geography_2026_index)
     value += team.defense_bias
     value += 0.30 * defense_form_signal(state)
     value += 0.14 * recent_form_signal(state)
     value += 0.08 * discipline_trend(state)
     value += 0.08 * tactical_defense_signal(state)
     value -= 0.03 * tactical_tempo_signal(state)
+    value -= 0.08 * centered(profile.squad.physical_load_index)
     value -= 0.10 * fatigue_level(state)
     value -= 0.20 * (1.0 - availability_level(state))
     return value
@@ -239,9 +265,18 @@ def expected_goals(
     delta_score += history_weight * (profile_a.heritage_index - profile_b.heritage_index)
     delta_score += 0.05 * (profile_a.history.world_cup_index - profile_b.history.world_cup_index)
     delta_score += 0.07 * (profile_a.resource_index - profile_b.resource_index)
+    delta_score += 0.06 * (profile_a.macro_resource_index - profile_b.macro_resource_index)
+    delta_score += 0.07 * (profile_a.squad.talent_market_index - profile_b.squad.talent_market_index)
+    delta_score += 0.04 * (profile_a.league_strength_index - profile_b.league_strength_index)
     delta_score += 0.09 * (profile_a.coach_index - profile_b.coach_index)
     delta_score += 0.07 * (profile_a.squad.player_experience - profile_b.squad.player_experience)
     delta_score += 0.05 * (profile_a.chemistry_index - profile_b.chemistry_index)
+    delta_score += 0.05 * (profile_a.squad.tactical_matchup_index - profile_b.squad.tactical_matchup_index)
+    delta_score += 0.04 * (profile_a.squad.advanced_style_index - profile_b.squad.advanced_style_index)
+    delta_score += 0.03 * (profile_a.geography_2026_index - profile_b.geography_2026_index)
+    delta_score -= 0.05 * (profile_a.squad.physical_load_index - profile_b.squad.physical_load_index)
+    if ctx.knockout:
+        delta_score += 0.03 * (profile_a.squad.penalty_granular_index - profile_b.squad.penalty_granular_index)
     delta_score += 0.05 * (importance_scale - 1.0) * (
         (profile_a.coach_index + profile_a.squad.player_experience + profile_a.heritage_index)
         - (profile_b.coach_index + profile_b.squad.player_experience + profile_b.heritage_index)
@@ -277,6 +312,11 @@ def expected_goals(
     total_goals += 0.18 * centered(profile_a.squad.attack_unit + profile_b.squad.attack_unit)
     total_goals += 0.08 * centered(profile_a.history.attack_index + profile_b.history.attack_index)
     total_goals += 0.12 * centered(profile_a.squad.shot_creation + profile_b.squad.shot_creation)
+    total_goals += 0.08 * centered(profile_a.squad.expected_threat + profile_b.squad.expected_threat)
+    total_goals += 0.05 * centered(profile_a.squad.progressive_passes + profile_b.squad.progressive_passes)
+    total_goals += 0.05 * centered(profile_a.squad.progressive_carries + profile_b.squad.progressive_carries)
+    total_goals += 0.05 * centered(profile_a.squad.field_tilt + profile_b.squad.field_tilt)
+    total_goals += 0.04 * centered(profile_a.squad.low_block_breaking + profile_b.squad.low_block_breaking)
     total_goals -= 0.12 * centered(profile_a.squad.defense_unit + profile_b.squad.defense_unit)
     total_goals -= 0.08 * centered(profile_a.history.defense_index + profile_b.history.defense_index)
     total_goals -= 0.06 * centered(profile_a.squad.goalkeeper_unit + profile_b.squad.goalkeeper_unit)
@@ -292,6 +332,11 @@ def expected_goals(
     total_goals -= 0.12 * (clamp(ctx.injuries_a, 0.0, 1.0) + clamp(ctx.injuries_b, 0.0, 1.0))
     total_goals -= 0.05 * ((ctx.travel_km_a + ctx.travel_km_b) / 12000.0)
     total_goals -= 0.10 * clamp(ctx.weather_stress, 0.0, 1.0)
+    total_goals -= 0.09 * clamp(float(getattr(ctx, "heat_humidity_load", 0.0) or 0.0), 0.0, 1.0)
+    total_goals -= 0.05 * (
+        clamp(float(getattr(ctx, "travel_cluster_difficulty_a", 0.0) or 0.0), 0.0, 1.0)
+        + clamp(float(getattr(ctx, "travel_cluster_difficulty_b", 0.0) or 0.0), 0.0, 1.0)
+    )
     total_goals += 0.08 if ctx.altitude_m >= 1400 else 0.0
     total_goals += 0.03 * rivalry_intensity(team_a, team_b)
     total_goals += 0.08 * (attack_form_signal(state_a) + attack_form_signal(state_b))
@@ -302,6 +347,7 @@ def expected_goals(
     total_goals += 0.03 * (tactical_attack_signal(state_a) + tactical_attack_signal(state_b))
     total_goals -= 0.02 * (tactical_defense_signal(state_a) + tactical_defense_signal(state_b))
     total_goals -= 0.10 * (fatigue_level(state_a) + fatigue_level(state_b))
+    total_goals -= 0.07 * (profile_a.squad.physical_load_index + profile_b.squad.physical_load_index)
     total_goals -= 0.07 * ((1.0 - availability_level(state_a)) + (1.0 - availability_level(state_b)))
     if ctx.market_total_line is not None:
         consensus_total = clamp(ctx.market_total_line + PARAMS.goal_consensus_total_offset, 1.5, 4.6)
@@ -353,6 +399,10 @@ def factor_breakdown(
         "elo_diff": effective_elo(team_a, state_a) - effective_elo(team_b, state_b),
         "fifa_strength_diff": profile_a.fifa_strength_index - profile_b.fifa_strength_index,
         "resource_diff": profile_a.resource_index - profile_b.resource_index,
+        "population_diff": profile_a.population_index - profile_b.population_index,
+        "gdp_diff": profile_a.gdp_index - profile_b.gdp_index,
+        "league_strength_diff": profile_a.league_strength_index - profile_b.league_strength_index,
+        "macro_resource_diff": profile_a.macro_resource_index - profile_b.macro_resource_index,
         "heritage_diff": profile_a.heritage_index - profile_b.heritage_index,
         "historical_strength_diff": profile_a.history.strength_index - profile_b.history.strength_index,
         "historical_attack_diff": profile_a.history.attack_index - profile_b.history.attack_index,
@@ -367,12 +417,21 @@ def factor_breakdown(
         "defense_diff": profile_a.squad.defense_unit - profile_b.squad.defense_unit,
         "goalkeeper_diff": profile_a.squad.goalkeeper_unit - profile_b.squad.goalkeeper_unit,
         "bench_depth_diff": profile_a.squad.bench_depth - profile_b.squad.bench_depth,
+        "market_value_diff": profile_a.squad.talent_market_index - profile_b.squad.talent_market_index,
+        "squad_market_value_raw_diff": profile_a.squad.squad_market_value - profile_b.squad.squad_market_value,
+        "top5_value_share_diff": profile_a.squad.top_5_players_value_share - profile_b.squad.top_5_players_value_share,
+        "value_depth_ratio_diff": profile_a.squad.value_depth_ratio - profile_b.squad.value_depth_ratio,
         "recent_minutes_load_diff": profile_a.squad.recent_minutes_load - profile_b.squad.recent_minutes_load,
+        "physical_load_diff": profile_a.squad.physical_load_index - profile_b.squad.physical_load_index,
+        "club_world_cup_minutes_diff": profile_a.squad.club_world_cup_minutes - profile_b.squad.club_world_cup_minutes,
+        "days_since_last_match_diff": profile_a.squad.days_since_last_match - profile_b.squad.days_since_last_match,
+        "injury_proneness_diff": profile_a.squad.injury_proneness - profile_b.squad.injury_proneness,
         "goalkeeper_minutes_load_diff": profile_a.squad.goalkeeper_minutes_load - profile_b.squad.goalkeeper_minutes_load,
         "bench_impact_diff": profile_a.squad.bench_impact - profile_b.squad.bench_impact,
         "experience_diff": profile_a.squad.player_experience - profile_b.squad.player_experience,
         "discipline_diff": profile_a.squad.discipline_index - profile_b.squad.discipline_index,
         "home_diff": context_a["home"] - context_b["home"],
+        "geography_2026_diff": context_a["geography_2026"] - context_b["geography_2026"],
         "injury_diff": context_a["injury"] - context_b["injury"],
         "travel_diff": context_a["travel"] - context_b["travel"],
         "morale_diff": context_a["morale"] - context_b["morale"],
@@ -402,5 +461,20 @@ def factor_breakdown(
         "tactical_attack_diff": tactical_attack_signal(state_a) - tactical_attack_signal(state_b),
         "tactical_defense_diff": tactical_defense_signal(state_a) - tactical_defense_signal(state_b),
         "tactical_tempo_diff": tactical_tempo_signal(state_a) - tactical_tempo_signal(state_b),
+        "expected_threat_diff": profile_a.squad.expected_threat - profile_b.squad.expected_threat,
+        "progressive_passes_diff": profile_a.squad.progressive_passes - profile_b.squad.progressive_passes,
+        "progressive_carries_diff": profile_a.squad.progressive_carries - profile_b.squad.progressive_carries,
+        "ppda_pressing_diff": profile_a.squad.ppda - profile_b.squad.ppda,
+        "field_tilt_diff": profile_a.squad.field_tilt - profile_b.squad.field_tilt,
+        "advanced_style_diff": profile_a.squad.advanced_style_index - profile_b.squad.advanced_style_index,
+        "high_press_resistance_diff": profile_a.squad.high_press_resistance - profile_b.squad.high_press_resistance,
+        "low_block_breaking_diff": profile_a.squad.low_block_breaking - profile_b.squad.low_block_breaking,
+        "transition_defense_diff": profile_a.squad.transition_defense - profile_b.squad.transition_defense,
+        "aerial_matchup_diff": profile_a.squad.aerial_matchup_advantage - profile_b.squad.aerial_matchup_advantage,
+        "tactical_matchup_diff": profile_a.squad.tactical_matchup_index - profile_b.squad.tactical_matchup_index,
+        "penalty_taker_quality_diff": profile_a.squad.penalty_taker_quality - profile_b.squad.penalty_taker_quality,
+        "goalkeeper_penalty_save_rate_diff": profile_a.squad.goalkeeper_penalty_save_rate - profile_b.squad.goalkeeper_penalty_save_rate,
+        "shootout_pressure_experience_diff": profile_a.squad.shootout_pressure_experience - profile_b.squad.shootout_pressure_experience,
+        "penalty_granular_diff": profile_a.squad.penalty_granular_index - profile_b.squad.penalty_granular_index,
         "rivalry": context_a["rivalry"],
     }

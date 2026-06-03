@@ -38,6 +38,15 @@ class TeamState:
     style_tempo: float = 0.0
     style_attack_bias: float = 0.0
     style_defense_bias: float = 0.0
+    expected_threat_live: float = 0.0
+    progressive_passes_live: float = 0.0
+    progressive_carries_live: float = 0.0
+    ppda_live: float = 0.0
+    field_tilt_live: float = 0.0
+    high_press_resistance_live: float = 0.0
+    low_block_breaking_live: float = 0.0
+    transition_defense_live: float = 0.0
+    aerial_matchup_advantage_live: float = 0.0
     tactical_sample_matches: int = 0
     tactical_signature: str = "sin muestra suficiente"
     updated_at: Optional[str] = None
@@ -77,6 +86,15 @@ class TeamState:
         self.style_tempo = clamp(float(self.style_tempo), -1.0, 1.0)
         self.style_attack_bias = clamp(float(self.style_attack_bias), -1.0, 1.0)
         self.style_defense_bias = clamp(float(self.style_defense_bias), -1.0, 1.0)
+        self.expected_threat_live = clamp(float(self.expected_threat_live), -1.0, 1.0)
+        self.progressive_passes_live = clamp(float(self.progressive_passes_live), -1.0, 1.0)
+        self.progressive_carries_live = clamp(float(self.progressive_carries_live), -1.0, 1.0)
+        self.ppda_live = clamp(float(self.ppda_live), -1.0, 1.0)
+        self.field_tilt_live = clamp(float(self.field_tilt_live), -1.0, 1.0)
+        self.high_press_resistance_live = clamp(float(self.high_press_resistance_live), -1.0, 1.0)
+        self.low_block_breaking_live = clamp(float(self.low_block_breaking_live), -1.0, 1.0)
+        self.transition_defense_live = clamp(float(self.transition_defense_live), -1.0, 1.0)
+        self.aerial_matchup_advantage_live = clamp(float(self.aerial_matchup_advantage_live), -1.0, 1.0)
         self.yellow_cards = max(0, int(self.yellow_cards))
         self.red_suspensions = max(0, int(self.red_suspensions))
         self.group_points = int(self.group_points)
@@ -106,6 +124,15 @@ class TeamState:
             round(self.style_attack_bias, 1),
             round(self.style_defense_bias, 1),
             round(self.style_tempo, 1),
+            round(self.expected_threat_live, 1),
+            round(self.progressive_passes_live, 1),
+            round(self.progressive_carries_live, 1),
+            round(self.ppda_live, 1),
+            round(self.field_tilt_live, 1),
+            round(self.high_press_resistance_live, 1),
+            round(self.low_block_breaking_live, 1),
+            round(self.transition_defense_live, 1),
+            round(self.aerial_matchup_advantage_live, 1),
         )
 
     def to_dict(self) -> Dict[str, Any]:
@@ -153,6 +180,15 @@ def state_has_activity(state: Optional[Mapping[str, Any]]) -> bool:
             abs(normalized.recent_opponent_strength) > 1e-9,
             abs(normalized.fatigue) > 1e-9,
             abs(normalized.availability - 1.0) > 1e-9,
+            abs(normalized.expected_threat_live) > 1e-9,
+            abs(normalized.progressive_passes_live) > 1e-9,
+            abs(normalized.progressive_carries_live) > 1e-9,
+            abs(normalized.ppda_live) > 1e-9,
+            abs(normalized.field_tilt_live) > 1e-9,
+            abs(normalized.high_press_resistance_live) > 1e-9,
+            abs(normalized.low_block_breaking_live) > 1e-9,
+            abs(normalized.transition_defense_live) > 1e-9,
+            abs(normalized.aerial_matchup_advantage_live) > 1e-9,
             normalized.tactical_sample_matches > 0,
         ]
     )

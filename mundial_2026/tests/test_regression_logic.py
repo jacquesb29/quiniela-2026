@@ -68,6 +68,63 @@ class RegressionLogicTest(unittest.TestCase):
         self.assertGreater(mu_a, 1.05)
         self.assertLess(mu_b, 1.05)
 
+    def test_explicit_value_style_load_and_geography_variables_move_expected_goals(self):
+        teams = app.load_teams()
+        opponent = teams["Saudi Arabia"]
+        base = teams["Cape Verde"]
+        boosted = dataclasses.replace(
+            base,
+            squad_market_value_eur_m=1450.0,
+            top_league_minutes_share=0.95,
+            gdp_ppp_usd_billion=3600.0,
+            population_millions=72.0,
+            league_strength_index=0.94,
+            expected_threat=0.92,
+            progressive_passes=0.90,
+            progressive_carries=0.88,
+            ppda=0.82,
+            field_tilt=0.91,
+            high_press_resistance=0.90,
+            low_block_breaking=0.92,
+            transition_defense=0.86,
+            aerial_matchup_advantage=0.84,
+            heat_humidity_load=0.02,
+            time_zone_shift=0.0,
+            venue_surface_adjustment=0.0,
+            travel_cluster_difficulty=0.02,
+        )
+        ctx = app.MatchContext(neutral=True)
+
+        mu_base, _ = app.expected_goals(base, opponent, ctx, state_a={}, state_b={})
+        mu_boosted, _ = app.expected_goals(boosted, opponent, ctx, state_a={}, state_b={})
+
+        self.assertGreater(mu_boosted, mu_base)
+
+    def test_granular_penalty_variables_affect_shootout_edge(self):
+        teams = app.load_teams()
+        base_a = teams["Portugal"]
+        base_b = teams["Netherlands"]
+        stronger_penalty_side = dataclasses.replace(
+            base_a,
+            penalty_taker_quality=0.95,
+            goalkeeper_penalty_save_rate=0.88,
+            shootout_pressure_experience=0.93,
+            keeper_taker_strategy_matchup=0.75,
+        )
+        weaker_penalty_side = dataclasses.replace(
+            base_b,
+            penalty_taker_quality=0.35,
+            goalkeeper_penalty_save_rate=0.30,
+            shootout_pressure_experience=0.38,
+            keeper_taker_strategy_matchup=-0.55,
+        )
+        state = app.default_team_state()
+
+        boosted_prob = app.penalties_probability(stronger_penalty_side, weaker_penalty_side, state, state)
+        baseline_prob = app.penalties_probability(base_a, base_b, state, state)
+
+        self.assertGreater(boosted_prob, baseline_prob)
+
     def test_knockout_resolution_with_penalties_keeps_scores_consistent(self):
         team_a = SimpleNamespace(name="Spain")
         team_b = SimpleNamespace(name="Portugal")
