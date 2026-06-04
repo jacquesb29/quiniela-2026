@@ -13,6 +13,7 @@ Fecha de auditoria: 2026-05-15.
 - El dashboard acepta variantes de estado en vivo del proveedor (`in`, `live`, `in_progress`) y de partido final (`post`, `final`, `finished`).
 - El modelo v1 queda congelado como baseline verificable en `modelo_quiniela_2026_v1_base.py`: commit `0370dfd`, SHA-256 `e49da3c5dc296d85c6de46529686bde9e2f1e3fa965dba843cb10d2fa0b05ad0`.
 - El esquema `data/historical_match_master_schema.json` define la tabla maestra historica para backtesting sin fuga de informacion futura.
+- El protocolo `data/prediction_operating_system_2026.json` define como usar el modelo durante el torneo: congelacion final, re-simulacion diaria, alertas, estrategia segun posicion en Penca y auditoria post-jornada.
 
 ## Como usarlo para la quiniela
 
@@ -38,5 +39,6 @@ Fecha de auditoria: 2026-05-15.
 - Tests del workflow de Pages: cron cada 5 minutos, 15000 simulaciones, `API_FOOTBALL_KEY` y deploy sin cancelar corridas previas.
 - Tests de estado live/final para que el in-play no falle por diferencias de nombre entre proveedores.
 - Tests del baseline v1 congelado y del esquema historico anti-fuga.
+- Tests del sistema operativo de prediccion para no cambiar pesos durante el Mundial ni crear un final pre-torneo antes de validar.
 - Separacion metodologica entre modelo pre-torneo, modelo pre-partido y modelo live.
 - Separacion entre prediccion futbolistica y optimizacion Penca.

@@ -2800,14 +2800,35 @@ pre {
 .agentic-panel .meta,
 .agentic-panel .lede-tight,
 .competitive-penca-panel .certainty-grid li span,
-.strategy-panel .certainty-grid li span {
+.strategy-panel .certainty-grid li span,
+.operating-system-panel .ops-list li span,
+.operating-system-panel .ops-list li em,
+.operating-system-panel .certainty-grid p {
   color: #3d4b50 !important;
 }
 .competitive-penca-panel .certainty-grid li em,
-.strategy-panel .certainty-grid li em {
+.strategy-panel .certainty-grid li em,
+.operating-system-panel .ops-list li em {
   background: rgba(15,109,102,0.12) !important;
   color: var(--accent-dark) !important;
   border: 1px solid rgba(15,109,102,0.12);
+}
+.operating-system-panel .ops-list {
+  display: grid;
+  gap: 12px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.operating-system-panel .ops-list li {
+  display: grid;
+  gap: 6px;
+  color: var(--ink);
+  padding-bottom: 12px;
+  border-bottom: 1px dashed rgba(15, 109, 102, 0.18);
+}
+.operating-system-panel .ops-list.compact {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 @media (max-width: 820px) {
   .landing-nav {

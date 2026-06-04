@@ -9505,6 +9505,156 @@ def build_agentic_learning_html(entries: Sequence[dict], bracket_payload: dict, 
     )
 
 
+def prediction_operating_system_payload() -> dict:
+    path = Path(__file__).with_name("data") / "prediction_operating_system_2026.json"
+    try:
+        return json.loads(path.read_text())
+    except Exception:
+        return {
+            "schema_version": "fallback",
+            "core_rule": "Actualizar datos; no cambiar metodología durante el torneo salvo bug real.",
+            "final_freeze": {"status": "no disponible", "target_file": "modelo_quiniela_2026_final_pre_torneo.py"},
+            "runtime_modes": {},
+            "penca_position_strategy": {},
+            "daily_resimulation": {"minimum_iterations": 15000, "recommended_deep_iterations": 50000},
+            "alerts": [],
+            "post_round_review": [],
+        }
+
+
+def build_prediction_operating_system_markdown(
+    entries: Sequence[dict],
+    bracket_payload: dict,
+    backtest: dict,
+) -> List[str]:
+    payload = prediction_operating_system_payload()
+    iterations = int(bracket_payload.get("iterations", 0) or 0)
+    completed_matches = int(backtest.get("completed_matches", 0) or 0)
+    final_freeze = payload.get("final_freeze", {})
+    daily = payload.get("daily_resimulation", {})
+    position = payload.get("penca_position_strategy", {})
+    alerts = payload.get("alerts", [])
+    review = payload.get("post_round_review", [])
+    target_file = str(final_freeze.get("target_file", "modelo_quiniela_2026_final_pre_torneo.py"))
+    status = str(final_freeze.get("status", "pendiente"))
+
+    lines = [
+        "- Regla central: durante el Mundial se actualizan datos, estado dinámico, lesiones, alineaciones, mercado y feed live; no se cambian pesos ni funciones salvo bug real documentado.",
+        f"- Congelación final pre-torneo: {target_file} está {status}. No debe crearse como final hasta completar backtesting, calibración y ablations.",
+        f"- Re-simulación diaria: mínimo {int(daily.get('minimum_iterations', 15000)):,} simulaciones; reporte profundo recomendado {int(daily.get('recommended_deep_iterations', 50000)):,} si el tiempo de cómputo lo permite.".replace(",", "."),
+        f"- Estado actual: llave publicada con {iterations:,} simulaciones y {completed_matches} partidos cerrados 2026 para calibración real.".replace(",", "."),
+        "- Estrategia según posición en Penca:",
+    ]
+    for key, value in position.items():
+        lines.append(f"  - {key}: {value}")
+    if alerts:
+        lines.append("- Alertas que deben disparar revisión:")
+        for alert in alerts[:7]:
+            lines.append(f"  - {alert}")
+    if review:
+        lines.append("- Revisión post-jornada:")
+        for item in review[:7]:
+            lines.append(f"  - {item}")
+    return lines
+
+
+def build_prediction_operating_system_html(
+    entries: Sequence[dict],
+    bracket_payload: dict,
+    backtest: dict,
+) -> str:
+    payload = prediction_operating_system_payload()
+    iterations = int(bracket_payload.get("iterations", 0) or 0)
+    completed_matches = int(backtest.get("completed_matches", 0) or 0)
+    final_freeze = payload.get("final_freeze", {})
+    daily = payload.get("daily_resimulation", {})
+    runtime_modes = payload.get("runtime_modes", {})
+    position = payload.get("penca_position_strategy", {})
+    alerts = payload.get("alerts", [])
+    review = payload.get("post_round_review", [])
+    state_updates = payload.get("dynamic_state_updates", [])
+    freeze_status = str(final_freeze.get("status", "pendiente"))
+    target_file = str(final_freeze.get("target_file", "modelo_quiniela_2026_final_pre_torneo.py"))
+    min_iterations = int(daily.get("minimum_iterations", 15000) or 15000)
+    deep_iterations = int(daily.get("recommended_deep_iterations", 50000) or 50000)
+
+    if "pendiente" in freeze_status:
+        freeze_reading = "No congelado todavía"
+        freeze_note = "Correcto: falta demostrar mejora con backtesting, calibración, ablations y benchmarks antes de crear el final pre-torneo."
+        freeze_tone = "warn"
+    else:
+        freeze_reading = "Congelado"
+        freeze_note = "Desde esta versión solo se actualizan datos y estado; la metodología queda cerrada salvo bug real."
+        freeze_tone = "ok"
+
+    def card(title: str, value: str, detail: str) -> str:
+        return (
+            "<article class=\"method-quality-card ops-card\">"
+            f"<h3>{html.escape(title)}</h3>"
+            f"<strong>{html.escape(value)}</strong>"
+            f"<p>{html.escape(detail)}</p>"
+            "</article>"
+        )
+
+    def list_rows(items: Sequence[str], limit: int = 7) -> str:
+        rows = []
+        for item in list(items)[:limit]:
+            rows.append(f"<li>{html.escape(str(item))}</li>")
+        return "".join(rows) or "<li>Sin reglas cargadas.</li>"
+
+    mode_rows = []
+    for mode, meta in runtime_modes.items():
+        outputs = ", ".join(str(item) for item in meta.get("outputs", [])[:5])
+        mode_rows.append(
+            "<li>"
+            f"<strong>{html.escape(str(mode).replace('_', '-'))}</strong>"
+            f"<span>{html.escape(str(meta.get('objective', '')))}</span>"
+            f"<em>{html.escape(outputs)}</em>"
+            "</li>"
+        )
+    position_rows = [
+        "<li>"
+        f"<strong>{html.escape(str(key))}</strong>"
+        f"<span>{html.escape(str(value))}</span>"
+        "</li>"
+        for key, value in position.items()
+    ]
+
+    return (
+        "<section class=\"panel operating-system-panel\" id=\"sistema-operativo\">"
+        "<div class=\"panel-head\"><div>"
+        "<p class=\"eyebrow\">Sistema operativo de predicción</p>"
+        "<h2>Cómo usar el modelo durante el Mundial sin sobreajustarlo.</h2>"
+        "<p class=\"lede-tight\">La ventaja no sale de cambiar el modelo después de cada sorpresa. Sale de congelar metodología, actualizar datos trazables, re-simular, escoger el marcador Penca correcto y auditar cada jornada.</p>"
+        "</div></div>"
+        "<div class=\"confidence-tiles operating-tiles\">"
+        f"{card('Congelar modelo final pre-torneo', freeze_reading, f'{target_file}: {freeze_note}')}"
+        f"{card('Re-simulación diaria', f'{min_iterations:,}+ / ideal {deep_iterations:,}'.replace(',', '.'), f'El corte actual publica {iterations:,} simulaciones; compara movimientos contra el snapshot anterior.'.replace(',', '.'))}"
+        f"{card('Calibración viva', f'{completed_matches} finales 2026', 'Brier/log-loss empiezan apenas haya resultados; antes de eso no se inventa track record.')}"
+        f"{card('No cambiar pesos durante el Mundial', 'Regla dura', str(payload.get('core_rule', 'Actualizar datos, no tocar metodología.')))}"
+        "</div>"
+        "<div class=\"certainty-grid operating-grid\">"
+        "<article><h3>Modos del sistema</h3><ul class=\"ops-list\">"
+        f"{''.join(mode_rows) or '<li>Sin modos cargados.</li>'}"
+        "</ul></article>"
+        "<article><h3>Estrategia según posición en Penca</h3><ul class=\"ops-list\">"
+        f"{''.join(position_rows) or '<li>Sin estrategia cargada.</li>'}"
+        "</ul></article>"
+        "<article><h3>Alertas que cambian decisiones</h3><ul class=\"ops-list\">"
+        f"{list_rows(alerts)}"
+        "</ul></article>"
+        "<article><h3>Actualizar estado dinámico</h3><ul class=\"ops-list compact\">"
+        f"{list_rows(state_updates, limit=12)}"
+        "</ul></article>"
+        "<article><h3>Revisión post-jornada</h3><ul class=\"ops-list\">"
+        f"{list_rows(review)}"
+        "</ul></article>"
+        "<article><h3>Salida que debes usar</h3><p>Para cada partido: marcador probable del modelo, marcador recomendado para Penca, safe score, óptimo, diferencial, riesgo, cobertura y consenso. Si difieren, Penca manda para cargar la app.</p></article>"
+        "</div>"
+        "</section>"
+    )
+
+
 def build_dashboard_markdown(
     entries: Sequence[dict],
     bracket_text: str,
@@ -9537,6 +9687,8 @@ def build_dashboard_markdown(
     lines.extend(build_calibration_depth_markdown(entries, backtest))
     lines.extend(["", "## Auditoría metodológica profunda", ""])
     lines.extend(build_methodology_governance_markdown(entries, bracket_payload, backtest))
+    lines.extend(["", "## Sistema operativo de predicción", ""])
+    lines.extend(build_prediction_operating_system_markdown(entries, bracket_payload, backtest))
     lines.extend(["", "## Predicción potenciada", ""])
     lines.extend(build_prediction_power_markdown(entries))
     lines.extend(["", "## Agentes de aprendizaje y fuentes", ""])
@@ -11982,6 +12134,7 @@ def build_dashboard_html(
     championship_penca_html = build_championship_penca_optimizer_html(entries)
     methodology_html = build_methodology_html(bracket_payload, backtest, entries)
     methodology_governance_html = build_methodology_governance_html(entries, bracket_payload, backtest)
+    prediction_operating_system_html = build_prediction_operating_system_html(entries, bracket_payload, backtest)
     calibration_depth_html = build_calibration_depth_html(entries, backtest)
     prediction_power_html = build_prediction_power_html(entries)
     agentic_learning_html = build_agentic_learning_html(entries, bracket_payload, backtest)
@@ -12015,6 +12168,7 @@ def build_dashboard_html(
             "championship_penca_html": championship_penca_html,
             "methodology_html": methodology_html,
             "methodology_governance_html": methodology_governance_html,
+            "prediction_operating_system_html": prediction_operating_system_html,
             "calibration_depth_html": calibration_depth_html,
             "prediction_power_html": prediction_power_html,
             "agentic_learning_html": agentic_learning_html,
@@ -12387,6 +12541,12 @@ def audit_dashboard_html(dashboard_html: str) -> List[str]:
         "Tabla maestra histórica anti-fuga",
         "Tres modos separados",
         "Predicción fútbol vs optimización Penca",
+        "Sistema operativo de predicción",
+        "Congelar modelo final pre-torneo",
+        "Re-simulación diaria",
+        "No cambiar pesos durante el Mundial",
+        "Estrategia según posición en Penca",
+        "Revisión post-jornada",
         "Pronóstico de goles",
         "15000",
     ]
@@ -12401,6 +12561,8 @@ def audit_dashboard_html(dashboard_html: str) -> List[str]:
         errors.append("Dashboard escapó el HTML del módulo de decisión dinámica.")
     if "&lt;section class=&#34;panel championship-penca-panel&#34;" in dashboard_html:
         errors.append("Dashboard escapó el HTML del módulo campeonato Penca.")
+    if "&lt;section class=&#34;panel operating-system-panel&#34;" in dashboard_html:
+        errors.append("Dashboard escapó el HTML del sistema operativo de predicción.")
     return errors
 
 

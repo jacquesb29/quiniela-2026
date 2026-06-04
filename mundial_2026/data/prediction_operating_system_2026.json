@@ -1,0 +1,194 @@
+{
+  "schema_version": "prediction_operating_system_v1",
+  "purpose": "Convertir el modelo en un sistema operativo de prediccion: congelar metodologia, actualizar datos, emitir decisiones Penca y auditar resultados sin sobreajustar emocionalmente el Mundial.",
+  "core_rule": "Durante el torneo se actualizan datos y estado dinamico; no se cambian pesos, funciones de goles, reglas Penca ni metodologia salvo bug real documentado.",
+  "final_freeze": {
+    "target_file": "mundial_2026/modelo_quiniela_2026_final_pre_torneo.py",
+    "status": "pendiente_hasta_backtesting_calibracion_y_ablations",
+    "freeze_only_after": [
+      "backtesting temporal completo contra baseline v1",
+      "calibracion Brier/log-loss con muestra historica comparable",
+      "ablation tests por bloque",
+      "benchmarks Elo/FIFA/mercado/Poisson simple",
+      "validacion de reglas Penca"
+    ],
+    "frozen_components": [
+      "pesos del modelo",
+      "funciones principales",
+      "metodo de simulacion",
+      "metodo de calibracion",
+      "reglas de Penca",
+      "benchmarks",
+      "reglas de no fuga de informacion"
+    ]
+  },
+  "runtime_modes": {
+    "pre_tournament": {
+      "objective": "Foto inicial del torneo antes del primer partido.",
+      "outputs": [
+        "campeon",
+        "finalistas",
+        "semifinalistas",
+        "cuartofinalistas",
+        "pasar grupo",
+        "primer lugar de grupo",
+        "puntos esperados por equipo",
+        "goles esperados por equipo",
+        "riesgo de eliminacion temprana",
+        "dark horses",
+        "sobrevalorados",
+        "infravalorados"
+      ],
+      "recommended_iterations": 50000,
+      "minimum_iterations": 15000
+    },
+    "pre_match": {
+      "objective": "Decision antes de cargar cada partido en Penca.",
+      "outputs": [
+        "probabilidad 1X2",
+        "goles esperados",
+        "marcadores mas probables",
+        "marcador probable del modelo",
+        "marcador recomendado Penca",
+        "safe_score",
+        "optimal_score",
+        "differential_score",
+        "riesgo",
+        "cobertura"
+      ]
+    },
+    "live": {
+      "objective": "Actualizar probabilidad y marcador cuando el feed trae minuto, marcador y eventos.",
+      "outputs": [
+        "probabilidad de victoria actualizada",
+        "goles restantes esperados",
+        "marcador final probable",
+        "alerta de cambio fuerte",
+        "decision Penca si el formato permite cambios"
+      ],
+      "refresh_minutes": 5
+    }
+  },
+  "confidence_tiers": [
+    "alta confianza",
+    "media confianza",
+    "baja confianza",
+    "partido trampa",
+    "alta varianza",
+    "diferencial ideal"
+  ],
+  "group_stage_archetypes": {
+    "favorito_claro": {
+      "strategy": "Puntos seguros con victoria corta o media.",
+      "score_families": [
+        "2-0",
+        "3-0",
+        "2-1"
+      ]
+    },
+    "favorito_con_riesgo": {
+      "strategy": "No exagerar goleada; proteger diferencia.",
+      "score_families": [
+        "1-0",
+        "2-1",
+        "2-0"
+      ]
+    },
+    "partido_parejo": {
+      "strategy": "Comparar puntos esperados y cobertura.",
+      "score_families": [
+        "1-1",
+        "2-1",
+        "1-2"
+      ]
+    },
+    "alta_varianza": {
+      "strategy": "Buscar diferencial razonable, nunca marcador heroico sin base.",
+      "score_families": [
+        "1-1",
+        "2-1",
+        "1-2",
+        "2-2"
+      ]
+    }
+  },
+  "penca_position_strategy": {
+    "leader": "Jugar mas seguro: favoritos claros, marcadores conservadores y menos diferenciales extremos.",
+    "middle": "Jugar balanceado: mayoria picks seguros y algunos diferenciales de valor.",
+    "chaser": "Buscar diferenciales razonables: empates, victorias cortas de underdogs y marcadores menos populares sin locuras."
+  },
+  "dynamic_state_updates": [
+    "morale",
+    "elo_shift",
+    "recent_form",
+    "attack_form",
+    "defense_form",
+    "fatigue",
+    "availability",
+    "discipline_drift",
+    "yellow_load",
+    "fair_play",
+    "group_points",
+    "group_goal_diff",
+    "goals_for",
+    "goals_against"
+  ],
+  "daily_resimulation": {
+    "minimum_iterations": 15000,
+    "recommended_deep_iterations": 50000,
+    "compare_against_previous_snapshot": true,
+    "track_movements": [
+      "campeon",
+      "final",
+      "semifinal",
+      "cuartos",
+      "pasar grupo",
+      "marcador recomendado Penca",
+      "dark horses",
+      "path_difficulty"
+    ]
+  },
+  "alerts": [
+    "lesion o baja confirmada cambia probabilidad por al menos 3 puntos",
+    "equipo sube o baja probabilidad de campeon por al menos 3 puntos",
+    "cuadro se vuelve sustancialmente mas facil o dificil",
+    "riesgo alto de tarjetas o suspension",
+    "fatiga acumulada alta",
+    "dark horse entra en ruta realista",
+    "marcador recomendado Penca cambia por diferencia de puntos esperados"
+  ],
+  "knockout_rules": {
+    "required_outputs": [
+      "probabilidad de avanzar",
+      "probabilidad de ganar en 90 minutos",
+      "probabilidad de prorroga",
+      "probabilidad de penales",
+      "marcador reglamentario probable",
+      "marcador de tanda probable"
+    ],
+    "score_discipline": "Bajar ligeramente marcadores altos y subir peso de portero, balon parado, experiencia y penales."
+  },
+  "post_round_review": [
+    "que acerto el modelo",
+    "que fallo",
+    "si el fallo fue varianza o error estructural",
+    "variable que explico mal",
+    "sobreconfianza detectada",
+    "senal de mercado que el modelo no vio",
+    "cambio recomendado de estrategia Penca sin tocar pesos"
+  ],
+  "final_audit": [
+    "Brier Score",
+    "Log Loss",
+    "accuracy 1X2",
+    "accuracy de clasificados",
+    "accuracy de semifinalistas",
+    "accuracy de finalistas",
+    "campeon dentro del top 3/top 5",
+    "puntos Penca",
+    "ranking contra participantes humanos",
+    "comparacion contra mercado",
+    "comparacion contra Elo",
+    "comparacion contra benchmarks externos disponibles"
+  ]
+}

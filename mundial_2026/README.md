@@ -39,6 +39,7 @@ La nueva version ya incorpora variables macro, historicas, tacticas, disciplinar
 - `modelo_quiniela_2026.py`: CLI para prediccion, perfiles internos y simulacion Monte Carlo del torneo.
 - `modelo_quiniela_2026_v1_base.py`: checkpoint congelado del modelo v1 en commit `0370dfd` con SHA-256. Sirve como base fija para comparar mejoras futuras.
 - `data/historical_match_master_schema.json`: esquema de tabla maestra historica para backtesting temporal sin fuga de informacion futura.
+- `data/prediction_operating_system_2026.json`: protocolo operativo para usar el modelo durante el Mundial sin sobreajustarlo: congelacion final, re-simulacion diaria, alertas, estrategia Penca y auditoria post-jornada.
 - `sync_fifa_rankings.py`: refresca `fifa_points` y `fifa_rank` desde el endpoint oficial de FIFA.
 - `fixtures_template.json`: ejemplo de formato para cargar partidos con estado dinamico.
 - `tournament_2026_draw.json`: draw oficial del Mundial 2026 con placeholders de repechaje.
@@ -55,6 +56,15 @@ La mejora predictiva no se mide subiendo porcentajes a mano. A partir de esta ve
 - Tres modos separados: pre-torneo usa senales estructurales; pre-partido agrega lesiones, descanso, mercado y alineacion probable; live agrega minuto, marcador, eventos, tarjetas y momentum. Una variable live no puede contaminar un backtest pre-partido.
 
 La optimizacion Penca tambien queda separada de la prediccion futbolistica: el marcador mas probable del modelo puede no ser el marcador que maximiza puntos esperados bajo regla Penca. Por eso la web debe mostrar ambos cuando difieran.
+
+## Sistema operativo durante el Mundial
+
+El proyecto no debe seguir cambiando metodologia infinitamente. La regla operativa queda documentada en `data/prediction_operating_system_2026.json`:
+
+- Antes del torneo: congelar `modelo_quiniela_2026_final_pre_torneo.py` solo despues de backtesting, calibracion, ablations y benchmarks.
+- Durante el torneo: actualizar datos, noticias, lesiones, alineaciones, mercado, estado dinamico y feed live; no cambiar pesos ni funciones principales salvo bug real.
+- Despues de cada jornada: re-simular, comparar contra el snapshot anterior, emitir alertas, revisar fallos y ajustar estrategia Penca segun posicion, no la metodologia.
+- Despues del torneo: auditar Brier, log-loss, 1X2, clasificados, finalistas, campeon top 3/top 5 y puntos Penca contra benchmarks.
 
 ## Uso rapido
 

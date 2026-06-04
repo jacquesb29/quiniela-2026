@@ -125,6 +125,27 @@ class QuinielaAuditIntegrityTest(unittest.TestCase):
         self.assertIn("without_elo", schema["ablation_blocks"])
         self.assertIn("without_live", schema["ablation_blocks"])
 
+    def test_prediction_operating_system_defines_tournament_protocol(self):
+        payload = json.loads((PACKAGE_ROOT / "data" / "prediction_operating_system_2026.json").read_text())
+
+        self.assertEqual(payload["schema_version"], "prediction_operating_system_v1")
+        self.assertIn("no se cambian pesos", payload["core_rule"])
+        self.assertEqual(
+            payload["final_freeze"]["target_file"],
+            "mundial_2026/modelo_quiniela_2026_final_pre_torneo.py",
+        )
+        self.assertEqual(payload["final_freeze"]["status"], "pendiente_hasta_backtesting_calibracion_y_ablations")
+        self.assertIn("pre_tournament", payload["runtime_modes"])
+        self.assertIn("pre_match", payload["runtime_modes"])
+        self.assertIn("live", payload["runtime_modes"])
+        self.assertGreaterEqual(int(payload["daily_resimulation"]["minimum_iterations"]), 15000)
+        self.assertGreaterEqual(int(payload["daily_resimulation"]["recommended_deep_iterations"]), 50000)
+        self.assertIn("leader", payload["penca_position_strategy"])
+        self.assertIn("middle", payload["penca_position_strategy"])
+        self.assertIn("chaser", payload["penca_position_strategy"])
+        self.assertIn("morale", payload["dynamic_state_updates"])
+        self.assertIn("Brier Score", payload["final_audit"])
+
     def test_github_pages_workflow_runs_full_auto_refresh(self):
         workflow = (REPO_ROOT / ".github" / "workflows" / "quiniela-pages.yml").read_text()
         deep_workflow = (REPO_ROOT / ".github" / "workflows" / "quiniela-deep.yml").read_text()
@@ -346,6 +367,9 @@ class QuinielaAuditIntegrityTest(unittest.TestCase):
                 "<p>Semáforo metodológico</p><p>Control de calidad del pronóstico</p>"
                 "<p>Baseline v1 congelado</p><p>Tabla maestra histórica anti-fuga</p>"
                 "<p>Tres modos separados</p><p>Predicción fútbol vs optimización Penca</p>"
+                "<p>Sistema operativo de predicción</p><p>Congelar modelo final pre-torneo</p>"
+                "<p>Re-simulación diaria</p><p>No cambiar pesos durante el Mundial</p>"
+                "<p>Estrategia según posición en Penca</p><p>Revisión post-jornada</p>"
                 "<p>Pronóstico de goles</p><p>15000</p></section></html>"
             )
             workflow_path.write_text(
