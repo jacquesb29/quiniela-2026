@@ -1,0 +1,99 @@
+name: Quiniela 2026 Full 100k Bracket
+
+on:
+  workflow_dispatch:
+    inputs:
+      reason:
+        description: "Motivo de la corrida 100k"
+        required: false
+        default: "manual"
+  push:
+    branches:
+      - main
+    paths:
+      - "mundial_2026/modelo_quiniela_2026.py"
+      - "mundial_2026/tournament_2026_draw.json"
+      - "mundial_2026/teams_2026.json"
+      - "mundial_2026/fixtures_live_2026.json"
+      - "mundial_2026/worldcup2026/**"
+      - ".github/workflows/quiniela-100k.yml"
+  schedule:
+    - cron: "42 4 * * *"
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "quiniela-pages-100k"
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install Python dependencies
+        run: |
+          python3 -m pip install --upgrade pip
+          python3 -m pip install -r mundial_2026/requirements.txt
+
+      - name: Make scripts executable
+        run: |
+          chmod +x mundial_2026/build_pages_site.sh
+
+      - name: Run regression tests
+        run: |
+          python3 -m unittest discover -s mundial_2026/tests
+
+      - name: Refresh traceable historical base
+        run: |
+          python3 mundial_2026/build_historical_features_1950.py --download --min-official-matches 25000
+
+      - name: Sync live data and rebuild 100k bracket
+        env:
+          API_FOOTBALL_KEY: ${{ secrets.API_FOOTBALL_KEY }}
+          API_FOOTBALL_BASE_URL: ${{ vars.API_FOOTBALL_BASE_URL }}
+          API_FOOTBALL_HOST: ${{ vars.API_FOOTBALL_HOST }}
+          SPORTMONKS_TOKEN: ${{ secrets.SPORTMONKS_TOKEN }}
+          THE_ODDS_API_KEY: ${{ secrets.THE_ODDS_API_KEY }}
+          NEWSAPI_KEY: ${{ secrets.NEWSAPI_KEY }}
+          GDELT_DOC_API: ${{ vars.GDELT_DOC_API }}
+          SPORTRADAR_KEY: ${{ secrets.SPORTRADAR_KEY }}
+          OPTA_KEY: ${{ secrets.OPTA_KEY }}
+        run: |
+          python3 mundial_2026/sync_live_data_2026.py
+          python3 mundial_2026/modelo_quiniela_2026.py state-reset
+          python3 mundial_2026/modelo_quiniela_2026.py fixtures mundial_2026/fixtures_live_2026.json
+          python3 mundial_2026/modelo_quiniela_2026.py project-bracket --config mundial_2026/tournament_2026_draw.json --iterations 100000 --seed 2026 --progress-every 10000
+          python3 mundial_2026/modelo_quiniela_2026.py project-dashboard --fixtures mundial_2026/fixtures_live_2026.json
+          ./mundial_2026/build_pages_site.sh
+          python3 mundial_2026/modelo_quiniela_2026.py audit-quiniela --fixtures mundial_2026/fixtures_live_2026.json --dashboard-html mundial_2026/site/index.html --bracket-json-file mundial_2026/site/llave_actual_2026.json --workflow-file .github/workflows/quiniela-pages.yml --deep-workflow-file .github/workflows/quiniela-deep.yml --min-iterations 15000
+
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload Pages Artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: mundial_2026/site
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

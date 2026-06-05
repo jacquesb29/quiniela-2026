@@ -1,6 +1,6 @@
 # Reporte actual del Mundial 2026
 
-Actualizado: 2026-06-03T23:52:18+00:00
+Actualizado: 2026-06-05T15:28:12+00:00
 Estado usado: /Users/jacquesbentata/Documents/New project/mundial_2026/runtime/tournament_state_2026.json
 Fixtures leidos: mundial_2026/fixtures_live_2026.json
 
@@ -74,12 +74,12 @@ Fixtures leidos: mundial_2026/fixtures_live_2026.json
 - Objetivo: aumentar expectativa y ventaja relativa frente a un boleto popular, no inflar porcentajes.
 - Reglas Penca Ovación usadas para optimizar marcador: 8 puntos por resultado exacto, 5 por diferencia de goles y 3 por ganador.
 - Aciertos esperados del boleto modelo: 67.5/104.
-- Puntos esperados por marcadores recomendados para la app: 293.4/832 (2.82 por partido).
+- Puntos esperados por marcadores recomendados para la app: 293.5/832 (2.82 por partido).
 - Boleto popular por nombre estimado: 67.4/104. Ventaja esperada del modelo: +0.1 picks.
 - Marcador exacto recomendado esperado: 15.1/104. Esto NO mide acierto de ganador; mide cuántas veces esperarías acertar el marcador optimizado para puntos.
 - Diferencia de goles esperada con el marcador recomendado: 25.0/104.
 - Rango realista 90% del marcador exacto principal: 9-21 aciertos.
-- Si la quiniela permite poner 3 marcadores alternativos por partido, la cobertura esperada sube a 44.7/104.
+- Si la quiniela permite poner 3 marcadores alternativos por partido, la cobertura esperada sube a 44.8/104.
 - Rango estadístico aproximado de resultados principales: 60-75 aciertos.
 - Cobertura mínima/recomendada/agresiva: 22/44/58 partidos.
 
@@ -193,7 +193,7 @@ Fixtures leidos: mundial_2026/fixtures_live_2026.json
 - Dieciseisavos de final | Dieciseisavos 16: Turkey vs Iran: 2-1 (Turkey - Iran) | pick Victoria Turkey 54.8% | exacto 8.8% | puntos esp. 2.41/8 | exacto más probable 1-0 | cruce proyectado
 - Octavos de final | Octavos 1: Canada vs Germany: 0-2 (Canada - Germany) | pick Victoria Germany 62.6% | exacto 13.5% | puntos esp. 2.67/8 | exacto más probable 0-1 | cruce proyectado
 - Octavos de final | Octavos 2: Netherlands vs Brazil: 1-1 (Netherlands - Brazil) | pick Victoria Brazil 42.5% | exacto 14.1% | puntos esp. 1.97/8 | exacto más probable 1-1 | cruce proyectado
-- Octavos de final | Octavos 3: France vs Norway: 2-0 (France - Norway) | pick Victoria France 64.1% | exacto 14.0% | puntos esp. 2.74/8 | exacto más probable 1-0 | cruce proyectado
+- Octavos de final | Octavos 3: France vs Ecuador: 2-0 (France - Ecuador) | pick Victoria France 64.5% | exacto 14.3% | puntos esp. 2.77/8 | exacto más probable 1-0 | cruce proyectado
 - Octavos de final | Octavos 4: Mexico vs England: 0-2 (Mexico - England) | pick Victoria England 65.8% | exacto 14.1% | puntos esp. 2.81/8 | exacto más probable 0-1 | cruce proyectado
 - Octavos de final | Octavos 5: Turkey vs Belgium: 1-1 (Turkey - Belgium) | pick Victoria Turkey 34.0% | exacto 14.5% | puntos esp. 2.04/8 | exacto más probable 1-1 | cruce proyectado
 - Octavos de final | Octavos 6: Croatia vs Spain: 0-2 (Croatia - Spain) | pick Victoria Spain 69.7% | exacto 15.2% | puntos esp. 2.97/8 | exacto más probable 0-1 | cruce proyectado
@@ -233,7 +233,7 @@ Fixtures leidos: mundial_2026/fixtures_live_2026.json
 - Benchmarks base | Preparado: La web debe comparar contra Elo puro, FIFA puro, mercado puro, Poisson simple y modelo completo antes de decir que el modelo agrega valor. Acción: Si el modelo completo no supera benchmarks simples en validación temporal, está sobrecomplicado y debe simplificarse.
 - Pesos aprendidos del ensamble | Regularización pendiente: Los pesos no deben elegirse por gusto: deben aprenderse con historial cerrado, regularización y walk-forward. Acción: Usar los pesos manuales solo como prior; migrar a stacking calibrado cuando la matriz histórica por partido esté limpia.
 - Dependencia dinámica de partidos | Activo en estado: El estado acumula fatiga, tarjetas, moral, forma, lesiones y disponibilidad; live actual 0, finales 0. Acción: Formalizar esta capa como modelo bayesiano dinámico: cada partido actualiza priors del siguiente y no trata los encuentros como independientes.
-- Intervalos de incertidumbre | Recomendado: La llave corre 15.000 simulaciones, suficiente para publicar rangos tipo España campeona 14%-19% en vez de un número aislado. Acción: Agregar intervalos por campeón, final, clasificación y marcador modal usando varianza Monte Carlo y bootstrap de parámetros.
+- Intervalos de incertidumbre | Recomendado: La llave corre 100.000 simulaciones, suficiente para publicar rangos tipo España campeona 14%-19% en vez de un número aislado. Acción: Agregar intervalos por campeón, final, clasificación y marcador modal usando varianza Monte Carlo y bootstrap de parámetros.
 - Stress testing | Escenarios definidos: Baja de estrella, baja de mediocentro, roja temprana, calor extremo, descanso corto, viaje largo y tanda de penales ya tienen variables de entrada. Acción: Publicar sensibilidad por escenario: cuánto cambia pick, marcador Penca y llave si entra una noticia crítica.
 - Explicabilidad por predicción | Activa: Cada partido ya puede mostrar drivers: fuerza, mercado, bajas, forma, clima, estilos, noticia/live y marcador recomendado. Acción: Mantener la explicación en lenguaje de quiniela: por qué jugar fijo, cubrir o buscar diferencial.
 - Base histórica oficial | Cargada como memoria: 29.566 partidos oficiales desde 1950 alimentan priors, familias de marcador y penales; no sustituyen el backtest rolling. Acción: Separar claramente memoria histórica de evaluación predictiva: una cosa entrena/regulariza, otra mide si acertamos.
@@ -244,7 +244,7 @@ Fixtures leidos: mundial_2026/fixtures_live_2026.json
 - Regla central: durante el Mundial se actualizan datos, estado dinámico, lesiones, alineaciones, mercado y feed live; no se cambian pesos ni funciones salvo bug real documentado.
 - Congelación final pre-torneo: mundial_2026/modelo_quiniela_2026_final_pre_torneo.py está pendiente_hasta_backtesting_calibracion_y_ablations. No debe crearse como final hasta completar backtesting, calibración y ablations.
 - Re-simulación diaria: mínimo 15.000 simulaciones; reporte profundo recomendado 50.000 si el tiempo de cómputo lo permite.
-- Estado actual: llave publicada con 15.000 simulaciones y 0 partidos cerrados 2026 para calibración real.
+- Estado actual: llave publicada con 100.000 simulaciones y 0 partidos cerrados 2026 para calibración real.
 - Estrategia según posición en Penca:
   - leader: Jugar mas seguro: favoritos claros, marcadores conservadores y menos diferenciales extremos.
   - middle: Jugar balanceado: mayoria picks seguros y algunos diferenciales de valor.
@@ -287,7 +287,7 @@ Fixtures leidos: mundial_2026/fixtures_live_2026.json
 
 ### Agentes de aprendizaje
 - Lectura: esto no es un chatbot generando opiniones. Es un pipeline de agentes que ingiere datos, los transforma en señales, predice, calibra, decide y audita.
-- Monte Carlo vigente: 15.000 simulaciones por corrida.
+- Monte Carlo vigente: 100.000 simulaciones por corrida.
 - Aprendizaje real disponible hoy: 0 partidos finalizados y 0 en vivo dentro del fixture cargado.
 - Backtesting/calibración: 0 partidos cerrados reconstruidos.
 - Noticias multi-fuente: no depende solo de ESPN; ESPN puede ser fuente base, pero el modelo acepta fuentes oficiales, prensa internacional, mercado y proveedor live profundo.
@@ -296,7 +296,7 @@ Fixtures leidos: mundial_2026/fixtures_live_2026.json
 - Agente predictivo: Combina Poisson/Dixon-Coles, overdispersión calibrada, predictivo bayesiano dinámico, ML ligero, Elo/FIFA, ensamble, consenso externo y Monte Carlo de torneo. Cuando cambia un resultado, recalcula de inmediato el tablero live y propaga grupos, cruces, llave y campeón en la siguiente corrida profunda.
 - Agente de calibración: Mide Brier, log-loss, buckets de confianza y backtesting temporal. Baja la agresividad si el modelo está sobreconfiado y sube cobertura si los modelos discrepan.
 - Agente de quiniela: Convierte probabilidades en decisiones: pick base, marcador principal, segunda opción y cobertura. Optimiza contra un boleto popular estimado para buscar ventaja relativa, no solo acierto bruto.
-- Agente auditor: Bloquea publicación si faltan 15.000 simulaciones, llave coherente, consenso, goles, auditoría o refresh de 5 minutos. Cada falla deja una regla verificable para que el pipeline no publique una versión incompleta.
+- Agente auditor: Bloquea publicación si falta el mínimo operativo de simulaciones, llave coherente, consenso, goles, auditoría o refresh de 5 minutos. Cada falla deja una regla verificable para que el pipeline no publique una versión incompleta.
 
 ### Mapa de proveedores buscados
 - Proveedores catalogados: 17 | ya cableados: 4 | adaptadores pendientes: 6 | enterprise/contrato: 3.
@@ -325,37 +325,37 @@ Fixtures leidos: mundial_2026/fixtures_live_2026.json
 - Mezcla dinámica usada para campeón recomendado: 50.0% modelo propio/live + 50.0% consenso externo.
 - Actualización live de esa mezcla: 0 partidos finales, 0 en vivo y 72 pendientes. A medida que entran resultados reales, el consenso externo pesa menos y la simulación Monte Carlo vigente pesa más.
 - Transparencia: el consenso externo no es una caja negra; combina priors declarados de campeón, ratings tipo Elo/FIFA, fuerza ofensiva-defensiva tipo SPI, mercado cuando existe y simulación Monte Carlo para dependencias de llave.
-- Campeón recomendado de boleto: Spain | probabilidad calibrada 23.9% | modelo puro 28.9% | consenso 19.0%.
+- Campeón recomendado de boleto: Spain | probabilidad calibrada 23.7% | modelo puro 28.3% | consenso 19.0%.
 - Top calibrado de campeón:
-  - Spain: calibrado 23.9% | modelo 28.9% | consenso 19.0% | sobreponderado
-  - France: calibrado 14.9% | modelo 14.7% | consenso 15.0% | alineado
-  - Argentina: calibrado 14.4% | modelo 16.9% | consenso 12.0% | sobreponderado
-  - England: calibrado 11.3% | modelo 9.6% | consenso 13.0% | subponderado
-  - Brazil: calibrado 9.6% | modelo 8.1% | consenso 11.0% | subponderado
-  - Germany: calibrado 5.9% | modelo 4.3% | consenso 7.5% | subponderado
-  - Portugal: calibrado 5.8% | modelo 4.0% | consenso 7.5% | subponderado
-  - Netherlands: calibrado 4.2% | modelo 3.4% | consenso 5.0% | alineado
+  - Spain: calibrado 23.7% | modelo 28.3% | consenso 19.0% | sobreponderado
+  - Argentina: calibrado 15.5% | modelo 19.0% | consenso 12.0% | sobreponderado
+  - France: calibrado 15.2% | modelo 15.4% | consenso 15.0% | alineado
+  - England: calibrado 11.5% | modelo 10.0% | consenso 13.0% | subponderado
+  - Brazil: calibrado 9.6% | modelo 8.3% | consenso 11.0% | subponderado
+  - Germany: calibrado 5.9% | modelo 4.4% | consenso 7.5% | subponderado
+  - Portugal: calibrado 5.5% | modelo 3.4% | consenso 7.5% | subponderado
+  - Netherlands: calibrado 4.0% | modelo 3.1% | consenso 5.0% | alineado
 
 ### Ajustes estratégicos de llave
 - Octavos 5: Turkey vs Belgium | modelo Turkey 51.1% | boleto Belgium 48.9% | margen 2.2% | Aplicar en boleto.
 
 ## Comparación contra modelos externos publicados
 
-- Nuestro líder vigente: Spain con 23.9% de probabilidad calibrada de campeón.
+- Nuestro líder vigente: Spain con 23.7% de probabilidad calibrada de campeón.
 - Coincidencias: 4/7 benchmarks publicados eligen al mismo campeón. No se promedian a ciegas: se usan para auditar divergencias.
 - Próxima mejora que sí mueve calidad: recalibrar pesos con walk-forward apenas entren resultados reales del Mundial y añadir mercado live solo cuando exista un feed verificable.
-- Goldman Sachs GIR (30 may 2026): campeón Spain | externo 25.7% | nuestro modelo hoy 23.9% | final Spain vs Argentina | Coincide con nuestro líder vigente.
-- Opta Analyst (8 dic 2025): campeón Spain | externo 17.0% | nuestro modelo hoy 23.9% | final No publicado en el corte | Coincide con nuestro líder vigente.
-- PwC (9 dic 2025): campeón Spain | externo 26.0% | nuestro modelo hoy 23.9% | final No publicado en el corte | Coincide con nuestro líder vigente.
-- FairCast / University of Portsmouth (14 abr 2026): campeón England | externo 15.9% | nuestro modelo hoy 11.3% | final No publicado en el corte | No lidera nuestra corrida, pero sigue siendo candidato serio.
-- Panmure Liberum / Joachim Klement (abr 2026): campeón Netherlands | externo probabilidad no publicada | nuestro modelo hoy 4.2% | final Netherlands vs Portugal | Funciona como alerta de tapado; vigilar su ruta antes de subirlo.
-- Oddschecker / mercado público (jun 2026): campeón Spain | externo probabilidad no publicada | nuestro modelo hoy 23.9% | final No publica llave; ordena candidatos por cuota | Coincide con nuestro líder vigente.
-- Covers / mercado de outrights (jun 2026): campeón France | externo probabilidad no publicada | nuestro modelo hoy 14.9% | final No publica llave; muestra bloque de favoritos | No lidera nuestra corrida, pero sigue siendo candidato serio.
+- Goldman Sachs GIR (30 may 2026): campeón Spain | externo 25.7% | nuestro modelo hoy 23.7% | final Spain vs Argentina | Coincide con nuestro líder vigente.
+- Opta Analyst (8 dic 2025): campeón Spain | externo 17.0% | nuestro modelo hoy 23.7% | final No publicado en el corte | Coincide con nuestro líder vigente.
+- PwC (9 dic 2025): campeón Spain | externo 26.0% | nuestro modelo hoy 23.7% | final No publicado en el corte | Coincide con nuestro líder vigente.
+- FairCast / University of Portsmouth (14 abr 2026): campeón England | externo 15.9% | nuestro modelo hoy 11.5% | final No publicado en el corte | No lidera nuestra corrida, pero sigue siendo candidato serio.
+- Panmure Liberum / Joachim Klement (abr 2026): campeón Netherlands | externo probabilidad no publicada | nuestro modelo hoy 4.0% | final Netherlands vs Portugal | Funciona como alerta de tapado; vigilar su ruta antes de subirlo.
+- Oddschecker / mercado público (jun 2026): campeón Spain | externo probabilidad no publicada | nuestro modelo hoy 23.7% | final No publica llave; ordena candidatos por cuota | Coincide con nuestro líder vigente.
+- Covers / mercado de outrights (jun 2026): campeón France | externo probabilidad no publicada | nuestro modelo hoy 15.2% | final No publica llave; muestra bloque de favoritos | No lidera nuestra corrida, pero sigue siendo candidato serio.
 - Escenarios de estrés para no casarnos con un solo relato:
-  - Escenario modelo propio: Spain | 28.9% | Si coincide con el calibrado, mantener la llave base.
-  - Escenario calibrado para boleto: Spain | 23.9% | Este es el campeón que guía el boleto salvo noticias, lesiones o mercado fuerte en contra.
+  - Escenario modelo propio: Spain | 28.3% | Si coincide con el calibrado, mantener la llave base.
+  - Escenario calibrado para boleto: Spain | 23.7% | Este es el campeón que guía el boleto salvo noticias, lesiones o mercado fuerte en contra.
   - Escenario consenso externo: Spain | 19.0% | Si difiere del modelo, revisar ruta y no sobrecargar el favorito propio.
-  - Escenario tapado vigilado: Portugal | 92/100 | No cambia el campeón base; activa vigilancia de rama y posibles diferenciales.
+  - Escenario tapado vigilado: Portugal | 89/100 | No cambia el campeón base; activa vigilancia de rama y posibles diferenciales.
   - Escenario externo disidente: France | Covers / mercado de outrights | No copiar: usarlo como alarma para auditar variables y evitar ceguera de confirmación.
 - Modelos/variables que sí conviene agregar o reforzar:
   - Variables explícitas de plantilla, macro, estilo, carga, geografía y penales (Implementado): PIB, población, valor de plantilla, edad/media de liga, minutos top, carga física, xT, progresión, PPDA, compatibilidad táctica, geografía 2026 y penales granulares ya entran como señales separadas. Impacto: Permite auditar qué mueve cada pick y evita que todo quede escondido dentro de un resource_index genérico.
@@ -369,23 +369,23 @@ Fixtures leidos: mundial_2026/fixtures_live_2026.json
 
 - Regla: un tapado no se agrega por intuición. Debe conservar una ruta Monte Carlo visible hacia cuartos/semifinales o aparecer en una señal externa trazable. Las menciones externas son alertas; no reemplazan probabilidades ni fuerzan la llave.
 - Lectura: candidato secundario no significa favorito. Tapado serio indica que conviene vigilar su rama. Tapado de mayor varianza solo justifica una alerta, no cambiar el boleto base.
-- Portugal | Candidato secundario | índice de vigilancia 92/100 | campeón calibrado 5.8% | cuartos 44.5% | semifinal 21.1% | final 8.9% | El consenso externo lo sostiene más que el modelo propio. Señal: Opta post-sorteo + Klement.
-- Netherlands | Candidato secundario | índice de vigilancia 84/100 | campeón calibrado 4.2% | cuartos 33.4% | semifinal 21.3% | final 9.1% | El consenso externo lo sostiene más que el modelo propio. Señal: Sports Illustrated + Klement.
-- Colombia | Candidato secundario | índice de vigilancia 66/100 | campeón calibrado 2.2% | cuartos 36.7% | semifinal 16.2% | final 6.1% | Modelo propio y consenso están razonablemente alineados. Señal: Sky Sports.
-- Croatia | Tapado serio | índice de vigilancia 46/100 | campeón calibrado 1.5% | cuartos 26.7% | semifinal 12.3% | final 5.1% | Modelo propio y consenso están razonablemente alineados. Señal: Detección interna por ruta Monte Carlo.
-- Ecuador | Tapado serio | índice de vigilancia 38/100 | campeón calibrado 0.5% | cuartos 25.6% | semifinal 8.5% | final 2.5% | Modelo propio y consenso están razonablemente alineados. Señal: World Soccer Talk.
-- Belgium | Tapado serio | índice de vigilancia 34/100 | campeón calibrado 1.1% | cuartos 34.1% | semifinal 7.7% | final 2.3% | Modelo propio y consenso están razonablemente alineados. Señal: Detección interna por ruta Monte Carlo.
-- Switzerland | Tapado serio | índice de vigilancia 32/100 | campeón calibrado 0.8% | cuartos 22.1% | semifinal 9.2% | final 2.6% | Modelo propio y consenso están razonablemente alineados. Señal: Detección interna por ruta Monte Carlo.
-- Norway | Tapado de mayor varianza | índice de vigilancia 31/100 | campeón calibrado 0.7% | cuartos 17.3% | semifinal 6.0% | final 2.4% | Modelo propio y consenso están razonablemente alineados. Señal: World Soccer Talk.
-- Turkey | Tapado serio | índice de vigilancia 30/100 | campeón calibrado 0.7% | cuartos 29.2% | semifinal 7.0% | final 2.1% | Modelo propio y consenso están razonablemente alineados. Señal: Detección interna por ruta Monte Carlo.
-- Japan | Tapado serio | índice de vigilancia 29/100 | campeón calibrado 0.5% | cuartos 13.7% | semifinal 6.6% | final 2.0% | Modelo propio y consenso están razonablemente alineados. Señal: World Soccer Talk.
-- Mexico | Tapado serio | índice de vigilancia 26/100 | campeón calibrado 0.5% | cuartos 22.3% | semifinal 6.7% | final 2.1% | Modelo propio y consenso están razonablemente alineados. Señal: Detección interna por ruta Monte Carlo.
-- Uruguay | Tapado serio | índice de vigilancia 23/100 | campeón calibrado 0.5% | cuartos 14.5% | semifinal 7.3% | final 1.7% | Modelo propio y consenso están razonablemente alineados. Señal: Detección interna por ruta Monte Carlo.
-- Morocco | Tapado de mayor varianza | índice de vigilancia 16/100 | campeón calibrado 0.1% | cuartos 6.1% | semifinal 2.0% | final 0.5% | Modelo propio y consenso están razonablemente alineados. Señal: FIFA + World Soccer Talk.
+- Portugal | Candidato secundario | índice de vigilancia 89/100 | campeón calibrado 5.5% | cuartos 44.8% | semifinal 20.3% | final 8.2% | El consenso externo lo sostiene más que el modelo propio. Señal: Opta post-sorteo + Klement.
+- Netherlands | Candidato secundario | índice de vigilancia 83/100 | campeón calibrado 4.0% | cuartos 33.2% | semifinal 20.7% | final 8.6% | El consenso externo lo sostiene más que el modelo propio. Señal: Sports Illustrated + Klement.
+- Colombia | Candidato secundario | índice de vigilancia 63/100 | campeón calibrado 1.9% | cuartos 37.1% | semifinal 15.4% | final 5.4% | Modelo propio y consenso están razonablemente alineados. Señal: Sky Sports.
+- Croatia | Tapado serio | índice de vigilancia 44/100 | campeón calibrado 1.5% | cuartos 26.5% | semifinal 11.6% | final 4.6% | Modelo propio y consenso están razonablemente alineados. Señal: Detección interna por ruta Monte Carlo.
+- Ecuador | Tapado serio | índice de vigilancia 39/100 | campeón calibrado 0.7% | cuartos 26.7% | semifinal 8.8% | final 2.5% | Modelo propio y consenso están razonablemente alineados. Señal: World Soccer Talk.
+- Belgium | Tapado serio | índice de vigilancia 34/100 | campeón calibrado 1.0% | cuartos 35.6% | semifinal 7.7% | final 2.2% | Modelo propio y consenso están razonablemente alineados. Señal: Detección interna por ruta Monte Carlo.
+- Switzerland | Tapado serio | índice de vigilancia 30/100 | campeón calibrado 0.8% | cuartos 21.7% | semifinal 8.7% | final 2.3% | Modelo propio y consenso están razonablemente alineados. Señal: Detección interna por ruta Monte Carlo.
+- Turkey | Tapado serio | índice de vigilancia 30/100 | campeón calibrado 0.6% | cuartos 30.4% | semifinal 6.8% | final 1.9% | Modelo propio y consenso están razonablemente alineados. Señal: Detección interna por ruta Monte Carlo.
+- Norway | Tapado de mayor varianza | índice de vigilancia 28/100 | campeón calibrado 0.6% | cuartos 15.8% | semifinal 5.3% | final 1.8% | Modelo propio y consenso están razonablemente alineados. Señal: World Soccer Talk.
+- Japan | Tapado de mayor varianza | índice de vigilancia 25/100 | campeón calibrado 0.4% | cuartos 12.1% | semifinal 5.5% | final 1.5% | Modelo propio y consenso están razonablemente alineados. Señal: World Soccer Talk.
+- Mexico | Tapado de mayor varianza | índice de vigilancia 22/100 | campeón calibrado 0.4% | cuartos 20.1% | semifinal 5.2% | final 1.6% | Modelo propio y consenso están razonablemente alineados. Señal: Detección interna por ruta Monte Carlo.
+- Uruguay | Tapado de mayor varianza | índice de vigilancia 19/100 | campeón calibrado 0.5% | cuartos 12.7% | semifinal 5.8% | final 1.5% | Modelo propio y consenso están razonablemente alineados. Señal: Detección interna por ruta Monte Carlo.
+- Morocco | Tapado de mayor varianza | índice de vigilancia 15/100 | campeón calibrado 0.1% | cuartos 5.3% | semifinal 1.6% | final 0.4% | Modelo propio y consenso están razonablemente alineados. Señal: FIFA + World Soccer Talk.
 
 ## Qué cambió desde la última actualización
 
-- Comparado contra la publicación anterior de: 2026-06-03T23:43:44+00:00
+- Comparado contra la publicación anterior de: 2026-06-05T15:17:26+00:00
 - Esta sección separa dos cosas distintas: cambios de cruce proyectado y cambios de probabilidad dentro del mismo partido. Solo compara picks cuando los dos equipos son los mismos; si cambia el cruce, aparece como cambio de llave, no como movimiento de probabilidad.
 - Partidos comparables donde más se movió el pick principal: Cuartos 4: Argentina vs Portugal: Victoria Argentina 57.4% -> Victoria Argentina 56.1%; Bosnia and Herzegovina vs Qatar: Victoria Bosnia and Herzegovina 58.2% -> Victoria Bosnia and Herzegovina 57.1%; Final: France vs Spain: Victoria Spain 48.6% -> Victoria Spain 47.6%; Dieciseisavos 14: Argentina vs Uruguay: Victoria Argentina 69.4% -> Victoria Argentina 68.5%; Dieciseisavos 11: Colombia vs Croatia: Victoria Colombia 38.7% -> Victoria Colombia 37.8%; Dieciseisavos 1: South Korea vs Canada: Victoria Canada 37.1% -> Victoria Canada 36.3%
 - Partidos cuyo marcador proyectado cambió: Mexico vs South Korea: 1-0 -> 1-1; Switzerland vs Canada: 1-0 -> 1-1; South Africa vs South Korea: 0-1 -> 0-2; Norway vs France: 0-1 -> 0-2; Dieciseisavos 7: Mexico vs Scotland: 1-0 -> 1-1; Dieciseisavos 14: Argentina vs Uruguay: 1-0 -> 2-0
@@ -396,299 +396,299 @@ _El Brier 2026 se activa automáticamente con el primer partido terminado; antes
 
 ## Llave actual
 
-# Llave actual proyectada | iteraciones=15000
+# Llave actual proyectada | iteraciones=100000
 
 ## Dieciseisavos de final
 ### Dieciseisavos 1
 - Cruce usado para este casillero: South Korea vs Canada
-- Probabilidad de que este cruce ocurra: 20.4%
-- Ganador proyectado del casillero: Canada (26.6% global)
-- Nota de lectura: en ese cruce específico el favorito condicional es South Korea (50.0%), pero Canada es quien más sale del casillero al sumar todas las rutas simuladas.
-- Otros cruces que también aparecen seguido: South Korea vs Canada | gana más probable Canada | este escenario aparece 10.2%; Czech Republic vs Canada | gana más probable Canada | este escenario aparece 9.2%
-- Va a proroga en 31.1% y a penales en 19.0%
-- Marcadores de penales más probables en este cruce: 4-3 (1.9%); 4-2 (1.9%); 2-4 (1.7%)
+- Probabilidad de que este cruce ocurra: 21.0%
+- Ganador proyectado del casillero: Canada (28.3% global)
+- Si se juega ese cruce, Canada avanza 51.3%.
+- Otros cruces que también aparecen seguido: South Korea vs Canada | gana más probable South Korea | este escenario aparece 10.2%; Czech Republic vs Canada | gana más probable Canada | este escenario aparece 9.8%
+- Va a proroga en 29.4% y a penales en 17.4%
+- Marcadores de penales más probables en este cruce: 3-4 (1.8%); 4-3 (1.7%); 2-4 (1.6%)
 
 ### Dieciseisavos 2
 - Cruce usado para este casillero: Germany vs Bosnia and Herzegovina
-- Probabilidad de que este cruce ocurra: 8.9%
-- Ganador proyectado del casillero: Germany (53.5% global)
-- Si se juega ese cruce, Germany avanza 94.2%.
-- Otros cruces que también aparecen seguido: Germany vs Czech Republic | gana más probable Germany | este escenario aparece 5.5%; Ecuador vs Bosnia and Herzegovina | gana más probable Ecuador | este escenario aparece 4.5%
-- Va a proroga en 22.9% y a penales en 13.1%
-- Marcadores de penales más probables en este cruce: 4-2 (1.5%); 4-3 (1.4%); 5-4 (1.2%)
+- Probabilidad de que este cruce ocurra: 9.3%
+- Ganador proyectado del casillero: Germany (55.2% global)
+- Si se juega ese cruce, Germany avanza 95.5%.
+- Otros cruces que también aparecen seguido: Germany vs Czech Republic | gana más probable Germany | este escenario aparece 6.1%; Ecuador vs Bosnia and Herzegovina | gana más probable Ecuador | este escenario aparece 4.9%
+- Va a proroga en 21.1% y a penales en 11.9%
+- Marcadores de penales más probables en este cruce: 4-2 (1.5%); 4-3 (1.5%); 5-4 (1.2%)
 
 ### Dieciseisavos 3
 - Cruce usado para este casillero: Netherlands vs Morocco
-- Probabilidad de que este cruce ocurra: 29.9%
-- Ganador proyectado del casillero: Netherlands (50.6% global)
-- Si se juega ese cruce, Netherlands avanza 80.8%.
-- Otros cruces que también aparecen seguido: Netherlands vs Scotland | gana más probable Netherlands | este escenario aparece 18.2%; Japan vs Morocco | gana más probable Japan | este escenario aparece 9.9%
-- Va a proroga en 27.0% y a penales en 16.0%
-- Marcadores de penales más probables en este cruce: 5-4 (1.7%); 3-4 (1.6%); 4-2 (1.5%)
+- Probabilidad de que este cruce ocurra: 30.6%
+- Ganador proyectado del casillero: Netherlands (51.8% global)
+- Si se juega ese cruce, Netherlands avanza 82.9%.
+- Otros cruces que también aparecen seguido: Netherlands vs Scotland | gana más probable Netherlands | este escenario aparece 18.9%; Japan vs Morocco | gana más probable Japan | este escenario aparece 10.1%
+- Va a proroga en 25.4% y a penales en 14.5%
+- Marcadores de penales más probables en este cruce: 4-3 (1.5%); 4-2 (1.4%); 3-4 (1.4%)
 
 ### Dieciseisavos 4
 - Cruce usado para este casillero: Brazil vs Japan
-- Probabilidad de que este cruce ocurra: 40.0%
-- Ganador proyectado del casillero: Brazil (60.7% global)
-- Si se juega ese cruce, Brazil avanza 79.3%.
-- Otros cruces que también aparecen seguido: Brazil vs Netherlands | gana más probable Brazil | este escenario aparece 14.7%; Brazil vs Sweden | gana más probable Brazil | este escenario aparece 9.5%
-- Va a proroga en 27.1% y a penales en 16.0%
-- Marcadores de penales más probables en este cruce: 4-3 (1.7%); 3-4 (1.6%); 5-4 (1.6%)
+- Probabilidad de que este cruce ocurra: 41.6%
+- Ganador proyectado del casillero: Brazil (63.4% global)
+- Si se juega ese cruce, Brazil avanza 82.1%.
+- Otros cruces que también aparecen seguido: Brazil vs Netherlands | gana más probable Brazil | este escenario aparece 15.6%; Brazil vs Sweden | gana más probable Brazil | este escenario aparece 9.3%
+- Va a proroga en 25.3% y a penales en 14.7%
+- Marcadores de penales más probables en este cruce: 4-2 (1.8%); 4-3 (1.7%); 5-4 (1.5%)
 
 ### Dieciseisavos 5
 - Cruce usado para este casillero: France vs Egypt
-- Probabilidad de que este cruce ocurra: 7.1%
-- Ganador proyectado del casillero: France (67.0% global)
-- Si se juega ese cruce, France avanza 93.4%.
-- Otros cruces que también aparecen seguido: France vs Scotland | gana más probable France | este escenario aparece 6.4%; France vs United States | gana más probable France | este escenario aparece 5.6%
-- Va a proroga en 19.6% y a penales en 10.8%
-- Marcadores de penales más probables en este cruce: 4-3 (1.3%); 3-4 (1.0%); 4-2 (1.0%)
+- Probabilidad de que este cruce ocurra: 7.8%
+- Ganador proyectado del casillero: France (70.3% global)
+- Si se juega ese cruce, France avanza 95.0%.
+- Otros cruces que también aparecen seguido: France vs Scotland | gana más probable France | este escenario aparece 6.7%; France vs Australia | gana más probable France | este escenario aparece 6.0%
+- Va a proroga en 18.1% y a penales en 9.9%
+- Marcadores de penales más probables en este cruce: 4-3 (1.2%); 4-2 (1.2%); 5-4 (1.0%)
 
 ### Dieciseisavos 6
 - Cruce usado para este casillero: Ecuador vs Norway
-- Probabilidad de que este cruce ocurra: 22.1%
-- Ganador proyectado del casillero: Norway (23.1% global)
-- Si se juega ese cruce, Norway avanza 56.7%.
-- Otros cruces que también aparecen seguido: Ecuador vs Senegal | gana más probable Ecuador | este escenario aparece 10.0%; Ecuador vs Norway | gana más probable Ecuador | este escenario aparece 9.5%
-- Va a proroga en 30.1% y a penales en 17.9%
-- Marcadores de penales más probables en este cruce: 2-4 (1.8%); 3-4 (1.8%); 4-3 (1.7%)
+- Probabilidad de que este cruce ocurra: 23.9%
+- Ganador proyectado del casillero: Ecuador (24.2% global)
+- Nota de lectura: en ese cruce específico el favorito condicional es Norway (55.4%), pero Ecuador es quien más sale del casillero al sumar todas las rutas simuladas.
+- Otros cruces que también aparecen seguido: Ecuador vs Norway | gana más probable Ecuador | este escenario aparece 10.7%; Ecuador vs Senegal | gana más probable Ecuador | este escenario aparece 10.6%
+- Va a proroga en 28.7% y a penales en 16.9%
+- Marcadores de penales más probables en este cruce: 4-3 (1.8%); 3-4 (1.6%); 4-2 (1.6%)
 
 ### Dieciseisavos 7
 - Cruce usado para este casillero: Mexico vs Scotland
-- Probabilidad de que este cruce ocurra: 10.5%
-- Ganador proyectado del casillero: Mexico (43.4% global)
-- Si se juega ese cruce, Mexico avanza 72.2%.
-- Otros cruces que también aparecen seguido: Mexico vs Morocco | gana más probable Mexico | este escenario aparece 5.6%; Mexico vs Saudi Arabia | gana más probable Mexico | este escenario aparece 5.0%
-- Va a proroga en 27.1% y a penales en 16.0%
-- Marcadores de penales más probables en este cruce: 3-4 (1.8%); 4-3 (1.7%); 4-2 (1.5%)
+- Probabilidad de que este cruce ocurra: 11.1%
+- Ganador proyectado del casillero: Mexico (45.2% global)
+- Si se juega ese cruce, Mexico avanza 72.3%.
+- Otros cruces que también aparecen seguido: Mexico vs Morocco | gana más probable Mexico | este escenario aparece 5.8%; Mexico vs Ivory Coast | gana más probable Mexico | este escenario aparece 5.5%
+- Va a proroga en 26.1% y a penales en 15.3%
+- Marcadores de penales más probables en este cruce: 4-3 (1.7%); 3-4 (1.5%); 4-2 (1.5%)
 
 ### Dieciseisavos 8
 - Cruce usado para este casillero: England vs Uzbekistan
-- Probabilidad de que este cruce ocurra: 23.7%
-- Ganador proyectado del casillero: England (60.0% global)
-- Si se juega ese cruce, England avanza 92.1%.
-- Otros cruces que también aparecen seguido: Croatia vs Uzbekistan | gana más probable Croatia | este escenario aparece 9.2%; England vs Dem. Rep. of Congo | gana más probable England | este escenario aparece 8.8%
-- Va a proroga en 20.9% y a penales en 11.9%
-- Marcadores de penales más probables en este cruce: 4-3 (1.4%); 4-2 (1.4%); 5-4 (1.1%)
+- Probabilidad de que este cruce ocurra: 25.7%
+- Ganador proyectado del casillero: England (63.1% global)
+- Si se juega ese cruce, England avanza 93.8%.
+- Otros cruces que también aparecen seguido: Croatia vs Uzbekistan | gana más probable Croatia | este escenario aparece 9.6%; England vs Dem. Rep. of Congo | gana más probable England | este escenario aparece 9.0%
+- Va a proroga en 18.7% y a penales en 10.3%
+- Marcadores de penales más probables en este cruce: 4-2 (1.3%); 4-3 (1.2%); 5-4 (1.0%)
 
 ### Dieciseisavos 9
 - Cruce usado para este casillero: Turkey vs Bosnia and Herzegovina
-- Probabilidad de que este cruce ocurra: 10.5%
-- Ganador proyectado del casillero: Turkey (34.9% global)
-- Si se juega ese cruce, Turkey avanza 91.1%.
-- Otros cruces que también aparecen seguido: Paraguay vs Bosnia and Herzegovina | gana más probable Paraguay | este escenario aparece 4.8%; Australia vs Bosnia and Herzegovina | gana más probable Australia | este escenario aparece 3.8%
-- Va a proroga en 24.8% y a penales en 14.2%
+- Probabilidad de que este cruce ocurra: 11.5%
+- Ganador proyectado del casillero: Turkey (37.1% global)
+- Si se juega ese cruce, Turkey avanza 91.7%.
+- Otros cruces que también aparecen seguido: Paraguay vs Bosnia and Herzegovina | gana más probable Paraguay | este escenario aparece 4.7%; United States vs Bosnia and Herzegovina | gana más probable United States | este escenario aparece 3.7%
+- Va a proroga en 23.7% y a penales en 13.6%
 - Marcadores de penales más probables en este cruce: 4-3 (1.5%); 4-2 (1.4%); 3-4 (1.3%)
 
 ### Dieciseisavos 10
 - Cruce usado para este casillero: Belgium vs Czech Republic
-- Probabilidad de que este cruce ocurra: 12.8%
-- Ganador proyectado del casillero: Belgium (50.2% global)
-- Si se juega ese cruce, Belgium avanza 78.8%.
-- Otros cruces que también aparecen seguido: Belgium vs South Korea | gana más probable Belgium | este escenario aparece 7.3%; Belgium vs Saudi Arabia | gana más probable Belgium | este escenario aparece 4.6%
-- Va a proroga en 27.7% y a penales en 16.4%
-- Marcadores de penales más probables en este cruce: 3-4 (1.8%); 4-3 (1.6%); 4-2 (1.5%)
+- Probabilidad de que este cruce ocurra: 14.0%
+- Ganador proyectado del casillero: Belgium (53.3% global)
+- Si se juega ese cruce, Belgium avanza 80.9%.
+- Otros cruces que también aparecen seguido: Belgium vs South Korea | gana más probable Belgium | este escenario aparece 7.9%; Belgium vs Saudi Arabia | gana más probable Belgium | este escenario aparece 5.0%
+- Va a proroga en 25.5% y a penales en 15.0%
+- Marcadores de penales más probables en este cruce: 4-3 (1.7%); 4-2 (1.6%); 3-4 (1.4%)
 
 ### Dieciseisavos 11
 - Cruce usado para este casillero: Colombia vs Croatia
-- Probabilidad de que este cruce ocurra: 24.4%
-- Ganador proyectado del casillero: Croatia (27.5% global)
-- Nota de lectura: en ese cruce específico el favorito condicional es Colombia (55.0%), pero Croatia es quien más sale del casillero al sumar todas las rutas simuladas.
-- Otros cruces que también aparecen seguido: Colombia vs Croatia | gana más probable Colombia | este escenario aparece 13.4%; Colombia vs Croatia | gana más probable Croatia | este escenario aparece 11.0%
-- Va a proroga en 29.3% y a penales en 17.8%
-- Marcadores de penales más probables en este cruce: 3-4 (2.0%); 4-3 (1.8%); 2-4 (1.7%)
+- Probabilidad de que este cruce ocurra: 26.7%
+- Ganador proyectado del casillero: Croatia (28.6% global)
+- Nota de lectura: en ese cruce específico el favorito condicional es Colombia (55.4%), pero Croatia es quien más sale del casillero al sumar todas las rutas simuladas.
+- Otros cruces que también aparecen seguido: Portugal vs Croatia | gana más probable Portugal | este escenario aparece 14.2%; Colombia vs Croatia | gana más probable Croatia | este escenario aparece 11.9%
+- Va a proroga en 28.4% y a penales en 16.9%
+- Marcadores de penales más probables en este cruce: 3-4 (1.7%); 4-3 (1.7%); 2-4 (1.6%)
 
 ### Dieciseisavos 12
 - Cruce usado para este casillero: Spain vs Austria
-- Probabilidad de que este cruce ocurra: 46.7%
-- Ganador proyectado del casillero: Spain (77.4% global)
-- Si se juega ese cruce, Spain avanza 91.0%.
-- Otros cruces que también aparecen seguido: Spain vs Algeria | gana más probable Spain | este escenario aparece 15.0%; Spain vs Jordan | gana más probable Spain | este escenario aparece 13.6%
-- Va a proroga en 20.0% y a penales en 11.0%
-- Marcadores de penales más probables en este cruce: 4-3 (1.3%); 5-4 (1.1%); 4-2 (1.1%)
+- Probabilidad de que este cruce ocurra: 50.2%
+- Ganador proyectado del casillero: Spain (79.3% global)
+- Si se juega ese cruce, Spain avanza 91.6%.
+- Otros cruces que también aparecen seguido: Spain vs Algeria | gana más probable Spain | este escenario aparece 14.4%; Spain vs Jordan | gana más probable Spain | este escenario aparece 13.0%
+- Va a proroga en 18.3% y a penales en 10.0%
+- Marcadores de penales más probables en este cruce: 4-3 (1.2%); 4-2 (1.1%); 5-4 (1.0%)
 
 ### Dieciseisavos 13
 - Cruce usado para este casillero: Switzerland vs Egypt
-- Probabilidad de que este cruce ocurra: 10.6%
-- Ganador proyectado del casillero: Switzerland (51.0% global)
-- Si se juega ese cruce, Switzerland avanza 86.6%.
-- Otros cruces que también aparecen seguido: Switzerland vs New Zealand | gana más probable Switzerland | este escenario aparece 5.9%; Switzerland vs Iran | gana más probable Switzerland | este escenario aparece 5.9%
-- Va a proroga en 25.6% y a penales en 15.1%
-- Marcadores de penales más probables en este cruce: 4-3 (1.7%); 3-4 (1.7%); 4-2 (1.6%)
+- Probabilidad de que este cruce ocurra: 10.9%
+- Ganador proyectado del casillero: Switzerland (52.0% global)
+- Si se juega ese cruce, Switzerland avanza 87.8%.
+- Otros cruces que también aparecen seguido: Switzerland vs Iran | gana más probable Switzerland | este escenario aparece 6.4%; Switzerland vs New Zealand | gana más probable Switzerland | este escenario aparece 5.8%
+- Va a proroga en 24.1% y a penales en 13.8%
+- Marcadores de penales más probables en este cruce: 4-3 (1.5%); 4-2 (1.4%); 5-4 (1.2%)
 
 ### Dieciseisavos 14
 - Cruce usado para este casillero: Argentina vs Uruguay
-- Probabilidad de que este cruce ocurra: 64.2%
-- Ganador proyectado del casillero: Argentina (71.0% global)
-- Si se juega ese cruce, Argentina avanza 83.7%.
-- Otros cruces que también aparecen seguido: Argentina vs Uruguay | gana más probable Uruguay | este escenario aparece 10.5%; Argentina vs Saudi Arabia | gana más probable Argentina | este escenario aparece 7.2%
-- Va a proroga en 24.4% y a penales en 14.3%
-- Marcadores de penales más probables en este cruce: 4-3 (1.5%); 5-4 (1.5%); 4-2 (1.4%)
+- Probabilidad de que este cruce ocurra: 67.0%
+- Ganador proyectado del casillero: Argentina (74.0% global)
+- Si se juega ese cruce, Argentina avanza 86.2%.
+- Otros cruces que también aparecen seguido: Argentina vs Uruguay | gana más probable Uruguay | este escenario aparece 9.2%; Argentina vs Saudi Arabia | gana más probable Argentina | este escenario aparece 7.2%
+- Va a proroga en 22.5% y a penales en 12.8%
+- Marcadores de penales más probables en este cruce: 4-3 (1.5%); 4-2 (1.4%); 5-4 (1.3%)
 
 ### Dieciseisavos 15
 - Cruce usado para este casillero: Portugal vs Panama
-- Probabilidad de que este cruce ocurra: 22.2%
-- Ganador proyectado del casillero: Portugal (44.3% global)
-- Si se juega ese cruce, Portugal avanza 89.2%.
-- Otros cruces que también aparecen seguido: Colombia vs Panama | gana más probable Colombia | este escenario aparece 17.4%; Portugal vs Ghana | gana más probable Portugal | este escenario aparece 3.9%
-- Va a proroga en 22.0% y a penales en 12.2%
-- Marcadores de penales más probables en este cruce: 4-3 (1.3%); 5-4 (1.2%); 4-2 (1.2%)
+- Probabilidad de que este cruce ocurra: 23.3%
+- Ganador proyectado del casillero: Portugal (45.3% global)
+- Si se juega ese cruce, Portugal avanza 91.4%.
+- Otros cruces que también aparecen seguido: Colombia vs Panama | gana más probable Colombia | este escenario aparece 18.2%; Portugal vs Ghana | gana más probable Portugal | este escenario aparece 4.0%
+- Va a proroga en 20.6% y a penales en 11.5%
+- Marcadores de penales más probables en este cruce: 4-3 (1.4%); 4-2 (1.2%); 5-4 (1.1%)
 
 ### Dieciseisavos 16
 - Cruce usado para este casillero: Turkey vs Iran
 - Probabilidad de que este cruce ocurra: 11.1%
-- Ganador proyectado del casillero: Turkey (18.8% global)
-- Si se juega ese cruce, Turkey avanza 70.1%.
-- Otros cruces que también aparecen seguido: Paraguay vs Iran | gana más probable Paraguay | este escenario aparece 6.4%; Australia vs Iran | gana más probable Australia | este escenario aparece 5.8%
-- Va a proroga en 30.4% y a penales en 18.0%
-- Marcadores de penales más probables en este cruce: 3-4 (1.9%); 4-2 (1.8%); 4-3 (1.7%)
+- Ganador proyectado del casillero: Turkey (18.9% global)
+- Si se juega ese cruce, Turkey avanza 70.5%.
+- Otros cruces que también aparecen seguido: Paraguay vs Iran | gana más probable Paraguay | este escenario aparece 6.6%; United States vs Iran | gana más probable United States | este escenario aparece 6.1%
+- Va a proroga en 29.3% y a penales en 17.3%
+- Marcadores de penales más probables en este cruce: 4-3 (1.8%); 3-4 (1.8%); 4-2 (1.6%)
 
 ## Octavos de final
 ### Octavos 1
 - Cruce usado para este casillero: Canada vs Germany
-- Probabilidad de que este cruce ocurra: 14.3%
-- Ganador proyectado del casillero: Germany (41.8% global)
-- Si se juega ese cruce, Germany avanza 81.2%.
-- Otros cruces que también aparecen seguido: South Korea vs Germany | gana más probable Germany | este escenario aparece 8.3%; Switzerland vs Germany | gana más probable Germany | este escenario aparece 6.8%
-- Va a proroga en 27.7% y a penales en 16.2%
-- Marcadores de penales más probables en este cruce: 3-4 (1.9%); 2-4 (1.7%); 4-5 (1.5%)
+- Probabilidad de que este cruce ocurra: 15.6%
+- Ganador proyectado del casillero: Germany (44.1% global)
+- Si se juega ese cruce, Germany avanza 81.7%.
+- Otros cruces que también aparecen seguido: South Korea vs Germany | gana más probable Germany | este escenario aparece 8.4%; Switzerland vs Germany | gana más probable Germany | este escenario aparece 8.3%
+- Va a proroga en 26.4% y a penales en 15.4%
+- Marcadores de penales más probables en este cruce: 2-4 (1.7%); 3-4 (1.7%); 4-5 (1.5%)
 
 ### Octavos 2
 - Cruce usado para este casillero: Netherlands vs Brazil
-- Probabilidad de que este cruce ocurra: 34.1%
-- Ganador proyectado del casillero: Brazil (48.3% global)
-- Si se juega ese cruce, Brazil avanza 59.0%.
-- Otros cruces que también aparecen seguido: Netherlands vs Brazil | gana más probable Netherlands | este escenario aparece 14.0%; Japan vs Brazil | gana más probable Brazil | este escenario aparece 9.2%
-- Va a proroga en 29.1% y a penales en 17.3%
-- Marcadores de penales más probables en este cruce: 3-4 (1.9%); 2-4 (1.8%); 4-5 (1.6%)
+- Probabilidad de que este cruce ocurra: 36.6%
+- Ganador proyectado del casillero: Brazil (50.8% global)
+- Si se juega ese cruce, Brazil avanza 60.1%.
+- Otros cruces que también aparecen seguido: Netherlands vs Brazil | gana más probable Netherlands | este escenario aparece 14.6%; Japan vs Brazil | gana más probable Brazil | este escenario aparece 9.6%
+- Va a proroga en 28.0% y a penales en 16.5%
+- Marcadores de penales más probables en este cruce: 3-4 (1.8%); 2-4 (1.7%); 4-5 (1.7%)
 
 ### Octavos 3
 - Cruce usado para este casillero: France vs Norway
-- Probabilidad de que este cruce ocurra: 19.8%
-- Ganador proyectado del casillero: France (64.9% global)
-- Si se juega ese cruce, France avanza 79.5%.
-- Otros cruces que también aparecen seguido: France vs Ecuador | gana más probable France | este escenario aparece 14.0%; France vs Senegal | gana más probable France | este escenario aparece 10.9%
-- Va a proroga en 26.5% y a penales en 15.7%
-- Marcadores de penales más probables en este cruce: 3-4 (1.6%); 4-3 (1.5%); 5-4 (1.5%)
+- Probabilidad de que este cruce ocurra: 21.1%
+- Ganador proyectado del casillero: France (67.9% global)
+- Si se juega ese cruce, France avanza 80.6%.
+- Otros cruces que también aparecen seguido: France vs Ecuador | gana más probable France | este escenario aparece 15.9%; France vs Germany | gana más probable France | este escenario aparece 11.1%
+- Va a proroga en 24.9% y a penales en 14.4%
+- Marcadores de penales más probables en este cruce: 4-3 (1.5%); 4-2 (1.4%); 3-4 (1.4%)
 
 ### Octavos 4
 - Cruce usado para este casillero: Mexico vs England
-- Probabilidad de que este cruce ocurra: 25.7%
-- Ganador proyectado del casillero: England (48.7% global)
-- Si se juega ese cruce, England avanza 76.8%.
-- Otros cruces que también aparecen seguido: South Korea vs England | gana más probable England | este escenario aparece 8.8%; Mexico vs Croatia | gana más probable Croatia | este escenario aparece 7.4%
-- Va a proroga en 26.2% y a penales en 15.1%
-- Marcadores de penales más probables en este cruce: 2-4 (1.6%); 3-4 (1.6%); 4-3 (1.5%)
+- Probabilidad de que este cruce ocurra: 28.4%
+- Ganador proyectado del casillero: England (52.8% global)
+- Si se juega ese cruce, England avanza 80.7%.
+- Otros cruces que también aparecen seguido: South Korea vs England | gana más probable England | este escenario aparece 9.3%; Mexico vs Croatia | gana más probable Croatia | este escenario aparece 7.4%
+- Va a proroga en 24.2% y a penales en 13.9%
+- Marcadores de penales más probables en este cruce: 3-4 (1.6%); 2-4 (1.4%); 4-5 (1.3%)
 
 ### Octavos 5
 - Cruce usado para este casillero: Turkey vs Belgium
-- Probabilidad de que este cruce ocurra: 17.8%
-- Ganador proyectado del casillero: Belgium (29.1% global)
+- Probabilidad de que este cruce ocurra: 19.7%
+- Ganador proyectado del casillero: Belgium (30.9% global)
 - Nota de lectura: en ese cruce específico el favorito condicional es Turkey (51.1%), pero Belgium es quien más sale del casillero al sumar todas las rutas simuladas.
-- Otros cruces que también aparecen seguido: Turkey vs Belgium | gana más probable Belgium | este escenario aparece 8.7%; Paraguay vs Belgium | gana más probable Belgium | este escenario aparece 4.8%
-- Va a proroga en 31.3% y a penales en 18.7%
-- Marcadores de penales más probables en este cruce: 2-4 (2.0%); 4-3 (1.8%); 3-4 (1.7%)
+- Otros cruces que también aparecen seguido: Turkey vs Belgium | gana más probable Belgium | este escenario aparece 9.6%; Paraguay vs Belgium | gana más probable Belgium | este escenario aparece 5.1%
+- Va a proroga en 29.0% y a penales en 17.2%
+- Marcadores de penales más probables en este cruce: 3-4 (1.7%); 4-3 (1.7%); 4-2 (1.5%)
 
 ### Octavos 6
 - Cruce usado para este casillero: Croatia vs Spain
-- Probabilidad de que este cruce ocurra: 21.6%
-- Ganador proyectado del casillero: Spain (62.2% global)
-- Si se juega ese cruce, Spain avanza 82.6%.
-- Otros cruces que también aparecen seguido: Colombia vs Spain | gana más probable Spain | este escenario aparece 14.8%; Portugal vs Spain | gana más probable Spain | este escenario aparece 14.1%
-- Va a proroga en 26.0% y a penales en 15.2%
-- Marcadores de penales más probables en este cruce: 3-4 (1.7%); 4-3 (1.5%); 2-4 (1.4%)
+- Probabilidad de que este cruce ocurra: 22.6%
+- Ganador proyectado del casillero: Spain (63.7% global)
+- Si se juega ese cruce, Spain avanza 83.6%.
+- Otros cruces que también aparecen seguido: Colombia vs Spain | gana más probable Spain | este escenario aparece 15.9%; Portugal vs Spain | gana más probable Spain | este escenario aparece 14.6%
+- Va a proroga en 24.7% y a penales en 14.2%
+- Marcadores de penales más probables en este cruce: 3-4 (1.5%); 2-4 (1.5%); 4-3 (1.4%)
 
 ### Octavos 7
 - Cruce usado para este casillero: Switzerland vs Argentina
-- Probabilidad de que este cruce ocurra: 36.2%
-- Ganador proyectado del casillero: Argentina (60.6% global)
-- Si se juega ese cruce, Argentina avanza 81.4%.
-- Otros cruces que también aparecen seguido: Canada vs Argentina | gana más probable Argentina | este escenario aparece 14.7%; Switzerland vs Argentina | gana más probable Switzerland | este escenario aparece 6.7%
-- Va a proroga en 23.0% y a penales en 13.7%
-- Marcadores de penales más probables en este cruce: 2-4 (1.6%); 3-4 (1.4%); 4-3 (1.2%)
+- Probabilidad de que este cruce ocurra: 38.5%
+- Ganador proyectado del casillero: Argentina (64.0% global)
+- Si se juega ese cruce, Argentina avanza 83.1%.
+- Otros cruces que también aparecen seguido: Canada vs Argentina | gana más probable Argentina | este escenario aparece 16.1%; Switzerland vs Argentina | gana más probable Switzerland | este escenario aparece 6.5%
+- Va a proroga en 22.6% y a penales en 12.8%
+- Marcadores de penales más probables en este cruce: 3-4 (1.4%); 2-4 (1.4%); 4-5 (1.2%)
 
 ### Octavos 8
 - Cruce usado para este casillero: Portugal vs Turkey
-- Probabilidad de que este cruce ocurra: 8.5%
-- Ganador proyectado del casillero: Portugal (35.8% global)
-- Si se juega ese cruce, Portugal avanza 74.5%.
-- Otros cruces que también aparecen seguido: Portugal vs Iran | gana más probable Portugal | este escenario aparece 5.8%; Portugal vs Paraguay | gana más probable Portugal | este escenario aparece 5.7%
-- Va a proroga en 26.8% y a penales en 15.9%
-- Marcadores de penales más probables en este cruce: 4-3 (1.7%); 4-2 (1.7%); 3-4 (1.5%)
+- Probabilidad de que este cruce ocurra: 8.6%
+- Ganador proyectado del casillero: Portugal (36.6% global)
+- Si se juega ese cruce, Portugal avanza 73.5%.
+- Otros cruces que también aparecen seguido: Portugal vs Iran | gana más probable Portugal | este escenario aparece 6.0%; Portugal vs Paraguay | gana más probable Portugal | este escenario aparece 5.9%
+- Va a proroga en 25.4% y a penales en 14.6%
+- Marcadores de penales más probables en este cruce: 4-3 (1.6%); 4-2 (1.4%); 3-4 (1.4%)
 
 ## Cuartos de final
 ### Cuartos 1
 - Cruce usado para este casillero: Germany vs Brazil
-- Probabilidad de que este cruce ocurra: 20.1%
-- Ganador proyectado del casillero: Brazil (34.2% global)
-- Si se juega ese cruce, Brazil avanza 58.6%.
-- Otros cruces que también aparecen seguido: Germany vs Brazil | gana más probable Germany | este escenario aparece 8.3%; Germany vs Netherlands | gana más probable Netherlands | este escenario aparece 6.8%
-- Va a proroga en 29.4% y a penales en 17.9%
-- Marcadores de penales más probables en este cruce: 3-4 (1.8%); 4-3 (1.8%); 5-4 (1.7%)
+- Probabilidad de que este cruce ocurra: 22.5%
+- Ganador proyectado del casillero: Brazil (36.2% global)
+- Si se juega ese cruce, Brazil avanza 59.2%.
+- Otros cruces que también aparecen seguido: Germany vs Brazil | gana más probable Germany | este escenario aparece 9.2%; Ecuador vs Brazil | gana más probable Brazil | este escenario aparece 7.4%
+- Va a proroga en 28.2% y a penales en 16.6%
+- Marcadores de penales más probables en este cruce: 3-4 (1.6%); 4-3 (1.6%); 5-4 (1.5%)
 
 ### Cuartos 2
 - Cruce usado para este casillero: France vs England
-- Probabilidad de que este cruce ocurra: 31.8%
-- Ganador proyectado del casillero: France (43.4% global)
-- Si se juega ese cruce, France avanza 54.3%.
-- Otros cruces que también aparecen seguido: France vs England | gana más probable England | este escenario aparece 14.5%; France vs Croatia | gana más probable France | este escenario aparece 8.3%
-- Va a proroga en 29.7% y a penales en 17.6%
-- Marcadores de penales más probables en este cruce: 4-2 (1.9%); 4-3 (1.8%); 3-4 (1.7%)
+- Probabilidad de que este cruce ocurra: 36.1%
+- Ganador proyectado del casillero: France (45.3% global)
+- Si se juega ese cruce, France avanza 54.7%.
+- Otros cruces que también aparecen seguido: France vs England | gana más probable England | este escenario aparece 16.3%; France vs Croatia | gana más probable France | este escenario aparece 8.8%
+- Va a proroga en 28.2% y a penales en 16.8%
+- Marcadores de penales más probables en este cruce: 4-3 (1.7%); 4-2 (1.7%); 3-4 (1.6%)
 
 ### Cuartos 3
 - Cruce usado para este casillero: Belgium vs Spain
-- Probabilidad de que este cruce ocurra: 18.1%
-- Ganador proyectado del casillero: Spain (54.6% global)
-- Si se juega ese cruce, Spain avanza 86.6%.
-- Otros cruces que también aparecen seguido: Turkey vs Spain | gana más probable Spain | este escenario aparece 11.2%; Paraguay vs Spain | gana más probable Spain | este escenario aparece 4.6%
-- Va a proroga en 23.2% y a penales en 13.6%
-- Marcadores de penales más probables en este cruce: 3-4 (1.5%); 4-5 (1.4%); 2-4 (1.3%)
+- Probabilidad de que este cruce ocurra: 19.7%
+- Ganador proyectado del casillero: Spain (56.5% global)
+- Si se juega ese cruce, Spain avanza 86.8%.
+- Otros cruces que también aparecen seguido: Turkey vs Spain | gana más probable Spain | este escenario aparece 12.5%; Paraguay vs Spain | gana más probable Spain | este escenario aparece 4.5%
+- Va a proroga en 22.1% y a penales en 12.6%
+- Marcadores de penales más probables en este cruce: 2-4 (1.3%); 3-4 (1.3%); 4-5 (1.2%)
 
 ### Cuartos 4
 - Cruce usado para este casillero: Argentina vs Portugal
-- Probabilidad de que este cruce ocurra: 22.0%
-- Ganador proyectado del casillero: Argentina (46.1% global)
-- Si se juega ese cruce, Argentina avanza 68.4%.
-- Otros cruces que también aparecen seguido: Argentina vs Colombia | gana más probable Argentina | este escenario aparece 12.5%; Argentina vs Portugal | gana más probable Portugal | este escenario aparece 6.9%
-- Va a proroga en 28.0% y a penales en 16.3%
-- Marcadores de penales más probables en este cruce: 4-3 (1.8%); 5-4 (1.6%); 4-2 (1.5%)
+- Probabilidad de que este cruce ocurra: 23.5%
+- Ganador proyectado del casillero: Argentina (49.9% global)
+- Si se juega ese cruce, Argentina avanza 71.6%.
+- Otros cruces que también aparecen seguido: Argentina vs Colombia | gana más probable Argentina | este escenario aparece 14.4%; Argentina vs Portugal | gana más probable Portugal | este escenario aparece 6.7%
+- Va a proroga en 26.4% y a penales en 15.6%
+- Marcadores de penales más probables en este cruce: 4-3 (1.7%); 4-2 (1.6%); 5-4 (1.5%)
 
 ## Semifinales
 ### Semifinal 1
 - Cruce usado para este casillero: Brazil vs France
-- Probabilidad de que este cruce ocurra: 14.7%
-- Ganador proyectado del casillero: France (28.6% global)
-- Si se juega ese cruce, France avanza 55.4%.
-- Otros cruces que también aparecen seguido: Brazil vs France | gana más probable Brazil | este escenario aparece 6.6%; Germany vs France | gana más probable France | este escenario aparece 6.1%
-- Va a proroga en 29.9% y a penales en 17.9%
-- Marcadores de penales más probables en este cruce: 5-4 (1.8%); 3-4 (1.8%); 4-3 (1.7%)
+- Probabilidad de que este cruce ocurra: 16.4%
+- Ganador proyectado del casillero: France (30.1% global)
+- Si se juega ese cruce, France avanza 57.4%.
+- Otros cruces que también aparecen seguido: Brazil vs France | gana más probable Brazil | este escenario aparece 7.0%; Germany vs France | gana más probable France | este escenario aparece 6.5%
+- Va a proroga en 28.8% y a penales en 17.0%
+- Marcadores de penales más probables en este cruce: 4-3 (1.7%); 5-4 (1.7%); 4-2 (1.7%)
 
 ### Semifinal 2
 - Cruce usado para este casillero: Spain vs Argentina
-- Probabilidad de que este cruce ocurra: 27.0%
-- Ganador proyectado del casillero: Spain (41.7% global)
-- Si se juega ese cruce, Spain avanza 58.1%.
-- Otros cruces que también aparecen seguido: Spain vs Argentina | gana más probable Argentina | este escenario aparece 11.3%; Spain vs Portugal | gana más probable Spain | este escenario aparece 6.3%
-- Va a proroga en 28.3% y a penales en 17.0%
-- Marcadores de penales más probables en este cruce: 4-3 (1.8%); 4-5 (1.6%); 3-4 (1.6%)
+- Probabilidad de que este cruce ocurra: 30.2%
+- Ganador proyectado del casillero: Spain (41.6% global)
+- Si se juega ese cruce, Spain avanza 56.5%.
+- Otros cruces que también aparecen seguido: Spain vs Argentina | gana más probable Argentina | este escenario aparece 13.2%; Spain vs Portugal | gana más probable Spain | este escenario aparece 6.3%
+- Va a proroga en 27.6% y a penales en 16.1%
+- Marcadores de penales más probables en este cruce: 3-4 (1.7%); 4-5 (1.5%); 2-4 (1.5%)
 
 ## Partido por el tercer puesto
 ### Tercer puesto
 - Cruce usado para este casillero: Brazil vs Argentina
-- Probabilidad de que este cruce ocurra: 3.5%
-- Ganador proyectado del casillero: Argentina (14.5% global)
-- Si se juega ese cruce, Argentina avanza 62.8%.
-- Otros cruces que también aparecen seguido: Brazil vs Spain | gana más probable Spain | este escenario aparece 2.1%; Germany vs Argentina | gana más probable Argentina | este escenario aparece 2.0%
+- Probabilidad de que este cruce ocurra: 3.9%
+- Ganador proyectado del casillero: Argentina (15.3% global)
+- Si se juega ese cruce, Argentina avanza 62.4%.
+- Otros cruces que también aparecen seguido: Brazil vs Spain | gana más probable Spain | este escenario aparece 2.3%; Germany vs Argentina | gana más probable Argentina | este escenario aparece 2.1%
 
 ## Final
 ### Final
 - Cruce usado para este casillero: France vs Spain
-- Probabilidad de que este cruce ocurra: 11.8%
-- Ganador proyectado del casillero: Spain (28.9% global)
-- Si se juega ese cruce, Spain avanza 60.9%.
-- Otros cruces que también aparecen seguido: Brazil vs Spain | gana más probable Spain | este escenario aparece 5.2%; France vs Spain | gana más probable France | este escenario aparece 4.6%
-- Va a proroga en 30.6% y a penales en 18.3%
-- Marcadores de penales más probables en este cruce: 3-4 (1.7%); 4-3 (1.7%); 4-2 (1.6%)
+- Probabilidad de que este cruce ocurra: 12.5%
+- Ganador proyectado del casillero: Spain (28.3% global)
+- Si se juega ese cruce, Spain avanza 60.7%.
+- Otros cruces que también aparecen seguido: Brazil vs Spain | gana más probable Spain | este escenario aparece 5.0%; England vs Spain | gana más probable Spain | este escenario aparece 5.0%
+- Va a proroga en 28.7% y a penales en 17.1%
+- Marcadores de penales más probables en este cruce: 4-3 (1.7%); 3-4 (1.7%); 4-2 (1.6%)
 
 ## Partidos cargados
 
@@ -2879,8 +2879,8 @@ _El Brier 2026 se activa automáticamente con el primer partido terminado; antes
 - Hora UTC: 2026-06-28T19:00:00Z
 - Clima estimado: 26.0 C | HR 70% | viento 11 km/h | estrés 0.06
 - Factores que más pesan ahora: Valor bruto de plantilla -190.312; Minutos Mundial de Clubes +29.155
-- Proyección automática: Cruce usado para este casillero hoy: South Korea vs Canada | probabilidad de que se dé 20.4% | ganador global del casillero: Canada 26.6% | si se juega exactamente este cruce: South Korea 50.0%
-- Otras opciones de cruce: South Korea vs Canada -> Canada 10.2%; Czech Republic vs Canada -> Canada 9.2%
+- Proyección automática: Cruce usado para este casillero hoy: South Korea vs Canada | probabilidad de que se dé 21.0% | ganador global del casillero: Canada 28.3% | si se juega exactamente este cruce: Canada 51.3%
+- Otras opciones de cruce: South Korea vs Canada -> South Korea 10.2%; Czech Republic vs Canada -> Canada 9.8%
 - Marcador proyectado: 1-1
 - Marcador para cargar en Penca: 1-1 | 2.03 pts esp. | exacto 14.1% | diferencia 32.1%
 - Precisión de marcador: Marcador con precisión media | exacto más probable 1-1 14.1% | top-5 cubre 54.8%
@@ -2905,9 +2905,9 @@ _El Brier 2026 se activa automáticamente con el primer partido terminado; antes
 - Quién tiene más probabilidad de avanzar: South Korea 47.4% | Canada 52.6%
 - Si empatan tras 90': gana en prórroga South Korea 18.6% | siguen empatados 60.0% | Canada 21.3%
 - Si llegan a penales: South Korea 50.8% | Canada 49.2%
-- Marcador más probable de la tanda: 4-3
-- Marcador medio esperado en la tanda: South Korea 3.76 | Canada 3.77
-- Marcadores de tanda más probables: 4-3 10.9%, 3-4 10.1%, 2-4 9.2%, 4-5 9.1%, 4-2 8.9%
+- Marcador más probable de la tanda: 4-2
+- Marcador medio esperado en la tanda: South Korea 3.72 | Canada 3.70
+- Marcadores de tanda más probables: 4-2 10.4%, 3-4 10.2%, 4-3 10.0%, 2-4 9.2%, 5-4 8.5%
 - Marcadores más probables: 1-1 14.1%, 0-0 13.0%, 0-1 10.6%, 1-0 9.8%, 1-2 7.3%, 0-2 6.9%, 2-1 6.5%, 2-0 6.1%
 
 ### Dieciseisavos 2: Germany vs Bosnia and Herzegovina
@@ -2918,8 +2918,8 @@ _El Brier 2026 se activa automáticamente con el primer partido terminado; antes
 - Clima estimado: 33.0 C | HR 73% | viento 12 km/h | estrés 0.33
 - Cambio por clima exigente: estrés climático 0.33.
 - Factores que más pesan ahora: Valor bruto de plantilla +1760.557; Minutos Mundial de Clubes +1210.384
-- Proyección automática: Cruce usado para este casillero hoy: Germany vs Bosnia and Herzegovina | probabilidad de que se dé 8.9% | ganador global del casillero: Germany 53.5% | si se juega exactamente este cruce: Germany 94.2%
-- Otras opciones de cruce: Germany vs Czech Republic -> Germany 5.5%; Ecuador vs Bosnia and Herzegovina -> Ecuador 4.5%
+- Proyección automática: Cruce usado para este casillero hoy: Germany vs Bosnia and Herzegovina | probabilidad de que se dé 9.3% | ganador global del casillero: Germany 55.2% | si se juega exactamente este cruce: Germany 95.5%
+- Otras opciones de cruce: Germany vs Czech Republic -> Germany 6.1%; Ecuador vs Bosnia and Herzegovina -> Ecuador 4.9%
 - Marcador proyectado: 2-0
 - Marcador para cargar en Penca: 2-0 | 3.47 pts esp. | exacto 19.1% | diferencia 23.5%
 - Precisión de marcador: Marcador defendible | exacto más probable 2-0 19.1% | top-5 cubre 69.1%
@@ -2945,8 +2945,8 @@ _El Brier 2026 se activa automáticamente con el primer partido terminado; antes
 - Si empatan tras 90': gana en prórroga Germany 43.1% | siguen empatados 51.9% | Bosnia and Herzegovina 5.1%
 - Si llegan a penales: Germany 63.9% | Bosnia and Herzegovina 36.1%
 - Marcador más probable de la tanda: 4-2
-- Marcador medio esperado en la tanda: Germany 3.97 | Bosnia and Herzegovina 3.15
-- Marcadores de tanda más probables: 4-2 15.5%, 4-3 13.6%, 5-4 10.2%, 5-3 7.8%, 3-4 5.8%
+- Marcador medio esperado en la tanda: Germany 3.97 | Bosnia and Herzegovina 3.13
+- Marcadores de tanda más probables: 4-2 15.4%, 4-3 14.7%, 5-4 9.2%, 3-1 7.0%, 3-4 6.6%
 - Marcadores más probables: 2-0 19.1%, 1-0 16.0%, 3-0 16.0%, 0-0 9.2%, 4-0 8.9%, 1-1 5.2%, 2-1 5.0%, 3-1 4.1%
 
 ### Dieciseisavos 3: Netherlands vs Morocco
@@ -2956,8 +2956,8 @@ _El Brier 2026 se activa automáticamente con el primer partido terminado; antes
 - Hora UTC: 2026-06-29T20:30:00Z
 - Clima estimado: 26.0 C | HR 67% | viento 12 km/h | estrés 0.02
 - Factores que más pesan ahora: Minutos Mundial de Clubes +1037.547; Valor bruto de plantilla +640.096
-- Proyección automática: Cruce usado para este casillero hoy: Netherlands vs Morocco | probabilidad de que se dé 29.9% | ganador global del casillero: Netherlands 50.6% | si se juega exactamente este cruce: Netherlands 80.8%
-- Otras opciones de cruce: Netherlands vs Scotland -> Netherlands 18.2%; Japan vs Morocco -> Japan 9.9%
+- Proyección automática: Cruce usado para este casillero hoy: Netherlands vs Morocco | probabilidad de que se dé 30.6% | ganador global del casillero: Netherlands 51.8% | si se juega exactamente este cruce: Netherlands 82.9%
+- Otras opciones de cruce: Netherlands vs Scotland -> Netherlands 18.9%; Japan vs Morocco -> Japan 10.1%
 - Marcador proyectado: 1-0
 - Marcador para cargar en Penca: 1-0 | 2.84 pts esp. | exacto 15.4% | diferencia 25.4%
 - Precisión de marcador: Marcador con precisión media | exacto más probable 1-0 15.4% | top-5 cubre 58.8%
@@ -2982,9 +2982,9 @@ _El Brier 2026 se activa automáticamente con el primer partido terminado; antes
 - Quién tiene más probabilidad de avanzar: Netherlands 78.3% | Morocco 21.7%
 - Si empatan tras 90': gana en prórroga Netherlands 32.7% | siguen empatados 57.0% | Morocco 10.3%
 - Si llegan a penales: Netherlands 55.8% | Morocco 44.2%
-- Marcador más probable de la tanda: 4-3
-- Marcador medio esperado en la tanda: Netherlands 3.92 | Morocco 3.75
-- Marcadores de tanda más probables: 4-3 10.4%, 4-2 9.2%, 5-4 9.1%, 3-4 9.0%, 4-5 8.8%
+- Marcador más probable de la tanda: 4-2
+- Marcador medio esperado en la tanda: Netherlands 3.95 | Morocco 3.68
+- Marcadores de tanda más probables: 4-2 12.7%, 5-4 11.8%, 4-3 10.6%, 3-4 8.9%, 4-5 8.2%
 - Marcadores más probables: 1-0 15.4%, 2-0 13.4%, 0-0 11.2%, 1-1 10.7%, 2-1 8.2%, 3-0 8.1%, 0-1 5.4%, 3-1 5.0%
 
 ### Dieciseisavos 4: Brazil vs Japan
@@ -2995,8 +2995,8 @@ _El Brier 2026 se activa automáticamente con el primer partido terminado; antes
 - Clima estimado: 31.0 C | HR 57% | viento 13 km/h | estrés 0.19
 - Cambio por clima exigente: estrés climático 0.19.
 - Factores que más pesan ahora: Valor bruto de plantilla +764.978; Elo dinámico +100.000
-- Proyección automática: Cruce usado para este casillero hoy: Brazil vs Japan | probabilidad de que se dé 40.0% | ganador global del casillero: Brazil 60.7% | si se juega exactamente este cruce: Brazil 79.3%
-- Otras opciones de cruce: Brazil vs Netherlands -> Brazil 14.7%; Brazil vs Sweden -> Brazil 9.5%
+- Proyección automática: Cruce usado para este casillero hoy: Brazil vs Japan | probabilidad de que se dé 41.6% | ganador global del casillero: Brazil 63.4% | si se juega exactamente este cruce: Brazil 82.1%
+- Otras opciones de cruce: Brazil vs Netherlands -> Brazil 15.6%; Brazil vs Sweden -> Brazil 9.3%
 - Marcador proyectado: 1-0
 - Marcador para cargar en Penca: 2-1 | 2.52 pts esp. | exacto 8.2% | diferencia 24.6%
 - Precisión de marcador: Marcador con precisión media | exacto más probable 1-0 14.3% | top-5 cubre 57.5%
@@ -3022,8 +3022,8 @@ _El Brier 2026 se activa automáticamente con el primer partido terminado; antes
 - Si empatan tras 90': gana en prórroga Brazil 32.0% | siguen empatados 56.8% | Japan 11.2%
 - Si llegan a penales: Brazil 60.5% | Japan 39.5%
 - Marcador más probable de la tanda: 4-2
-- Marcador medio esperado en la tanda: Brazil 4.08 | Japan 3.58
-- Marcadores de tanda más probables: 4-2 13.5%, 4-3 11.3%, 5-4 10.4%, 4-5 7.9%, 3-4 6.7%
+- Marcador medio esperado en la tanda: Brazil 4.12 | Japan 3.54
+- Marcadores de tanda más probables: 4-2 12.7%, 4-3 12.3%, 5-4 11.6%, 5-3 7.7%, 3-4 6.8%
 - Marcadores más probables: 1-0 14.3%, 2-0 12.7%, 1-1 11.4%, 0-0 11.0%, 2-1 8.2%, 3-0 7.5%, 0-1 5.8%, 3-1 5.0%
 
 ### Dieciseisavos 5: France vs Egypt
@@ -3034,8 +3034,8 @@ _El Brier 2026 se activa automáticamente con el primer partido terminado; antes
 - Clima estimado: 32.0 C | HR 55% | viento 15 km/h | estrés 0.20
 - Cambio por clima exigente: estrés climático 0.20.
 - Factores que más pesan ahora: Valor bruto de plantilla +1534.858; Minutos Mundial de Clubes +982.034
-- Proyección automática: Cruce usado para este casillero hoy: France vs Egypt | probabilidad de que se dé 7.1% | ganador global del casillero: France 67.0% | si se juega exactamente este cruce: France 93.4%
-- Otras opciones de cruce: France vs Scotland -> France 6.4%; France vs United States -> France 5.6%
+- Proyección automática: Cruce usado para este casillero hoy: France vs Egypt | probabilidad de que se dé 7.8% | ganador global del casillero: France 70.3% | si se juega exactamente este cruce: France 95.0%
+- Otras opciones de cruce: France vs Scotland -> France 6.7%; France vs Australia -> France 6.0%
 - Marcador proyectado: 2-0
 - Marcador para cargar en Penca: 2-0 | 3.53 pts esp. | exacto 20.0% | diferencia 24.1%
 - Precisión de marcador: Marcador defendible | exacto más probable 2-0 20.0% | top-5 cubre 71.2%
@@ -3061,8 +3061,8 @@ _El Brier 2026 se activa automáticamente con el primer partido terminado; antes
 - Si empatan tras 90': gana en prórroga France 44.6% | siguen empatados 51.1% | Egypt 4.3%
 - Si llegan a penales: France 60.3% | Egypt 39.7%
 - Marcador más probable de la tanda: 4-2
-- Marcador medio esperado en la tanda: France 3.94 | Egypt 3.38
-- Marcadores de tanda más probables: 4-2 13.0%, 4-3 11.4%, 5-4 10.9%, 3-4 6.9%, 4-5 6.5%
+- Marcador medio esperado en la tanda: France 3.96 | Egypt 3.36
+- Marcadores de tanda más probables: 4-2 13.2%, 4-3 12.6%, 5-4 10.4%, 3-4 6.6%, 2-4 5.8%
 - Marcadores más probables: 2-0 20.0%, 1-0 17.6%, 3-0 15.6%, 0-0 9.5%, 4-0 8.6%, 1-1 4.8%, 2-1 4.7%, 5-0 4.0%
 
 ### Dieciseisavos 6: Ecuador vs Norway
@@ -3072,8 +3072,8 @@ _El Brier 2026 se activa automáticamente con el primer partido terminado; antes
 - Hora UTC: 2026-06-30T21:00:00Z
 - Clima estimado: 29.0 C | HR 68% | viento 13 km/h | estrés 0.08
 - Factores que más pesan ahora: Minutos Mundial de Clubes -883.165; Valor bruto de plantilla -86.234
-- Proyección automática: Cruce usado para este casillero hoy: Ecuador vs Norway | probabilidad de que se dé 22.1% | ganador global del casillero: Norway 23.1% | si se juega exactamente este cruce: Norway 56.7%
-- Otras opciones de cruce: Ecuador vs Senegal -> Ecuador 10.0%; Ecuador vs Norway -> Ecuador 9.5%
+- Proyección automática: Cruce usado para este casillero hoy: Ecuador vs Norway | probabilidad de que se dé 23.9% | ganador global del casillero: Ecuador 24.2% | si se juega exactamente este cruce: Norway 55.4%
+- Otras opciones de cruce: Ecuador vs Norway -> Ecuador 10.7%; Ecuador vs Senegal -> Ecuador 10.6%
 - Marcador proyectado: 1-1
 - Marcador para cargar en Penca: 1-1 | 2.05 pts esp. | exacto 14.6% | diferencia 32.3%
 - Precisión de marcador: Marcador con precisión media | exacto más probable 1-1 14.6% | top-5 cubre 54.6%
@@ -3099,8 +3099,8 @@ _El Brier 2026 se activa automáticamente con el primer partido terminado; antes
 - Si empatan tras 90': gana en prórroga Ecuador 19.6% | siguen empatados 60.9% | Norway 19.6%
 - Si llegan a penales: Ecuador 48.2% | Norway 51.8%
 - Marcador más probable de la tanda: 4-3
-- Marcador medio esperado en la tanda: Ecuador 3.74 | Norway 3.76
-- Marcadores de tanda más probables: 4-3 10.4%, 3-4 9.9%, 4-5 9.8%, 4-2 9.3%, 5-4 8.5%
+- Marcador medio esperado en la tanda: Ecuador 3.75 | Norway 3.80
+- Marcadores de tanda más probables: 4-3 11.4%, 4-5 10.3%, 3-4 9.2%, 2-4 8.8%, 5-4 8.2%
 - Marcadores más probables: 1-1 14.6%, 0-0 12.7%, 0-1 10.1%, 1-0 10.0%, 1-2 7.2%, 2-1 7.2%, 0-2 6.5%, 2-0 6.3%
 
 ### Dieciseisavos 7: Mexico vs Scotland
@@ -3110,8 +3110,8 @@ _El Brier 2026 se activa automáticamente con el primer partido terminado; antes
 - Hora UTC: 2026-07-01T01:00:00Z
 - Clima estimado: 22.0 C | HR 56% | viento 12 km/h | estrés 0.02
 - Factores que más pesan ahora: Minutos Mundial de Clubes +964.201; Valor bruto de plantilla +434.312
-- Proyección automática: Cruce usado para este casillero hoy: Mexico vs Scotland | probabilidad de que se dé 10.5% | ganador global del casillero: Mexico 43.4% | si se juega exactamente este cruce: Mexico 72.2%
-- Otras opciones de cruce: Mexico vs Morocco -> Mexico 5.6%; Mexico vs Saudi Arabia -> Mexico 5.0%
+- Proyección automática: Cruce usado para este casillero hoy: Mexico vs Scotland | probabilidad de que se dé 11.1% | ganador global del casillero: Mexico 45.2% | si se juega exactamente este cruce: Mexico 72.3%
+- Otras opciones de cruce: Mexico vs Morocco -> Mexico 5.8%; Mexico vs Ivory Coast -> Mexico 5.5%
 - Marcador proyectado: 1-1
 - Marcador para cargar en Penca: 2-1 | 2.19 pts esp. | exacto 8.3% | diferencia 22.9%
 - Precisión de marcador: Marcador frágil | exacto más probable 1-1 12.8% | top-5 cubre 55.0%
@@ -3136,9 +3136,9 @@ _El Brier 2026 se activa automáticamente con el primer partido terminado; antes
 - Quién tiene más probabilidad de avanzar: Mexico 65.9% | Scotland 34.1%
 - Si empatan tras 90': gana en prórroga Mexico 27.2% | siguen empatados 58.1% | Scotland 14.6%
 - Si llegan a penales: Mexico 50.4% | Scotland 49.6%
-- Marcador más probable de la tanda: 3-4
-- Marcador medio esperado en la tanda: Mexico 3.74 | Scotland 3.70
-- Marcadores de tanda más probables: 3-4 10.1%, 4-3 9.2%, 4-5 9.1%, 5-4 8.8%, 4-2 8.7%
+- Marcador más probable de la tanda: 4-3
+- Marcador medio esperado en la tanda: Mexico 3.71 | Scotland 3.68
+- Marcadores de tanda más probables: 4-3 10.6%, 5-4 10.1%, 4-2 9.7%, 3-4 9.6%, 4-5 8.5%
 - Marcadores más probables: 1-1 12.8%, 1-0 12.3%, 0-0 11.5%, 2-0 10.1%, 2-1 8.3%, 0-1 7.3%, 3-0 5.5%, 1-2 5.2%
 
 ### Dieciseisavos 8: England vs Uzbekistan
@@ -3149,8 +3149,8 @@ _El Brier 2026 se activa automáticamente con el primer partido terminado; antes
 - Clima estimado: 30.0 C | HR 70% | viento 11 km/h | estrés 0.23
 - Cambio por clima exigente: estrés climático 0.23.
 - Factores que más pesan ahora: Valor bruto de plantilla +1365.254; Minutos Mundial de Clubes +913.324
-- Proyección automática: Cruce usado para este casillero hoy: England vs Uzbekistan | probabilidad de que se dé 23.7% | ganador global del casillero: England 60.0% | si se juega exactamente este cruce: England 92.1%
-- Otras opciones de cruce: Croatia vs Uzbekistan -> Croatia 9.2%; England vs Dem. Rep. of Congo -> England 8.8%
+- Proyección automática: Cruce usado para este casillero hoy: England vs Uzbekistan | probabilidad de que se dé 25.7% | ganador global del casillero: England 63.1% | si se juega exactamente este cruce: England 93.8%
+- Otras opciones de cruce: Croatia vs Uzbekistan -> Croatia 9.6%; England vs Dem. Rep. of Congo -> England 9.0%
 - Marcador proyectado: 2-0
 - Marcador para cargar en Penca: 2-0 | 3.41 pts esp. | exacto 19.1% | diferencia 23.6%
 - Precisión de marcador: Marcador con precisión media | exacto más probable 2-0 19.1% | top-5 cubre 68.5%
@@ -3176,8 +3176,8 @@ _El Brier 2026 se activa automáticamente con el primer partido terminado; antes
 - Si empatan tras 90': gana en prórroga England 42.0% | siguen empatados 52.7% | Uzbekistan 5.3%
 - Si llegan a penales: England 59.9% | Uzbekistan 40.1%
 - Marcador más probable de la tanda: 4-2
-- Marcador medio esperado en la tanda: England 3.97 | Uzbekistan 3.28
-- Marcadores de tanda más probables: 4-2 14.2%, 4-3 12.6%, 5-4 10.1%, 5-3 6.7%, 3-4 6.7%
+- Marcador medio esperado en la tanda: England 3.91 | Uzbekistan 3.29
+- Marcadores de tanda más probables: 4-2 13.2%, 4-3 12.4%, 5-4 8.6%, 5-3 6.8%, 3-4 6.4%
 - Marcadores más probables: 2-0 19.1%, 1-0 17.4%, 3-0 14.4%, 0-0 9.9%, 4-0 7.6%, 1-1 5.7%, 2-1 5.3%, 3-1 4.1%
 
 ### Dieciseisavos 9: Turkey vs Bosnia and Herzegovina
@@ -3187,8 +3187,8 @@ _El Brier 2026 se activa automáticamente con el primer partido terminado; antes
 - Hora UTC: 2026-07-01T20:00:00Z
 - Clima estimado: 23.0 C | HR 65% | viento 10 km/h | estrés 0.02
 - Factores que más pesan ahora: Valor bruto de plantilla +1184.881; Minutos Mundial de Clubes +989.555
-- Proyección automática: Cruce usado para este casillero hoy: Turkey vs Bosnia and Herzegovina | probabilidad de que se dé 10.5% | ganador global del casillero: Turkey 34.9% | si se juega exactamente este cruce: Turkey 91.1%
-- Otras opciones de cruce: Paraguay vs Bosnia and Herzegovina -> Paraguay 4.8%; Australia vs Bosnia and Herzegovina -> Australia 3.8%
+- Proyección automática: Cruce usado para este casillero hoy: Turkey vs Bosnia and Herzegovina | probabilidad de que se dé 11.5% | ganador global del casillero: Turkey 37.1% | si se juega exactamente este cruce: Turkey 91.7%
+- Otras opciones de cruce: Paraguay vs Bosnia and Herzegovina -> Paraguay 4.7%; United States vs Bosnia and Herzegovina -> United States 3.7%
 - Marcador proyectado: 2-0
 - Marcador para cargar en Penca: 2-0 | 3.27 pts esp. | exacto 17.8% | diferencia 23.2%
 - Precisión de marcador: Marcador con precisión media | exacto más probable 2-0 17.8% | top-5 cubre 64.0%
@@ -3214,8 +3214,8 @@ _El Brier 2026 se activa automáticamente con el primer partido terminado; antes
 - Si empatan tras 90': gana en prórroga Turkey 40.4% | siguen empatados 53.4% | Bosnia and Herzegovina 6.2%
 - Si llegan a penales: Turkey 53.5% | Bosnia and Herzegovina 46.5%
 - Marcador más probable de la tanda: 4-3
-- Marcador medio esperado en la tanda: Turkey 3.83 | Bosnia and Herzegovina 3.56
-- Marcadores de tanda más probables: 4-3 13.2%, 4-2 11.0%, 5-4 9.2%, 3-4 8.8%, 4-5 7.3%
+- Marcador medio esperado en la tanda: Turkey 3.80 | Bosnia and Herzegovina 3.49
+- Marcadores de tanda más probables: 4-3 12.3%, 4-2 11.4%, 5-4 9.7%, 3-4 9.3%, 4-5 7.2%
 - Marcadores más probables: 2-0 17.8%, 1-0 16.3%, 3-0 12.8%, 0-0 10.0%, 1-1 7.2%, 2-1 6.6%, 4-0 6.5%, 3-1 4.8%
 
 ### Dieciseisavos 10: Belgium vs Czech Republic
@@ -3225,8 +3225,8 @@ _El Brier 2026 se activa automáticamente con el primer partido terminado; antes
 - Hora UTC: 2026-07-02T00:00:00Z
 - Clima estimado: 24.0 C | HR 60% | viento 12 km/h | estrés 0.02
 - Factores que más pesan ahora: Minutos Mundial de Clubes +946.492; Valor bruto de plantilla +798.199
-- Proyección automática: Cruce usado para este casillero hoy: Belgium vs Czech Republic | probabilidad de que se dé 12.8% | ganador global del casillero: Belgium 50.2% | si se juega exactamente este cruce: Belgium 78.8%
-- Otras opciones de cruce: Belgium vs South Korea -> Belgium 7.3%; Belgium vs Saudi Arabia -> Belgium 4.6%
+- Proyección automática: Cruce usado para este casillero hoy: Belgium vs Czech Republic | probabilidad de que se dé 14.0% | ganador global del casillero: Belgium 53.3% | si se juega exactamente este cruce: Belgium 80.9%
+- Otras opciones de cruce: Belgium vs South Korea -> Belgium 7.9%; Belgium vs Saudi Arabia -> Belgium 5.0%
 - Marcador proyectado: 1-0
 - Marcador para cargar en Penca: 2-1 | 2.45 pts esp. | exacto 8.7% | diferencia 24.4%
 - Precisión de marcador: Marcador con precisión media | exacto más probable 1-0 13.6% | top-5 cubre 57.0%
@@ -3253,7 +3253,7 @@ _El Brier 2026 se activa automáticamente con el primer partido terminado; antes
 - Si llegan a penales: Belgium 52.6% | Czech Republic 47.4%
 - Marcador más probable de la tanda: 4-3
 - Marcador medio esperado en la tanda: Belgium 3.89 | Czech Republic 3.56
-- Marcadores de tanda más probables: 4-3 13.4%, 4-2 9.6%, 5-4 9.6%, 3-4 8.6%, 4-5 7.4%
+- Marcadores de tanda más probables: 4-3 11.6%, 4-2 11.6%, 5-4 9.9%, 3-4 8.3%, 4-5 7.2%
 - Marcadores más probables: 1-0 13.6%, 1-1 12.1%, 2-0 11.7%, 0-0 10.9%, 2-1 8.7%, 3-0 6.8%, 0-1 6.0%, 3-1 5.0%
 
 ### Dieciseisavos 11: Colombia vs Croatia
@@ -3263,8 +3263,8 @@ _El Brier 2026 se activa automáticamente con el primer partido terminado; antes
 - Hora UTC: 2026-07-02T19:00:00Z
 - Clima estimado: 26.0 C | HR 70% | viento 11 km/h | estrés 0.06
 - Factores que más pesan ahora: Minutos Mundial de Clubes -1004.117; Valor bruto de plantilla -188.656
-- Proyección automática: Cruce usado para este casillero hoy: Colombia vs Croatia | probabilidad de que se dé 24.4% | ganador global del casillero: Croatia 27.5% | si se juega exactamente este cruce: Colombia 55.0%
-- Otras opciones de cruce: Colombia vs Croatia -> Colombia 13.4%; Colombia vs Croatia -> Croatia 11.0%
+- Proyección automática: Cruce usado para este casillero hoy: Colombia vs Croatia | probabilidad de que se dé 26.7% | ganador global del casillero: Croatia 28.6% | si se juega exactamente este cruce: Colombia 55.4%
+- Otras opciones de cruce: Portugal vs Croatia -> Portugal 14.2%; Colombia vs Croatia -> Croatia 11.9%
 - Marcador proyectado: 1-1
 - Marcador para cargar en Penca: 1-1 | 2.01 pts esp. | exacto 14.2% | diferencia 31.7%
 - Precisión de marcador: Marcador con precisión media | exacto más probable 1-1 14.2% | top-5 cubre 54.5%
@@ -3289,9 +3289,9 @@ _El Brier 2026 se activa automáticamente con el primer partido terminado; antes
 - Quién tiene más probabilidad de avanzar: Colombia 53.6% | Croatia 46.4%
 - Si empatan tras 90': gana en prórroga Colombia 21.5% | siguen empatados 59.9% | Croatia 18.6%
 - Si llegan a penales: Colombia 47.2% | Croatia 52.8%
-- Marcador más probable de la tanda: 2-4
-- Marcador medio esperado en la tanda: Colombia 3.76 | Croatia 3.95
-- Marcadores de tanda más probables: 2-4 11.0%, 3-4 10.9%, 4-5 10.1%, 5-4 8.0%, 4-3 7.8%
+- Marcador más probable de la tanda: 4-5
+- Marcador medio esperado en la tanda: Colombia 3.84 | Croatia 3.98
+- Marcadores de tanda más probables: 4-5 10.1%, 2-4 9.5%, 3-4 9.5%, 5-4 8.8%, 4-2 7.9%
 - Marcadores más probables: 1-1 14.2%, 0-0 12.5%, 1-0 10.8%, 0-1 9.3%, 2-1 7.6%, 2-0 7.2%, 1-2 6.6%, 0-2 5.5%
 
 ### Dieciseisavos 12: Spain vs Austria
@@ -3301,8 +3301,8 @@ _El Brier 2026 se activa automáticamente con el primer partido terminado; antes
 - Hora UTC: 2026-07-02T23:00:00Z
 - Clima estimado: 25.0 C | HR 63% | viento 14 km/h | estrés 0.02
 - Factores que más pesan ahora: Valor bruto de plantilla +595.236; Elo dinámico +353.000
-- Proyección automática: Cruce usado para este casillero hoy: Spain vs Austria | probabilidad de que se dé 46.7% | ganador global del casillero: Spain 77.4% | si se juega exactamente este cruce: Spain 91.0%
-- Otras opciones de cruce: Spain vs Algeria -> Spain 15.0%; Spain vs Jordan -> Spain 13.6%
+- Proyección automática: Cruce usado para este casillero hoy: Spain vs Austria | probabilidad de que se dé 50.2% | ganador global del casillero: Spain 79.3% | si se juega exactamente este cruce: Spain 91.6%
+- Otras opciones de cruce: Spain vs Algeria -> Spain 14.4%; Spain vs Jordan -> Spain 13.0%
 - Marcador proyectado: 2-0
 - Marcador para cargar en Penca: 2-0 | 3.39 pts esp. | exacto 18.2% | diferencia 23.4%
 - Precisión de marcador: Marcador con precisión media | exacto más probable 2-0 18.2% | top-5 cubre 65.4%
@@ -3327,9 +3327,9 @@ _El Brier 2026 se activa automáticamente con el primer partido terminado; antes
 - Quién tiene más probabilidad de avanzar: Spain 90.9% | Austria 9.1%
 - Si empatan tras 90': gana en prórroga Spain 42.3% | siguen empatados 51.7% | Austria 5.9%
 - Si llegan a penales: Spain 56.1% | Austria 43.9%
-- Marcador más probable de la tanda: 4-3
-- Marcador medio esperado en la tanda: Spain 3.99 | Austria 3.66
-- Marcadores de tanda más probables: 4-3 12.6%, 4-2 9.9%, 5-4 9.8%, 4-5 8.9%, 3-4 7.3%
+- Marcador más probable de la tanda: 4-2
+- Marcador medio esperado en la tanda: Spain 3.97 | Austria 3.54
+- Marcadores de tanda más probables: 4-2 12.8%, 4-3 11.9%, 5-4 11.1%, 3-4 7.9%, 2-4 7.1%
 - Marcadores más probables: 2-0 18.2%, 1-0 15.8%, 3-0 14.4%, 0-0 9.1%, 4-0 8.0%, 1-1 6.2%, 2-1 5.7%, 3-1 4.6%
 
 ### Dieciseisavos 13: Switzerland vs Egypt
@@ -3339,8 +3339,8 @@ _El Brier 2026 se activa automáticamente con el primer partido terminado; antes
 - Hora UTC: 2026-07-03T03:00:00Z
 - Clima estimado: 21.0 C | HR 71% | viento 10 km/h | estrés 0.02
 - Factores que más pesan ahora: Valor bruto de plantilla +1013.609; Minutos Mundial de Clubes +882.681
-- Proyección automática: Cruce usado para este casillero hoy: Switzerland vs Egypt | probabilidad de que se dé 10.6% | ganador global del casillero: Switzerland 51.0% | si se juega exactamente este cruce: Switzerland 86.6%
-- Otras opciones de cruce: Switzerland vs New Zealand -> Switzerland 5.9%; Switzerland vs Iran -> Switzerland 5.9%
+- Proyección automática: Cruce usado para este casillero hoy: Switzerland vs Egypt | probabilidad de que se dé 10.9% | ganador global del casillero: Switzerland 52.0% | si se juega exactamente este cruce: Switzerland 87.8%
+- Otras opciones de cruce: Switzerland vs Iran -> Switzerland 6.4%; Switzerland vs New Zealand -> Switzerland 5.8%
 - Marcador proyectado: 1-0
 - Marcador para cargar en Penca: 2-0 | 2.96 pts esp. | exacto 15.4% | diferencia 21.2%
 - Precisión de marcador: Marcador con precisión media | exacto más probable 1-0 16.4% | top-5 cubre 62.0%
@@ -3365,9 +3365,9 @@ _El Brier 2026 se activa automáticamente con el primer partido terminado; antes
 - Quién tiene más probabilidad de avanzar: Switzerland 83.9% | Egypt 16.1%
 - Si empatan tras 90': gana en prórroga Switzerland 36.8% | siguen empatados 55.2% | Egypt 8.0%
 - Si llegan a penales: Switzerland 54.2% | Egypt 45.8%
-- Marcador más probable de la tanda: 4-2
-- Marcador medio esperado en la tanda: Switzerland 3.86 | Egypt 3.57
-- Marcadores de tanda más probables: 4-2 11.6%, 4-3 10.9%, 4-5 9.5%, 5-4 8.9%, 3-4 8.9%
+- Marcador más probable de la tanda: 3-4
+- Marcador medio esperado en la tanda: Switzerland 3.87 | Egypt 3.63
+- Marcadores de tanda más probables: 3-4 10.1%, 5-4 10.0%, 4-3 10.0%, 4-2 9.9%, 4-5 8.2%
 - Marcadores más probables: 1-0 16.4%, 2-0 15.4%, 0-0 10.8%, 3-0 10.2%, 1-1 9.3%, 2-1 7.7%, 3-1 5.0%, 4-0 4.7%
 
 ### Dieciseisavos 14: Argentina vs Uruguay
@@ -3378,8 +3378,8 @@ _El Brier 2026 se activa automáticamente con el primer partido terminado; antes
 - Clima estimado: 32.0 C | HR 55% | viento 15 km/h | estrés 0.20
 - Cambio por clima exigente: estrés climático 0.20.
 - Factores que más pesan ahora: Minutos Mundial de Clubes +1101.132; Valor bruto de plantilla +636.279
-- Proyección automática: Cruce usado para este casillero hoy: Argentina vs Uruguay | probabilidad de que se dé 64.2% | ganador global del casillero: Argentina 71.0% | si se juega exactamente este cruce: Argentina 83.7%
-- Otras opciones de cruce: Argentina vs Uruguay -> Uruguay 10.5%; Argentina vs Saudi Arabia -> Argentina 7.2%
+- Proyección automática: Cruce usado para este casillero hoy: Argentina vs Uruguay | probabilidad de que se dé 67.0% | ganador global del casillero: Argentina 74.0% | si se juega exactamente este cruce: Argentina 86.2%
+- Otras opciones de cruce: Argentina vs Uruguay -> Uruguay 9.2%; Argentina vs Saudi Arabia -> Argentina 7.2%
 - Marcador proyectado: 2-0
 - Marcador para cargar en Penca: 2-0 | 2.96 pts esp. | exacto 15.8% | diferencia 21.4%
 - Precisión de marcador: Marcador con precisión media | exacto más probable 2-0 15.8% | top-5 cubre 62.6%
@@ -3404,9 +3404,9 @@ _El Brier 2026 se activa automáticamente con el primer partido terminado; antes
 - Quién tiene más probabilidad de avanzar: Argentina 83.9% | Uruguay 16.1%
 - Si empatan tras 90': gana en prórroga Argentina 36.7% | siguen empatados 55.5% | Uruguay 7.9%
 - Si llegan a penales: Argentina 55.0% | Uruguay 45.0%
-- Marcador más probable de la tanda: 5-4
-- Marcador medio esperado en la tanda: Argentina 4.02 | Uruguay 3.71
-- Marcadores de tanda más probables: 5-4 10.7%, 4-3 10.5%, 4-2 10.1%, 4-5 7.9%, 2-4 7.1%
+- Marcador más probable de la tanda: 4-2
+- Marcador medio esperado en la tanda: Argentina 3.96 | Uruguay 3.61
+- Marcadores de tanda más probables: 4-2 12.6%, 4-3 10.4%, 5-4 9.9%, 4-5 8.2%, 2-4 7.7%
 - Marcadores más probables: 2-0 15.8%, 1-0 15.7%, 0-0 11.2%, 3-0 10.5%, 1-1 9.4%, 2-1 7.3%, 4-0 4.9%, 3-1 4.9%
 
 ### Dieciseisavos 15: Portugal vs Panama
@@ -3417,8 +3417,8 @@ _El Brier 2026 se activa automáticamente con el primer partido terminado; antes
 - Clima estimado: 31.0 C | HR 74% | viento 15 km/h | estrés 0.28
 - Cambio por clima exigente: estrés climático 0.28.
 - Factores que más pesan ahora: Valor bruto de plantilla +907.391; Minutos Mundial de Clubes +868.839
-- Proyección automática: Cruce usado para este casillero hoy: Portugal vs Panama | probabilidad de que se dé 22.2% | ganador global del casillero: Portugal 44.3% | si se juega exactamente este cruce: Portugal 89.2%
-- Otras opciones de cruce: Colombia vs Panama -> Colombia 17.4%; Portugal vs Ghana -> Portugal 3.9%
+- Proyección automática: Cruce usado para este casillero hoy: Portugal vs Panama | probabilidad de que se dé 23.3% | ganador global del casillero: Portugal 45.3% | si se juega exactamente este cruce: Portugal 91.4%
+- Otras opciones de cruce: Colombia vs Panama -> Colombia 18.2%; Portugal vs Ghana -> Portugal 4.0%
 - Marcador proyectado: 2-0
 - Marcador para cargar en Penca: 2-0 | 3.21 pts esp. | exacto 17.4% | diferencia 22.7%
 - Precisión de marcador: Marcador con precisión media | exacto más probable 2-0 17.4% | top-5 cubre 64.3%
@@ -3444,8 +3444,8 @@ _El Brier 2026 se activa automáticamente con el primer partido terminado; antes
 - Si empatan tras 90': gana en prórroga Portugal 38.9% | siguen empatados 54.0% | Panama 7.1%
 - Si llegan a penales: Portugal 60.4% | Panama 39.6%
 - Marcador más probable de la tanda: 4-3
-- Marcador medio esperado en la tanda: Portugal 3.89 | Panama 3.35
-- Marcadores de tanda más probables: 4-3 13.1%, 4-2 11.6%, 5-4 9.6%, 3-4 8.8%, 3-1 5.9%
+- Marcador medio esperado en la tanda: Portugal 3.85 | Panama 3.33
+- Marcadores de tanda más probables: 4-3 13.8%, 4-2 11.9%, 5-4 9.2%, 3-4 7.4%, 3-1 6.1%
 - Marcadores más probables: 2-0 17.4%, 1-0 16.4%, 3-0 13.0%, 0-0 10.2%, 1-1 7.3%, 4-0 6.5%, 2-1 6.3%, 3-1 4.6%
 
 ### Dieciseisavos 16: Turkey vs Iran
@@ -3455,8 +3455,8 @@ _El Brier 2026 se activa automáticamente con el primer partido terminado; antes
 - Hora UTC: 2026-07-04T01:30:00Z
 - Clima estimado: 30.0 C | HR 63% | viento 14 km/h | estrés 0.16
 - Factores que más pesan ahora: Minutos Mundial de Clubes +844.057; Valor bruto de plantilla +731.090
-- Proyección automática: Cruce usado para este casillero hoy: Turkey vs Iran | probabilidad de que se dé 11.1% | ganador global del casillero: Turkey 18.8% | si se juega exactamente este cruce: Turkey 70.1%
-- Otras opciones de cruce: Paraguay vs Iran -> Paraguay 6.4%; Australia vs Iran -> Australia 5.8%
+- Proyección automática: Cruce usado para este casillero hoy: Turkey vs Iran | probabilidad de que se dé 11.1% | ganador global del casillero: Turkey 18.9% | si se juega exactamente este cruce: Turkey 70.5%
+- Otras opciones de cruce: Paraguay vs Iran -> Paraguay 6.6%; United States vs Iran -> United States 6.1%
 - Marcador proyectado: 1-0
 - Marcador para cargar en Penca: 2-1 | 2.41 pts esp. | exacto 8.8% | diferencia 25.1%
 - Precisión de marcador: Marcador con precisión media | exacto más probable 1-0 14.0% | top-5 cubre 57.6%
@@ -3482,8 +3482,8 @@ _El Brier 2026 se activa automáticamente con el primer partido terminado; antes
 - Si empatan tras 90': gana en prórroga Turkey 29.4% | siguen empatados 58.0% | Iran 12.5%
 - Si llegan a penales: Turkey 53.7% | Iran 46.3%
 - Marcador más probable de la tanda: 4-3
-- Marcador medio esperado en la tanda: Turkey 3.81 | Iran 3.63
-- Marcadores de tanda más probables: 4-3 10.8%, 4-2 10.8%, 5-4 9.2%, 3-4 8.6%, 2-4 8.5%
+- Marcador medio esperado en la tanda: Turkey 3.79 | Iran 3.63
+- Marcadores de tanda más probables: 4-3 11.2%, 3-4 9.8%, 4-2 9.3%, 5-4 9.0%, 2-4 7.9%
 - Marcadores más probables: 1-0 14.0%, 1-1 12.1%, 0-0 11.5%, 2-0 11.2%, 2-1 8.8%, 0-1 6.5%, 3-0 5.9%, 3-1 4.8%
 
 ### Octavos 1: Canada vs Germany
@@ -3494,8 +3494,8 @@ _El Brier 2026 se activa automáticamente con el primer partido terminado; antes
 - Clima estimado: 33.0 C | HR 73% | viento 12 km/h | estrés 0.33
 - Cambio por clima exigente: estrés climático 0.33.
 - Factores que más pesan ahora: Valor bruto de plantilla -851.400; Minutos Mundial de Clubes -142.683
-- Proyección automática: Cruce usado para este casillero hoy: Canada vs Germany | probabilidad de que se dé 14.3% | ganador global del casillero: Germany 41.8% | si se juega exactamente este cruce: Germany 81.2%
-- Otras opciones de cruce: South Korea vs Germany -> Germany 8.3%; Switzerland vs Germany -> Germany 6.8%
+- Proyección automática: Cruce usado para este casillero hoy: Canada vs Germany | probabilidad de que se dé 15.6% | ganador global del casillero: Germany 44.1% | si se juega exactamente este cruce: Germany 81.7%
+- Otras opciones de cruce: South Korea vs Germany -> Germany 8.4%; Switzerland vs Germany -> Germany 8.3%
 - Marcador proyectado: 0-1
 - Marcador para cargar en Penca: 0-2 | 2.67 pts esp. | exacto 13.5% | diferencia 19.5%
 - Precisión de marcador: Marcador con precisión media | exacto más probable 0-1 14.5% | top-5 cubre 57.8%
@@ -3521,8 +3521,8 @@ _El Brier 2026 se activa automáticamente con el primer partido terminado; antes
 - Si empatan tras 90': gana en prórroga Canada 10.1% | siguen empatados 56.3% | Germany 33.6%
 - Si llegan a penales: Canada 37.2% | Germany 62.8%
 - Marcador más probable de la tanda: 2-4
-- Marcador medio esperado en la tanda: Canada 3.30 | Germany 3.98
-- Marcadores de tanda más probables: 2-4 13.9%, 3-4 13.1%, 4-5 10.1%, 3-5 7.2%, 4-3 6.5%
+- Marcador medio esperado en la tanda: Canada 3.33 | Germany 3.96
+- Marcadores de tanda más probables: 2-4 13.8%, 3-4 12.8%, 4-5 10.2%, 4-3 7.6%, 5-4 6.6%
 - Marcadores más probables: 0-1 14.5%, 0-2 13.5%, 1-1 10.7%, 0-0 10.6%, 0-3 8.5%, 1-2 8.1%, 1-0 5.2%, 1-3 5.1%
 
 ### Octavos 2: Netherlands vs Brazil
@@ -3532,8 +3532,8 @@ _El Brier 2026 se activa automáticamente con el primer partido terminado; antes
 - Hora UTC: 2026-07-04T21:00:00Z
 - Clima estimado: 29.0 C | HR 66% | viento 12 km/h | estrés 0.08
 - Factores que más pesan ahora: Valor bruto de plantilla -619.072; Minutos Mundial de Clubes -33.802
-- Proyección automática: Cruce usado para este casillero hoy: Netherlands vs Brazil | probabilidad de que se dé 34.1% | ganador global del casillero: Brazil 48.3% | si se juega exactamente este cruce: Brazil 59.0%
-- Otras opciones de cruce: Netherlands vs Brazil -> Netherlands 14.0%; Japan vs Brazil -> Brazil 9.2%
+- Proyección automática: Cruce usado para este casillero hoy: Netherlands vs Brazil | probabilidad de que se dé 36.6% | ganador global del casillero: Brazil 50.8% | si se juega exactamente este cruce: Brazil 60.1%
+- Otras opciones de cruce: Netherlands vs Brazil -> Netherlands 14.6%; Japan vs Brazil -> Brazil 9.6%
 - Marcador proyectado: 1-1
 - Marcador para cargar en Penca: 1-1 | 1.97 pts esp. | exacto 14.1% | diferencia 31.0%
 - Precisión de marcador: Marcador con precisión media | exacto más probable 1-1 14.1% | top-5 cubre 53.6%
@@ -3558,48 +3558,48 @@ _El Brier 2026 se activa automáticamente con el primer partido terminado; antes
 - Quién tiene más probabilidad de avanzar: Netherlands 39.8% | Brazil 60.2%
 - Si empatan tras 90': gana en prórroga Netherlands 16.5% | siguen empatados 60.1% | Brazil 23.4%
 - Si llegan a penales: Netherlands 44.0% | Brazil 56.0%
-- Marcador más probable de la tanda: 4-5
-- Marcador medio esperado en la tanda: Netherlands 3.76 | Brazil 4.10
-- Marcadores de tanda más probables: 4-5 12.9%, 3-4 11.1%, 2-4 10.2%, 5-4 9.4%, 4-3 7.4%
+- Marcador más probable de la tanda: 2-4
+- Marcador medio esperado en la tanda: Netherlands 3.67 | Brazil 4.09
+- Marcadores de tanda más probables: 2-4 12.1%, 4-5 10.2%, 3-4 9.8%, 5-4 8.8%, 4-3 8.1%
 - Marcadores más probables: 1-1 14.1%, 0-0 11.7%, 0-1 11.3%, 0-2 8.3%, 1-0 8.3%, 1-2 8.0%, 2-1 6.1%, 2-0 4.6%
 
-### Octavos 3: France vs Norway
+### Octavos 3: France vs Ecuador
 - Etapa: Octavos de final
 - Estado: Proyección
 - Sede: MetLife Stadium | United States
 - Hora UTC: 2026-07-05T20:00:00Z
 - Clima estimado: 29.0 C | HR 68% | viento 13 km/h | estrés 0.08
-- Factores que más pesan ahora: Valor bruto de plantilla +620.228; Elo dinámico +141.000
-- Proyección automática: Cruce usado para este casillero hoy: France vs Norway | probabilidad de que se dé 19.8% | ganador global del casillero: France 64.9% | si se juega exactamente este cruce: France 79.5%
-- Otras opciones de cruce: France vs Ecuador -> France 14.0%; France vs Senegal -> France 10.9%
+- Factores que más pesan ahora: Minutos Mundial de Clubes +978.284; Valor bruto de plantilla +706.462
+- Proyección automática: Cruce usado para este casillero hoy: France vs Ecuador | probabilidad de que se dé 19.2% | ganador global del casillero: France 67.9% | si se juega exactamente este cruce: France 82.9%
+- Otras opciones de cruce: France vs Ecuador -> France 15.9%; France vs Germany -> France 11.1%
 - Marcador proyectado: 1-0
-- Marcador para cargar en Penca: 2-0 | 2.74 pts esp. | exacto 14.0% | diferencia 20.1%
-- Precisión de marcador: Marcador con precisión media | exacto más probable 1-0 14.6% | top-5 cubre 58.4%
-- Promedio estimado de goles del modelo: France 1.80 | Norway 0.62
-- Probabilidades de resultado (90'): 64.1% / 24.1% / 11.9%
-- Lectura estadistica: Pick utilizable | pick actual Victoria France 64.1% | confianza 69.6%
-- Escenario de goles: ambos marcan 38.6% | más de 2.5 goles 43.8%
-- Goles totales esperados por el modelo: 2.44. Sin línea externa de goles cargada para ese partido.
-- Probabilidad de que no reciba goles: France 54.2% | Norway 17.7%
-- Cuánta probabilidad cubren los 3 marcadores más probables: 39.1% | ventaja final más probable +1 (24.5%)
+- Marcador para cargar en Penca: 2-0 | 2.77 pts esp. | exacto 14.3% | diferencia 20.3%
+- Precisión de marcador: Marcador con precisión media | exacto más probable 1-0 15.0% | top-5 cubre 59.4%
+- Promedio estimado de goles del modelo: France 1.81 | Ecuador 0.61
+- Probabilidades de resultado (90'): 64.5% / 24.0% / 11.5%
+- Lectura estadistica: Pick utilizable | pick actual Victoria France 64.5% | confianza 70.2%
+- Escenario de goles: ambos marcan 37.5% | más de 2.5 goles 43.1%
+- Goles totales esperados por el modelo: 2.41. Sin línea externa de goles cargada para ese partido.
+- Probabilidad de que no reciba goles: France 55.4% | Ecuador 17.9%
+- Cuánta probabilidad cubren los 3 marcadores más probables: 40.0% | ventaja final más probable +1 (24.7%)
 - Qué tanto coinciden los modelos entre sí: 94.4%
 - Stack estadístico usado: Bivariante Poisson + Poisson independiente + Ajuste de baja anotación + Overdispersión calibrada + ML ligero regularizado + Predictivo bayesiano dinámico + Ensamble + asimetría histórica
-- Factores dominantes: Valor bruto de plantilla +620.228; Elo dinámico +141.000; Minutos Mundial de Clubes +95.119
+- Factores dominantes: Minutos Mundial de Clubes +978.284; Valor bruto de plantilla +706.462; Elo dinámico +130.000
 - Comparativa entre modelos:
-- Bivariante Poisson: victoria France 66.3% | empate 22.8% | victoria Norway 10.9% | marcador más probable 1-0 (16.7%) | peso actual 35.4%
-- Poisson independiente: victoria France 63.6% | empate 26.1% | victoria Norway 10.3% | marcador más probable 2-0 (14.3%) | peso actual 16.1%
-- Ajuste de baja anotación: victoria France 63.6% | empate 26.1% | victoria Norway 10.3% | marcador más probable 2-0 (14.3%) | peso actual 17.1%
-- Overdispersión calibrada: victoria France 63.6% | empate 22.9% | victoria Norway 13.5% | marcador más probable 1-0 (16.0%) | peso actual 7.3%
-- ML ligero regularizado: victoria France 65.4% | empate 22.6% | victoria Norway 11.9% | marcador más probable 1-0 (16.3%) | peso actual 12.6%
-- Predictivo bayesiano dinámico: victoria France 52.8% | empate 26.5% | victoria Norway 20.7% | marcador más probable 1-0 (13.6%) | peso actual 11.5%
-- Ensamble + asimetría histórica: victoria France 64.1% | empate 24.1% | victoria Norway 11.9% | marcador más probable 1-0 (14.6%)
-- Quién tiene más probabilidad de avanzar: France 79.8% | Norway 20.2%
-- Si empatan tras 90': gana en prórroga France 33.8% | siguen empatados 56.1% | Norway 10.1%
-- Si llegan a penales: France 56.5% | Norway 43.5%
-- Marcador más probable de la tanda: 4-3
-- Marcador medio esperado en la tanda: France 3.95 | Norway 3.60
-- Marcadores de tanda más probables: 4-3 11.2%, 4-2 10.9%, 5-4 10.5%, 4-5 8.9%, 3-4 7.8%
-- Marcadores más probables: 1-0 14.6%, 2-0 14.0%, 0-0 10.5%, 1-1 10.4%, 3-0 8.9%, 2-1 8.1%, 3-1 5.2%, 0-1 5.0%
+- Bivariante Poisson: victoria France 66.9% | empate 22.7% | victoria Ecuador 10.4% | marcador más probable 1-0 (17.0%) | peso actual 35.5%
+- Poisson independiente: victoria France 64.2% | empate 25.9% | victoria Ecuador 9.9% | marcador más probable 2-0 (14.6%) | peso actual 16.1%
+- Ajuste de baja anotación: victoria France 64.2% | empate 25.9% | victoria Ecuador 9.9% | marcador más probable 2-0 (14.6%) | peso actual 17.1%
+- Overdispersión calibrada: victoria France 64.1% | empate 22.8% | victoria Ecuador 13.1% | marcador más probable 1-0 (16.3%) | peso actual 7.3%
+- ML ligero regularizado: victoria France 65.5% | empate 22.6% | victoria Ecuador 11.9% | marcador más probable 1-0 (16.3%) | peso actual 12.6%
+- Predictivo bayesiano dinámico: victoria France 53.1% | empate 26.5% | victoria Ecuador 20.5% | marcador más probable 1-0 (13.7%) | peso actual 11.4%
+- Ensamble + asimetría histórica: victoria France 64.5% | empate 24.0% | victoria Ecuador 11.5% | marcador más probable 1-0 (15.0%)
+- Quién tiene más probabilidad de avanzar: France 80.5% | Ecuador 19.5%
+- Si empatan tras 90': gana en prórroga France 33.8% | siguen empatados 56.2% | Ecuador 10.0%
+- Si llegan a penales: France 58.2% | Ecuador 41.8%
+- Marcador más probable de la tanda: 5-4
+- Marcador medio esperado en la tanda: France 4.04 | Ecuador 3.66
+- Marcadores de tanda más probables: 5-4 11.6%, 4-2 11.4%, 4-3 10.9%, 4-5 7.9%, 3-4 7.2%
+- Marcadores más probables: 1-0 15.0%, 2-0 14.3%, 0-0 10.7%, 1-1 10.3%, 3-0 9.1%, 2-1 8.0%, 3-1 5.1%, 0-1 5.0%
 
 ### Octavos 4: Mexico vs England
 - Etapa: Octavos de final
@@ -3608,8 +3608,8 @@ _El Brier 2026 se activa automáticamente con el primer partido terminado; antes
 - Hora UTC: 2026-07-06T00:00:00Z
 - Clima estimado: 22.0 C | HR 56% | viento 12 km/h | estrés 0.02
 - Factores que más pesan ahora: Valor bruto de plantilla -475.764; Elo dinámico -189.000
-- Proyección automática: Cruce usado para este casillero hoy: Mexico vs England | probabilidad de que se dé 25.7% | ganador global del casillero: England 48.7% | si se juega exactamente este cruce: England 76.8%
-- Otras opciones de cruce: South Korea vs England -> England 8.8%; Mexico vs Croatia -> Croatia 7.4%
+- Proyección automática: Cruce usado para este casillero hoy: Mexico vs England | probabilidad de que se dé 28.4% | ganador global del casillero: England 52.8% | si se juega exactamente este cruce: England 80.7%
+- Otras opciones de cruce: South Korea vs England -> England 9.3%; Mexico vs Croatia -> Croatia 7.4%
 - Marcador proyectado: 0-1
 - Marcador para cargar en Penca: 0-2 | 2.81 pts esp. | exacto 14.1% | diferencia 20.4%
 - Precisión de marcador: Marcador con precisión media | exacto más probable 0-1 14.6% | top-5 cubre 57.8%
@@ -3634,9 +3634,9 @@ _El Brier 2026 se activa automáticamente con el primer partido terminado; antes
 - Quién tiene más probabilidad de avanzar: Mexico 19.1% | England 80.9%
 - Si empatan tras 90': gana en prórroga Mexico 9.8% | siguen empatados 55.4% | England 34.8%
 - Si llegan a penales: Mexico 44.5% | England 55.5%
-- Marcador más probable de la tanda: 3-4
-- Marcador medio esperado en la tanda: Mexico 3.69 | England 4.00
-- Marcadores de tanda más probables: 3-4 11.6%, 2-4 10.9%, 4-5 10.4%, 4-3 7.8%, 5-4 7.2%
+- Marcador más probable de la tanda: 2-4
+- Marcador medio esperado en la tanda: Mexico 3.73 | England 4.05
+- Marcadores de tanda más probables: 2-4 10.7%, 3-4 10.7%, 4-5 10.6%, 5-4 7.6%, 4-3 7.6%
 - Marcadores más probables: 0-1 14.6%, 0-2 14.1%, 0-0 10.0%, 1-1 9.8%, 0-3 9.3%, 1-2 8.0%, 1-3 5.3%, 1-0 4.7%
 
 ### Octavos 5: Turkey vs Belgium
@@ -3647,8 +3647,8 @@ _El Brier 2026 se activa automáticamente con el primer partido terminado; antes
 - Clima estimado: 32.0 C | HR 55% | viento 15 km/h | estrés 0.20
 - Cambio por clima exigente: estrés climático 0.20.
 - Factores que más pesan ahora: Minutos Mundial de Clubes -155.328; Valor bruto de plantilla -61.422
-- Proyección automática: Cruce usado para este casillero hoy: Turkey vs Belgium | probabilidad de que se dé 17.8% | ganador global del casillero: Belgium 29.1% | si se juega exactamente este cruce: Turkey 51.1%
-- Otras opciones de cruce: Turkey vs Belgium -> Belgium 8.7%; Paraguay vs Belgium -> Belgium 4.8%
+- Proyección automática: Cruce usado para este casillero hoy: Turkey vs Belgium | probabilidad de que se dé 19.7% | ganador global del casillero: Belgium 30.9% | si se juega exactamente este cruce: Turkey 51.1%
+- Otras opciones de cruce: Turkey vs Belgium -> Belgium 9.6%; Paraguay vs Belgium -> Belgium 5.1%
 - Marcador proyectado: 1-1
 - Marcador para cargar en Penca: 1-1 | 2.04 pts esp. | exacto 14.5% | diferencia 32.1%
 - Precisión de marcador: Marcador con precisión media | exacto más probable 1-1 14.5% | top-5 cubre 53.1%
@@ -3673,9 +3673,9 @@ _El Brier 2026 se activa automáticamente con el primer partido terminado; antes
 - Quién tiene más probabilidad de avanzar: Turkey 49.8% | Belgium 50.2%
 - Si empatan tras 90': gana en prórroga Turkey 19.3% | siguen empatados 61.4% | Belgium 19.3%
 - Si llegan a penales: Turkey 48.4% | Belgium 51.6%
-- Marcador más probable de la tanda: 5-4
-- Marcador medio esperado en la tanda: Turkey 3.79 | Belgium 3.90
-- Marcadores de tanda más probables: 5-4 9.9%, 4-5 9.8%, 3-4 9.5%, 2-4 9.0%, 4-2 8.2%
+- Marcador más probable de la tanda: 3-4
+- Marcador medio esperado en la tanda: Turkey 3.77 | Belgium 3.80
+- Marcadores de tanda más probables: 3-4 10.2%, 5-4 9.7%, 4-3 9.1%, 4-5 8.8%, 2-4 8.8%
 - Marcadores más probables: 1-1 14.5%, 0-0 12.1%, 1-0 9.6%, 0-1 9.5%, 2-1 7.4%, 1-2 7.1%, 0-2 6.4%, 2-0 6.2%
 
 ### Octavos 6: Croatia vs Spain
@@ -3685,8 +3685,8 @@ _El Brier 2026 se activa automáticamente con el primer partido terminado; antes
 - Hora UTC: 2026-07-07T00:00:00Z
 - Clima estimado: 23.0 C | HR 65% | viento 10 km/h | estrés 0.02
 - Factores que más pesan ahora: Minutos Mundial de Clubes +309.415; Valor bruto de plantilla -288.818
-- Proyección automática: Cruce usado para este casillero hoy: Croatia vs Spain | probabilidad de que se dé 21.6% | ganador global del casillero: Spain 62.2% | si se juega exactamente este cruce: Spain 82.6%
-- Otras opciones de cruce: Colombia vs Spain -> Spain 14.8%; Portugal vs Spain -> Spain 14.1%
+- Proyección automática: Cruce usado para este casillero hoy: Croatia vs Spain | probabilidad de que se dé 22.6% | ganador global del casillero: Spain 63.7% | si se juega exactamente este cruce: Spain 83.6%
+- Otras opciones de cruce: Colombia vs Spain -> Spain 15.9%; Portugal vs Spain -> Spain 14.6%
 - Marcador proyectado: 0-1
 - Marcador para cargar en Penca: 0-2 | 2.97 pts esp. | exacto 15.2% | diferencia 21.4%
 - Precisión de marcador: Marcador con precisión media | exacto más probable 0-1 15.3% | top-5 cubre 59.8%
@@ -3712,8 +3712,8 @@ _El Brier 2026 se activa automáticamente con el primer partido terminado; antes
 - Si empatan tras 90': gana en prórroga Croatia 8.7% | siguen empatados 55.0% | Spain 36.4%
 - Si llegan a penales: Croatia 46.7% | Spain 53.3%
 - Marcador más probable de la tanda: 4-5
-- Marcador medio esperado en la tanda: Croatia 3.88 | Spain 4.05
-- Marcadores de tanda más probables: 4-5 11.1%, 2-4 9.9%, 3-4 9.1%, 4-3 8.4%, 5-4 8.4%
+- Marcador medio esperado en la tanda: Croatia 3.88 | Spain 4.08
+- Marcadores de tanda más probables: 4-5 10.6%, 3-4 9.8%, 2-4 9.7%, 4-3 8.5%, 4-2 7.9%
 - Marcadores más probables: 0-1 15.3%, 0-2 15.2%, 0-3 10.5%, 0-0 9.8%, 1-1 9.0%, 1-2 7.7%, 1-3 5.4%, 0-4 5.1%
 
 ### Octavos 7: Switzerland vs Argentina
@@ -3724,8 +3724,8 @@ _El Brier 2026 se activa automáticamente con el primer partido terminado; antes
 - Clima estimado: 30.0 C | HR 70% | viento 11 km/h | estrés 0.23
 - Cambio por clima exigente: estrés climático 0.23.
 - Factores que más pesan ahora: Valor bruto de plantilla -316.379; Minutos Mundial de Clubes -265.725
-- Proyección automática: Cruce usado para este casillero hoy: Switzerland vs Argentina | probabilidad de que se dé 36.2% | ganador global del casillero: Argentina 60.6% | si se juega exactamente este cruce: Argentina 81.4%
-- Otras opciones de cruce: Canada vs Argentina -> Argentina 14.7%; Switzerland vs Argentina -> Switzerland 6.7%
+- Proyección automática: Cruce usado para este casillero hoy: Switzerland vs Argentina | probabilidad de que se dé 38.5% | ganador global del casillero: Argentina 64.0% | si se juega exactamente este cruce: Argentina 83.1%
+- Otras opciones de cruce: Canada vs Argentina -> Argentina 16.1%; Switzerland vs Argentina -> Switzerland 6.5%
 - Marcador proyectado: 0-1
 - Marcador para cargar en Penca: 0-2 | 2.97 pts esp. | exacto 15.5% | diferencia 21.5%
 - Precisión de marcador: Marcador con precisión media | exacto más probable 0-1 15.5% | top-5 cubre 60.7%
@@ -3751,8 +3751,8 @@ _El Brier 2026 se activa automáticamente con el primer partido terminado; antes
 - Si empatan tras 90': gana en prórroga Switzerland 8.6% | siguen empatados 55.3% | Argentina 36.2%
 - Si llegan a penales: Switzerland 42.6% | Argentina 57.4%
 - Marcador más probable de la tanda: 2-4
-- Marcador medio esperado en la tanda: Switzerland 3.55 | Argentina 3.90
-- Marcadores de tanda más probables: 2-4 12.0%, 4-5 10.9%, 3-4 10.2%, 5-4 7.4%, 4-3 7.1%
+- Marcador medio esperado en la tanda: Switzerland 3.54 | Argentina 4.03
+- Marcadores de tanda más probables: 2-4 12.1%, 3-4 11.5%, 4-5 10.1%, 4-3 7.8%, 3-5 7.8%
 - Marcadores más probables: 0-1 15.5%, 0-2 15.5%, 0-3 10.4%, 0-0 10.0%, 1-1 9.1%, 1-2 7.6%, 1-3 5.2%, 0-4 5.0%
 
 ### Octavos 8: Portugal vs Turkey
@@ -3762,8 +3762,8 @@ _El Brier 2026 se activa automáticamente con el primer partido terminado; antes
 - Hora UTC: 2026-07-07T20:00:00Z
 - Clima estimado: 21.0 C | HR 71% | viento 10 km/h | estrés 0.02
 - Factores que más pesan ahora: Elo dinámico +96.000; Minutos Mundial de Clubes -57.377
-- Proyección automática: Cruce usado para este casillero hoy: Portugal vs Turkey | probabilidad de que se dé 8.5% | ganador global del casillero: Portugal 35.8% | si se juega exactamente este cruce: Portugal 74.5%
-- Otras opciones de cruce: Portugal vs Iran -> Portugal 5.8%; Portugal vs Paraguay -> Portugal 5.7%
+- Proyección automática: Cruce usado para este casillero hoy: Portugal vs Turkey | probabilidad de que se dé 8.6% | ganador global del casillero: Portugal 36.6% | si se juega exactamente este cruce: Portugal 73.5%
+- Otras opciones de cruce: Portugal vs Iran -> Portugal 6.0%; Portugal vs Paraguay -> Portugal 5.9%
 - Marcador proyectado: 1-0
 - Marcador para cargar en Penca: 2-1 | 2.32 pts esp. | exacto 8.3% | diferencia 23.5%
 - Precisión de marcador: Marcador frágil | exacto más probable 1-0 13.0% | top-5 cubre 55.8%
@@ -3789,8 +3789,8 @@ _El Brier 2026 se activa automáticamente con el primer partido terminado; antes
 - Si empatan tras 90': gana en prórroga Portugal 28.8% | siguen empatados 57.8% | Turkey 13.4%
 - Si llegan a penales: Portugal 53.5% | Turkey 46.5%
 - Marcador más probable de la tanda: 4-3
-- Marcador medio esperado en la tanda: Portugal 3.87 | Turkey 3.72
-- Marcadores de tanda más probables: 4-3 10.6%, 4-2 10.2%, 4-5 9.1%, 3-4 8.6%, 5-4 8.6%
+- Marcador medio esperado en la tanda: Portugal 3.92 | Turkey 3.78
+- Marcadores de tanda más probables: 4-3 11.0%, 5-4 9.6%, 4-5 8.9%, 4-2 8.9%, 3-4 8.5%
 - Marcadores más probables: 1-0 13.0%, 1-1 12.3%, 0-0 11.2%, 2-0 10.9%, 2-1 8.3%, 0-1 6.6%, 3-0 6.2%, 3-1 4.7%
 
 ### Cuartos 1: Germany vs Brazil
@@ -3800,8 +3800,8 @@ _El Brier 2026 se activa automáticamente con el primer partido terminado; antes
 - Hora UTC: 2026-07-09T20:00:00Z
 - Clima estimado: 26.0 C | HR 67% | viento 12 km/h | estrés 0.02
 - Factores que más pesan ahora: Minutos Mundial de Clubes +172.501; Valor bruto de plantilla -117.217
-- Proyección automática: Cruce usado para este casillero hoy: Germany vs Brazil | probabilidad de que se dé 20.1% | ganador global del casillero: Brazil 34.2% | si se juega exactamente este cruce: Brazil 58.6%
-- Otras opciones de cruce: Germany vs Brazil -> Germany 8.3%; Germany vs Netherlands -> Netherlands 6.8%
+- Proyección automática: Cruce usado para este casillero hoy: Germany vs Brazil | probabilidad de que se dé 22.5% | ganador global del casillero: Brazil 36.2% | si se juega exactamente este cruce: Brazil 59.2%
+- Otras opciones de cruce: Germany vs Brazil -> Germany 9.2%; Ecuador vs Brazil -> Brazil 7.4%
 - Marcador proyectado: 1-1
 - Marcador para cargar en Penca: 1-1 | 1.93 pts esp. | exacto 13.9% | diferencia 30.3%
 - Precisión de marcador: Marcador con precisión media | exacto más probable 1-1 13.9% | top-5 cubre 52.4%
@@ -3827,8 +3827,8 @@ _El Brier 2026 se activa automáticamente con el primer partido terminado; antes
 - Si empatan tras 90': gana en prórroga Germany 16.2% | siguen empatados 60.5% | Brazil 23.3%
 - Si llegan a penales: Germany 50.6% | Brazil 49.4%
 - Marcador más probable de la tanda: 5-4
-- Marcador medio esperado en la tanda: Germany 4.08 | Brazil 4.04
-- Marcadores de tanda más probables: 5-4 10.7%, 4-5 9.7%, 4-3 9.6%, 4-2 9.2%, 3-4 8.1%
+- Marcador medio esperado en la tanda: Germany 4.12 | Brazil 4.12
+- Marcadores de tanda más probables: 5-4 10.8%, 4-5 10.4%, 4-3 9.6%, 4-2 8.1%, 3-4 7.9%
 - Marcadores más probables: 1-1 13.9%, 0-1 11.0%, 0-0 10.9%, 0-2 8.4%, 1-2 8.2%, 1-0 7.7%, 2-1 6.1%, 2-2 4.6%
 
 ### Cuartos 2: France vs England
@@ -3838,8 +3838,8 @@ _El Brier 2026 se activa automáticamente con el primer partido terminado; antes
 - Hora UTC: 2026-07-10T19:00:00Z
 - Clima estimado: 26.0 C | HR 70% | viento 11 km/h | estrés 0.06
 - Factores que más pesan ahora: Valor bruto de plantilla +154.374; Minutos Mundial de Clubes +64.131
-- Proyección automática: Cruce usado para este casillero hoy: France vs England | probabilidad de que se dé 31.8% | ganador global del casillero: France 43.4% | si se juega exactamente este cruce: France 54.3%
-- Otras opciones de cruce: France vs England -> England 14.5%; France vs Croatia -> France 8.3%
+- Proyección automática: Cruce usado para este casillero hoy: France vs England | probabilidad de que se dé 36.1% | ganador global del casillero: France 45.3% | si se juega exactamente este cruce: France 54.7%
+- Otras opciones de cruce: France vs England -> England 16.3%; France vs Croatia -> France 8.8%
 - Marcador proyectado: 1-1
 - Marcador para cargar en Penca: 1-1 | 2.00 pts esp. | exacto 14.2% | diferencia 31.5%
 - Precisión de marcador: Marcador con precisión media | exacto más probable 1-1 14.2% | top-5 cubre 53.5%
@@ -3864,9 +3864,9 @@ _El Brier 2026 se activa automáticamente con el primer partido terminado; antes
 - Quién tiene más probabilidad de avanzar: France 55.1% | England 44.9%
 - Si empatan tras 90': gana en prórroga France 22.4% | siguen empatados 59.2% | England 18.3%
 - Si llegan a penales: France 52.0% | England 48.0%
-- Marcador más probable de la tanda: 4-3
-- Marcador medio esperado en la tanda: France 3.96 | England 3.88
-- Marcadores de tanda más probables: 4-3 11.1%, 4-5 11.1%, 5-4 10.2%, 4-2 9.1%, 3-4 8.6%
+- Marcador más probable de la tanda: 4-5
+- Marcador medio esperado en la tanda: France 3.94 | England 3.91
+- Marcadores de tanda más probables: 4-5 10.2%, 5-4 9.4%, 4-3 8.9%, 4-2 8.7%, 2-4 8.1%
 - Marcadores más probables: 1-1 14.2%, 0-0 12.0%, 1-0 10.5%, 0-1 9.0%, 2-1 7.7%, 2-0 7.2%, 1-2 6.6%, 0-2 5.5%
 
 ### Cuartos 3: Belgium vs Spain
@@ -3877,8 +3877,8 @@ _El Brier 2026 se activa automáticamente con el primer partido terminado; antes
 - Clima estimado: 31.0 C | HR 74% | viento 15 km/h | estrés 0.28
 - Cambio por clima exigente: estrés climático 0.28.
 - Factores que más pesan ahora: Elo dinámico -322.000; Minutos Mundial de Clubes +298.846
-- Proyección automática: Cruce usado para este casillero hoy: Belgium vs Spain | probabilidad de que se dé 18.1% | ganador global del casillero: Spain 54.6% | si se juega exactamente este cruce: Spain 86.6%
-- Otras opciones de cruce: Turkey vs Spain -> Spain 11.2%; Paraguay vs Spain -> Spain 4.6%
+- Proyección automática: Cruce usado para este casillero hoy: Belgium vs Spain | probabilidad de que se dé 19.7% | ganador global del casillero: Spain 56.5% | si se juega exactamente este cruce: Spain 86.8%
+- Otras opciones de cruce: Turkey vs Spain -> Spain 12.5%; Paraguay vs Spain -> Spain 4.5%
 - Marcador proyectado: 0-2
 - Marcador para cargar en Penca: 0-2 | 3.22 pts esp. | exacto 16.9% | diferencia 22.7%
 - Precisión de marcador: Marcador con precisión media | exacto más probable 0-2 16.9% | top-5 cubre 62.5%
@@ -3903,9 +3903,9 @@ _El Brier 2026 se activa automáticamente con el primer partido terminado; antes
 - Quién tiene más probabilidad de avanzar: Belgium 11.9% | Spain 88.1%
 - Si empatan tras 90': gana en prórroga Belgium 7.1% | siguen empatados 53.2% | Spain 39.8%
 - Si llegan a penales: Belgium 45.9% | Spain 54.1%
-- Marcador más probable de la tanda: 4-5
-- Marcador medio esperado en la tanda: Belgium 3.62 | Spain 3.88
-- Marcadores de tanda más probables: 4-5 11.9%, 3-4 11.1%, 2-4 10.3%, 4-3 9.1%, 5-4 8.4%
+- Marcador más probable de la tanda: 3-4
+- Marcador medio esperado en la tanda: Belgium 3.59 | Spain 3.91
+- Marcadores de tanda más probables: 3-4 12.3%, 2-4 10.3%, 4-5 10.1%, 5-4 8.6%, 4-3 7.6%
 - Marcadores más probables: 0-2 16.9%, 0-1 15.9%, 0-3 12.4%, 0-0 9.7%, 1-1 7.6%, 1-2 6.7%, 0-4 6.5%, 1-3 5.1%
 
 ### Cuartos 4: Argentina vs Portugal
@@ -3915,8 +3915,8 @@ _El Brier 2026 se activa automáticamente con el primer partido terminado; antes
 - Hora UTC: 2026-07-12T01:00:00Z
 - Clima estimado: 30.0 C | HR 63% | viento 14 km/h | estrés 0.16
 - Factores que más pesan ahora: Valor bruto de plantilla +432.399; Minutos Mundial de Clubes +311.490
-- Proyección automática: Cruce usado para este casillero hoy: Argentina vs Portugal | probabilidad de que se dé 22.0% | ganador global del casillero: Argentina 46.1% | si se juega exactamente este cruce: Argentina 68.4%
-- Otras opciones de cruce: Argentina vs Colombia -> Argentina 12.5%; Argentina vs Portugal -> Portugal 6.9%
+- Proyección automática: Cruce usado para este casillero hoy: Argentina vs Portugal | probabilidad de que se dé 23.5% | ganador global del casillero: Argentina 49.9% | si se juega exactamente este cruce: Argentina 71.6%
+- Otras opciones de cruce: Argentina vs Colombia -> Argentina 14.4%; Argentina vs Portugal -> Portugal 6.7%
 - Marcador proyectado: 1-0
 - Marcador para cargar en Penca: 2-1 | 2.41 pts esp. | exacto 8.4% | diferencia 23.9%
 - Precisión de marcador: Marcador frágil | exacto más probable 1-0 13.4% | top-5 cubre 58.0%
@@ -3942,8 +3942,8 @@ _El Brier 2026 se activa automáticamente con el primer partido terminado; antes
 - Si empatan tras 90': gana en prórroga Argentina 30.0% | siguen empatados 58.1% | Portugal 11.9%
 - Si llegan a penales: Argentina 54.9% | Portugal 45.1%
 - Marcador más probable de la tanda: 4-3
-- Marcador medio esperado en la tanda: Argentina 4.01 | Portugal 3.74
-- Marcadores de tanda más probables: 4-3 11.2%, 4-2 11.1%, 3-4 9.8%, 5-4 9.7%, 4-5 9.1%
+- Marcador medio esperado en la tanda: Argentina 4.03 | Portugal 3.71
+- Marcadores de tanda más probables: 4-3 12.6%, 5-4 11.4%, 4-2 10.1%, 4-5 8.8%, 2-4 8.1%
 - Marcadores más probables: 1-0 13.4%, 1-1 12.5%, 0-0 11.9%, 2-0 11.8%, 2-1 8.4%, 3-0 6.7%, 0-1 5.7%, 3-1 4.9%
 
 ### Semifinal 1: Brazil vs France
@@ -3954,8 +3954,8 @@ _El Brier 2026 se activa automáticamente con el primer partido terminado; antes
 - Clima estimado: 32.0 C | HR 55% | viento 15 km/h | estrés 0.20
 - Cambio por clima exigente: estrés climático 0.20.
 - Factores que más pesan ahora: Valor bruto de plantilla +95.080; Elo dinámico -85.000
-- Proyección automática: Cruce usado para este casillero hoy: Brazil vs France | probabilidad de que se dé 14.7% | ganador global del casillero: France 28.6% | si se juega exactamente este cruce: France 55.4%
-- Otras opciones de cruce: Brazil vs France -> Brazil 6.6%; Germany vs France -> France 6.1%
+- Proyección automática: Cruce usado para este casillero hoy: Brazil vs France | probabilidad de que se dé 16.4% | ganador global del casillero: France 30.1% | si se juega exactamente este cruce: France 57.4%
+- Otras opciones de cruce: Brazil vs France -> Brazil 7.0%; Germany vs France -> France 6.5%
 - Marcador proyectado: 1-1
 - Marcador para cargar en Penca: 1-1 | 1.95 pts esp. | exacto 13.8% | diferencia 30.7%
 - Precisión de marcador: Marcador con precisión media | exacto más probable 1-1 13.8% | top-5 cubre 53.6%
@@ -3980,9 +3980,9 @@ _El Brier 2026 se activa automáticamente con el primer partido terminado; antes
 - Quién tiene más probabilidad de avanzar: Brazil 40.9% | France 59.1%
 - Si empatan tras 90': gana en prórroga Brazil 15.9% | siguen empatados 61.0% | France 23.0%
 - Si llegan a penales: Brazil 53.0% | France 47.0%
-- Marcador más probable de la tanda: 5-4
-- Marcador medio esperado en la tanda: Brazil 4.07 | France 3.86
-- Marcadores de tanda más probables: 5-4 11.4%, 4-3 9.2%, 4-5 9.1%, 4-2 8.5%, 3-4 7.7%
+- Marcador más probable de la tanda: 4-3
+- Marcador medio esperado en la tanda: Brazil 3.98 | France 3.83
+- Marcadores de tanda más probables: 4-3 10.6%, 5-4 10.4%, 4-2 9.4%, 4-5 9.1%, 2-4 8.2%
 - Marcadores más probables: 1-1 13.8%, 0-0 11.8%, 0-1 11.4%, 0-2 8.3%, 1-0 8.3%, 1-2 8.2%, 2-1 5.9%, 2-0 4.6%
 
 ### Semifinal 2: Spain vs Argentina
@@ -3993,8 +3993,8 @@ _El Brier 2026 se activa automáticamente con el primer partido terminado; antes
 - Clima estimado: 30.0 C | HR 70% | viento 11 km/h | estrés 0.23
 - Cambio por clima exigente: estrés climático 0.23.
 - Factores que más pesan ahora: Minutos Mundial de Clubes -397.631; Valor bruto de plantilla -62.815
-- Proyección automática: Cruce usado para este casillero hoy: Spain vs Argentina | probabilidad de que se dé 27.0% | ganador global del casillero: Spain 41.7% | si se juega exactamente este cruce: Spain 58.1%
-- Otras opciones de cruce: Spain vs Argentina -> Argentina 11.3%; Spain vs Portugal -> Spain 6.3%
+- Proyección automática: Cruce usado para este casillero hoy: Spain vs Argentina | probabilidad de que se dé 30.2% | ganador global del casillero: Spain 41.6% | si se juega exactamente este cruce: Spain 56.5%
+- Otras opciones de cruce: Spain vs Argentina -> Argentina 13.2%; Spain vs Portugal -> Spain 6.3%
 - Marcador proyectado: 1-1
 - Marcador para cargar en Penca: 1-1 | 1.98 pts esp. | exacto 14.0% | diferencia 31.2%
 - Precisión de marcador: Marcador con precisión media | exacto más probable 1-1 14.0% | top-5 cubre 53.8%
@@ -4020,8 +4020,8 @@ _El Brier 2026 se activa automáticamente con el primer partido terminado; antes
 - Si empatan tras 90': gana en prórroga Spain 23.1% | siguen empatados 59.7% | Argentina 17.2%
 - Si llegan a penales: Spain 47.3% | Argentina 52.7%
 - Marcador más probable de la tanda: 4-5
-- Marcador medio esperado en la tanda: Spain 3.85 | Argentina 3.98
-- Marcadores de tanda más probables: 4-5 12.1%, 3-4 9.9%, 2-4 9.2%, 4-2 8.4%, 5-4 8.2%
+- Marcador medio esperado en la tanda: Spain 3.87 | Argentina 4.01
+- Marcadores de tanda más probables: 4-5 10.4%, 2-4 10.4%, 3-4 10.0%, 5-4 9.1%, 4-3 8.4%
 - Marcadores más probables: 1-1 14.0%, 0-0 12.0%, 1-0 11.3%, 0-1 8.6%, 2-0 8.0%, 2-1 7.9%, 1-2 6.1%, 0-2 4.8%
 
 ### Final: France vs Spain
@@ -4031,8 +4031,8 @@ _El Brier 2026 se activa automáticamente con el primer partido terminado; antes
 - Hora UTC: 2026-07-19T19:00:00Z
 - Clima estimado: 29.0 C | HR 68% | viento 13 km/h | estrés 0.08
 - Factores que más pesan ahora: Valor bruto de plantilla +267.685; Minutos Mundial de Clubes +231.258
-- Proyección automática: Cruce usado para este casillero hoy: France vs Spain | probabilidad de que se dé 11.8% | ganador global del casillero: Spain 28.9% | si se juega exactamente este cruce: Spain 60.9%
-- Otras opciones de cruce: Brazil vs Spain -> Spain 5.2%; France vs Spain -> France 4.6%
+- Proyección automática: Cruce usado para este casillero hoy: France vs Spain | probabilidad de que se dé 12.5% | ganador global del casillero: Spain 28.3% | si se juega exactamente este cruce: Spain 60.7%
+- Otras opciones de cruce: Brazil vs Spain -> Spain 5.0%; England vs Spain -> Spain 5.0%
 - Marcador proyectado: 1-1
 - Marcador para cargar en Penca: 1-2 | 2.14 pts esp. | exacto 8.4% | diferencia 22.9%
 - Precisión de marcador: Marcador frágil | exacto más probable 1-1 13.3% | top-5 cubre 54.5%
@@ -4057,9 +4057,9 @@ _El Brier 2026 se activa automáticamente con el primer partido terminado; antes
 - Quién tiene más probabilidad de avanzar: France 36.2% | Spain 63.8%
 - Si empatan tras 90': gana en prórroga France 14.9% | siguen empatados 59.0% | Spain 26.2%
 - Si llegan a penales: France 51.5% | Spain 48.5%
-- Marcador más probable de la tanda: 5-4
-- Marcador medio esperado en la tanda: France 3.98 | Spain 3.88
-- Marcadores de tanda más probables: 5-4 11.7%, 4-5 10.3%, 3-4 9.3%, 4-2 8.9%, 2-4 8.3%
+- Marcador más probable de la tanda: 4-3
+- Marcador medio esperado en la tanda: France 3.95 | Spain 3.85
+- Marcadores de tanda más probables: 4-3 10.6%, 5-4 10.0%, 3-4 9.3%, 4-2 8.9%, 4-5 8.8%
 - Marcadores más probables: 1-1 13.3%, 0-1 12.1%, 0-0 11.3%, 0-2 9.3%, 1-2 8.4%, 1-0 7.4%, 2-1 5.4%, 0-3 4.8%
 
 ### Tercer puesto: Brazil vs Argentina
@@ -4070,8 +4070,8 @@ _El Brier 2026 se activa automáticamente con el primer partido terminado; antes
 - Clima estimado: 31.0 C | HR 74% | viento 15 km/h | estrés 0.28
 - Cambio por clima exigente: estrés climático 0.28.
 - Factores que más pesan ahora: Valor bruto de plantilla +299.949; Minutos Mundial de Clubes -205.785
-- Proyección automática: Cruce usado para este casillero hoy: Brazil vs Argentina | probabilidad de que se dé 3.5% | ganador global del casillero: Argentina 14.5% | si se juega exactamente este cruce: Argentina 62.8%
-- Otras opciones de cruce: Brazil vs Spain -> Spain 2.1%; Germany vs Argentina -> Argentina 2.0%
+- Proyección automática: Cruce usado para este casillero hoy: Brazil vs Argentina | probabilidad de que se dé 3.9% | ganador global del casillero: Argentina 15.3% | si se juega exactamente este cruce: Argentina 62.4%
+- Otras opciones de cruce: Brazil vs Spain -> Spain 2.3%; Germany vs Argentina -> Argentina 2.1%
 - Marcador proyectado: 1-1
 - Marcador para cargar en Penca: 1-2 | 2.20 pts esp. | exacto 8.5% | diferencia 23.4%
 - Precisión de marcador: Marcador frágil | exacto más probable 1-1 13.1% | top-5 cubre 55.3%
@@ -4097,6 +4097,6 @@ _El Brier 2026 se activa automáticamente con el primer partido terminado; antes
 - Si empatan tras 90': gana en prórroga Brazil 14.6% | siguen empatados 58.2% | Argentina 27.2%
 - Si llegan a penales: Brazil 51.8% | Argentina 48.2%
 - Marcador más probable de la tanda: 5-4
-- Marcador medio esperado en la tanda: Brazil 4.00 | Argentina 3.91
-- Marcadores de tanda más probables: 5-4 10.9%, 4-2 9.6%, 3-4 9.1%, 4-3 9.0%, 4-5 8.8%
+- Marcador medio esperado en la tanda: Brazil 3.96 | Argentina 3.94
+- Marcadores de tanda más probables: 5-4 10.1%, 3-4 10.0%, 4-5 9.9%, 4-3 8.8%, 4-2 8.5%
 - Marcadores más probables: 1-1 13.1%, 0-1 12.6%, 0-0 11.4%, 0-2 9.7%, 1-2 8.5%, 1-0 7.3%, 2-1 5.1%, 0-3 5.0%

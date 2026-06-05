@@ -1,14 +1,21 @@
 {
-  "updated_at_utc": "2026-06-03T23:53:40+00:00",
-  "publication_updated_at_utc": "2026-06-03T23:53:40+00:00",
-  "dashboard_updated_at_utc": "2026-06-03T23:52:18+00:00",
+  "updated_at_utc": "2026-06-05T15:29:51+00:00",
+  "publication_updated_at_utc": "2026-06-05T15:29:51+00:00",
+  "dashboard_updated_at_utc": "2026-06-05T15:28:12+00:00",
   "timestamp_consistency_note": "latest.json se escribe despues de copiar el HTML; compara dashboard_updated_at_utc contra publication_updated_at_utc para detectar desfases reales de publicacion o cache.",
   "refresh_interval_minutes": 5,
   "live_refresh_interval_minutes": 5,
+  "scoreline_refresh_interval_minutes": 5,
+  "fast_dashboard_refresh_interval_minutes": 5,
   "deep_bracket_refresh_interval_minutes": 60,
+  "deep_bracket_minimum_iterations": 15000,
+  "full_100k_bracket_refresh_interval_minutes": 1440,
+  "full_100k_bracket_workflow": "quiniela-100k.yml",
+  "full_100k_bracket_update_policy": "La llave 100k no corre cada 5 minutos: se publica de madrugada, se puede lanzar manualmente despues de cambios grandes, tambien corre tras push relevante de modelo/datos, y el tablero live de 5 minutos sigue usando la ultima llave profunda publicada.",
+  "update_policy_summary": "Marcadores, picks y lectura in-play: cada 5 minutos. Llave profunda minima 15k: cada 60 minutos. Llave completa 100k: diaria/manual/push relevante por costo de computo.",
   "in_play_enabled": true,
   "delivery": "github_actions_pages",
-  "monte_carlo_iterations": 15000,
+  "monte_carlo_iterations": 100000,
   "scoreline_engine": "ensamble_no_solo_poisson_bayes_dinamico_v2",
   "explicit_variable_blocks": [
     "squad_market_value",
@@ -22,7 +29,7 @@
     "granular_penalties_taker_keeper_pressure_matchup"
   ],
   "bracket_recalculated_from_scoreline_ensemble": true,
-  "bracket_recalculation_policy": "Los marcadores directos se refrescan cada 5 minutos. La llave completa se reconstruye con 15.000 simulaciones en el carril profundo cada hora y en ejecuciones manuales o push; si cambian marcadores, estados o se\u00f1ales relevantes, se propagan en la siguiente corrida profunda.",
+  "bracket_recalculation_policy": "Corte pre-torneo manual de 100.000 simulaciones. Durante el Mundial, solo deben actualizarse datos de estado, resultados, lesiones, sanciones, alineaciones, descanso, fatiga, grupo y mercado; no pesos ni metodologia salvo bug real.",
   "live_feed_stack": [
     "espn_scoreboard"
   ],

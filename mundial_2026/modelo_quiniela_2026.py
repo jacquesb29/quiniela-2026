@@ -3956,7 +3956,13 @@ def command_project_bracket(args: argparse.Namespace, teams: Dict[str, Team]) ->
         "workers": workers,
         "scoreline_engine": "ensamble_no_solo_poisson_bayes_dinamico_v2",
         "bracket_recalculated_from_scoreline_ensemble": True,
-        "recalculation_policy": "Los marcadores directos se refrescan cada 5 minutos. La llave completa se reconstruye con 15.000 simulaciones en el carril profundo cada hora y en ejecuciones manuales o push; si cambian marcadores, estados o señales relevantes, se propagan en la siguiente corrida profunda.",
+        "recalculation_policy": (
+            f"Los marcadores directos se refrescan cada 5 minutos. La llave completa se reconstruye con "
+            f"{args.iterations:,} simulaciones en esta corrida; el mínimo operativo del carril profundo es "
+            "15.000. La llave 100.000 corre en un carril nocturno/manual/push relevante separado por costo de cómputo. "
+            "Si cambian marcadores, estados o señales relevantes, se propagan primero en el tablero live "
+            "de 5 minutos y después en la siguiente corrida profunda."
+        ).replace(",", "."),
         "matches": {
             match_id: structured_match_projection(match_id, aggregate, args.iterations)
             for match_id, aggregate in match_aggregate.items()
@@ -8176,7 +8182,7 @@ def external_estimator_methodology_items() -> List[dict]:
         {
             "name": "Monte Carlo de torneo",
             "signal": "Miles de rutas completas para grupos, cruces, prorroga, penales y dependencias de llave.",
-            "usage": "15.000 simulaciones por corrida para que una victoria real recalcule cruces y probabilidades posteriores.",
+            "usage": "Mínimo operativo de 15.000 simulaciones por corrida; los cortes pretorneo profundos pueden subir a 100.000 para estabilizar llave, campeón y marcadores.",
         },
         {
             "name": "Bradley-Terry jerárquico dinámico",
@@ -8595,12 +8601,14 @@ def build_dark_horses_html(bracket_payload: dict, entries: Optional[Sequence[dic
         )
     leader = candidates[0]
     external_count = sum(1 for candidate in candidates if candidate["external_url"])
+    iterations = int(bracket_payload.get("iterations", 0) or 0)
+    iterations_label = f"{iterations:,}".replace(",", ".") if iterations else "sin dato"
     return (
         "<section class=\"panel dark-horse-panel\" id=\"tapados\">"
         "<div class=\"panel-head\"><div>"
         "<p class=\"eyebrow\">Radar de tapados</p>"
         "<h2>Tapados con ruta realista</h2>"
-        "<p class=\"lede-tight\">Este módulo busca equipos capaces de romper la llave sin disfrazarlos de favoritos. Combina la ruta vigente de 15.000 simulaciones Monte Carlo, la probabilidad calibrada de campeón y señales externas recientes. El índice de vigilancia ordena alertas; no es una probabilidad de título. La señal editorial solo activa vigilancia: no reemplaza la llave base ni maquilla el pronóstico.</p>"
+        f"<p class=\"lede-tight\">Este módulo busca equipos capaces de romper la llave sin disfrazarlos de favoritos. Combina la ruta vigente de {iterations_label} simulaciones Monte Carlo, la probabilidad calibrada de campeón y señales externas recientes. El índice de vigilancia ordena alertas; no es una probabilidad de título. La señal editorial solo activa vigilancia: no reemplaza la llave base ni maquilla el pronóstico.</p>"
         "</div></div>"
         "<div class=\"confidence-tiles\">"
         f"<div class=\"summary-tile\"><span>Tapados vigilados</span><strong>{len(candidates)}</strong><small>Se recalculan con cada corrida y cambian si cambia la llave.</small></div>"
@@ -9037,7 +9045,7 @@ def agentic_learning_items() -> List[dict]:
         },
         {
             "agent": "Agente auditor",
-            "job": "Bloquea publicación si faltan 15.000 simulaciones, llave coherente, consenso, goles, auditoría o refresh de 5 minutos.",
+            "job": "Bloquea publicación si falta el mínimo operativo de simulaciones, llave coherente, consenso, goles, auditoría o refresh de 5 minutos.",
             "learns": "Cada falla deja una regla verificable para que el pipeline no publique una versión incompleta.",
         },
     ]
@@ -9484,7 +9492,7 @@ def build_agentic_learning_html(entries: Sequence[dict], bracket_payload: dict, 
         "</div></div>"
         "<div class=\"confidence-tiles\">"
         f"{tile('Monte Carlo activo', iterations_label + ' simulaciones', 'La auditoría exige al menos 15.000 por corrida.')}"
-        f"{tile('Eficiencia operativa', 'live ligero cada 5 min', 'El carril live publica rápido; la llave profunda de 15.000 simulaciones corre por separado.')}"
+        f"{tile('Eficiencia operativa', 'live ligero cada 5 min', f'El carril live publica rápido; la llave profunda vigente usa {iterations_label} simulaciones en esta corrida.')}"
         f"{tile('Datos ya incorporados', f'{final_count} final / {live_count} live', f'Además {projected_count} cruces de llave recalculables.')}"
         f"{tile('Noticias multi-fuente', 'No solo ESPN', f'Fuente activa visible: {source_label}; stack preparado: {prepared_stack}.')}"
         "</div>"
@@ -9496,8 +9504,8 @@ def build_agentic_learning_html(entries: Sequence[dict], bracket_payload: dict, 
         f"{source_rows}"
         "</ul></article>"
         "<article><h3>Qué tan eficiente es</h3><ul>"
-        f"<li><strong>15.000 simulaciones</strong><span>La llave se calcula con rutas completas de torneo, no solo favoritos sueltos.</span><em>Más iteraciones reducen ruido Monte Carlo; no convierten un pick incierto en seguro.</em></li>"
-        f"<li><strong>Refresh live cada 5 minutos</strong><span>GitHub Actions reconstruye el tablero ligero y recalcula in-play cuando el feed trae cambios.</span><em>La llave de 15.000 simulaciones se reconstruye en el carril profundo horario o manual.</em></li>"
+        f"<li><strong>{html.escape(iterations_label)} simulaciones</strong><span>La llave vigente se calcula con rutas completas de torneo, no solo favoritos sueltos.</span><em>Más iteraciones reducen ruido Monte Carlo; no convierten un pick incierto en seguro.</em></li>"
+        f"<li><strong>Refresh live cada 5 minutos</strong><span>GitHub Actions reconstruye el tablero ligero y recalcula in-play cuando el feed trae cambios.</span><em>La llave profunda se reconstruye en el carril horario/manual y este corte usa {html.escape(iterations_label)} simulaciones.</em></li>"
         f"<li><strong>Calibración acumulada</strong><span>{completed} partidos cerrados disponibles para backtesting en este corte.</span><em>Cuando crece la muestra, el agente de calibración ajusta confianza y coberturas.</em></li>"
         "</ul></article>"
         "</div>"
@@ -11319,7 +11327,7 @@ def build_methodology_quality_html(
             "status": "Activo" if live_count else "Preparado",
             "tone": "ok" if live_count else "neutral",
             "detail": (
-                f"{live_count} partidos en vivo y {final_count} cerrados. El tablero live recalcula cada 5 minutos; la llave profunda corre cada hora y en cada push."
+                f"{live_count} partidos en vivo y {final_count} cerrados. El tablero live recalcula cada 5 minutos; la llave profunda mínima corre cada hora y la llave 100k corre diaria/manual o tras push relevante."
                 if total_fixtures
                 else "El workflow está listo, pero no hay partidos para monitorear."
             ),
@@ -11667,13 +11675,20 @@ def build_runtime_status_html(entries: Sequence[dict], bracket_payload: dict) ->
         (
             "Estado operativo",
             "Publicación automática en <strong>GitHub Actions + Pages</strong>. "
-            "El tablero live se reconstruye cada <strong>5 minutos</strong>. "
-            "La llave de 15.000 simulaciones se recalcula cada <strong>hora</strong> y también en cada push a <strong>main</strong>.",
+            "El tablero live, los marcadores recomendados y los picks Penca se reconstruyen cada <strong>5 minutos</strong>. "
+            f"La llave profunda vigente usa <strong>{iterations_label} simulaciones</strong> en esta publicación; "
+            "se recalcula en el carril profundo horario/manual. La llave completa <strong>100k</strong> corre en un carril separado nocturno/manual o tras push relevante.",
         ),
         (
             "Monte Carlo publicado",
             f"La llave visible usa <strong>{iterations_label} simulaciones</strong> por corrida. "
-            "Ese número ya no debería verse como 1.200.",
+            "El carril rápido nunca baja de 15.000 y el carril completo sube a 100.000 cuando se publica la llave profunda definitiva.",
+        ),
+        (
+            "Frecuencia real de actualización",
+            "Marcadores y tablero: <strong>cada 5 minutos</strong>. "
+            "Llave profunda mínima: <strong>cada 60 minutos</strong>. "
+            "Llave 100k: <strong>diaria de madrugada, manual o por push relevante</strong> después de cambios grandes, porque esa corrida es costosa.",
         ),
         (
             "Proveedor live activo",
@@ -11707,7 +11722,7 @@ def build_runtime_status_html(entries: Sequence[dict], bracket_payload: dict) ->
         "<div class=\"runtime-chip-row\">"
         f"<span class=\"runtime-chip\">In-play <strong>{html.escape(in_play_label)}</strong></span>"
         f"<span class=\"runtime-chip\">Validación <strong>{html.escape('latest.json + badge En vivo + minuto')}</strong></span>"
-        f"<span class=\"runtime-chip\">Frecuencia <strong>{html.escape('live 5 min | llave profunda 60 min')}</strong></span>"
+        f"<span class=\"runtime-chip\">Frecuencia <strong>{html.escape('marcadores 5 min | llave 15k 60 min | llave 100k diaria/manual/push')}</strong></span>"
         "</div>"
     )
     return (
@@ -11745,7 +11760,7 @@ def build_landing_proof_html(entries: Sequence[dict], bracket_payload: dict, bac
         ),
         (
             "Actualización real",
-            f"GitHub Actions regenera el tablero live cada 5 minutos y la llave profunda cada hora. Modela {modeled_total} partidos: {len(fixture_entries)} fixtures directos y {len(projected_entries)} cruces de llave proyectados. Estado directo: {live_count} live, {final_count} final, {pending_count} pendientes.",
+            f"GitHub Actions regenera marcadores y picks cada 5 minutos, la llave profunda mínima cada hora y la llave 100k diaria/manual o tras push relevante. Modela {modeled_total} partidos: {len(fixture_entries)} fixtures directos y {len(projected_entries)} cruces de llave proyectados. Estado directo: {live_count} live, {final_count} final, {pending_count} pendientes.",
             "ok",
         ),
         (
@@ -12127,6 +12142,8 @@ def build_dashboard_html(
     bracket_html = html.escape(bracket_text.strip() or "No hay llave generada todavía.")
     bracket_visual_html = build_bracket_visual_html(bracket_payload, entries)
     updated_at = iso_timestamp()
+    iterations = int(bracket_payload.get("iterations", 0) or 0)
+    monte_carlo_iterations_label = f"{iterations:,}".replace(",", ".") if iterations else "sin dato"
     ticket_snapshot_html = build_ticket_snapshot_html(entries, updated_at)
     landing_proof_html = build_landing_proof_html(entries, bracket_payload, backtest)
     runtime_status_html = build_runtime_status_html(entries, bracket_payload)
@@ -12159,6 +12176,7 @@ def build_dashboard_html(
     return render_dashboard_html(
         {
             "updated_at": html.escape(updated_at),
+            "monte_carlo_iterations_label": html.escape(monte_carlo_iterations_label),
             "state_path": html.escape(str(state_path)),
             "fixtures_path": html.escape(str(fixtures_path)),
             "ticket_snapshot_html": ticket_snapshot_html,
@@ -12442,7 +12460,7 @@ def audit_dashboard_html(dashboard_html: str) -> List[str]:
         "De datos a boleto",
         "Primero decide como una mesa profesional",
         "Monte Carlo vigente",
-        "15.000 simulaciones por corrida",
+        "simulaciones por corrida",
         "actualiza picks, goles y marcadores live; la llave se propaga en el carril profundo",
         "Marcadores dinámicos",
         "Los marcadores cambian a medida que avanza el campeonato",
