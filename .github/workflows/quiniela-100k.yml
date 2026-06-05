@@ -18,7 +18,7 @@ on:
       - "mundial_2026/worldcup2026/**"
       - ".github/workflows/quiniela-100k.yml"
   schedule:
-    - cron: "42 4 * * *"
+    - cron: "42 4,12,20 * * *"
 
 permissions:
   contents: read

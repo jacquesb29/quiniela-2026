@@ -3959,7 +3959,7 @@ def command_project_bracket(args: argparse.Namespace, teams: Dict[str, Team]) ->
         "recalculation_policy": (
             f"Los marcadores directos se refrescan cada 5 minutos. La llave completa se reconstruye con "
             f"{args.iterations:,} simulaciones en esta corrida; el mínimo operativo del carril profundo es "
-            "15.000. La llave 100.000 corre en un carril nocturno/manual/push relevante separado por costo de cómputo. "
+            "15.000. La llave 100.000 corre en un carril cada 8 horas/manual/push relevante separado por costo de cómputo. "
             "Si cambian marcadores, estados o señales relevantes, se propagan primero en el tablero live "
             "de 5 minutos y después en la siguiente corrida profunda."
         ).replace(",", "."),
@@ -11327,7 +11327,7 @@ def build_methodology_quality_html(
             "status": "Activo" if live_count else "Preparado",
             "tone": "ok" if live_count else "neutral",
             "detail": (
-                f"{live_count} partidos en vivo y {final_count} cerrados. El tablero live recalcula cada 5 minutos; la llave profunda mínima corre cada hora y la llave 100k corre diaria/manual o tras push relevante."
+                f"{live_count} partidos en vivo y {final_count} cerrados. El tablero live recalcula cada 5 minutos; la llave profunda mínima corre cada hora y la llave 100k corre cada 8 horas/manual o tras push relevante."
                 if total_fixtures
                 else "El workflow está listo, pero no hay partidos para monitorear."
             ),
@@ -11677,7 +11677,7 @@ def build_runtime_status_html(entries: Sequence[dict], bracket_payload: dict) ->
             "Publicación automática en <strong>GitHub Actions + Pages</strong>. "
             "El tablero live, los marcadores recomendados y los picks Penca se reconstruyen cada <strong>5 minutos</strong>. "
             f"La llave profunda vigente usa <strong>{iterations_label} simulaciones</strong> en esta publicación; "
-            "se recalcula en el carril profundo horario/manual. La llave completa <strong>100k</strong> corre en un carril separado nocturno/manual o tras push relevante.",
+            "se recalcula en el carril profundo horario/manual. La llave completa <strong>100k</strong> corre en un carril separado cada 8 horas/manual o tras push relevante.",
         ),
         (
             "Monte Carlo publicado",
@@ -11688,7 +11688,7 @@ def build_runtime_status_html(entries: Sequence[dict], bracket_payload: dict) ->
             "Frecuencia real de actualización",
             "Marcadores y tablero: <strong>cada 5 minutos</strong>. "
             "Llave profunda mínima: <strong>cada 60 minutos</strong>. "
-            "Llave 100k: <strong>diaria de madrugada, manual o por push relevante</strong> después de cambios grandes, porque esa corrida es costosa.",
+            "Llave 100k: <strong>cada 8 horas, manual o por push relevante</strong> después de cambios grandes, porque esa corrida es costosa.",
         ),
         (
             "Proveedor live activo",
@@ -11722,7 +11722,7 @@ def build_runtime_status_html(entries: Sequence[dict], bracket_payload: dict) ->
         "<div class=\"runtime-chip-row\">"
         f"<span class=\"runtime-chip\">In-play <strong>{html.escape(in_play_label)}</strong></span>"
         f"<span class=\"runtime-chip\">Validación <strong>{html.escape('latest.json + badge En vivo + minuto')}</strong></span>"
-        f"<span class=\"runtime-chip\">Frecuencia <strong>{html.escape('marcadores 5 min | llave 15k 60 min | llave 100k diaria/manual/push')}</strong></span>"
+        f"<span class=\"runtime-chip\">Frecuencia <strong>{html.escape('marcadores 5 min | llave 15k 60 min | llave 100k cada 8h/manual/push')}</strong></span>"
         "</div>"
     )
     return (
@@ -11760,7 +11760,7 @@ def build_landing_proof_html(entries: Sequence[dict], bracket_payload: dict, bac
         ),
         (
             "Actualización real",
-            f"GitHub Actions regenera marcadores y picks cada 5 minutos, la llave profunda mínima cada hora y la llave 100k diaria/manual o tras push relevante. Modela {modeled_total} partidos: {len(fixture_entries)} fixtures directos y {len(projected_entries)} cruces de llave proyectados. Estado directo: {live_count} live, {final_count} final, {pending_count} pendientes.",
+            f"GitHub Actions regenera marcadores y picks cada 5 minutos, la llave profunda mínima cada hora y la llave 100k cada 8 horas/manual o tras push relevante. Modela {modeled_total} partidos: {len(fixture_entries)} fixtures directos y {len(projected_entries)} cruces de llave proyectados. Estado directo: {live_count} live, {final_count} final, {pending_count} pendientes.",
             "ok",
         ),
         (
