@@ -1162,6 +1162,36 @@ class RegressionLogicTest(unittest.TestCase):
         self.assertIn("Picks más defendibles", html)
         self.assertIn("Spain vs Uruguay", html)
 
+    def test_model_quality_audit_html_does_not_fake_ten_out_of_ten(self):
+        prediction = app.MatchPrediction(
+            team_a="Spain",
+            team_b="Uruguay",
+            expected_goals_a=1.7,
+            expected_goals_b=0.8,
+            win_a=0.68,
+            draw=0.20,
+            win_b=0.12,
+            exact_scores=[("2-0", 0.18), ("1-0", 0.15)],
+            statistical_depth={"confidence_index": 0.78, "top3_coverage": 0.45, "model_agreement": 0.76},
+        )
+        html = app.build_model_quality_audit_html(
+            [
+                {
+                    "title": "Spain vs Uruguay",
+                    "stage_label": "Grupo H",
+                    "prediction": prediction,
+                    "status_state": "pre",
+                }
+            ],
+            {"iterations": 15000},
+            {"completed_matches": 0},
+        )
+
+        self.assertIn("Auditoría 10/10", html)
+        self.assertIn("No se maquilla como 10/10", html)
+        self.assertIn("no subimos una métrica a 90/95 o 10/10", html)
+        self.assertIn("Histórico anti-fuga", html)
+
     def test_quiniela_audit_metrics_flags_traps_and_fragile_scores(self):
         firm_prediction = app.MatchPrediction(
             team_a="Spain",

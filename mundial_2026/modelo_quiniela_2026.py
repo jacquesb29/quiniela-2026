@@ -11812,6 +11812,252 @@ def build_landing_proof_html(entries: Sequence[dict], bracket_payload: dict, bac
     )
 
 
+def _quality_artifact_exists(base_dir: Path, candidates: Sequence[str]) -> bool:
+    for candidate in candidates:
+        if (base_dir / candidate).exists():
+            return True
+    return False
+
+
+def model_quality_audit_items(
+    entries: Sequence[dict],
+    bracket_payload: dict,
+    backtest: dict,
+) -> Tuple[float, List[dict]]:
+    """Score the project as an auditable prediction product, not as a promise."""
+
+    base_dir = Path(__file__).resolve().parent
+    fixture_entries = [entry for entry in entries if not entry.get("projection")]
+    projected_entries = [entry for entry in entries if entry.get("projection")]
+    runtime = provider_runtime_diagnostics(entries)
+    iterations = int(bracket_payload.get("iterations", 0) or 0)
+    completed_matches = int(backtest.get("completed_matches", 0) or 0)
+    regular_samples = int(backtest.get("regular_time_samples", 0) or 0)
+    live_count = sum(1 for entry in fixture_entries if fixture_is_live(entry))
+    final_count = sum(1 for entry in fixture_entries if fixture_is_final(entry))
+    profiles = [
+        quiniela_certainty_profile(entry)
+        for entry in entries
+        if entry.get("prediction") is not None and not entry.get("projection")
+    ]
+    ticket_audit = quiniela_audit_metrics(profiles)
+    has_historical = _quality_artifact_exists(
+        base_dir,
+        [
+            "historical_matches.csv",
+            "data/historical_matches.csv",
+            "worldcup2026/data/historical_matches.csv",
+        ],
+    )
+    has_benchmarks = _quality_artifact_exists(
+        base_dir,
+        [
+            "benchmark_results.csv",
+            "outputs/benchmark_results.csv",
+            "site/benchmark_results.csv",
+        ],
+    )
+    has_backtest = _quality_artifact_exists(
+        base_dir,
+        [
+            "backtest_summary.csv",
+            "outputs/backtest_summary.csv",
+            "site/backtest_summary.csv",
+        ],
+    )
+    has_calibration = _quality_artifact_exists(
+        base_dir,
+        [
+            "calibration_report.csv",
+            "outputs/calibration_report.csv",
+            "site/calibration_report.csv",
+        ],
+    )
+    has_ablation = _quality_artifact_exists(
+        base_dir,
+        [
+            "ablation_results.csv",
+            "outputs/ablation_results.csv",
+            "site/ablation_results.csv",
+        ],
+    )
+
+    def score_item(
+        title: str,
+        score: float,
+        status: str,
+        detail: str,
+        next_step: str,
+        weight: float,
+    ) -> dict:
+        return {
+            "title": title,
+            "score": clamp(score, 0.0, 10.0),
+            "status": status,
+            "detail": detail,
+            "next_step": next_step,
+            "weight": weight,
+        }
+
+    monte_score = 10.0 if iterations >= 100000 else 9.0 if iterations >= 50000 else 8.0 if iterations >= 15000 else 4.0
+    fixture_total = len(fixture_entries) + len(projected_entries)
+    penca_score = 8.0
+    if ticket_audit.get("total"):
+        defensible_ratio = float(ticket_audit.get("defensible_scores", 0)) / max(float(ticket_audit.get("total", 0)), 1.0)
+        penca_score = 6.5 + 2.0 * defensible_ratio
+        if float(ticket_audit.get("strategy_adjusted_firmness", 0.0)) >= 0.90:
+            penca_score += 1.0
+        if fixture_total >= 104:
+            penca_score += 0.5
+    calibration_score = 9.0 if completed_matches >= 60 and has_calibration else 7.0 if completed_matches >= 20 else 5.0 if completed_matches else 4.0
+    benchmark_score = 9.0 if has_benchmarks else 6.0
+    ablation_score = 9.0 if has_ablation else 5.5
+    historical_score = 9.0 if has_historical and has_backtest else 6.0 if has_historical else 4.0
+    provider_score = 8.5 if runtime["deep_sources"] else 7.0 if runtime["configured_wired"] else 6.0
+    exact_score_score = 8.0 if ticket_audit.get("defensible_scores", 0) else 6.0
+    if has_backtest and completed_matches >= 20:
+        exact_score_score += 1.0
+    operations_score = 9.0 if fixture_total >= 104 and iterations >= 15000 else 7.0
+    if live_count or final_count:
+        operations_score += 0.5
+
+    items = [
+        score_item(
+            "Motor Monte Carlo",
+            monte_score,
+            "Excelente" if monte_score >= 9.5 else "Fuerte",
+            f"Última llave publicada con {iterations:,} simulaciones.".replace(",", "."),
+            "Mantener 15k para carril rápido/profundo y 100k para snapshots completos; más simulaciones reducen ruido, no garantizan exactos.",
+            0.12,
+        ),
+        score_item(
+            "Operación y refresh",
+            operations_score,
+            "Fuerte",
+            f"{len(fixture_entries)} fixtures directos + {len(projected_entries)} cruces proyectados; {live_count} live y {final_count} finales aplicados.",
+            "Seguir separando carril live de 5 minutos, llave 15k horaria y snapshot 100k cada 8h/manual/push relevante.",
+            0.10,
+        ),
+        score_item(
+            "Optimización Penca",
+            penca_score,
+            "Muy fuerte" if penca_score >= 8.5 else "Fuerte",
+            "La capa Penca separa marcador probable del modelo, marcador para cargar, cobertura y diferencial.",
+            "Validar puntos esperados contra resultados históricos o contra el scoring real de la app cuando empiece la Penca.",
+            0.13,
+        ),
+        score_item(
+            "Calibración probabilística",
+            calibration_score,
+            "Pendiente de muestra" if not completed_matches else "En medición",
+            (
+                f"{completed_matches} partidos cerrados y {regular_samples} muestras de tiempo regular para Brier/log-loss."
+                if completed_matches
+                else "El Brier 2026 empieza con el primer final; antes de eso no hay track record real del torneo."
+            ),
+            "Conectar calibration_report.csv y reliability bins cuando existan suficientes partidos cerrados.",
+            0.16,
+        ),
+        score_item(
+            "Benchmarks externos/simples",
+            benchmark_score,
+            "Estructura lista" if not has_benchmarks else "Medido",
+            "El módulo de benchmarks existe; el 10/10 requiere comparar contra Elo, FIFA, mercado, Poisson simple e histórico en CSV publicado.",
+            "Correr benchmark_results.csv con el mismo set histórico usado para backtesting.",
+            0.12,
+        ),
+        score_item(
+            "Ablation tests",
+            ablation_score,
+            "Estructura lista" if not has_ablation else "Medido",
+            "El módulo de ablation existe; falta publicar qué bloques suben o bajan Brier/log-loss fuera de muestra.",
+            "Ejecutar ablation_results.csv antes de congelar pesos finales.",
+            0.10,
+        ),
+        score_item(
+            "Histórico anti-fuga",
+            historical_score,
+            "Pendiente crítico" if not has_historical else "Preparado",
+            "Sin historical_matches.csv trazable, el modelo es auditable en estructura pero no puede reclamar validación histórica completa.",
+            "Cargar partidos históricos con variables pre-partido, sin rankings/valores posteriores ni resultados futuros.",
+            0.13,
+        ),
+        score_item(
+            "Fuentes y proveedores",
+            provider_score,
+            "Base sólida" if not runtime["deep_sources"] else "Profundo activo",
+            (
+                f"Fuentes profundas activas: {', '.join(runtime['deep_sources'])}."
+                if runtime["deep_sources"]
+                else "Corre con fuentes abiertas/base; eventos tiro-a-tiro dependen de proveedor válido."
+            ),
+            "No scrapear sin licencia; sumar proveedores abiertos verificables cuando cubran Mundial 2026.",
+            0.07,
+        ),
+        score_item(
+            "Realismo de marcadores",
+            exact_score_score,
+            "Fuerte, no perfecto",
+            "Los marcadores ya no deben leerse como Poisson puro: hay ensamble, Penca, baja anotación, overdispersion y optimización por puntos.",
+            "El 10/10 exige backtest específico de marcador exacto y puntos Penca, no solo intuición visual.",
+            0.07,
+        ),
+    ]
+    total_weight = sum(float(item["weight"]) for item in items) or 1.0
+    overall = sum(float(item["score"]) * float(item["weight"]) for item in items) / total_weight
+    return clamp(overall, 0.0, 10.0), items
+
+
+def build_model_quality_audit_html(
+    entries: Sequence[dict],
+    bracket_payload: dict,
+    backtest: dict,
+) -> str:
+    overall, items = model_quality_audit_items(entries, bracket_payload, backtest)
+    complete = overall >= 9.5 and all(float(item["score"]) >= 9.0 for item in items)
+    overall_label = f"{overall:.1f}/10"
+    if complete:
+        verdict = "Candidato real a 10/10"
+        verdict_note = "Todos los pilares principales tienen evidencia suficiente. Aun así, no garantiza resultados deportivos."
+    else:
+        verdict = "No se maquilla como 10/10"
+        verdict_note = "La herramienta es fuerte, pero el 10/10 real exige histórico, benchmarks, ablation y calibración publicados."
+
+    cards = []
+    for item in items:
+        tone = "ok" if float(item["score"]) >= 8.5 else "warn" if float(item["score"]) < 6.5 else "neutral"
+        cards.append(
+            "<article class=\"quality-audit-card\">"
+            "<div class=\"quality-audit-card-top\">"
+            f"<span class=\"method-status {tone}\">{html.escape(str(item['status']))}</span>"
+            f"<strong>{float(item['score']):.1f}/10</strong>"
+            "</div>"
+            f"<h3>{html.escape(str(item['title']))}</h3>"
+            f"<p>{html.escape(str(item['detail']))}</p>"
+            f"<em>{html.escape(str(item['next_step']))}</em>"
+            "</article>"
+        )
+
+    return (
+        "<section class=\"panel quality-audit-panel\" id=\"auditoria-10\">"
+        "<div class=\"quality-audit-hero\">"
+        "<div>"
+        "<p class=\"eyebrow\">Auditoría 10/10</p>"
+        "<h2>Qué falta para que el modelo sea 10/10 de verdad.</h2>"
+        "<p class=\"lede-tight\">Este bloque no evalúa si una selección va a ganar; evalúa si el sistema es verificable, calibrado, reproducible y útil para Penca sin vender certeza artificial.</p>"
+        "</div>"
+        "<div class=\"quality-audit-score\">"
+        f"<span>{html.escape(verdict)}</span>"
+        f"<strong>{html.escape(overall_label)}</strong>"
+        f"<p>{html.escape(verdict_note)}</p>"
+        "</div>"
+        "</div>"
+        f"<div class=\"quality-audit-grid\">{''.join(cards)}</div>"
+        "<p class=\"quality-audit-footnote\"><strong>Regla:</strong> no subimos una métrica a 90/95 o 10/10 por diseño visual. Solo sube si mejora Brier, log-loss, benchmarks, ablation o puntos Penca fuera de muestra.</p>"
+        "</section>"
+    )
+
+
 def build_score_dynamics_html(entries: Sequence[dict]) -> str:
     """Explain and expose why score recommendations are not static."""
 
@@ -12146,6 +12392,7 @@ def build_dashboard_html(
     monte_carlo_iterations_label = f"{iterations:,}".replace(",", ".") if iterations else "sin dato"
     ticket_snapshot_html = build_ticket_snapshot_html(entries, updated_at)
     landing_proof_html = build_landing_proof_html(entries, bracket_payload, backtest)
+    model_quality_audit_html = build_model_quality_audit_html(entries, bracket_payload, backtest)
     runtime_status_html = build_runtime_status_html(entries, bracket_payload)
     score_dynamics_html = build_score_dynamics_html(entries)
     championship_penca_html = build_championship_penca_optimizer_html(entries)
@@ -12181,6 +12428,7 @@ def build_dashboard_html(
             "fixtures_path": html.escape(str(fixtures_path)),
             "ticket_snapshot_html": ticket_snapshot_html,
             "landing_proof_html": landing_proof_html,
+            "model_quality_audit_html": model_quality_audit_html,
             "runtime_status_html": runtime_status_html,
             "score_dynamics_html": score_dynamics_html,
             "championship_penca_html": championship_penca_html,

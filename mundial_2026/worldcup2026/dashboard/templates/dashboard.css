@@ -1002,6 +1002,106 @@ h3 { font-size: 1.05rem; }
   line-height: 1.42;
   font-size: 0.91rem;
 }
+.quality-audit-panel {
+  background:
+    radial-gradient(circle at 8% 18%, rgba(176,71,60,0.10), transparent 28%),
+    radial-gradient(circle at 90% 8%, rgba(15,109,102,0.16), transparent 30%),
+    linear-gradient(135deg, rgba(255,253,246,0.98), rgba(239,247,243,0.98));
+}
+.quality-audit-hero {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: minmax(0, 1.3fr) minmax(240px, 0.7fr);
+  align-items: stretch;
+  margin-bottom: 14px;
+}
+.quality-audit-hero h2 {
+  max-width: 760px;
+  font-size: clamp(1.9rem, 4.2vw, 3.8rem);
+  line-height: 0.96;
+  letter-spacing: -0.045em;
+}
+.quality-audit-score {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 8px;
+  border-radius: 24px;
+  padding: 18px;
+  background:
+    radial-gradient(circle at 70% 10%, rgba(181,131,47,0.18), transparent 38%),
+    rgba(255,255,255,0.78);
+  border: 1px solid rgba(15,109,102,0.16);
+  box-shadow: 0 18px 34px rgba(20, 42, 38, 0.07);
+}
+.quality-audit-score span {
+  color: var(--accent-dark);
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  font-size: 0.74rem;
+}
+.quality-audit-score strong {
+  color: var(--ink);
+  font-size: clamp(2.3rem, 5vw, 4.2rem);
+  line-height: 0.9;
+}
+.quality-audit-score p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.38;
+}
+.quality-audit-grid {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+}
+.quality-audit-card {
+  border-radius: 20px;
+  padding: 14px;
+  color: var(--ink);
+  background: rgba(255,255,255,0.74);
+  border: 1px solid rgba(15,109,102,0.14);
+  box-shadow: 0 12px 26px rgba(20, 42, 38, 0.055);
+}
+.quality-audit-card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 9px;
+}
+.quality-audit-card-top strong {
+  color: var(--accent-dark);
+  font-size: 1.15rem;
+}
+.quality-audit-card h3 {
+  color: var(--ink);
+  margin: 0 0 7px;
+}
+.quality-audit-card p,
+.quality-audit-card em {
+  display: block;
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.38;
+  font-size: 0.90rem;
+}
+.quality-audit-card em {
+  margin-top: 10px;
+  color: #71501c;
+  font-style: normal;
+  font-weight: 800;
+}
+.quality-audit-footnote {
+  margin: 14px 0 0;
+  padding: 12px 14px;
+  border-radius: 16px;
+  color: var(--ink);
+  background: rgba(15,109,102,0.08);
+  border: 1px solid rgba(15,109,102,0.14);
+  line-height: 1.42;
+}
 .hero-note {
   background: rgba(255,255,255,0.08);
   border: 1px solid rgba(255,255,255,0.10);
@@ -2694,7 +2794,8 @@ pre {
 .calibration-panel,
 .power-panel,
 .provider-panel,
-.agentic-panel {
+.agentic-panel,
+.quality-audit-panel {
   color: var(--ink) !important;
 }
 .competitive-penca-panel h2,
@@ -2718,7 +2819,9 @@ pre {
 .provider-panel h2,
 .provider-panel h3,
 .agentic-panel h2,
-.agentic-panel h3 {
+.agentic-panel h3,
+.quality-audit-panel h2,
+.quality-audit-panel h3 {
   color: var(--ink) !important;
 }
 .competitive-penca-panel .summary-tile,
@@ -2732,6 +2835,8 @@ pre {
 .power-panel .summary-tile,
 .provider-panel .summary-tile,
 .agentic-panel .summary-tile,
+.quality-audit-card,
+.quality-audit-score,
 .competitive-penca-panel .certainty-grid article,
 .current-penca-panel .scenario-table-card,
 .championship-penca-panel .scenario-table-card,
@@ -2751,6 +2856,8 @@ pre {
 .power-panel .summary-tile strong,
 .provider-panel .summary-tile strong,
 .agentic-panel .summary-tile strong,
+.quality-audit-card strong,
+.quality-audit-score strong,
 .competitive-penca-panel .certainty-grid li strong,
 .strategy-panel .certainty-grid li strong {
   color: var(--accent-dark) !important;
@@ -2799,6 +2906,9 @@ pre {
 .provider-panel .lede-tight,
 .agentic-panel .meta,
 .agentic-panel .lede-tight,
+.quality-audit-panel .lede-tight,
+.quality-audit-card p,
+.quality-audit-score p,
 .competitive-penca-panel .certainty-grid li span,
 .strategy-panel .certainty-grid li span,
 .operating-system-panel .ops-list li span,
