@@ -1251,7 +1251,7 @@ class RegressionLogicTest(unittest.TestCase):
         self.assertAlmostEqual(projection["conditional_winner_prob"], 50 / 85)
         self.assertAlmostEqual(projection["winner_prob"], 50 / 120)
 
-    def test_structured_bracket_projection_prefers_global_slot_winner(self):
+    def test_structured_bracket_projection_prefers_conditional_matchup_favorite(self):
         aggregate = {
             "outcomes": {
                 ("Colombia", "Croatia", "Colombia"): 25,
@@ -1268,14 +1268,16 @@ class RegressionLogicTest(unittest.TestCase):
         projection = app.structured_match_projection("M83", aggregate, 90)
 
         self.assertEqual((projection["team_a"], projection["team_b"]), ("Colombia", "Croatia"))
-        self.assertEqual(projection["winner"], "Croatia")
+        self.assertEqual(projection["winner"], "Colombia")
         self.assertEqual(projection["matchup_favorite"], "Colombia")
-        self.assertEqual(projection["slot_winner_mode"], "global_slot")
+        self.assertEqual(projection["slot_winner_mode"], "conditional_favorite")
+        self.assertEqual(projection["global_slot_winner"], "Croatia")
         self.assertAlmostEqual(projection["matchup_prob"], 45 / 90)
-        self.assertAlmostEqual(projection["conditional_winner_prob"], 20 / 45)
-        self.assertAlmostEqual(projection["winner_prob"], 50 / 90)
+        self.assertAlmostEqual(projection["conditional_winner_prob"], 25 / 45)
+        self.assertAlmostEqual(projection["winner_prob"], 25 / 90)
+        self.assertAlmostEqual(projection["global_slot_winner_prob"], 50 / 90)
 
-    def test_coherent_bracket_preserves_global_slot_probability(self):
+    def test_coherent_bracket_prefers_conditional_matchup_favorite(self):
         payload = {
             "matches": {
                 "M81": {
@@ -1329,11 +1331,13 @@ class RegressionLogicTest(unittest.TestCase):
         coherent = app.coherent_bracket_matches(payload)
         match = coherent["M93"]
 
-        self.assertEqual(match["winner"], "Belgium")
+        self.assertEqual(match["winner"], "Turkey")
         self.assertEqual(match["matchup_favorite"], "Turkey")
-        self.assertEqual(match["slot_winner_mode"], "global_slot")
-        self.assertAlmostEqual(match["conditional_winner_prob"], 0.480)
-        self.assertAlmostEqual(match["winner_prob"], 0.301)
+        self.assertEqual(match["slot_winner_mode"], "conditional_favorite")
+        self.assertEqual(match["global_slot_winner"], "Belgium")
+        self.assertAlmostEqual(match["conditional_winner_prob"], 0.520)
+        self.assertAlmostEqual(match["winner_prob"], 0.096)
+        self.assertAlmostEqual(match["global_slot_winner_prob"], 0.301)
 
     def test_update_simulation_state_tracks_recent_xg_signals(self):
         teams = app.load_teams()
