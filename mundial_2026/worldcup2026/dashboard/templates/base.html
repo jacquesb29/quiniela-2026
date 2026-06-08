@@ -35,12 +35,12 @@
         <div class="hero-copy">
           <p class="eyebrow">Mundial 2026 | Motor privado de quiniela</p>
           <h1>Una sala de decisión para jugar la quiniela con ventaja.</h1>
-          <div class="montecarlo-strip" aria-label="Monte Carlo vigente">
-            <span>Monte Carlo vigente</span>
-            <strong>{{ monte_carlo_iterations_label | default("15.000") }} simulaciones por corrida</strong>
+          <div class="montecarlo-strip" aria-label="Monte Carlo publicado">
+            <span>Monte Carlo publicado</span>
+            <strong>{{ monte_carlo_iterations_label | default("100.000") }} simulaciones por corrida</strong>
             <em>actualiza picks, goles y marcadores live; la llave se propaga en el carril profundo</em>
           </div>
-          <p class="lede">Pronósticos, goles, llave, picks defendibles, partidos cerrados y actualización in-play en una sola web, sostenidos por un motor Monte Carlo de {{ monte_carlo_iterations_label | default("15.000") }} simulaciones por corrida. El objetivo no es vender certeza falsa: es reducir errores, detectar valor y elegir cuándo cubrir.</p>
+          <p class="lede">Pronósticos, goles, llave, picks defendibles, partidos cerrados y actualización in-play en una sola web, sostenidos por un snapshot principal Monte Carlo de {{ monte_carlo_iterations_label | default("100.000") }} simulaciones por corrida. El objetivo no es vender certeza falsa: es reducir errores, detectar valor y elegir cuándo cubrir.</p>
           <p class="mini-disclaimer">Modelo de apoyo para quiniela; no garantiza resultados. Los horarios que vienen del feed pueden aparecer en EDT; confirma la hora local en tu app/calendario antes de cargar el boleto.</p>
           {{ ticket_snapshot_html }}
         </div>
@@ -64,7 +64,7 @@
           </div>
           <div class="command-metric">
             <span>4. Auditoría</span>
-            <strong>El tablero live se publica cada 5 minutos y la llave profunda vigente usa {{ monte_carlo_iterations_label | default("15.000") }} simulaciones Monte Carlo por corrida.</strong>
+            <strong>El tablero live se publica cada 5 minutos y la llave publicada usa {{ monte_carlo_iterations_label | default("100.000") }} simulaciones Monte Carlo por corrida; 15.000 queda como mínimo técnico horario.</strong>
           </div>
           <p class="command-note">Menos explicación arriba, más decisión arriba. La metodología completa queda más abajo para auditar sin estorbar el boleto.</p>
         </aside>
@@ -111,7 +111,7 @@
         <article>
           <span>02</span>
           <strong>Simula escenarios</strong>
-          <p>15.000 Monte Carlo, ensamble estadístico, goles, llave y calibración.</p>
+          <p>100.000 Monte Carlo como snapshot principal; 15.000 queda solo como guardrail horario de respaldo.</p>
         </article>
         <article>
           <span>03</span>
@@ -155,7 +155,7 @@
       <div class="critical-grid">
         <article>
           <span>Verificable</span>
-          <strong>15.000 Monte Carlo + artefactos públicos</strong>
+          <strong>100.000 Monte Carlo + artefactos públicos</strong>
           <p>La salida publica dashboard, reporte, llave, fixtures y <a href="latest.json">latest.json</a>. Ese archivo permite revisar timestamp, frecuencia de refresh y stack live usado.</p>
         </article>
         <article>

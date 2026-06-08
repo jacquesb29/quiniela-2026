@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import argparse
+import csv
 import html
 import json
 import math
@@ -3944,8 +3945,9 @@ def command_project_bracket(args: argparse.Namespace, teams: Dict[str, Team]) ->
         "bracket_recalculated_from_scoreline_ensemble": True,
         "recalculation_policy": (
             f"Los marcadores directos se refrescan cada 5 minutos. La llave completa se reconstruye con "
-            f"{args.iterations:,} simulaciones en esta corrida; el mínimo operativo del carril profundo es "
-            "15.000. La llave 100.000 corre en un carril cada 8 horas/manual/push relevante separado por costo de cómputo. "
+            f"{args.iterations:,} simulaciones en esta corrida. Si aparece 15.000, es solo el mínimo técnico "
+            "del carril horario para no publicar corridas débiles; el snapshot principal de alta estabilidad "
+            "usa 100.000 simulaciones y corre cada 8 horas/manual/push relevante por costo de cómputo. "
             "Si cambian marcadores, estados o señales relevantes, se propagan primero en el tablero live "
             "de 5 minutos y después en la siguiente corrida profunda."
         ).replace(",", "."),
@@ -4169,6 +4171,30 @@ def dark_horse_candidates(bracket_payload: dict, entries: Optional[Sequence[dict
             1.0,
         )
         delta = model_prob - consensus_prob
+        adjusted_delta = adjusted_prob - consensus_prob
+        path_index = 0.50 * quarterfinal_prob + 0.32 * semifinal_prob + 0.18 * final_prob
+        ceiling_index = 0.55 * semifinal_prob + 0.45 * final_prob
+        undervalued_edge = max(delta, adjusted_delta, 0.0)
+        undervalued_score = 100.0 * clamp(
+            0.36 * min(undervalued_edge / 0.025, 1.0)
+            + 0.28 * min(path_index / 0.24, 1.0)
+            + 0.20 * min(ceiling_index / 0.16, 1.0)
+            + 0.16 * min(watch_index / 100.0, 1.0),
+            0.0,
+            1.0,
+        )
+        if undervalued_edge >= 0.01 and path_index >= 0.16 and undervalued_score >= 70.0:
+            undervalued_label = "Tapado infravalorado fuerte"
+            undervalued_action = "Considerar como diferencial de llave si necesitas separarte del consenso."
+        elif undervalued_edge >= 0.004 and path_index >= 0.10 and undervalued_score >= 50.0:
+            undervalued_label = "Tapado infravalorado jugable"
+            undervalued_action = "Vigilar antes de octavos/cuartos; usar solo si su ruta se confirma."
+        elif path_index >= 0.15:
+            undervalued_label = "Tapado por camino favorable"
+            undervalued_action = "No subirlo por talento puro; subirlo solo si el cuadro queda abierto."
+        else:
+            undervalued_label = "Alerta secundaria"
+            undervalued_action = "Mantener en watchlist, no mover la llave base sin nueva evidencia."
         if delta >= 0.01:
             contrast = "El modelo propio lo ve más alto que el consenso."
         elif delta <= -0.01:
@@ -4187,6 +4213,11 @@ def dark_horse_candidates(bracket_payload: dict, entries: Optional[Sequence[dict
                 "quarterfinal_prob": quarterfinal_prob,
                 "semifinal_prob": semifinal_prob,
                 "final_prob": final_prob,
+                "path_index": path_index,
+                "ceiling_index": ceiling_index,
+                "undervalued_score": undervalued_score,
+                "undervalued_label": undervalued_label,
+                "undervalued_action": undervalued_action,
                 "contrast": contrast,
                 "external_source": str((external or {}).get("source", "Detección interna por ruta Monte Carlo")),
                 "external_url": str((external or {}).get("url", "")),
@@ -8114,7 +8145,7 @@ def build_consensus_guardrail_markdown(bracket_payload: dict, entries: Optional[
     lines = [
         "- Lectura: esta capa no reemplaza el modelo. Lo calibra contra consenso externo definido para evitar dos errores típicos de quiniela: sobreconcentrarse en un favorito y dejar vivo muy poco a contendientes fuertes.",
         f"- Mezcla dinámica usada para campeón recomendado: {format_pct(float(context['model_blend']))} modelo propio/live + {format_pct(float(context['consensus_blend']))} consenso externo.",
-        f"- Actualización live de esa mezcla: {int(context['final_count'])} partidos finales, {int(context['live_count'])} en vivo y {int(context['pending_count'])} pendientes. A medida que entran resultados reales, el consenso externo pesa menos y la simulación Monte Carlo vigente pesa más.",
+        f"- Actualización live de esa mezcla: {int(context['final_count'])} partidos finales, {int(context['live_count'])} en vivo y {int(context['pending_count'])} pendientes. A medida que entran resultados reales, el consenso externo pesa menos y la simulación Monte Carlo publicada pesa más.",
         "- Transparencia: el consenso externo no es una caja negra; combina priors declarados de campeón, ratings tipo Elo/FIFA, fuerza ofensiva-defensiva tipo SPI, mercado cuando existe y simulación Monte Carlo para dependencias de llave.",
     ]
     if rows:
@@ -8168,7 +8199,7 @@ def external_estimator_methodology_items() -> List[dict]:
         {
             "name": "Monte Carlo de torneo",
             "signal": "Miles de rutas completas para grupos, cruces, prorroga, penales y dependencias de llave.",
-            "usage": "Mínimo operativo de 15.000 simulaciones por corrida; los cortes pretorneo profundos pueden subir a 100.000 para estabilizar llave, campeón y marcadores.",
+            "usage": "El snapshot principal profundo usa 100.000 simulaciones para estabilizar llave, campeón y marcadores; 15.000 queda como mínimo técnico del carril horario.",
         },
         {
             "name": "Bradley-Terry jerárquico dinámico",
@@ -8547,6 +8578,7 @@ def build_dark_horses_markdown(bracket_payload: dict, entries: Optional[Sequence
     for candidate in candidates:
         lines.append(
             f"- {candidate['team']} | {candidate['tier']} | índice de vigilancia {float(candidate['watch_index']):.0f}/100 | "
+            f"valor tapado {float(candidate.get('undervalued_score', 0.0)):.0f}/100 ({candidate.get('undervalued_label', 'alerta')}) | "
             f"campeón calibrado {format_pct(float(candidate['adjusted_prob']))} | cuartos {format_pct(float(candidate['quarterfinal_prob']))} | "
             f"semifinal {format_pct(float(candidate['semifinal_prob']))} | final {format_pct(float(candidate['final_prob']))} | "
             f"{candidate['contrast']} Señal: {candidate['external_source']}."
@@ -8575,6 +8607,8 @@ def build_dark_horses_html(bracket_payload: dict, entries: Optional[Sequence[dic
             f"<em>{float(candidate['watch_index']):.0f}/100 vigilancia</em>"
             "</div>"
             "<div class=\"dark-horse-metrics\">"
+            f"<span>Valor tapado <strong>{float(candidate.get('undervalued_score', 0.0)):.0f}/100</strong></span>"
+            f"<span>Tipo <strong>{html.escape(str(candidate.get('undervalued_label', 'Alerta')))}</strong></span>"
             f"<span>Campeón calibrado <strong>{format_pct(float(candidate['adjusted_prob']))}</strong></span>"
             f"<span>Cuartos <strong>{format_pct(float(candidate['quarterfinal_prob']))}</strong></span>"
             f"<span>Semifinal <strong>{format_pct(float(candidate['semifinal_prob']))}</strong></span>"
@@ -8582,7 +8616,7 @@ def build_dark_horses_html(bracket_payload: dict, entries: Optional[Sequence[dic
             "</div>"
             f"<p><strong>Contraste:</strong> {html.escape(str(candidate['contrast']))}</p>"
             f"<p><strong>Señal trazable:</strong> {source_html}. {html.escape(str(candidate['external_note']))}</p>"
-            f"<p class=\"dark-horse-action\"><strong>Acción:</strong> {html.escape(str(candidate['action']))}</p>"
+            f"<p class=\"dark-horse-action\"><strong>Acción:</strong> {html.escape(str(candidate.get('undervalued_action') or candidate['action']))}</p>"
             "</article>"
         )
     leader = candidates[0]
@@ -9423,7 +9457,7 @@ def build_agentic_learning_markdown(entries: Sequence[dict], bracket_payload: di
     lines = [
         "### Agentes de aprendizaje",
         "- Lectura: esto no es un chatbot generando opiniones. Es un pipeline de agentes que ingiere datos, los transforma en señales, predice, calibra, decide y audita.",
-        f"- Monte Carlo vigente: {iterations:,} simulaciones por corrida.".replace(",", "."),
+        f"- Monte Carlo publicado en este corte: {iterations:,} simulaciones. El snapshot profundo de referencia usa 100.000; 15.000 queda como guardrail mínimo horario.".replace(",", "."),
         f"- Aprendizaje real disponible hoy: {final_count} partidos finalizados y {live_count} en vivo dentro del fixture cargado.",
         f"- Backtesting/calibración: {int(backtest.get('completed_matches', 0) or 0)} partidos cerrados reconstruidos.",
         "- Noticias multi-fuente: no depende solo de ESPN; ESPN puede ser fuente base, pero el modelo acepta fuentes oficiales, prensa internacional, mercado y proveedor live profundo.",
@@ -9477,8 +9511,8 @@ def build_agentic_learning_html(entries: Sequence[dict], bracket_payload: dict, 
         "<p class=\"lede-tight\">El modelo aprende de sí mismo en sentido operativo: cada resultado real, baja confirmada, cambio de mercado o evento live se convierte en estado, calibración y nuevas probabilidades. No inventa noticias; las exige como fuente trazable.</p>"
         "</div></div>"
         "<div class=\"confidence-tiles\">"
-        f"{tile('Monte Carlo activo', iterations_label + ' simulaciones', 'La auditoría exige al menos 15.000 por corrida.')}"
-        f"{tile('Eficiencia operativa', 'live ligero cada 5 min', f'El carril live publica rápido; la llave profunda vigente usa {iterations_label} simulaciones en esta corrida.')}"
+        f"{tile('Monte Carlo publicado', iterations_label + ' simulaciones', 'Esta es la corrida visible en el artefacto actual; el snapshot principal profundo es 100.000.')}"
+        f"{tile('Eficiencia operativa', 'live ligero cada 5 min', '15.000 es solo el mínimo técnico del carril horario; no la meta final del modelo.')}"
         f"{tile('Datos ya incorporados', f'{final_count} final / {live_count} live', f'Además {projected_count} cruces de llave recalculables.')}"
         f"{tile('Noticias multi-fuente', 'No solo ESPN', f'Fuente activa visible: {source_label}; stack preparado: {prepared_stack}.')}"
         "</div>"
@@ -9490,8 +9524,8 @@ def build_agentic_learning_html(entries: Sequence[dict], bracket_payload: dict, 
         f"{source_rows}"
         "</ul></article>"
         "<article><h3>Qué tan eficiente es</h3><ul>"
-        f"<li><strong>{html.escape(iterations_label)} simulaciones</strong><span>La llave vigente se calcula con rutas completas de torneo, no solo favoritos sueltos.</span><em>Más iteraciones reducen ruido Monte Carlo; no convierten un pick incierto en seguro.</em></li>"
-        f"<li><strong>Refresh live cada 5 minutos</strong><span>GitHub Actions reconstruye el tablero ligero y recalcula in-play cuando el feed trae cambios.</span><em>La llave profunda se reconstruye en el carril horario/manual y este corte usa {html.escape(iterations_label)} simulaciones.</em></li>"
+        f"<li><strong>{html.escape(iterations_label)} simulaciones publicadas</strong><span>La llave vigente se calcula con rutas completas de torneo, no solo favoritos sueltos.</span><em>Cuando el artefacto viene del workflow 100k, el snapshot profundo usa 100.000 simulaciones.</em></li>"
+        f"<li><strong>Refresh live cada 5 minutos</strong><span>GitHub Actions reconstruye el tablero ligero y recalcula in-play cuando el feed trae cambios.</span><em>El carril horario puede usar el guardrail 15.000; el corte de alta estabilidad se actualiza con 100.000 cada 8h/manual/push.</em></li>"
         f"<li><strong>Calibración acumulada</strong><span>{completed} partidos cerrados disponibles para backtesting en este corte.</span><em>Cuando crece la muestra, el agente de calibración ajusta confianza y coberturas.</em></li>"
         "</ul></article>"
         "</div>"
@@ -11045,8 +11079,10 @@ def build_bracket_visual_html(bracket_payload: dict, entries: Optional[Sequence[
         "<aside class=\"bracket-update-card\">"
         "<span>Llave actualizada</span>"
         f"<strong>{html.escape(updated_at)}</strong>"
-        "<span>Monte Carlo vigente</span>"
+        "<span>Monte Carlo publicado</span>"
         f"<strong>{html.escape(iterations_label)} simulaciones</strong>"
+        "<span>Snapshot profundo</span>"
+        "<strong>100.000 simulaciones</strong>"
         "<span>Proveedor activo</span>"
         f"<strong>{html.escape(str(provider_stack['active']))}</strong>"
         "</aside>"
@@ -11288,7 +11324,7 @@ def build_methodology_quality_html(
             "tone": "ok" if iterations >= 15000 else "warn",
             "detail": (
                 f"{iterations:,}".replace(",", ".")
-                + " simulaciones por corrida; mínimo operativo exigido: 15.000."
+                + " simulaciones en esta corrida; 15.000 es solo el mínimo técnico permitido."
                 if iterations
                 else "La llave no reporta número de simulaciones."
             ),
@@ -11326,7 +11362,7 @@ def build_methodology_quality_html(
             "status": "Activo" if live_count else "Preparado",
             "tone": "ok" if live_count else "neutral",
             "detail": (
-                f"{live_count} partidos en vivo y {final_count} cerrados. El tablero live recalcula cada 5 minutos; la llave profunda mínima corre cada hora y la llave 100k corre cada 8 horas/manual o tras push relevante."
+                f"{live_count} partidos en vivo y {final_count} cerrados. El tablero live recalcula cada 5 minutos; el guardrail 15k corre cada hora y el snapshot 100k corre cada 8 horas/manual o tras push relevante."
                 if total_fixtures
                 else "El workflow está listo, pero no hay partidos para monitorear."
             ),
@@ -11600,7 +11636,7 @@ def build_methodology_html(
         "</article>"
         "<article>"
         "<h3>Cuadro completo</h3>"
-        f"<p>La llave publicada se construye con Monte Carlo dinámico de {html.escape(montecarlo_line)} por corrida para que el cuadro no cambie solo por ruido de simulación. El muestreo de goles ya usa un RNG rápido con NumPy y semillas deterministas para sostener más simulaciones sin volver lento el procesamiento.</p>"
+        f"<p>La llave publicada se construye con Monte Carlo dinámico de {html.escape(montecarlo_line)} por corrida para que el cuadro no cambie solo por ruido de simulación. El snapshot profundo de referencia usa 100.000 simulaciones; 15.000 queda como guardrail mínimo horario. El muestreo de goles ya usa un RNG rápido con NumPy y semillas deterministas para sostener más simulaciones sin volver lento el procesamiento.</p>"
         "</article>"
         "<article>"
         "<h3>Stack estadístico</h3>"
@@ -11675,19 +11711,19 @@ def build_runtime_status_html(entries: Sequence[dict], bracket_payload: dict) ->
             "Estado operativo",
             "Publicación automática en <strong>GitHub Actions + Pages</strong>. "
             "El tablero live, los marcadores recomendados y los picks Penca se reconstruyen cada <strong>5 minutos</strong>. "
-            f"La llave profunda vigente usa <strong>{iterations_label} simulaciones</strong> en esta publicación; "
-            "se recalcula en el carril profundo horario/manual. La llave completa <strong>100k</strong> corre en un carril separado cada 8 horas/manual o tras push relevante.",
+            f"Esta publicación trae una llave de <strong>{iterations_label} simulaciones</strong>; "
+            "el snapshot profundo principal usa <strong>100.000 simulaciones</strong> y corre en un carril separado cada 8 horas/manual o tras push relevante.",
         ),
         (
             "Monte Carlo publicado",
-            f"La llave visible usa <strong>{iterations_label} simulaciones</strong> por corrida. "
-            "El carril rápido nunca baja de 15.000 y el carril completo sube a 100.000 cuando se publica la llave profunda definitiva.",
+            f"Simulaciones visibles en este corte: <strong>{iterations_label}</strong>. "
+            "Si ves <strong>15.000</strong>, léelo como mínimo técnico del carril horario; la referencia estable del modelo es <strong>100.000</strong>.",
         ),
         (
             "Frecuencia real de actualización",
             "Marcadores y tablero: <strong>cada 5 minutos</strong>. "
-            "Llave profunda mínima: <strong>cada 60 minutos</strong>. "
-            "Llave 100k: <strong>cada 8 horas, manual o por push relevante</strong> después de cambios grandes, porque esa corrida es costosa.",
+            "Guardrail horario: <strong>15.000 simulaciones como mínimo</strong>. "
+            "Snapshot principal 100k: <strong>cada 8 horas, manual o por push relevante</strong> después de cambios grandes, porque esa corrida es costosa.",
         ),
         (
             "Proveedor live activo",
@@ -11721,7 +11757,7 @@ def build_runtime_status_html(entries: Sequence[dict], bracket_payload: dict) ->
         "<div class=\"runtime-chip-row\">"
         f"<span class=\"runtime-chip\">In-play <strong>{html.escape(in_play_label)}</strong></span>"
         f"<span class=\"runtime-chip\">Validación <strong>{html.escape('latest.json + badge En vivo + minuto')}</strong></span>"
-        f"<span class=\"runtime-chip\">Frecuencia <strong>{html.escape('marcadores 5 min | llave 15k 60 min | llave 100k cada 8h/manual/push')}</strong></span>"
+        f"<span class=\"runtime-chip\">Frecuencia <strong>{html.escape('marcadores 5 min | guardrail 15k horario | snapshot 100k cada 8h/manual/push')}</strong></span>"
         "</div>"
     )
     return (
@@ -11759,7 +11795,7 @@ def build_landing_proof_html(entries: Sequence[dict], bracket_payload: dict, bac
         ),
         (
             "Actualización real",
-            f"GitHub Actions regenera marcadores y picks cada 5 minutos, la llave profunda mínima cada hora y la llave 100k cada 8 horas/manual o tras push relevante. Modela {modeled_total} partidos: {len(fixture_entries)} fixtures directos y {len(projected_entries)} cruces de llave proyectados. Estado directo: {live_count} live, {final_count} final, {pending_count} pendientes.",
+            f"GitHub Actions regenera marcadores y picks cada 5 minutos, el guardrail 15k cada hora y el snapshot 100k cada 8 horas/manual o tras push relevante. Modela {modeled_total} partidos: {len(fixture_entries)} fixtures directos y {len(projected_entries)} cruces de llave proyectados. Estado directo: {live_count} live, {final_count} final, {pending_count} pendientes.",
             "ok",
         ),
         (
@@ -11818,6 +11854,21 @@ def _quality_artifact_exists(base_dir: Path, candidates: Sequence[str]) -> bool:
     return False
 
 
+def _quality_csv_metric(base_dir: Path, candidates: Sequence[str], metric: str) -> str:
+    for candidate in candidates:
+        path = base_dir / candidate
+        if not path.exists():
+            continue
+        try:
+            with path.open(newline="", encoding="utf-8") as handle:
+                for row in csv.DictReader(handle):
+                    if str(row.get("metric", "")).strip() == metric:
+                        return str(row.get("value", "")).strip()
+        except (OSError, csv.Error):
+            continue
+    return ""
+
+
 def model_quality_audit_items(
     entries: Sequence[dict],
     bracket_payload: dict,
@@ -11861,8 +11912,19 @@ def model_quality_audit_items(
         [
             "backtest_summary.csv",
             "outputs/backtest_summary.csv",
+            "outputs/real_backtest/backtest_summary.csv",
             "site/backtest_summary.csv",
         ],
+    )
+    historical_rows_text = _quality_csv_metric(
+        base_dir,
+        ["data/real_data_coverage_report.csv", "site/real_data_coverage_report.csv"],
+        "selected_rows",
+    )
+    historical_missing_fields = _quality_csv_metric(
+        base_dir,
+        ["data/real_data_coverage_report.csv", "site/real_data_coverage_report.csv"],
+        "real_pre_match_fields_missing",
     )
     has_calibration = _quality_artifact_exists(
         base_dir,
@@ -11926,7 +11988,7 @@ def model_quality_audit_items(
             monte_score,
             "Excelente" if monte_score >= 9.5 else "Fuerte",
             f"Última llave publicada con {iterations:,} simulaciones.".replace(",", "."),
-            "Mantener 15k para carril rápido/profundo y 100k para snapshots completos; más simulaciones reducen ruido, no garantizan exactos.",
+            "Mantener 100k como snapshot principal; 15k queda solo como mínimo técnico del carril horario. Más simulaciones reducen ruido, no garantizan exactos.",
             0.12,
         ),
         score_item(
@@ -11934,7 +11996,7 @@ def model_quality_audit_items(
             operations_score,
             "Fuerte",
             f"{len(fixture_entries)} fixtures directos + {len(projected_entries)} cruces proyectados; {live_count} live y {final_count} finales aplicados.",
-            "Seguir separando carril live de 5 minutos, llave 15k horaria y snapshot 100k cada 8h/manual/push relevante.",
+            "Seguir separando carril live de 5 minutos, guardrail 15k horario y snapshot 100k cada 8h/manual/push relevante.",
             0.10,
         ),
         score_item(
@@ -11976,9 +12038,14 @@ def model_quality_audit_items(
         score_item(
             "Histórico anti-fuga",
             historical_score,
-            "Pendiente crítico" if not has_historical else "Preparado",
-            "Sin historical_matches.csv trazable, el modelo es auditable en estructura pero no puede reclamar validación histórica completa.",
-            "Cargar partidos históricos con variables pre-partido, sin rankings/valores posteriores ni resultados futuros.",
+            "Medido con datos reales" if has_historical and has_backtest else "Pendiente crítico" if not has_historical else "Preparado",
+            (
+                f"Backtest real con {historical_rows_text or 'dataset historico'} partidos de Mundial, Euro y Copa América desde 1950; "
+                f"campos no inventados siguen vacíos: {historical_missing_fields or 'FIFA/mercado/plantilla/fase exacta'}."
+                if has_historical and has_backtest
+                else "Sin historical_matches.csv trazable, el modelo es auditable en estructura pero no puede reclamar validación histórica completa."
+            ),
+            "Seguir incorporando fuentes reales para rankings FIFA pre-partido, mercado y plantillas históricas; no usar proxies para llenar huecos.",
             0.13,
         ),
         score_item(
@@ -12715,7 +12782,7 @@ def audit_dashboard_html(dashboard_html: str) -> List[str]:
         "Una sala de decisión",
         "De datos a boleto",
         "Primero decide como una mesa profesional",
-        "Monte Carlo vigente",
+        "Monte Carlo publicado",
         "simulaciones por corrida",
         "actualiza picks, goles y marcadores live; la llave se propaga en el carril profundo",
         "Marcadores dinámicos",
@@ -12822,11 +12889,12 @@ def audit_dashboard_html(dashboard_html: str) -> List[str]:
         "Estrategia según posición en Penca",
         "Revisión post-jornada",
         "Pronóstico de goles",
-        "15000",
     ]
     for snippet in required_snippets:
         if snippet not in dashboard_html:
             errors.append(f"Dashboard no contiene bloque requerido: {snippet}.")
+    if "15000" not in dashboard_html and "15.000" not in dashboard_html:
+        errors.append("Dashboard no contiene bloque requerido: 15000 o 15.000.")
     if "&lt;section class=&quot;certainty-panel&quot;&gt;" in dashboard_html:
         errors.append("Dashboard escapó el HTML del módulo de máxima firmeza.")
     if "&lt;section class=&#34;panel competitive-penca-panel&#34;&gt;" in dashboard_html:
