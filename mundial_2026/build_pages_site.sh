@@ -64,7 +64,7 @@ payload = {
     "full_100k_bracket_refresh_interval_minutes": 480,
     "full_100k_bracket_workflow": "quiniela-100k.yml",
     "full_100k_bracket_update_policy": "La llave 100k no corre cada 5 minutos: se publica cada 8 horas, se puede lanzar manualmente despues de cambios grandes, tambien corre tras push relevante de modelo/datos, y el tablero live de 5 minutos sigue usando la ultima llave profunda publicada.",
-    "update_policy_summary": "Marcadores, picks y lectura in-play: cada 5 minutos. Llave profunda minima 15k: cada 60 minutos. Llave completa 100k: cada 8 horas/manual/push relevante por costo de computo.",
+    "update_policy_summary": "Marcadores, picks y lectura in-play: cada 5 minutos. Guardrail horario de respaldo: minimo 15k. Snapshot principal publicado: 100k cada 8 horas/manual/push relevante por costo de computo.",
     "in_play_enabled": True,
     "delivery": "github_actions_pages",
     "monte_carlo_iterations": bracket_payload.get("iterations"),
