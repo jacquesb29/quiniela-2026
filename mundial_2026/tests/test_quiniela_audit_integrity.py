@@ -149,15 +149,17 @@ class QuinielaAuditIntegrityTest(unittest.TestCase):
     def test_github_pages_workflow_runs_full_auto_refresh(self):
         workflow = (REPO_ROOT / ".github" / "workflows" / "quiniela-pages.yml").read_text()
         deep_workflow = (REPO_ROOT / ".github" / "workflows" / "quiniela-deep.yml").read_text()
+        full_100k_workflow = (REPO_ROOT / ".github" / "workflows" / "quiniela-100k.yml").read_text()
         self.assertRegex(workflow, r"cron:\s*[\"']\*/5 \* \* \* \*[\"']")
-        self.assertRegex(deep_workflow, r"cron:\s*[\"']17 \* \* \* \*[\"']")
-        self.assertIn("--iterations 15000", deep_workflow)
+        self.assertRegex(full_100k_workflow, r"cron:\s*[\"']42 4,12,20 \* \* \*[\"']")
+        self.assertIn("--iterations 100000", deep_workflow)
+        self.assertIn("--iterations 100000", full_100k_workflow)
         self.assertIn("build_historical_features_1950.py --download --min-official-matches 25000", deep_workflow)
         self.assertIn("python3 -m unittest discover -s mundial_2026/tests", deep_workflow)
         self.assertIn("audit-quiniela", workflow)
         self.assertIn("API_FOOTBALL_KEY", workflow)
         self.assertIn("cancel-in-progress: true", workflow)
-        self.assertIn("cancel-in-progress: true", deep_workflow)
+        self.assertIn("cancel-in-progress: false", deep_workflow)
 
     def test_audit_workflow_text_requires_publish_gate(self):
         workflow = (REPO_ROOT / ".github" / "workflows" / "quiniela-pages.yml").read_text()
@@ -169,7 +171,7 @@ class QuinielaAuditIntegrityTest(unittest.TestCase):
             "<html><section class=\"certainty-panel\"><h2>Hoja de máxima certeza</h2>"
             "<p>Quiniela Intelligence 2026</p><p>Prueba operacional</p><p>Una sala de decisión</p>"
             "<p>De datos a boleto</p><p>Primero decide como una mesa profesional</p>"
-            "<p>Monte Carlo vigente</p><p>15.000 simulaciones por corrida</p>"
+            "<p>Monte Carlo publicado</p><p>100.000 simulaciones por corrida</p>"
             "<p>actualiza picks, goles y marcadores live; la llave se propaga en el carril profundo</p>"
             "<p>Marcadores dinámicos</p><p>Los marcadores cambian a medida que avanza el campeonato</p>"
             "<p>Durante el partido</p><p>Después de cada final</p><p>marcador para cargar en Penca</p>"
@@ -370,7 +372,7 @@ class QuinielaAuditIntegrityTest(unittest.TestCase):
                 "<p>Sistema operativo de predicción</p><p>Congelar modelo final pre-torneo</p>"
                 "<p>Re-simulación diaria</p><p>No cambiar pesos durante el Mundial</p>"
                 "<p>Estrategia según posición en Penca</p><p>Revisión post-jornada</p>"
-                "<p>Pronóstico de goles</p><p>15000</p></section></html>"
+                "<p>Pronóstico de goles</p><p>Monte Carlo publicado</p><p>100.000 simulaciones por corrida</p></section></html>"
             )
             workflow_path.write_text(
                 'cron: "*/5 * * * *"\n'

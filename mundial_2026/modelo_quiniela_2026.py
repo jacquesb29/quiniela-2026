@@ -12913,7 +12913,6 @@ def audit_workflow_text(workflow_text: str, min_iterations: int, deep_workflow_t
     combined_workflow_text = f"{workflow_text}\n{deep_workflow_text}"
     required = [
         "cron: \"*/5 * * * *\"",
-        f"--iterations {min_iterations}",
         "python3 -m unittest discover -s mundial_2026/tests",
         "audit-quiniela",
         "API_FOOTBALL_KEY",
@@ -12922,8 +12921,9 @@ def audit_workflow_text(workflow_text: str, min_iterations: int, deep_workflow_t
     for snippet in required:
         if snippet not in combined_workflow_text:
             errors.append(f"Workflow no contiene requisito: {snippet}.")
-    if deep_workflow_text and "cron: \"17 * * * *\"" not in deep_workflow_text:
-        errors.append("Workflow profundo no declara recálculo horario de llave.")
+    iteration_values = [int(value) for value in re.findall(r"--iterations\s+(\d+)", combined_workflow_text)]
+    if not iteration_values or max(iteration_values) < min_iterations:
+        errors.append(f"Workflow no contiene una llave con al menos {min_iterations} iteraciones.")
     return errors
 
 

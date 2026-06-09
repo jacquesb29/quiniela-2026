@@ -1,12 +1,7 @@
-name: Quiniela 2026 Deep Bracket
+name: Quiniela 2026 Deep 100k Bracket
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - main
-  schedule:
-    - cron: "17 * * * *"
 
 permissions:
   contents: read
@@ -14,8 +9,8 @@ permissions:
   id-token: write
 
 concurrency:
-  group: "quiniela-pages-deep"
-  cancel-in-progress: true
+  group: "quiniela-pages-deep-100k"
+  cancel-in-progress: false
 
 jobs:
   build:
@@ -61,10 +56,10 @@ jobs:
           python3 mundial_2026/sync_live_data_2026.py
           python3 mundial_2026/modelo_quiniela_2026.py state-reset
           python3 mundial_2026/modelo_quiniela_2026.py fixtures mundial_2026/fixtures_live_2026.json
-          python3 mundial_2026/modelo_quiniela_2026.py project-bracket --config mundial_2026/tournament_2026_draw.json --iterations 15000 --seed 7 --progress-every 1500
+          python3 mundial_2026/modelo_quiniela_2026.py project-bracket --config mundial_2026/tournament_2026_draw.json --iterations 100000 --seed 2026 --progress-every 10000
           python3 mundial_2026/modelo_quiniela_2026.py project-dashboard --fixtures mundial_2026/fixtures_live_2026.json
           ./mundial_2026/build_pages_site.sh
-          python3 mundial_2026/modelo_quiniela_2026.py audit-quiniela --fixtures mundial_2026/fixtures_live_2026.json --dashboard-html mundial_2026/site/index.html --bracket-json-file mundial_2026/site/llave_actual_2026.json --workflow-file .github/workflows/quiniela-pages.yml --deep-workflow-file .github/workflows/quiniela-deep.yml --min-iterations 15000
+          python3 mundial_2026/modelo_quiniela_2026.py audit-quiniela --fixtures mundial_2026/fixtures_live_2026.json --dashboard-html mundial_2026/site/index.html --bracket-json-file mundial_2026/site/llave_actual_2026.json --workflow-file .github/workflows/quiniela-pages.yml --deep-workflow-file .github/workflows/quiniela-deep.yml --min-iterations 100000
 
       - name: Configure Pages
         uses: actions/configure-pages@v5

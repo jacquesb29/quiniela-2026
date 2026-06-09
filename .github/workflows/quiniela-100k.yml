@@ -12,11 +12,15 @@ on:
       - main
     paths:
       - "mundial_2026/modelo_quiniela_2026.py"
+      - "mundial_2026/sync_live_data_2026.py"
+      - "mundial_2026/build_pages_site.sh"
       - "mundial_2026/tournament_2026_draw.json"
       - "mundial_2026/teams_2026.json"
       - "mundial_2026/fixtures_live_2026.json"
       - "mundial_2026/worldcup2026/**"
       - ".github/workflows/quiniela-100k.yml"
+      - ".github/workflows/quiniela-pages.yml"
+      - ".github/workflows/quiniela-deep.yml"
   schedule:
     - cron: "42 4,12,20 * * *"
 

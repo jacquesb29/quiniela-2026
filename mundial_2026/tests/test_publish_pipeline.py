@@ -26,7 +26,7 @@ class PublishPipelineTest(unittest.TestCase):
             (publish_root / "dashboard_actual_2026.html").write_text("<html><body>dashboard</body></html>")
             (publish_root / "reporte_actual_2026.md").write_text("# Reporte\n")
             (publish_root / "llave_actual_2026.md").write_text("# Llave\n")
-            (publish_root / "llave_actual_2026.json").write_text(json.dumps({"iterations": 15000}))
+            (publish_root / "llave_actual_2026.json").write_text(json.dumps({"iterations": 100000}))
             (publish_root / "fixtures_live_2026.json").write_text(
                 json.dumps(
                     [
@@ -76,8 +76,9 @@ class PublishPipelineTest(unittest.TestCase):
             latest = json.loads(latest_path.read_text())
             self.assertEqual(latest["refresh_interval_minutes"], 5)
             self.assertEqual(latest["live_refresh_interval_minutes"], 5)
-            self.assertEqual(latest["deep_bracket_refresh_interval_minutes"], 60)
-            self.assertEqual(latest["monte_carlo_iterations"], 15000)
+            self.assertEqual(latest["deep_bracket_refresh_interval_minutes"], 480)
+            self.assertEqual(latest["deep_bracket_minimum_iterations"], 100000)
+            self.assertEqual(latest["monte_carlo_iterations"], 100000)
             self.assertEqual(latest["delivery"], "github_actions_pages")
             self.assertTrue(latest["in_play_enabled"])
             self.assertEqual(latest["live_feed_stack"], ["espn_scoreboard"])
