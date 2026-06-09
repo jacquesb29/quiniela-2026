@@ -59,11 +59,15 @@ jobs:
           python3 mundial_2026/sync_live_data_2026.py
           python3 mundial_2026/modelo_quiniela_2026.py state-reset
           python3 mundial_2026/modelo_quiniela_2026.py fixtures mundial_2026/fixtures_live_2026.json
-          curl --fail --silent --show-error --location https://jacquesb29.github.io/quiniela-2026/llave_actual_2026.json --output mundial_2026/llave_actual_2026.json || true
-          curl --fail --silent --show-error --location https://jacquesb29.github.io/quiniela-2026/llave_actual_2026.md --output mundial_2026/llave_actual_2026.md || true
+          python3 mundial_2026/fetch_public_bracket_if_deep.py \
+            --json-url https://jacquesb29.github.io/quiniela-2026/llave_actual_2026.json \
+            --json-output mundial_2026/llave_actual_2026.json \
+            --md-url https://jacquesb29.github.io/quiniela-2026/llave_actual_2026.md \
+            --md-output mundial_2026/llave_actual_2026.md \
+            --min-iterations 100000
           python3 mundial_2026/modelo_quiniela_2026.py project-dashboard --fixtures mundial_2026/fixtures_live_2026.json
           ./mundial_2026/build_pages_site.sh
-          python3 mundial_2026/modelo_quiniela_2026.py audit-quiniela --fixtures mundial_2026/fixtures_live_2026.json --dashboard-html mundial_2026/site/index.html --bracket-json-file mundial_2026/site/llave_actual_2026.json --workflow-file .github/workflows/quiniela-pages.yml --deep-workflow-file .github/workflows/quiniela-deep.yml --min-iterations 15000
+          python3 mundial_2026/modelo_quiniela_2026.py audit-quiniela --fixtures mundial_2026/fixtures_live_2026.json --dashboard-html mundial_2026/site/index.html --bracket-json-file mundial_2026/site/llave_actual_2026.json --workflow-file .github/workflows/quiniela-pages.yml --deep-workflow-file .github/workflows/quiniela-deep.yml --min-iterations 100000
 
       - name: Configure Pages
         uses: actions/configure-pages@v5
