@@ -2291,11 +2291,21 @@ def build_live_fixtures(scoreboard_payload: dict) -> List[dict]:
 
 
 def main() -> None:
-    payload = run_curl_json(SCOREBOARD_URL)
-    fixtures = build_live_fixtures(payload)
-    OUTPUT_FILE.write_text(json.dumps(fixtures, indent=2, ensure_ascii=True))
+    used_fallback = False
+    try:
+        payload = run_curl_json(SCOREBOARD_URL)
+        fixtures = build_live_fixtures(payload)
+        OUTPUT_FILE.write_text(json.dumps(fixtures, indent=2, ensure_ascii=True))
+    except Exception as exc:
+        if not OUTPUT_FILE.exists():
+            raise
+        used_fallback = True
+        fixtures = json.loads(OUTPUT_FILE.read_text())
+        print(f"Advertencia: ESPN scoreboard no disponible ({exc}); se reutiliza {OUTPUT_FILE}")
+
     print(f"Fixtures vivos guardados en {OUTPUT_FILE}")
     print(f"Partidos sincronizados: {len(fixtures)}")
+    print(f"Fallback por feed base: {'si' if used_fallback else 'no'}")
     print(f"Proveedor live profundo activo: {'si' if provider_enabled() else 'no'}")
     print(f"Actualizado: {iso_now()}")
 
