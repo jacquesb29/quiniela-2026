@@ -228,6 +228,7 @@ CONSENSUS_CHAMPION_PRIORS = {
 CONSENSUS_CHAMPION_BLEND = 0.50
 CONSENSUS_CHAMPION_MIN_BLEND = 0.08
 CONSENSUS_LIVE_PROGRESS_WEIGHT = 0.55
+CHAMPION_MODEL_TEMPERATURE = 1.20
 DARK_HORSE_ESTABLISHED_FAVORITES = {
     "Spain",
     "France",
@@ -4045,6 +4046,33 @@ def consensus_distribution_for_teams(team_names: Sequence[str], model_probs: Dic
     return {team: value / total for team, value in consensus.items()}
 
 
+def temperature_calibrated_champion_model(
+    model_probs: Dict[str, float],
+    temperature: float = CHAMPION_MODEL_TEMPERATURE,
+) -> Dict[str, float]:
+    """Flatten champion probabilities before external blending.
+
+    The tournament Monte Carlo already combines Elo/FIFA/squad/history/path. A mild
+    temperature keeps the public champion table from treating correlated strength
+    signals as independent certainty, while preserving the raw model probability
+    separately for auditability.
+    """
+    total = sum(max(float(value), 0.0) for value in model_probs.values())
+    if total <= 0:
+        return {}
+    normalized = {team: max(float(value), 0.0) / total for team, value in model_probs.items()}
+    if temperature <= 1.0:
+        return normalized
+    powered = {
+        team: (prob ** (1.0 / temperature)) if prob > 0 else 0.0
+        for team, prob in normalized.items()
+    }
+    powered_total = sum(powered.values())
+    if powered_total <= 0:
+        return normalized
+    return {team: value / powered_total for team, value in powered.items()}
+
+
 def consensus_live_update_context(entries: Optional[Sequence[dict]] = None) -> dict:
     fixture_entries = [entry for entry in entries or [] if not entry.get("projection")]
     total = len(fixture_entries)
@@ -4084,20 +4112,26 @@ def consensus_adjusted_champion_probabilities(bracket_payload: dict, entries: Op
     consensus = consensus_distribution_for_teams(team_names, model_probs)
     model_total = sum(model_probs.values())
     normalized_model = {team: value / model_total for team, value in model_probs.items()} if model_total > 0 else model_probs
+    calibrated_model = temperature_calibrated_champion_model(normalized_model)
     consensus_blend = consensus_champion_blend(entries)
     model_blend = 1.0 - consensus_blend
     rows = []
     for team in team_names:
         model_prob = float(normalized_model.get(team, 0.0))
+        calibrated_model_prob = float(calibrated_model.get(team, model_prob))
         consensus_prob = float(consensus.get(team, 0.0))
-        adjusted = model_blend * model_prob + consensus_blend * consensus_prob
+        adjusted = model_blend * calibrated_model_prob + consensus_blend * consensus_prob
         rows.append(
             {
                 "team": team,
                 "model_prob": model_prob,
+                "calibrated_model_prob": calibrated_model_prob,
                 "consensus_prob": consensus_prob,
                 "adjusted_prob": adjusted,
-                "delta": model_prob - consensus_prob,
+                "delta": calibrated_model_prob - consensus_prob,
+                "raw_delta": model_prob - consensus_prob,
+                "overconfidence_adjustment": calibrated_model_prob - model_prob,
+                "champion_model_temperature": CHAMPION_MODEL_TEMPERATURE,
                 "model_blend": model_blend,
                 "consensus_blend": consensus_blend,
             }
@@ -8337,7 +8371,7 @@ def build_consensus_guardrail_html(bracket_payload: dict, entries: Optional[Sequ
             html_rows.append(
                 "<li>"
                 f"<strong>{html.escape(str(row['team']))}</strong>"
-                f"<span>Calibrado {format_pct(float(row['adjusted_prob']))} | modelo {format_pct(float(row['model_prob']))} | consenso {format_pct(float(row['consensus_prob']))}</span>"
+                f"<span>Final {format_pct(float(row['adjusted_prob']))} | modelo anti-sobreconfianza {format_pct(float(row.get('calibrated_model_prob', row['model_prob'])))} | crudo 100k {format_pct(float(row['model_prob']))} | consenso {format_pct(float(row['consensus_prob']))}</span>"
                 f"<em>{html.escape(tag)}</em>"
                 "</li>"
             )

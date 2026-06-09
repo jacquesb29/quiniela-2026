@@ -1042,6 +1042,13 @@ class RegressionLogicTest(unittest.TestCase):
         self.assertGreater(float(final_spain["adjusted_prob"]), float(pending_spain["adjusted_prob"]))
         self.assertGreater(float(final_spain["model_blend"]), float(pending_spain["model_blend"]))
 
+    def test_champion_temperature_reduces_top_favorite_concentration(self):
+        raw = {"Spain": 0.70, "France": 0.20, "Brazil": 0.10}
+        calibrated = app.temperature_calibrated_champion_model(raw)
+        self.assertLess(calibrated["Spain"], 0.70)
+        self.assertGreater(calibrated["Brazil"], 0.10)
+        self.assertAlmostEqual(sum(calibrated.values()), 1.0)
+
     def test_live_summary_fetch_keeps_live_and_bounds_finished_matches(self):
         far_kickoff = datetime.now(timezone.utc) + timedelta(days=90)
         recent_final = datetime.now(timezone.utc) - timedelta(hours=6)
