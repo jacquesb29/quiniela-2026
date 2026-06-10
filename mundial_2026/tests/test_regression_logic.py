@@ -100,6 +100,53 @@ class RegressionLogicTest(unittest.TestCase):
 
         self.assertGreater(mu_boosted, mu_base)
 
+    def test_strict_real_inputs_neutralize_missing_proxy_fields(self):
+        team = app.Team(
+            name="Strict Neutral Test",
+            confederation="UEFA",
+            status="qualified",
+            elo=1700.0,
+            fifa_points=None,
+            fifa_rank=None,
+        )
+
+        self.assertEqual(app.resource_index(team), 0.5)
+        self.assertEqual(app.population_index(team), 0.5)
+        self.assertEqual(app.gdp_index(team), 0.5)
+        self.assertEqual(app.league_strength_index(team), 0.5)
+        self.assertEqual(app.macro_resource_index(team), 0.5)
+        self.assertEqual(app.coach_index(team), 0.5)
+        self.assertEqual(app.chemistry_index(team), 0.5)
+        self.assertEqual(app.discipline_proxy(team), 0.5)
+        self.assertEqual(app.proxy_players(team), ())
+
+        squad = app.aggregate_squad(team)
+        self.assertEqual(squad.squad_quality, 0.5)
+        self.assertEqual(squad.talent_market_index, 0.5)
+        self.assertEqual(squad.physical_load_index, 0.0)
+
+    def test_public_popularity_proxy_does_not_move_strategy_when_disabled(self):
+        prediction = app.MatchPrediction(
+            team_a="Spain",
+            team_b="Portugal",
+            expected_goals_a=1.2,
+            expected_goals_b=1.1,
+            win_a=0.40,
+            draw=0.28,
+            win_b=0.32,
+            exact_scores=[("1-1", 0.12)],
+        )
+
+        public_probs = app.public_pick_proxy(prediction)
+
+        self.assertEqual(public_probs["1"], prediction.win_a)
+        self.assertEqual(public_probs["X"], prediction.draw)
+        self.assertEqual(public_probs["2"], prediction.win_b)
+        self.assertEqual(
+            app.public_scoreline_popularity_proxy(1, 1, 1.2, 1.1, 0.12, 0.12, 0.2, 0.8),
+            0.0,
+        )
+
     def test_granular_penalty_variables_affect_shootout_edge(self):
         teams = app.load_teams()
         base_a = teams["Portugal"]
@@ -613,7 +660,8 @@ class RegressionLogicTest(unittest.TestCase):
         self.assertIn("competitive_adjusted_points", options[0])
         popular = app.score_expected_points_for_penca(dist, 2, 0)
         less_obvious = app.score_expected_points_for_penca(dist, 3, 1)
-        self.assertGreater(float(popular["public_score_popularity_index"]), float(less_obvious["public_score_popularity_index"]))
+        self.assertEqual(float(popular["public_score_popularity_index"]), 0.0)
+        self.assertEqual(float(less_obvious["public_score_popularity_index"]), 0.0)
         portfolio = app.penca_score_portfolio(dist)
         self.assertIn("differential", portfolio)
         self.assertIn("differential_value_index", portfolio["differential"])
@@ -924,7 +972,8 @@ class RegressionLogicTest(unittest.TestCase):
         self.assertIn("Marcadores amplios o menos centrados a vigilar", html)
         self.assertIn("Modo seguro", html)
         self.assertIn("Modo diferencial", html)
-        self.assertIn("Popularidad estimada del marcador", html)
+        self.assertIn("Consenso real del marcador", html)
+        self.assertIn("Desactivado hasta tener fuente real", html)
         self.assertIn("Valor diferencial del marcador", html)
         self.assertIn("Qué cargar primero en Penca", html)
         self.assertIn("Modelo:", html)

@@ -1,7 +1,7 @@
 {
-  "updated_at_utc": "2026-06-09T18:24:29+00:00",
-  "publication_updated_at_utc": "2026-06-09T18:24:29+00:00",
-  "dashboard_updated_at_utc": "2026-06-09T17:31:16+00:00",
+  "updated_at_utc": "2026-06-10T00:03:58+00:00",
+  "publication_updated_at_utc": "2026-06-10T00:03:58+00:00",
+  "dashboard_updated_at_utc": "2026-06-10T00:02:22+00:00",
   "timestamp_consistency_note": "latest.json se escribe despues de copiar el HTML; compara dashboard_updated_at_utc contra publication_updated_at_utc para detectar desfases reales de publicacion o cache.",
   "refresh_interval_minutes": 5,
   "live_refresh_interval_minutes": 5,
@@ -17,6 +17,10 @@
   "delivery": "github_actions_pages",
   "monte_carlo_iterations": 100000,
   "scoreline_engine": "ensamble_no_solo_poisson_bayes_dinamico_v2",
+  "input_data_policy": "solo_datos_reales_explicitos",
+  "proxy_input_policy": "Si falta una variable, se neutraliza; no se imputa con proxies ni fama. Las senales de popularidad publica quedan apagadas hasta tener fuente real.",
+  "strict_real_inputs_only": true,
+  "public_popularity_proxy_enabled": false,
   "explicit_variable_blocks": [
     "squad_market_value",
     "top_5_players_value_share",

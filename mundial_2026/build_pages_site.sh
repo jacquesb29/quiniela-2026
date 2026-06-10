@@ -69,6 +69,10 @@ payload = {
     "delivery": "github_actions_pages",
     "monte_carlo_iterations": bracket_payload.get("iterations"),
     "scoreline_engine": bracket_payload.get("scoreline_engine"),
+    "input_data_policy": "solo_datos_reales_explicitos",
+    "proxy_input_policy": "Si falta una variable, se neutraliza; no se imputa con proxies ni fama. Las senales de popularidad publica quedan apagadas hasta tener fuente real.",
+    "strict_real_inputs_only": True,
+    "public_popularity_proxy_enabled": False,
     "explicit_variable_blocks": [
         "squad_market_value",
         "top_5_players_value_share",

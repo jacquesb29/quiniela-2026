@@ -12,7 +12,7 @@ import re
 import shutil
 import tempfile
 import unicodedata
-from dataclasses import asdict, dataclass
+from dataclasses import asdict, dataclass, replace
 from datetime import datetime, timezone
 from functools import lru_cache
 from pathlib import Path
@@ -229,6 +229,13 @@ CONSENSUS_CHAMPION_BLEND = 0.50
 CONSENSUS_CHAMPION_MIN_BLEND = 0.08
 CONSENSUS_LIVE_PROGRESS_WEIGHT = 0.55
 CHAMPION_MODEL_TEMPERATURE = 1.20
+STRICT_REAL_INPUTS_ONLY = True
+NEUTRAL_INDEX_VALUE = 0.50
+PROXY_INPUT_POLICY = (
+    "Solo datos reales explícitos pueden mover el modelo. "
+    "Si una variable falta, se neutraliza; no se reemplaza con proxies."
+)
+DISABLE_PUBLIC_POPULARITY_PROXY = True
 DARK_HORSE_ESTABLISHED_FAVORITES = {
     "Spain",
     "France",
@@ -918,7 +925,7 @@ def top_factor_drivers(factors: Optional[Dict[str, float]], limit: int = 3) -> L
     labels = {
         "elo_diff": "Elo dinámico",
         "fifa_strength_diff": "Ranking FIFA / puntos FIFA",
-        "resource_diff": "Recursos/PIB proxy",
+        "resource_diff": "Recursos explícitos neutralizados si faltan",
         "population_diff": "Población futbolística/económica",
         "gdp_diff": "PIB explícito",
         "league_strength_diff": "Ranking/fuerza de liga",
@@ -1063,8 +1070,208 @@ def centered(value: float) -> float:
     return value - 0.5
 
 
+def has_real_number(value: object, *, allow_zero: bool = False) -> bool:
+    if value is None:
+        return False
+    try:
+        number = float(value)
+    except (TypeError, ValueError):
+        return False
+    if not math.isfinite(number):
+        return False
+    return allow_zero or number > 0.0
+
+
+def has_any_nonzero_team_field(team: Team, fields: Sequence[str]) -> bool:
+    return any(has_real_number(getattr(team, field, None), allow_zero=False) for field in fields)
+
+
+def neutral_historical_snapshot(team: Team) -> HistoricalSnapshot:
+    neutral_scoreline_families = {
+        "clean_sheet_win_1": 0.105,
+        "clean_sheet_win_2": 0.078,
+        "clean_sheet_win_3_plus": 0.047,
+        "btts_win_1": 0.128,
+        "btts_win_2_plus": 0.037,
+        "draw_00": 0.076,
+        "draw_11": 0.116,
+        "draw_22_plus": 0.052,
+        "clean_sheet_loss_1": 0.105,
+        "clean_sheet_loss_2": 0.078,
+        "clean_sheet_loss_3_plus": 0.047,
+        "btts_loss_1": 0.128,
+        "btts_loss_2_plus": 0.037,
+        "btts": 0.498,
+        "total_0_1": 0.274,
+        "total_2_3": 0.487,
+        "total_4_plus": 0.239,
+    }
+    return HistoricalSnapshot(
+        source_names=(team.name, "neutral_no_proxy"),
+        history_start_year=1950,
+        matches_since_start=0,
+        weighted_matches_since_start=0.0,
+        points_per_match=1.25,
+        weighted_points_per_match=1.25,
+        goals_for_per_match=1.2,
+        goals_against_per_match=1.2,
+        goal_diff_per_match=0.0,
+        weighted_goals_for_per_match=1.2,
+        weighted_goals_against_per_match=1.2,
+        weighted_goal_diff_per_match=0.0,
+        scoring_rate=0.62,
+        clean_sheet_rate=0.26,
+        competitive_matches_since_start=0,
+        competitive_points_per_match=1.25,
+        competitive_goal_diff_per_match=0.0,
+        world_cup_matches_since_start=0,
+        world_cup_points_per_match=0.0,
+        world_cup_goal_diff_per_match=0.0,
+        shootout_matches_since_start=0,
+        shootout_win_rate=0.5,
+        scoreline_family_rates=neutral_scoreline_families,
+        strength_index=NEUTRAL_INDEX_VALUE,
+        attack_index=NEUTRAL_INDEX_VALUE,
+        defense_index=NEUTRAL_INDEX_VALUE,
+        competitive_index=NEUTRAL_INDEX_VALUE,
+        world_cup_index=NEUTRAL_INDEX_VALUE,
+        shootout_index=NEUTRAL_INDEX_VALUE,
+    )
+
+
+def neutral_squad_aggregate(team: Team) -> SquadAggregate:
+    explicit_market_value = float(team.squad_market_value_eur_m or 0.0) if team.squad_market_value_eur_m is not None else 0.0
+    explicit_top_minutes = (
+        clamp(float(team.top_league_minutes_share), 0.0, 1.0)
+        if team.top_league_minutes_share is not None
+        else NEUTRAL_INDEX_VALUE
+    )
+    market_index = (
+        clamp(math.log1p(explicit_market_value) / math.log1p(1600.0), 0.10, 1.0)
+        if explicit_market_value > 0.0
+        else NEUTRAL_INDEX_VALUE
+    )
+    style_fields = ("expected_threat", "progressive_passes", "progressive_carries", "ppda", "field_tilt")
+    has_style = has_any_nonzero_team_field(team, style_fields)
+    expected_threat_value = clamp(float(team.expected_threat), 0.0, 1.0) if has_style else NEUTRAL_INDEX_VALUE
+    progressive_passes_value = clamp(float(team.progressive_passes), 0.0, 1.0) if has_style else NEUTRAL_INDEX_VALUE
+    progressive_carries_value = clamp(float(team.progressive_carries), 0.0, 1.0) if has_style else NEUTRAL_INDEX_VALUE
+    ppda_value = clamp(float(team.ppda), 0.0, 1.0) if has_style else NEUTRAL_INDEX_VALUE
+    field_tilt_value = clamp(float(team.field_tilt), 0.0, 1.0) if has_style else NEUTRAL_INDEX_VALUE
+    advanced_style_index = clamp(
+        0.28 * expected_threat_value
+        + 0.20 * progressive_passes_value
+        + 0.18 * progressive_carries_value
+        + 0.16 * ppda_value
+        + 0.18 * field_tilt_value,
+        0.0,
+        1.0,
+    )
+
+    tactical_fields = (
+        "high_press_resistance",
+        "low_block_breaking",
+        "transition_defense",
+        "aerial_matchup_advantage",
+    )
+    has_tactical = has_any_nonzero_team_field(team, tactical_fields)
+    high_press_resistance = (
+        clamp(float(team.high_press_resistance), 0.0, 1.0) if has_tactical else NEUTRAL_INDEX_VALUE
+    )
+    low_block_breaking = clamp(float(team.low_block_breaking), 0.0, 1.0) if has_tactical else NEUTRAL_INDEX_VALUE
+    transition_defense = clamp(float(team.transition_defense), 0.0, 1.0) if has_tactical else NEUTRAL_INDEX_VALUE
+    aerial_matchup_advantage = (
+        clamp(float(team.aerial_matchup_advantage), 0.0, 1.0) if has_tactical else NEUTRAL_INDEX_VALUE
+    )
+    tactical_matchup_index = clamp(
+        0.28 * high_press_resistance
+        + 0.26 * low_block_breaking
+        + 0.25 * transition_defense
+        + 0.21 * aerial_matchup_advantage,
+        0.0,
+        1.0,
+    )
+
+    penalty_fields = (
+        "penalty_taker_quality",
+        "goalkeeper_penalty_save_rate",
+        "shootout_pressure_experience",
+        "keeper_taker_strategy_matchup",
+    )
+    has_penalty = has_any_nonzero_team_field(team, penalty_fields)
+    penalty_taker_quality = (
+        clamp(float(team.penalty_taker_quality), 0.0, 1.0) if has_penalty else NEUTRAL_INDEX_VALUE
+    )
+    goalkeeper_penalty_save_rate = (
+        clamp(float(team.goalkeeper_penalty_save_rate), 0.0, 1.0) if has_penalty else NEUTRAL_INDEX_VALUE
+    )
+    shootout_pressure_experience = (
+        clamp(float(team.shootout_pressure_experience), 0.0, 1.0) if has_penalty else NEUTRAL_INDEX_VALUE
+    )
+    keeper_taker_strategy_matchup = (
+        clamp(float(team.keeper_taker_strategy_matchup), -1.0, 1.0) if has_penalty else 0.0
+    )
+    penalty_granular_index = clamp(
+        0.38 * penalty_taker_quality
+        + 0.26 * goalkeeper_penalty_save_rate
+        + 0.24 * shootout_pressure_experience
+        + 0.12 * (0.5 + 0.5 * keeper_taker_strategy_matchup),
+        0.0,
+        1.0,
+    )
+
+    return SquadAggregate(
+        squad_quality=NEUTRAL_INDEX_VALUE,
+        attack_unit=NEUTRAL_INDEX_VALUE,
+        midfield_unit=NEUTRAL_INDEX_VALUE,
+        defense_unit=NEUTRAL_INDEX_VALUE,
+        goalkeeper_unit=NEUTRAL_INDEX_VALUE,
+        bench_depth=NEUTRAL_INDEX_VALUE,
+        player_experience=NEUTRAL_INDEX_VALUE,
+        set_piece_attack=NEUTRAL_INDEX_VALUE,
+        set_piece_defense=NEUTRAL_INDEX_VALUE,
+        discipline_index=NEUTRAL_INDEX_VALUE,
+        yellow_rate=0.12,
+        red_rate=0.01,
+        availability=1.0,
+        finishing=NEUTRAL_INDEX_VALUE,
+        shot_creation=NEUTRAL_INDEX_VALUE,
+        pressing=NEUTRAL_INDEX_VALUE,
+        recent_minutes_load=NEUTRAL_INDEX_VALUE,
+        goalkeeper_minutes_load=NEUTRAL_INDEX_VALUE,
+        bench_impact=NEUTRAL_INDEX_VALUE,
+        squad_market_value=explicit_market_value,
+        top_5_players_value_share=NEUTRAL_INDEX_VALUE,
+        value_depth_ratio=NEUTRAL_INDEX_VALUE,
+        talent_market_index=clamp(0.72 * market_index + 0.28 * explicit_top_minutes, 0.08, 1.0),
+        total_minutes_last_12_months=0.0,
+        club_world_cup_minutes=0.0,
+        days_since_last_match=14.0,
+        injury_proneness=0.0,
+        physical_load_index=0.0,
+        expected_threat=expected_threat_value,
+        progressive_passes=progressive_passes_value,
+        progressive_carries=progressive_carries_value,
+        ppda=ppda_value,
+        field_tilt=field_tilt_value,
+        advanced_style_index=advanced_style_index,
+        high_press_resistance=high_press_resistance,
+        low_block_breaking=low_block_breaking,
+        transition_defense=transition_defense,
+        aerial_matchup_advantage=aerial_matchup_advantage,
+        tactical_matchup_index=tactical_matchup_index,
+        penalty_taker_quality=penalty_taker_quality,
+        goalkeeper_penalty_save_rate=goalkeeper_penalty_save_rate,
+        shootout_pressure_experience=shootout_pressure_experience,
+        keeper_taker_strategy_matchup=keeper_taker_strategy_matchup,
+        penalty_granular_index=penalty_granular_index,
+    )
+
+
 @lru_cache(maxsize=None)
 def estimated_fifa_points(team: Team) -> float:
+    if STRICT_REAL_INPUTS_ONLY:
+        return 1500.0
     return calculate_estimated_fifa_points(
         team,
         heritage_index=heritage_index,
@@ -1106,6 +1313,8 @@ def fifa_points_bounds() -> Tuple[float, float]:
 
 @lru_cache(maxsize=None)
 def fifa_strength_index(team: Team) -> float:
+    if STRICT_REAL_INPUTS_ONLY and team.fifa_points is None:
+        return NEUTRAL_INDEX_VALUE
     return calculate_fifa_strength_index(
         team,
         points_bounds_fn=fifa_points_bounds,
@@ -1120,6 +1329,8 @@ def historical_features_payload() -> dict:
 
 
 def proxy_historical_snapshot(team: Team) -> HistoricalSnapshot:
+    if STRICT_REAL_INPUTS_ONLY:
+        return neutral_historical_snapshot(team)
     return calculate_proxy_historical_snapshot(
         team,
         HistoricalSnapshotCls=HistoricalSnapshot,
@@ -1143,11 +1354,15 @@ def historical_snapshot(team: Team) -> HistoricalSnapshot:
 
 @lru_cache(maxsize=None)
 def resource_index(team: Team) -> float:
+    if STRICT_REAL_INPUTS_ONLY:
+        return NEUTRAL_INDEX_VALUE
     return calculate_resource_index(team, clamp=clamp)
 
 
 @lru_cache(maxsize=None)
 def population_index(team: Team) -> float:
+    if STRICT_REAL_INPUTS_ONLY and not has_real_number(team.population_millions):
+        return NEUTRAL_INDEX_VALUE
     return calculate_population_index(
         team,
         resource_index_value=resource_index(team),
@@ -1157,6 +1372,10 @@ def population_index(team: Team) -> float:
 
 @lru_cache(maxsize=None)
 def gdp_index(team: Team) -> float:
+    if STRICT_REAL_INPUTS_ONLY and not (
+        has_real_number(team.gdp_per_capita_usd) or has_real_number(team.gdp_ppp_usd_billion)
+    ):
+        return NEUTRAL_INDEX_VALUE
     return calculate_gdp_index(
         team,
         resource_index_value=resource_index(team),
@@ -1166,6 +1385,12 @@ def gdp_index(team: Team) -> float:
 
 @lru_cache(maxsize=None)
 def league_strength_index(team: Team) -> float:
+    if STRICT_REAL_INPUTS_ONLY:
+        if team.league_strength_index is not None:
+            return clamp(float(team.league_strength_index), 0.12, 1.0)
+        if team.top_league_minutes_share is not None:
+            return clamp(float(team.top_league_minutes_share), 0.0, 1.0)
+        return NEUTRAL_INDEX_VALUE
     return calculate_league_strength_index(
         team,
         resource_index_value=resource_index(team),
@@ -1176,6 +1401,17 @@ def league_strength_index(team: Team) -> float:
 
 @lru_cache(maxsize=None)
 def macro_resource_index(team: Team) -> float:
+    if STRICT_REAL_INPUTS_ONLY:
+        components = []
+        if has_real_number(team.population_millions):
+            components.append(population_index(team))
+        if has_real_number(team.gdp_per_capita_usd) or has_real_number(team.gdp_ppp_usd_billion):
+            components.append(gdp_index(team))
+        if team.league_strength_index is not None or team.top_league_minutes_share is not None:
+            components.append(league_strength_index(team))
+        if not components:
+            return NEUTRAL_INDEX_VALUE
+        return clamp(sum(components) / len(components), 0.16, 1.0)
     return calculate_macro_resource_index(
         resource_index_value=resource_index(team),
         population_index_value=population_index(team),
@@ -1187,6 +1423,18 @@ def macro_resource_index(team: Team) -> float:
 
 @lru_cache(maxsize=None)
 def heritage_index(team: Team) -> float:
+    if STRICT_REAL_INPUTS_ONLY:
+        history = historical_snapshot(team)
+        titles = WORLD_CUP_TITLES.get(team.name, 0)
+        return clamp(
+            NEUTRAL_INDEX_VALUE
+            + 0.16 * centered(history.strength_index)
+            + 0.12 * centered(history.world_cup_index)
+            + 0.06 * centered(history.competitive_index)
+            + 0.03 * titles,
+            0.10,
+            1.00,
+        )
     return calculate_heritage_index(
         team,
         historical_snapshot=historical_snapshot,
@@ -1197,6 +1445,18 @@ def heritage_index(team: Team) -> float:
 
 @lru_cache(maxsize=None)
 def trajectory_index(team: Team) -> float:
+    if STRICT_REAL_INPUTS_ONLY:
+        history = historical_snapshot(team)
+        return clamp(
+            NEUTRAL_INDEX_VALUE
+            + 0.20 * centered(history.strength_index)
+            + 0.12 * centered(history.competitive_index)
+            + 0.08 * centered(history.attack_index)
+            + 0.08 * centered(history.defense_index)
+            + 0.05 * clamp((team.elo - 1650.0) / 350.0, -0.2, 0.4),
+            0.12,
+            1.00,
+        )
     return calculate_trajectory_index(
         team,
         historical_snapshot=historical_snapshot,
@@ -1208,6 +1468,8 @@ def trajectory_index(team: Team) -> float:
 
 @lru_cache(maxsize=None)
 def coach_index(team: Team) -> float:
+    if STRICT_REAL_INPUTS_ONLY:
+        return NEUTRAL_INDEX_VALUE
     return calculate_coach_index(
         team,
         historical_snapshot=historical_snapshot,
@@ -1219,6 +1481,8 @@ def coach_index(team: Team) -> float:
 
 @lru_cache(maxsize=None)
 def chemistry_index(team: Team) -> float:
+    if STRICT_REAL_INPUTS_ONLY:
+        return NEUTRAL_INDEX_VALUE
     return calculate_chemistry_index(
         team,
         coach_index_value=coach_index(team),
@@ -1230,11 +1494,15 @@ def chemistry_index(team: Team) -> float:
 
 @lru_cache(maxsize=None)
 def discipline_proxy(team: Team) -> float:
+    if STRICT_REAL_INPUTS_ONLY:
+        return NEUTRAL_INDEX_VALUE
     return calculate_discipline_proxy(team, clamp=clamp)
 
 
 @lru_cache(maxsize=None)
 def tactical_flexibility(team: Team) -> float:
+    if STRICT_REAL_INPUTS_ONLY:
+        return NEUTRAL_INDEX_VALUE
     return calculate_tactical_flexibility(
         coach_index_value=coach_index(team),
         resource_index_value=resource_index(team),
@@ -1245,6 +1513,8 @@ def tactical_flexibility(team: Team) -> float:
 
 @lru_cache(maxsize=None)
 def morale_base(team: Team) -> float:
+    if STRICT_REAL_INPUTS_ONLY:
+        return NEUTRAL_INDEX_VALUE
     return calculate_morale_base(
         chemistry_index_value=chemistry_index(team),
         heritage_index_value=heritage_index(team),
@@ -1255,6 +1525,8 @@ def morale_base(team: Team) -> float:
 
 @lru_cache(maxsize=None)
 def travel_resilience(team: Team) -> float:
+    if STRICT_REAL_INPUTS_ONLY:
+        return NEUTRAL_INDEX_VALUE
     return calculate_travel_resilience(
         team,
         resource_index_value=resource_index(team),
@@ -1265,6 +1537,11 @@ def travel_resilience(team: Team) -> float:
 
 @lru_cache(maxsize=None)
 def geography_2026_index(team: Team) -> float:
+    if STRICT_REAL_INPUTS_ONLY and not has_any_nonzero_team_field(
+        team,
+        ("heat_humidity_load", "time_zone_shift", "venue_surface_adjustment", "travel_cluster_difficulty"),
+    ):
+        return NEUTRAL_INDEX_VALUE
     return calculate_geography_2026_index(
         team,
         travel_resilience_value=travel_resilience(team),
@@ -1275,6 +1552,8 @@ def geography_2026_index(team: Team) -> float:
 
 @lru_cache(maxsize=None)
 def tempo_proxy(team: Team) -> float:
+    if STRICT_REAL_INPUTS_ONLY:
+        return NEUTRAL_INDEX_VALUE
     return calculate_tempo_proxy(
         team,
         trajectory_index_value=trajectory_index(team),
@@ -1296,6 +1575,8 @@ def player_stat_quality(base: float, jitter: float, rng: random.Random) -> float
 def proxy_players(team: Team) -> Tuple[Player, ...]:
     if team.players:
         return team.players
+    if STRICT_REAL_INPUTS_ONLY:
+        return ()
 
     rng = random.Random(stable_seed(team.name))
     strength = clamp(0.50 + (team.elo - 1650.0) / 620.0, 0.12, 0.92)
@@ -1431,9 +1712,11 @@ def sort_by(players: Sequence[Player], key_name: str) -> List[Player]:
 
 @lru_cache(maxsize=None)
 def aggregate_squad(team: Team) -> SquadAggregate:
+    if STRICT_REAL_INPUTS_ONLY and not team.players:
+        return neutral_squad_aggregate(team)
     return calculate_aggregate_squad(
         team,
-        proxy_players_fn=proxy_players,
+        proxy_players_fn=(lambda selected_team: selected_team.players) if STRICT_REAL_INPUTS_ONLY else proxy_players,
         clamp=clamp,
         SquadAggregateCls=SquadAggregate,
     )
@@ -1622,8 +1905,9 @@ def context_components(
 
 
 def attack_metric(team: Team, profile: TeamProfile, state: Optional[dict] = None) -> float:
+    model_team = replace(team, attack_bias=0.0) if STRICT_REAL_INPUTS_ONLY else team
     return calculate_attack_metric(
-        team,
+        model_team,
         profile,
         state=state,
         effective_elo=effective_elo,
@@ -1638,8 +1922,9 @@ def attack_metric(team: Team, profile: TeamProfile, state: Optional[dict] = None
 
 
 def defense_metric(team: Team, profile: TeamProfile, state: Optional[dict] = None) -> float:
+    model_team = replace(team, defense_bias=0.0) if STRICT_REAL_INPUTS_ONLY else team
     return calculate_defense_metric(
-        team,
+        model_team,
         profile,
         state=state,
         effective_elo=effective_elo,
@@ -3943,6 +4228,10 @@ def command_project_bracket(args: argparse.Namespace, teams: Dict[str, Team]) ->
         "iterations": args.iterations,
         "workers": workers,
         "scoreline_engine": "ensamble_no_solo_poisson_bayes_dinamico_v2",
+        "input_data_policy": "solo_datos_reales_explicitos",
+        "proxy_input_policy": PROXY_INPUT_POLICY,
+        "strict_real_inputs_only": STRICT_REAL_INPUTS_ONLY,
+        "public_popularity_proxy_enabled": not DISABLE_PUBLIC_POPULARITY_PROXY,
         "bracket_recalculated_from_scoreline_ensemble": True,
         "recalculation_policy": (
             f"Los marcadores directos se refrescan cada 5 minutos. La llave completa se reconstruye con "
@@ -4417,7 +4706,6 @@ def extract_live_stats_payload(source: dict) -> Dict[str, float]:
         "yellow_cards",
         "red_cards",
         "xg",
-        "xg_proxy",
         "substitutions",
         "substitution_impact",
         "bench_remaining",
@@ -4465,12 +4753,11 @@ def dashboard_live_stats_lines(entry: dict, team_a: str, team_b: str) -> List[st
         lines.append(
             f"- Posesion: {team_a} {stats.get('possession_a', 0.0):.0f}% | {team_b} {stats.get('possession_b', 0.0):.0f}%"
         )
-    xg_a = stats.get("xg_a", stats.get("xg_proxy_a"))
-    xg_b = stats.get("xg_b", stats.get("xg_proxy_b"))
+    xg_a = stats.get("xg_a")
+    xg_b = stats.get("xg_b")
     if xg_a is not None or xg_b is not None:
-        label = "Calidad de ocasiones en vivo" if stats.get("xg_a") is not None or stats.get("xg_b") is not None else "Calidad de ocasiones en vivo (estimada)"
         lines.append(
-            f"- {label}: {team_a} {float(xg_a or 0.0):.2f} | {team_b} {float(xg_b or 0.0):.2f}"
+            f"- Calidad de ocasiones en vivo: {team_a} {float(xg_a or 0.0):.2f} | {team_b} {float(xg_b or 0.0):.2f}"
         )
     if stats.get("red_cards_a") or stats.get("red_cards_b"):
         lines.append(
@@ -5288,8 +5575,8 @@ def adjustment_reason_lines(entry: dict, prediction: MatchPrediction) -> List[st
     if live_stats:
         shots_on_target_a = int(live_stats.get("shots_on_target_a", 0.0))
         shots_on_target_b = int(live_stats.get("shots_on_target_b", 0.0))
-        xg_a = float(live_stats.get("xg_a", live_stats.get("xg_proxy_a", 0.0)))
-        xg_b = float(live_stats.get("xg_b", live_stats.get("xg_proxy_b", 0.0)))
+        xg_a = float(live_stats.get("xg_a", 0.0))
+        xg_b = float(live_stats.get("xg_b", 0.0))
         red_a = int(live_stats.get("red_cards_a", 0.0))
         red_b = int(live_stats.get("red_cards_b", 0.0))
         if shots_on_target_a or shots_on_target_b or xg_a or xg_b:
@@ -5507,6 +5794,9 @@ def public_scoreline_popularity_proxy(
     The Penca optimizer can use that signal to distinguish "safe/obvious" from
     "differential but still defensible" score choices.
     """
+
+    if DISABLE_PUBLIC_POPULARITY_PROXY:
+        return 0.0
 
     total_goals = pick_a + pick_b
     margin = abs(pick_a - pick_b)
@@ -6766,8 +7056,8 @@ def score_precision_profile(
         )
     if float(top_penca.get("differential_value_index", 0.0)) >= 0.55:
         recommendation_note = (
-            f"{recommendation_note} También tiene valor diferencial: no parece tan obvio para el boleto popular, "
-            "pero conserva soporte de puntos esperados."
+            f"{recommendation_note} También tiene valor competitivo por puntos esperados y plausibilidad, "
+            "pero sin usar proxy de popularidad."
         )
 
     return {
@@ -6795,7 +7085,7 @@ def score_precision_profile(
         "recommended_scoreline_scenario_family": str(top_penca.get("scoreline_scenario_family", "marcador balanceado")),
         "recommended_scoreline_scenario_note": str(top_penca.get("scoreline_scenario_note", "escenario mixto")),
         "recommended_poisson_modal_lock_penalty": float(top_penca.get("poisson_modal_lock_penalty", 0.0)),
-        "score_selector_method": "Ensamble de marcador: puntos Penca + distribución multimodelo + familias históricas por selección + escenarios de partido + plausibilidad + valor competitivo vs marcador popular",
+        "score_selector_method": "Ensamble de marcador: puntos Penca + distribución multimodelo + familias históricas reales + escenarios de partido + plausibilidad; sin proxy de popularidad",
         "recommended_historical_matchup_boost": float(top_penca.get("shape_boost", 1.0)),
         "recommended_matchup_family_index": float(top_penca.get("matchup_family_index", 0.50)),
         "recommended_plausibility_index": float(top_penca.get("plausibility_index", top_penca.get("realism_index", 1.0))),
@@ -7166,6 +7456,8 @@ def build_ticket_snapshot_html(entries: Sequence[dict], updated_at: str) -> str:
 
 
 def team_public_popularity_index(team_name: str) -> float:
+    if DISABLE_PUBLIC_POPULARITY_PROXY:
+        return NEUTRAL_INDEX_VALUE
     teams = load_teams()
     team = teams.get(team_name)
     if not team:
@@ -7191,6 +7483,9 @@ def public_pick_proxy(prediction: MatchPrediction) -> Dict[str, float]:
     No pretende ser una encuesta; sirve para encontrar picks donde el modelo
     tiene ventaja relativa frente a una quiniela llenada por favoritos obvios.
     """
+
+    if DISABLE_PUBLIC_POPULARITY_PROXY:
+        return {"1": float(prediction.win_a), "X": float(prediction.draw), "2": float(prediction.win_b)}
 
     pop_a = team_public_popularity_index(prediction.team_a)
     pop_b = team_public_popularity_index(prediction.team_b)
@@ -7236,7 +7531,7 @@ def quiniela_strategy_profile(entry: dict) -> dict:
         public_code != best_code and expected_gain_vs_popular >= 0.025 and float(base["pick_prob"]) >= 0.44
     ) or (edge_vs_public >= 0.055 and 0.44 <= float(base["pick_prob"]) < 0.66):
         strategy_tier = "Diferencial positivo"
-        strategy_action = "Usarlo para sacar ventaja si otros siguen el favorito popular."
+        strategy_action = "Usarlo solo si hay fuente real de consenso; con proxy apagado, prioriza puntos esperados."
     elif second_edge >= 0.035 and second_prob >= 0.26 and float(base["gap"]) <= 0.12:
         strategy_tier = "Cubrir si puedes"
         strategy_action = (
@@ -7320,7 +7615,7 @@ def penca_decision_profile(entry: dict) -> dict:
     elif item["strategy_tier"] == "Diferencial positivo" and float(item.get("expected_gain_vs_popular", 0.0)) > 0.0:
         score = penca_score_from_profile(item, "upside_score")
         scenario = "Diferencial"
-        action = "Escoger este escenario si necesitas ganarle al boleto popular; si vas liderando, baja a modo óptimo."
+        action = "Escoger este escenario solo si hay consenso real; si vas liderando, baja a modo óptimo."
         reason = (
             f"El modelo ve ventaja contra el pick popular: ganancia esperada "
             f"{float(item.get('expected_gain_vs_popular', 0.0)):+.1%}."
@@ -7618,11 +7913,11 @@ def build_quiniela_strategy_markdown(entries: Sequence[dict]) -> List[str]:
     )[:10]
     lines = [
         "### Estrategia para ganar la quiniela",
-        "- Objetivo: aumentar expectativa y ventaja relativa frente a un boleto popular, no inflar porcentajes.",
+        "- Objetivo: aumentar expectativa de puntos y controlar riesgo, no inflar porcentajes.",
         "- Reglas Penca Ovación usadas para optimizar marcador: 8 puntos por resultado exacto, 5 por diferencia de goles y 3 por ganador.",
         f"- Aciertos esperados del boleto modelo: {metrics['expected_model_hits']:.1f}/{int(metrics['total'])}.",
         f"- Puntos esperados por marcadores recomendados para la app: {metrics['expected_penca_points']:.1f}/{int(metrics['total']) * 8} ({metrics['expected_penca_points_per_match']:.2f} por partido).",
-        f"- Boleto popular por nombre estimado: {metrics['expected_popular_hits']:.1f}/{int(metrics['total'])}. Ventaja esperada del modelo: {metrics['expected_gain']:+.1f} picks.",
+        "- Señales de popularidad pública: desactivadas mientras no haya fuente real de consenso de la Penca.",
         f"- Marcador exacto recomendado esperado: {metrics['expected_penca_exact_scores']:.1f}/{int(metrics['total'])}. Esto NO mide acierto de ganador; mide cuántas veces esperarías acertar el marcador optimizado para puntos.",
         f"- Diferencia de goles esperada con el marcador recomendado: {metrics['expected_penca_difference_scores']:.1f}/{int(metrics['total'])}.",
         f"- Rango realista 90% del marcador exacto principal: {metrics['exact_score_range_low']:.0f}-{metrics['exact_score_range_high']:.0f} aciertos.",
@@ -7635,7 +7930,7 @@ def build_quiniela_strategy_markdown(entries: Sequence[dict]) -> List[str]:
     if differentials:
         for item in differentials:
             lines.append(
-                f"- {item['title']}: {item['pick_label']} {format_pct(item['pick_prob'])}; boleto popular por nombre {item['public_label']} {format_pct(item['public_prob'])}; edge de seleccion {item['edge_vs_public']:+.1%}; ganancia esperada {item['expected_gain_vs_popular']:+.1%}."
+                f"- {item['title']}: {item['pick_label']} {format_pct(item['pick_prob'])}; diferencial solo habilitado con fuente real de consenso; proxy de popularidad apagado."
             )
     else:
         lines.append("- No hay diferenciales positivos fuertes en este corte; conviene priorizar acierto base.")
@@ -7686,9 +7981,8 @@ def build_quiniela_strategy_html(entries: Sequence[dict]) -> str:
                 f"{item['pick_label']} {format_pct(float(item['pick_prob']))} | "
                 f"marcador Penca {item['score']} ({float(item['penca_expected_points']):.2f} pts esp.; "
                 f"exacto {format_pct(float(item['score_prob']))}; diferencia {format_pct(float(item['penca_difference_prob']))}) | "
-                f"boleto popular por nombre: {item['public_label']} {format_pct(float(item['public_prob']))} | "
-                f"edge de selección {item['edge_vs_public']:+.1%} | "
-                f"ganancia esperada {item['expected_gain_vs_popular']:+.1%}"
+                f"riesgo {item['strategy_tier']} | "
+                "sin proxy de popularidad"
             )
             rows.append(
                 "<li>"
@@ -7705,7 +7999,7 @@ def build_quiniela_strategy_html(entries: Sequence[dict]) -> str:
         f"<div class=\"summary-tile\"><span>Puntos esperados Penca</span><strong>{metrics['expected_penca_points']:.1f}/{int(metrics['total']) * 8}</strong><small>{metrics['expected_penca_points_per_match']:.2f} puntos por partido con marcador optimizado.</small></div>"
         f"<div class=\"summary-tile\"><span>Firmeza media Penca</span><strong>{format_pct(float(metrics['avg_penca_certainty']))}</strong><small>Índice de decisión: combina ganador, diferencia, exacto, varianza del marcador y puntos esperados.</small></div>"
         f"<div class=\"summary-tile\"><span>Rango estadístico 90%</span><strong>{metrics['range_low']:.0f}-{metrics['range_high']:.0f}</strong></div>"
-        f"<div class=\"summary-tile\"><span>Ventaja vs boleto popular</span><strong>{metrics['expected_gain']:+.1f} picks</strong></div>"
+        "<div class=\"summary-tile\"><span>Ventaja vs boleto popular</span><strong>Solo con consenso real</strong><small>La popularidad pública está desactivada y no mueve picks sin fuente real de la Penca.</small></div>"
         f"<div class=\"summary-tile\"><span>Marcador exacto principal</span><strong>{metrics['expected_penca_exact_scores']:.1f}/{int(metrics['total'])}</strong><small>Marcador recomendado para cargar: maximiza puntos esperados de Penca, no solo probabilidad aislada. Rango 90%: {metrics['exact_score_range_low']:.0f}-{metrics['exact_score_range_high']:.0f}</small></div>"
         f"<div class=\"summary-tile\"><span>Diferencia de goles esperada</span><strong>{metrics['expected_penca_difference_scores']:.1f}/{int(metrics['total'])}</strong><small>Incluye exactos; en Penca esto vale 5 puntos si no clavas el marcador.</small></div>"
         f"<div class=\"summary-tile\"><span>Si puedes poner 3 marcadores</span><strong>{metrics['expected_top3_scores']:.1f}/{int(metrics['total'])}</strong><small>Cobertura esperada usando los tres marcadores más probables por partido.</small></div>"
@@ -7720,9 +8014,9 @@ def build_quiniela_strategy_html(entries: Sequence[dict]) -> str:
         "<div class=\"panel-head\"><div>"
         "<p class=\"eyebrow\">Optimización del boleto</p>"
         "<h2>Estrategia para ganar la quiniela</h2>"
-        "<p class=\"lede-tight\">Esta capa busca subir tus probabilidades de ganar la quiniela: maximiza aciertos esperados, separa picks seguros de diferenciales y evita copiar ciegamente al favorito popular cuando el modelo ve otra cosa.</p>"
+        "<p class=\"lede-tight\">Esta capa busca subir tus probabilidades de ganar la quiniela: maximiza puntos esperados, separa picks seguros de coberturas y evita sobreapostar marcadores frágiles.</p>"
         "<p class=\"meta\">Reglas públicas de Penca Ovación usadas aquí: 8 puntos por marcador exacto, 5 por diferencia de goles y 3 por ganador. Por eso el marcador recomendado puede diferir del marcador exacto más probable: se elige el que da más puntos esperados.</p>"
-        "<p class=\"meta\">No se inflan probabilidades: se mejora la estrategia. El proxy de boleto popular por nombre estima cómo llenaría alguien sobreponderando ranking, fama e historia; sirve para detectar dónde el modelo puede darte ventaja relativa.</p>"
+        "<p class=\"meta\">No se inflan probabilidades: se mejora la estrategia. Las señales de popularidad pública quedan apagadas hasta tener una fuente real; no se usa fama, intuición ni proxy para mover picks.</p>"
         "</div></div>"
         f"{tiles}"
         "<div class=\"certainty-grid strategy-grid\">"
@@ -8946,7 +9240,7 @@ def prediction_power_profile(entry: dict) -> dict:
         drivers.append("modelos alineados")
     if float(base["gap"]) >= 0.14:
         drivers.append("brecha clara")
-    if float(base["edge_vs_public"]) >= 0.04:
+    if not DISABLE_PUBLIC_POPULARITY_PROXY and float(base["edge_vs_public"]) >= 0.04:
         drivers.append("edge vs boleto popular")
     if market_alignment >= 0.70:
         drivers.append("sin choque fuerte con mercado")
@@ -9095,7 +9389,7 @@ def agentic_learning_items() -> List[dict]:
         {
             "agent": "Agente de quiniela",
             "job": "Convierte probabilidades en decisiones: pick base, marcador principal, segunda opción y cobertura.",
-            "learns": "Optimiza contra un boleto popular estimado para buscar ventaja relativa, no solo acierto bruto.",
+            "learns": "Optimiza puntos esperados, marcador principal, segunda opción y cobertura sin usar popularidad estimada como dato.",
         },
         {
             "agent": "Agente auditor",
@@ -10365,8 +10659,8 @@ def penca_ovacion_score_html(prediction: MatchPrediction) -> str:
         f"<div><span>Ajuste histórico del marcador</span><strong>{format_pct(float(guidance.get('recommended_empirical_prior_index', 0.0)))}</strong><small>Compatibilidad con frecuencias históricas de marcadores de fútbol.</small></div>"
         f"<div><span>Perfil histórico específico del cruce</span><strong>{float(guidance.get('recommended_historical_matchup_boost', 1.0)) - 1.0:+.1%}</strong><small>Corrección acotada por las familias de marcador de ambas selecciones; no es una probabilidad.</small></div>"
         f"<div><span>Compatibilidad histórica del marcador con el cruce</span><strong>{format_pct(float(guidance.get('recommended_matchup_family_index', 0.50)))}</strong><small>Compara cómo suele ganar una selección y cómo suele perder la otra. No reemplaza la probabilidad multimodelo.</small></div>"
-        f"<div><span>Popularidad estimada del marcador</span><strong>{format_pct(float(guidance.get('recommended_public_score_popularity_index', 0.0)))}</strong><small>Proxy de qué tan probable es que otros jueguen este marcador obvio.</small></div>"
-        f"<div><span>Valor diferencial del marcador</span><strong>{format_pct(float(guidance.get('recommended_differential_value_index', 0.0)))}</strong><small>Útil si buscas ganarle a boletos populares sin abandonar el modelo.</small></div>"
+        f"<div><span>Consenso real del marcador</span><strong>{format_pct(float(guidance.get('recommended_public_score_popularity_index', 0.0)))}</strong><small>Desactivado hasta tener fuente real; no se estima con fama ni intuición.</small></div>"
+        f"<div><span>Valor diferencial del marcador</span><strong>{format_pct(float(guidance.get('recommended_differential_value_index', 0.0)))}</strong><small>Útil solo si existe consenso real para comparar; no altera la probabilidad futbolística.</small></div>"
         f"<div><span>Filtro de plausibilidad</span><strong>{format_pct(float(guidance.get('recommended_plausibility_index', 1.0)))}</strong><small>{html.escape(str(guidance.get('recommended_plausibility_note', 'marcador de forma normal')))}</small></div>"
         f"<div><span>Máximo realista exacto único</span><strong>{format_pct(float(guidance.get('single_exact_upper_bound', top['exact_prob'])))}</strong><small>{html.escape(str(guidance.get('single_exact_ceiling_label', 'un exacto único no llega a 90-95%')))}</small></div>"
         f"<div><span>Puntos esperados del pick</span><strong>{float(top['expected_points']):.2f} / 8</strong></div>"
@@ -10384,7 +10678,7 @@ def penca_ovacion_score_html(prediction: MatchPrediction) -> str:
         "<div class=\"subgrid penca-mode-grid\">"
         f"{portfolio_tile('Modo principal', guidance.get('score_portfolio', {}).get('balanced') if isinstance(guidance.get('score_portfolio'), dict) else top, 'Maximiza puntos esperados.')}"
         f"{portfolio_tile('Modo seguro', guidance.get('safe_score'), 'Baja varianza: favorece diferencia/ganador.')}"
-        f"{portfolio_tile('Modo diferencial', guidance.get('score_portfolio', {}).get('differential') if isinstance(guidance.get('score_portfolio'), dict) else guidance.get('upside_score'), 'Menos obvio: busca valor contra marcador popular.')}"
+        f"{portfolio_tile('Modo diferencial', guidance.get('score_portfolio', {}).get('differential') if isinstance(guidance.get('score_portfolio'), dict) else guidance.get('upside_score'), 'Menos obvio: solo busca valor contra consenso real disponible.')}"
         "</div>"
         "<div class=\"certainty-grid score-guidance-grid\">"
         f"{goal_options_list(guidance.get('goal_options_a'), prediction.team_a)}"
@@ -13609,20 +13903,20 @@ def print_team_profile(team: Team) -> None:
     profile = profile_for(team)
     squad = profile.squad
     history = profile.history
-    fifa_note = " (proxy calibrado)" if fifa_points_are_proxy(team) else ""
+    fifa_note = " (neutralizado si faltan puntos reales)" if fifa_points_are_proxy(team) else ""
     print(f"{team.name} ({pretty_status(team.status)})")
     print(f"  Elo: {team.elo:.0f}")
     print(f"  Puntos FIFA{fifa_note}: {profile.fifa_points:.1f}")
     print(f"  Ranking FIFA{fifa_note}: {profile.fifa_rank}")
     print(f"  Recursos base: {profile.resource_index:.2f}")
-    print(f"  Población explícita: {team.population_millions if team.population_millions is not None else 'proxy'} | índice {profile.population_index:.2f}")
-    print(f"  PIB explícito: {team.gdp_ppp_usd_billion if team.gdp_ppp_usd_billion is not None else 'proxy'} | índice {profile.gdp_index:.2f}")
-    print(f"  Liga/minutos top: liga {profile.league_strength_index:.2f} | minutos top {team.top_league_minutes_share if team.top_league_minutes_share is not None else 'proxy'}")
+    print(f"  Población explícita: {team.population_millions if team.population_millions is not None else 'sin dato real; neutral'} | índice {profile.population_index:.2f}")
+    print(f"  PIB explícito: {team.gdp_ppp_usd_billion if team.gdp_ppp_usd_billion is not None else 'sin dato real; neutral'} | índice {profile.gdp_index:.2f}")
+    print(f"  Liga/minutos top: liga {profile.league_strength_index:.2f} | minutos top {team.top_league_minutes_share if team.top_league_minutes_share is not None else 'sin dato real; neutral'}")
     print(f"  Macro-recursos auditables: {profile.macro_resource_index:.2f}")
     print(f"  Historia mundialista: {profile.heritage_index:.2f}")
     print(f"  Títulos del mundo: {profile.world_cup_titles}")
     print(f"  Trayectoria futbolística: {profile.trajectory_index:.2f}")
-    print(f"  Experiencia proxy del entrenador: {profile.coach_index:.2f}")
+    print(f"  Entrenador: {profile.coach_index:.2f} (neutral si no hay dato real auditable)")
     print(f"  Química/cohesión: {profile.chemistry_index:.2f}")
     print(f"  Moral base: {profile.morale_base:.2f}")
     print(f"  Flexibilidad táctica: {profile.tactical_flexibility:.2f}")
@@ -13653,8 +13947,8 @@ def print_team_profile(team: Team) -> None:
     print(f"  Pelota parada ataque: {squad.set_piece_attack:.2f}")
     print(f"  Pelota parada defensa: {squad.set_piece_defense:.2f}")
     print(f"  Disciplina: {squad.discipline_index:.2f}")
-    print(f"  Amarillas proxy por jugador: {squad.yellow_rate:.2f}")
-    print(f"  Rojas proxy por jugador: {squad.red_rate:.3f}")
+    print(f"  Amarillas por jugador: {squad.yellow_rate:.2f} (neutral si no hay plantilla real)")
+    print(f"  Rojas por jugador: {squad.red_rate:.3f} (neutral si no hay plantilla real)")
     print(f"  Disponibilidad: {squad.availability:.2f}")
     print(f"  Definición: {squad.finishing:.2f}")
     print(f"  Generación de ocasiones: {squad.shot_creation:.2f}")
