@@ -1102,6 +1102,68 @@ h3 { font-size: 1.05rem; }
   border: 1px solid rgba(15,109,102,0.14);
   line-height: 1.42;
 }
+.robustness-panel {
+  background:
+    radial-gradient(circle at 12% 4%, rgba(181,131,47,0.12), transparent 34%),
+    radial-gradient(circle at 85% 10%, rgba(15,109,102,0.18), transparent 34%),
+    linear-gradient(135deg, rgba(255,255,251,0.98), rgba(237,246,243,0.98));
+}
+.robustness-grid {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+.robustness-tile {
+  min-height: 160px;
+  border-radius: 22px;
+  padding: 16px;
+  color: var(--ink);
+  background: rgba(255,255,255,0.82);
+  border: 1px solid rgba(15,109,102,0.16);
+  box-shadow: 0 16px 34px rgba(20, 42, 38, 0.06);
+}
+.robustness-tile.ok {
+  border-color: rgba(15,109,102,0.28);
+}
+.robustness-tile.warn {
+  border-color: rgba(176,71,60,0.30);
+}
+.robustness-tile.neutral {
+  border-color: rgba(181,131,47,0.26);
+}
+.robustness-tile span {
+  display: block;
+  color: var(--muted);
+  font-size: 0.76rem;
+  font-weight: 900;
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+.robustness-tile strong {
+  display: block;
+  color: var(--accent-dark);
+  font-size: 1.45rem;
+  line-height: 1.03;
+  margin-bottom: 10px;
+}
+.robustness-tile p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.42;
+}
+.robustness-policy {
+  margin-top: 14px;
+  border-radius: 18px;
+  padding: 14px 16px;
+  color: var(--ink);
+  background: rgba(15,109,102,0.09);
+  border: 1px solid rgba(15,109,102,0.16);
+  line-height: 1.45;
+}
+.robustness-policy strong {
+  color: var(--accent-dark);
+}
 .hero-note {
   background: rgba(255,255,255,0.08);
   border: 1px solid rgba(255,255,255,0.10);

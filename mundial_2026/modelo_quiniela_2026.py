@@ -12452,6 +12452,219 @@ def build_model_quality_audit_html(
     )
 
 
+def predictive_robustness_gate(
+    entries: Sequence[dict],
+    bracket_payload: dict,
+    backtest: dict,
+) -> dict:
+    """Expose the guardrails that keep the prediction system honest."""
+
+    base_dir = Path(__file__).resolve().parent
+    fixture_entries = [entry for entry in entries if not entry.get("projection")]
+    projected_entries = [entry for entry in entries if entry.get("projection")]
+    runtime = provider_runtime_diagnostics(entries)
+    completed_matches = int(backtest.get("completed_matches", 0) or 0)
+    brier_result = backtest.get("brier_result")
+    brier_active = completed_matches > 0 and brier_result is not None
+    iterations = int(bracket_payload.get("iterations", 0) or 0)
+    live_count = sum(1 for entry in fixture_entries if fixture_is_live(entry))
+    final_count = sum(1 for entry in fixture_entries if fixture_is_final(entry))
+
+    has_historical = _quality_artifact_exists(
+        base_dir,
+        [
+            "historical_matches.csv",
+            "data/historical_matches.csv",
+            "site/historical_matches.csv",
+        ],
+    )
+    has_backtest = _quality_artifact_exists(
+        base_dir,
+        [
+            "backtest_summary.csv",
+            "outputs/backtest_summary.csv",
+            "outputs/real_backtest/backtest_summary.csv",
+            "site/backtest_summary.csv",
+        ],
+    )
+    has_benchmarks = _quality_artifact_exists(
+        base_dir,
+        [
+            "benchmark_results.csv",
+            "outputs/benchmark_results.csv",
+            "site/benchmark_results.csv",
+        ],
+    )
+    historical_rows_text = _quality_csv_metric(
+        base_dir,
+        ["data/real_data_coverage_report.csv", "site/real_data_coverage_report.csv"],
+        "selected_rows",
+    )
+
+    exact_probs: List[float] = []
+    top3_coverages: List[float] = []
+    for entry in entries:
+        prediction = entry.get("prediction")
+        if not prediction:
+            continue
+        if prediction.exact_scores:
+            exact_probs.append(float(prediction.exact_scores[0][1]))
+        depth = prediction.statistical_depth or {}
+        top3_value = depth.get("top3_coverage")
+        if isinstance(top3_value, (int, float)):
+            top3_coverages.append(float(top3_value))
+
+    avg_exact = sum(exact_probs) / len(exact_probs) if exact_probs else None
+    max_exact = max(exact_probs) if exact_probs else None
+    avg_top3 = sum(top3_coverages) / len(top3_coverages) if top3_coverages else None
+    deep_live_active = bool(runtime["deep_sources"])
+    historical_ready = bool(has_historical and has_backtest)
+    benchmark_ready = bool(has_benchmarks)
+    strict_inputs = bool(STRICT_REAL_INPUTS_ONLY and DISABLE_PUBLIC_POPULARITY_PROXY)
+
+    if brier_active and historical_ready and benchmark_ready and strict_inputs:
+        status = "operativo_con_evidencia"
+    elif strict_inputs and (historical_ready or benchmark_ready or iterations >= 100000):
+        status = "operativo_con_guardrails"
+    else:
+        status = "operativo_en_preparacion"
+
+    return {
+        "status": status,
+        "iterations": iterations,
+        "fixture_count": len(fixture_entries),
+        "projected_count": len(projected_entries),
+        "live_count": live_count,
+        "final_count": final_count,
+        "completed_matches": completed_matches,
+        "brier_2026_active": brier_active,
+        "brier_result": brier_result,
+        "historical_backtest_available": historical_ready,
+        "historical_rows": historical_rows_text,
+        "benchmarks_available": benchmark_ready,
+        "deep_live_feed_active": deep_live_active,
+        "configured_deep_providers": runtime["configured_wired"],
+        "deep_sources": runtime["deep_sources"],
+        "avg_exact_score_probability": avg_exact,
+        "max_exact_score_probability": max_exact,
+        "avg_top3_score_coverage": avg_top3,
+        "proxy_inputs_blocked": strict_inputs,
+        "methodology_lock": (
+            "Datos, resultados, lesiones, sanciones, alineaciones y mercado pueden cambiar; "
+            "pesos y metodología no deben tocarse durante el torneo salvo bug real o mejora validada por backtest."
+        ),
+        "exact_score_single_pick_policy": (
+            "Un marcador único no se etiqueta como 90-95% sin evidencia; la mejora robusta viene de cartera, "
+            "cobertura y optimización de puntos Penca."
+        ),
+    }
+
+
+def build_predictive_robustness_gate_html(
+    entries: Sequence[dict],
+    bracket_payload: dict,
+    backtest: dict,
+) -> str:
+    """Render the operational fixes for the model's predictive weak points."""
+
+    gate = predictive_robustness_gate(entries, bracket_payload, backtest)
+    brier_label = "Activo" if gate["brier_2026_active"] else "Listo al primer final"
+    brier_detail = (
+        f"Brier 2026 ya mide {gate['completed_matches']} partidos cerrados."
+        if gate["brier_2026_active"]
+        else "No se inventa Brier antes de tener finales reales del Mundial 2026."
+    )
+    historical_label = "Publicado" if gate["historical_backtest_available"] else "Pendiente"
+    historical_detail = (
+        f"Backtest histórico disponible; filas reales seleccionadas: {gate['historical_rows'] or 'dataset publicado'}."
+        if gate["historical_backtest_available"]
+        else "Sin backtest histórico completo publicado, el modelo no debe reclamar validación total."
+    )
+    benchmark_label = "Medido" if gate["benchmarks_available"] else "Pendiente"
+    benchmark_detail = (
+        "Hay comparación contra benchmarks simples."
+        if gate["benchmarks_available"]
+        else "Debe compararse contra Elo, FIFA, mercado, Poisson simple y versión sin mercado."
+    )
+    feed_label = "Profundo activo" if gate["deep_live_feed_active"] else "Base limitado"
+    feed_detail = (
+        f"Fuentes profundas activas: {', '.join(gate['deep_sources'])}."
+        if gate["deep_live_feed_active"]
+        else "Si no hay proveedor profundo, no se finge xG tiro-a-tiro ni eventos que el feed no trae."
+    )
+    exact_detail_bits = []
+    if gate["avg_exact_score_probability"] is not None:
+        exact_detail_bits.append(f"Exacto medio top-1: {format_pct(float(gate['avg_exact_score_probability']))}")
+    if gate["max_exact_score_probability"] is not None:
+        exact_detail_bits.append(f"Mayor exacto individual: {format_pct(float(gate['max_exact_score_probability']))}")
+    if gate["avg_top3_score_coverage"] is not None:
+        exact_detail_bits.append(f"Cobertura top-3 media: {format_pct(float(gate['avg_top3_score_coverage']))}")
+    exact_detail = "; ".join(exact_detail_bits) or "Sin muestra suficiente de marcadores exactos en este corte."
+
+    tiles = [
+        (
+            "Calibración 2026",
+            brier_label,
+            brier_detail,
+            "ok" if gate["brier_2026_active"] else "warn",
+        ),
+        (
+            "Backtest histórico",
+            historical_label,
+            historical_detail,
+            "ok" if gate["historical_backtest_available"] else "warn",
+        ),
+        (
+            "Benchmarks",
+            benchmark_label,
+            benchmark_detail,
+            "ok" if gate["benchmarks_available"] else "warn",
+        ),
+        (
+            "Feed in-play",
+            feed_label,
+            feed_detail,
+            "ok" if gate["deep_live_feed_active"] else "neutral",
+        ),
+        (
+            "Marcador exacto",
+            "Guardrail activo",
+            f"{exact_detail}. Un marcador único no se fuerza a 90-95%.",
+            "ok",
+        ),
+        (
+            "Inputs proxy",
+            "Bloqueados" if gate["proxy_inputs_blocked"] else "Revisar",
+            "Si falta una variable real, queda neutral; no se llena con fama, intuición ni popularidad pública.",
+            "ok" if gate["proxy_inputs_blocked"] else "warn",
+        ),
+    ]
+    tile_html = "".join(
+        (
+            f"<article class=\"robustness-tile {html.escape(tone)}\">"
+            f"<span>{html.escape(title)}</span>"
+            f"<strong>{html.escape(label)}</strong>"
+            f"<p>{html.escape(detail)}</p>"
+            "</article>"
+        )
+        for title, label, detail, tone in tiles
+    )
+    return (
+        "<section class=\"panel robustness-panel\" id=\"robustez-predictiva\">"
+        "<div class=\"panel-head\"><div>"
+        "<p class=\"eyebrow\">Robustez predictiva</p>"
+        "<h2>Correcciones que evitan que el modelo se contamine o se sobrevenda.</h2>"
+        "<p class=\"lede-tight\">Este bloque convierte las limitaciones críticas en controles visibles: no inventar muestra, no fingir feed profundo, no usar proxies, no cambiar metodología por intuición y no prometer exact-score imposible.</p>"
+        "</div></div>"
+        f"<div class=\"robustness-grid\">{tile_html}</div>"
+        "<div class=\"robustness-policy\">"
+        "<strong>Bloqueo metodológico durante el Mundial.</strong> "
+        f"{html.escape(str(gate['methodology_lock']))}"
+        "</div>"
+        "</section>"
+    )
+
+
 def build_score_dynamics_html(entries: Sequence[dict]) -> str:
     """Explain and expose why score recommendations are not static."""
 
@@ -12787,6 +13000,7 @@ def build_dashboard_html(
     ticket_snapshot_html = build_ticket_snapshot_html(entries, updated_at)
     landing_proof_html = build_landing_proof_html(entries, bracket_payload, backtest)
     model_quality_audit_html = build_model_quality_audit_html(entries, bracket_payload, backtest)
+    predictive_robustness_gate_html = build_predictive_robustness_gate_html(entries, bracket_payload, backtest)
     runtime_status_html = build_runtime_status_html(entries, bracket_payload)
     score_dynamics_html = build_score_dynamics_html(entries)
     championship_penca_html = build_championship_penca_optimizer_html(entries)
@@ -12823,6 +13037,7 @@ def build_dashboard_html(
             "ticket_snapshot_html": ticket_snapshot_html,
             "landing_proof_html": landing_proof_html,
             "model_quality_audit_html": model_quality_audit_html,
+            "predictive_robustness_gate_html": predictive_robustness_gate_html,
             "runtime_status_html": runtime_status_html,
             "score_dynamics_html": score_dynamics_html,
             "championship_penca_html": championship_penca_html,

@@ -87,6 +87,13 @@ class PublishPipelineTest(unittest.TestCase):
             self.assertEqual(latest["historical_base"]["from_date"], "1950-01-01")
             self.assertEqual(latest["historical_base"]["official_matches"], 29562)
             self.assertEqual(latest["historical_base"]["minimum_official_matches_required"], 25000)
+            robustness = latest["predictive_robustness_gate"]
+            self.assertEqual(robustness["status"], "pretorneo_sin_muestra_2026")
+            self.assertFalse(robustness["calibration_2026_active"])
+            self.assertTrue(robustness["deep_live_feed_active"])
+            self.assertTrue(robustness["proxy_inputs_blocked"])
+            self.assertIn("primer partido finalizado", robustness["brier_2026_policy"])
+            self.assertIn("90-95", robustness["exact_score_single_pick_policy"])
             self.assertEqual(latest["files"]["dashboard"], "dashboard_actual_2026.html")
             self.assertEqual(latest["files"]["historical_features"], "historical_features_1950.json")
             self.assertTrue((site_dir / "historical_features_1950.json").exists())

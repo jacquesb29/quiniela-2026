@@ -1,7 +1,7 @@
 {
-  "updated_at_utc": "2026-06-10T00:03:58+00:00",
-  "publication_updated_at_utc": "2026-06-10T00:03:58+00:00",
-  "dashboard_updated_at_utc": "2026-06-10T00:02:22+00:00",
+  "updated_at_utc": "2026-06-10T18:17:25+00:00",
+  "publication_updated_at_utc": "2026-06-10T18:17:25+00:00",
+  "dashboard_updated_at_utc": "2026-06-10T18:16:31+00:00",
   "timestamp_consistency_note": "latest.json se escribe despues de copiar el HTML; compara dashboard_updated_at_utc contra publication_updated_at_utc para detectar desfases reales de publicacion o cache.",
   "refresh_interval_minutes": 5,
   "live_refresh_interval_minutes": 5,
@@ -21,6 +21,21 @@
   "proxy_input_policy": "Si falta una variable, se neutraliza; no se imputa con proxies ni fama. Las senales de popularidad publica quedan apagadas hasta tener fuente real.",
   "strict_real_inputs_only": true,
   "public_popularity_proxy_enabled": false,
+  "predictive_robustness_gate": {
+    "status": "pretorneo_sin_muestra_2026",
+    "completed_matches_2026": 0,
+    "calibration_2026_active": false,
+    "brier_2026_policy": "Se activa con el primer partido finalizado; no se imputa ni se maquilla antes.",
+    "historical_matches_available": true,
+    "historical_backtest_available": true,
+    "historical_rows": "1930",
+    "benchmarks_available": true,
+    "deep_live_feed_active": false,
+    "deep_live_providers": [],
+    "proxy_inputs_blocked": true,
+    "exact_score_single_pick_policy": "Un marcador unico no se etiqueta como 90-95%; se optimiza cartera, cobertura y puntos Penca.",
+    "methodology_lock": "Durante el Mundial se actualizan datos y estado; pesos/metodologia solo cambian por bug real o mejora validada por backtest."
+  },
   "explicit_variable_blocks": [
     "squad_market_value",
     "top_5_players_value_share",

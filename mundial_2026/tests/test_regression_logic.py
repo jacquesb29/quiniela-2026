@@ -437,6 +437,7 @@ class RegressionLogicTest(unittest.TestCase):
         self.assertIn("no garantiza ganar", template)
         self.assertIn("score_dynamics_html", template)
         self.assertIn("championship_penca_html", template)
+        self.assertIn("predictive_robustness_gate_html", template)
         self.assertIn("methodology_governance_html", template)
         self.assertIn("dark_horses_html", template)
         self.assertIn("external_benchmarks_html", template)
@@ -1247,6 +1248,39 @@ class RegressionLogicTest(unittest.TestCase):
         self.assertIn("No se maquilla como 10/10", html)
         self.assertIn("no subimos una métrica a 90/95 o 10/10", html)
         self.assertIn("Histórico anti-fuga", html)
+
+    def test_predictive_robustness_gate_surfaces_real_guardrails(self):
+        prediction = app.MatchPrediction(
+            team_a="Spain",
+            team_b="Uruguay",
+            expected_goals_a=1.7,
+            expected_goals_b=0.8,
+            win_a=0.68,
+            draw=0.20,
+            win_b=0.12,
+            exact_scores=[("2-0", 0.18), ("1-0", 0.15), ("2-1", 0.12)],
+            statistical_depth={"top3_coverage": 0.45},
+        )
+        html = app.build_predictive_robustness_gate_html(
+            [
+                {
+                    "title": "Spain vs Uruguay",
+                    "stage_label": "Grupo H",
+                    "prediction": prediction,
+                    "status_state": "pre",
+                }
+            ],
+            {"iterations": 100000},
+            {"completed_matches": 0},
+        )
+
+        self.assertIn("Robustez predictiva", html)
+        self.assertIn("Listo al primer final", html)
+        self.assertIn("No se inventa Brier", html)
+        self.assertIn("Un marcador único no se fuerza a 90-95%", html)
+        self.assertIn("Inputs proxy", html)
+        self.assertIn("Bloqueados", html)
+        self.assertIn("Bloqueo metodológico durante el Mundial", html)
 
     def test_quiniela_audit_metrics_flags_traps_and_fragile_scores(self):
         firm_prediction = app.MatchPrediction(

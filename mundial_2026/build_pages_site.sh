@@ -20,6 +20,7 @@ python3 - <<'PY'
 import json
 import os
 import re
+import csv
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -49,6 +50,50 @@ if dashboard_path.exists():
         dashboard_updated_at = match.group(1)
 live_sources = sorted({item.get("source") for item in fixtures_payload if item.get("source")})
 live_providers = sorted({item.get("live_feed_provider") for item in fixtures_payload if item.get("live_feed_provider")})
+final_statuses = {"final", "full_time", "finished", "post", "complete", "completed"}
+completed_matches = sum(
+    1
+    for item in fixtures_payload
+    if str(item.get("status_state") or item.get("status") or "").strip().lower() in final_statuses
+)
+
+def artifact_exists(*relative_paths):
+    return any((script_dir / relative_path).exists() for relative_path in relative_paths)
+
+def csv_metric(relative_paths, metric):
+    for relative_path in relative_paths:
+        path = script_dir / relative_path
+        if not path.exists():
+            continue
+        try:
+            with path.open(newline="", encoding="utf-8") as handle:
+                for row in csv.DictReader(handle):
+                    if str(row.get("metric", "")).strip() == metric:
+                        return str(row.get("value", "")).strip()
+        except (OSError, csv.Error):
+            continue
+    return ""
+
+historical_backtest_available = artifact_exists(
+    "backtest_summary.csv",
+    "outputs/backtest_summary.csv",
+    "outputs/real_backtest/backtest_summary.csv",
+    "site/backtest_summary.csv",
+)
+benchmarks_available = artifact_exists(
+    "benchmark_results.csv",
+    "outputs/benchmark_results.csv",
+    "site/benchmark_results.csv",
+)
+historical_matches_available = artifact_exists(
+    "historical_matches.csv",
+    "data/historical_matches.csv",
+    "site/historical_matches.csv",
+)
+historical_rows = csv_metric(
+    ["data/real_data_coverage_report.csv", "site/real_data_coverage_report.csv"],
+    "selected_rows",
+)
 published_at = datetime.now(timezone.utc).isoformat(timespec="seconds")
 payload = {
     "updated_at_utc": published_at,
@@ -73,6 +118,21 @@ payload = {
     "proxy_input_policy": "Si falta una variable, se neutraliza; no se imputa con proxies ni fama. Las senales de popularidad publica quedan apagadas hasta tener fuente real.",
     "strict_real_inputs_only": True,
     "public_popularity_proxy_enabled": False,
+    "predictive_robustness_gate": {
+        "status": "calibracion_2026_activa" if completed_matches else "pretorneo_sin_muestra_2026",
+        "completed_matches_2026": completed_matches,
+        "calibration_2026_active": bool(completed_matches),
+        "brier_2026_policy": "Se activa con el primer partido finalizado; no se imputa ni se maquilla antes.",
+        "historical_matches_available": historical_matches_available,
+        "historical_backtest_available": historical_backtest_available,
+        "historical_rows": historical_rows,
+        "benchmarks_available": benchmarks_available,
+        "deep_live_feed_active": bool(live_providers),
+        "deep_live_providers": live_providers,
+        "proxy_inputs_blocked": True,
+        "exact_score_single_pick_policy": "Un marcador unico no se etiqueta como 90-95%; se optimiza cartera, cobertura y puntos Penca.",
+        "methodology_lock": "Durante el Mundial se actualizan datos y estado; pesos/metodologia solo cambian por bug real o mejora validada por backtest.",
+    },
     "explicit_variable_blocks": [
         "squad_market_value",
         "top_5_players_value_share",
