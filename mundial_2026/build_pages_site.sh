@@ -14,6 +14,9 @@ cp "$SCRIPT_DIR/reporte_actual_2026.md" "$SITE_DIR/reporte_actual_2026.md"
 cp "$SCRIPT_DIR/llave_actual_2026.md" "$SITE_DIR/llave_actual_2026.md"
 cp "$SCRIPT_DIR/llave_actual_2026.json" "$SITE_DIR/llave_actual_2026.json"
 cp "$SCRIPT_DIR/fixtures_live_2026.json" "$SITE_DIR/fixtures_live_2026.json"
+if [[ -f "$SCRIPT_DIR/live_sync_status.json" ]]; then
+  cp "$SCRIPT_DIR/live_sync_status.json" "$SITE_DIR/live_sync_status.json"
+fi
 cp "$SCRIPT_DIR/historical_features_1950.json" "$SITE_DIR/historical_features_1950.json"
 
 python3 - <<'PY'
@@ -27,17 +30,21 @@ from pathlib import Path
 script_dir = Path(os.environ["SCRIPT_DIR"])
 site_dir = script_dir / "site"
 fixtures_path = script_dir / "fixtures_live_2026.json"
+live_sync_status_path = script_dir / "live_sync_status.json"
 teams_path = script_dir / "teams_2026.json"
 history_path = script_dir / "historical_features_1950.json"
 dashboard_path = script_dir / "dashboard_actual_2026.html"
 bracket_path = script_dir / "llave_actual_2026.json"
 fixtures_payload = []
+live_sync_status = {}
 teams_payload = {}
 history_payload = {}
 bracket_payload = {}
 dashboard_updated_at = None
 if fixtures_path.exists():
     fixtures_payload = json.loads(fixtures_path.read_text())
+if live_sync_status_path.exists():
+    live_sync_status = json.loads(live_sync_status_path.read_text())
 if teams_path.exists():
     teams_payload = json.loads(teams_path.read_text())
 if history_path.exists():
@@ -55,6 +62,13 @@ completed_matches = sum(
     1
     for item in fixtures_payload
     if str(item.get("status_state") or item.get("status") or "").strip().lower() in final_statuses
+)
+live_statuses = {"in", "live", "in_progress", "in_play", "paused"}
+live_matches = sum(
+    1
+    for item in fixtures_payload
+    if str(item.get("status_state") or item.get("provider_match_status") or "").strip().lower() in live_statuses
+    or item.get("live_elapsed_minutes") is not None
 )
 
 def artifact_exists(*relative_paths):
@@ -119,7 +133,15 @@ payload = {
     "strict_real_inputs_only": True,
     "public_popularity_proxy_enabled": False,
     "predictive_robustness_gate": {
-        "status": "calibracion_2026_activa" if completed_matches else "pretorneo_sin_muestra_2026",
+        "status": (
+            "calibracion_2026_activa"
+            if completed_matches
+            else "torneo_en_curso_live_activo"
+            if live_matches
+            else "pretorneo_sin_muestra_2026"
+        ),
+        "tournament_phase": "en_curso" if live_matches or completed_matches else "pretorneo",
+        "live_matches_2026": live_matches,
         "completed_matches_2026": completed_matches,
         "calibration_2026_active": bool(completed_matches),
         "brier_2026_policy": "Se activa con el primer partido finalizado; no se imputa ni se maquilla antes.",
@@ -148,6 +170,7 @@ payload = {
     "bracket_recalculation_policy": bracket_payload.get("recalculation_policy"),
     "live_feed_stack": live_sources or ["espn_scoreboard"],
     "live_feed_providers": live_providers,
+    "live_ingestion_status": live_sync_status,
     "official_fifa_rankings_as_of": (teams_payload.get("meta") or {}).get("fifa_rankings_as_of"),
     "historical_base": {
         "from_date": (history_payload.get("meta") or {}).get("from_date"),
@@ -161,6 +184,7 @@ payload = {
         "bracket_markdown": "llave_actual_2026.md",
         "bracket_json": "llave_actual_2026.json",
         "fixtures_live": "fixtures_live_2026.json",
+        "live_sync_status": "live_sync_status.json",
         "historical_features": "historical_features_1950.json",
     },
 }

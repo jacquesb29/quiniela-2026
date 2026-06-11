@@ -37,6 +37,17 @@ class PublishPipelineTest(unittest.TestCase):
                     ]
                 )
             )
+            (publish_root / "live_sync_status.json").write_text(
+                json.dumps(
+                    {
+                        "scoreboard_available": False,
+                        "used_fallback": True,
+                        "stale_live_warning": True,
+                        "providers_used": [],
+                        "configured_providers": ["gdelt", "thesportsdb"],
+                    }
+                )
+            )
             (publish_root / "teams_2026.json").write_text(
                 json.dumps({"meta": {"fifa_rankings_as_of": "2026-05-10"}})
             )
@@ -83,6 +94,8 @@ class PublishPipelineTest(unittest.TestCase):
             self.assertTrue(latest["in_play_enabled"])
             self.assertEqual(latest["live_feed_stack"], ["espn_scoreboard"])
             self.assertEqual(latest["live_feed_providers"], ["api_football"])
+            self.assertTrue(latest["live_ingestion_status"]["stale_live_warning"])
+            self.assertTrue((site_dir / "live_sync_status.json").exists())
             self.assertEqual(latest["official_fifa_rankings_as_of"], "2026-05-10")
             self.assertEqual(latest["historical_base"]["from_date"], "1950-01-01")
             self.assertEqual(latest["historical_base"]["official_matches"], 29562)
@@ -95,6 +108,7 @@ class PublishPipelineTest(unittest.TestCase):
             self.assertIn("primer partido finalizado", robustness["brier_2026_policy"])
             self.assertIn("90-95", robustness["exact_score_single_pick_policy"])
             self.assertEqual(latest["files"]["dashboard"], "dashboard_actual_2026.html")
+            self.assertEqual(latest["files"]["live_sync_status"], "live_sync_status.json")
             self.assertEqual(latest["files"]["historical_features"], "historical_features_1950.json")
             self.assertTrue((site_dir / "historical_features_1950.json").exists())
             datetime.fromisoformat(latest["updated_at_utc"])

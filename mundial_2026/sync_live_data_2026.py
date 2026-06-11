@@ -16,6 +16,7 @@ from modelo_quiniela_2026 import BRACKET_MATCH_TITLES, load_teams, profile_for, 
 
 SCRIPT_DIR = Path(__file__).resolve().parent
 OUTPUT_FILE = SCRIPT_DIR / "fixtures_live_2026.json"
+LIVE_SYNC_STATUS_FILE = SCRIPT_DIR / "live_sync_status.json"
 SCOREBOARD_URL = (
     "https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard"
     "?dates=20260611-20260719&limit=200"
@@ -33,6 +34,13 @@ SPORTMONKS_INCLUDES = os.environ.get(
     "SPORTMONKS_INCLUDES",
     "scores;events.type;participants;statistics.type;lineups.details.type;sidelined;venue;referees",
 ).strip()
+FOOTBALL_DATA_TOKEN = os.environ.get("FOOTBALL_DATA_TOKEN", "").strip()
+FOOTBALL_DATA_BASE_URL = (os.environ.get("FOOTBALL_DATA_BASE_URL") or "https://api.football-data.org/v4").rstrip("/")
+FOOTBALL_DATA_COMPETITION = os.environ.get("FOOTBALL_DATA_COMPETITION", "WC").strip()
+FOOTBALL_DATA_SEASON = os.environ.get("FOOTBALL_DATA_SEASON", "2026").strip()
+THESPORTSDB_KEY = os.environ.get("THESPORTSDB_KEY", "").strip()
+THESPORTSDB_BASE_URL = (os.environ.get("THESPORTSDB_BASE_URL") or "https://www.thesportsdb.com/api/v1/json").rstrip("/")
+THESPORTSDB_LIVESCORE_QUERY = os.environ.get("THESPORTSDB_LIVESCORE_QUERY", "s=Soccer").strip()
 THE_ODDS_API_KEY = os.environ.get("THE_ODDS_API_KEY", "").strip()
 THE_ODDS_API_BASE_URL = (os.environ.get("THE_ODDS_API_BASE_URL") or "https://api.the-odds-api.com/v4").rstrip("/")
 THE_ODDS_API_SPORTS = [
@@ -393,6 +401,25 @@ def provider_enabled() -> bool:
     return bool(API_FOOTBALL_KEY or SPORTMONKS_TOKEN)
 
 
+def configured_provider_names() -> List[str]:
+    providers = []
+    if API_FOOTBALL_KEY:
+        providers.append("api_football")
+    if SPORTMONKS_TOKEN:
+        providers.append("sportmonks")
+    if FOOTBALL_DATA_TOKEN:
+        providers.append("football_data")
+    if THESPORTSDB_KEY:
+        providers.append("thesportsdb")
+    if NEWSAPI_KEY:
+        providers.append("newsapi")
+    if GDELT_DOC_API:
+        providers.append("gdelt")
+    if THE_ODDS_API_KEY:
+        providers.append("the_odds_api")
+    return providers
+
+
 def api_football_headers() -> Dict[str, str]:
     headers = {"x-apisports-key": API_FOOTBALL_KEY}
     if API_FOOTBALL_HOST:
@@ -418,6 +445,29 @@ def sportmonks_url(path: str, **params: object) -> str:
     query["api_token"] = SPORTMONKS_TOKEN
     path_value = path if path.startswith("/") else f"/{path}"
     return f"{SPORTMONKS_BASE_URL}{path_value}?{urlencode(query, doseq=True)}"
+
+
+def football_data_enabled() -> bool:
+    return bool(FOOTBALL_DATA_TOKEN)
+
+
+def football_data_headers() -> Dict[str, str]:
+    return {"X-Auth-Token": FOOTBALL_DATA_TOKEN}
+
+
+def football_data_url() -> str:
+    query = {"season": FOOTBALL_DATA_SEASON} if FOOTBALL_DATA_SEASON else {}
+    suffix = f"?{urlencode(query)}" if query else ""
+    return f"{FOOTBALL_DATA_BASE_URL}/competitions/{FOOTBALL_DATA_COMPETITION}/matches{suffix}"
+
+
+def thesportsdb_enabled() -> bool:
+    return bool(THESPORTSDB_KEY)
+
+
+def thesportsdb_url() -> str:
+    query = THESPORTSDB_LIVESCORE_QUERY or "s=Soccer"
+    return f"{THESPORTSDB_BASE_URL}/{THESPORTSDB_KEY}/livescore.php?{query}"
 
 
 def odds_api_enabled() -> bool:
@@ -1672,6 +1722,114 @@ def fetch_sportmonks_live_index(teams: Dict[str, object]) -> Dict[Tuple[str, str
     return index
 
 
+def score_to_int(value) -> Optional[int]:
+    if value is None:
+        return None
+    if isinstance(value, dict):
+        for key in ("goals", "score", "display", "current", "regularTime"):
+            parsed = score_to_int(value.get(key))
+            if parsed is not None:
+                return parsed
+        return None
+    try:
+        return int(float(str(value).strip()))
+    except (TypeError, ValueError):
+        return None
+
+
+def football_data_match_score(score_payload: dict) -> Tuple[Optional[int], Optional[int]]:
+    if not isinstance(score_payload, dict):
+        return None, None
+    for key in ("fullTime", "regularTime", "halfTime"):
+        row = score_payload.get(key)
+        if not isinstance(row, dict):
+            continue
+        home = score_to_int(row.get("home"))
+        away = score_to_int(row.get("away"))
+        if home is not None and away is not None:
+            return home, away
+    return None, None
+
+
+def fetch_football_data_live_index(teams: Dict[str, object]) -> Dict[Tuple[str, str], dict]:
+    if not football_data_enabled():
+        return {}
+    try:
+        payload = run_curl_json(football_data_url(), headers=football_data_headers())
+    except Exception:
+        return {}
+
+    index: Dict[Tuple[str, str], dict] = {}
+    for row in payload.get("matches") or []:
+        if not isinstance(row, dict):
+            continue
+        raw_home = str((row.get("homeTeam") or {}).get("name") or "").strip()
+        raw_away = str((row.get("awayTeam") or {}).get("name") or "").strip()
+        if not raw_home or not raw_away:
+            continue
+        team_a = provider_team_name(raw_home, teams)
+        team_b = provider_team_name(raw_away, teams)
+        score_a, score_b = football_data_match_score(row.get("score") or {})
+        status = str(row.get("status") or "").strip().upper()
+        enrichment: Dict[str, object] = {
+            "live_feed_provider": "football_data",
+            "live_feed_depth": "estado_y_marcador",
+            "provider_fixture_id": row.get("id"),
+            "provider_status_detail": status.lower(),
+        }
+        if status in {"LIVE", "IN_PLAY", "PAUSED"} and score_a is not None and score_b is not None:
+            enrichment["live_score_a"] = score_a
+            enrichment["live_score_b"] = score_b
+        if status in {"FINISHED", "AWARDED"} and score_a is not None and score_b is not None:
+            enrichment["actual_score_a"] = score_a
+            enrichment["actual_score_b"] = score_b
+            enrichment["update_state"] = True
+        if status:
+            enrichment["provider_match_status"] = status
+        index[match_lookup_key(team_a, team_b)] = enrichment
+    return index
+
+
+def fetch_thesportsdb_live_index(teams: Dict[str, object]) -> Dict[Tuple[str, str], dict]:
+    if not thesportsdb_enabled():
+        return {}
+    try:
+        payload = run_curl_json(thesportsdb_url())
+    except Exception:
+        return {}
+
+    rows = payload.get("events") or payload.get("event") or payload.get("livescores") or []
+    if isinstance(rows, dict):
+        rows = [rows]
+    index: Dict[Tuple[str, str], dict] = {}
+    for row in rows or []:
+        if not isinstance(row, dict):
+            continue
+        raw_home = str(row.get("strHomeTeam") or row.get("strHome") or row.get("homeTeam") or "").strip()
+        raw_away = str(row.get("strAwayTeam") or row.get("strAway") or row.get("awayTeam") or "").strip()
+        if not raw_home or not raw_away:
+            continue
+        team_a = provider_team_name(raw_home, teams)
+        team_b = provider_team_name(raw_away, teams)
+        score_a = score_to_int(row.get("intHomeScore") or row.get("intHomeGoals") or row.get("homeScore"))
+        score_b = score_to_int(row.get("intAwayScore") or row.get("intAwayGoals") or row.get("awayScore"))
+        progress = str(row.get("strProgress") or row.get("strStatus") or row.get("status") or "").strip()
+        enrichment: Dict[str, object] = {
+            "live_feed_provider": "thesportsdb",
+            "live_feed_depth": "estado_y_marcador_publico",
+            "provider_fixture_id": row.get("idEvent") or row.get("id"),
+            "provider_status_detail": progress[:120],
+        }
+        if score_a is not None and score_b is not None:
+            enrichment["live_score_a"] = score_a
+            enrichment["live_score_b"] = score_b
+        minute = score_to_int(row.get("intMinute") or row.get("strMinute") or row.get("minute"))
+        if minute is not None:
+            enrichment["live_elapsed_minutes"] = minute
+        index[match_lookup_key(team_a, team_b)] = enrichment
+    return index
+
+
 def merge_provider_indexes(*indexes: Dict[Tuple[str, str], dict]) -> Dict[Tuple[str, str], dict]:
     merged: Dict[Tuple[str, str], dict] = {}
     for index in indexes:
@@ -1694,6 +1852,8 @@ def fetch_provider_live_index(teams: Dict[str, object]) -> Dict[Tuple[str, str],
     return merge_provider_indexes(
         fetch_api_football_live_index(teams),
         fetch_sportmonks_live_index(teams),
+        fetch_football_data_live_index(teams),
+        fetch_thesportsdb_live_index(teams),
     )
 
 
@@ -2290,23 +2450,126 @@ def build_live_fixtures(scoreboard_payload: dict) -> List[dict]:
     return fixtures
 
 
+def fixture_is_live_status(fixture: dict) -> bool:
+    status = str(fixture.get("status_state") or fixture.get("provider_match_status") or "").strip().lower()
+    return status in {"in", "live", "in_progress", "in_play", "paused"} or fixture.get("live_elapsed_minutes") is not None
+
+
+def fixture_is_final_status(fixture: dict) -> bool:
+    status = str(fixture.get("status_state") or fixture.get("provider_match_status") or "").strip().lower()
+    return status in {"post", "final", "full_time", "finished", "complete", "completed", "finished", "awarded"}
+
+
+def fixture_should_be_live_by_clock(fixture: dict, now: datetime) -> bool:
+    kickoff_text = fixture.get("kickoff_utc")
+    if not kickoff_text or fixture_is_final_status(fixture):
+        return False
+    try:
+        kickoff = parse_iso_utc(str(kickoff_text))
+    except Exception:
+        return False
+    return kickoff <= now <= kickoff + timedelta(minutes=150)
+
+
+def live_provider_names_from_fixtures(fixtures: Sequence[dict]) -> List[str]:
+    providers = []
+    for fixture in fixtures:
+        provider_blob = str(fixture.get("live_feed_provider") or "").strip()
+        if not provider_blob:
+            continue
+        providers.extend(part.strip() for part in provider_blob.split("+") if part.strip())
+    return sorted(dict.fromkeys(providers))
+
+
+def live_source_names_from_fixtures(fixtures: Sequence[dict]) -> List[str]:
+    sources = []
+    for fixture in fixtures:
+        source_blob = str(fixture.get("source") or "").strip()
+        if not source_blob:
+            continue
+        sources.extend(part.strip() for part in source_blob.split("+") if part.strip())
+    return sorted(dict.fromkeys(sources))
+
+
+def write_live_sync_status(fixtures: Sequence[dict], *, scoreboard_available: bool, used_fallback: bool, fallback_reason: str = "") -> dict:
+    now = datetime.now(timezone.utc)
+    live_count = sum(1 for fixture in fixtures if fixture_is_live_status(fixture))
+    final_count = sum(1 for fixture in fixtures if fixture_is_final_status(fixture))
+    should_be_live = [
+        {
+            "id": fixture.get("id"),
+            "label": fixture.get("label"),
+            "kickoff_utc": fixture.get("kickoff_utc"),
+            "status_state": fixture.get("status_state"),
+            "live_score_a": fixture.get("live_score_a"),
+            "live_score_b": fixture.get("live_score_b"),
+            "live_elapsed_minutes": fixture.get("live_elapsed_minutes"),
+        }
+        for fixture in fixtures
+        if fixture_should_be_live_by_clock(fixture, now)
+    ]
+    missing_live_payload = [
+        item
+        for item in should_be_live
+        if item.get("live_score_a") is None and item.get("live_score_b") is None and item.get("live_elapsed_minutes") is None
+    ]
+    providers_used = live_provider_names_from_fixtures(fixtures)
+    sources_used = live_source_names_from_fixtures(fixtures) or ["espn_scoreboard"]
+    status = {
+        "updated_at_utc": iso_now(),
+        "scoreboard_available": bool(scoreboard_available),
+        "used_fallback": bool(used_fallback),
+        "fallback_reason": fallback_reason[:500],
+        "configured_providers": configured_provider_names(),
+        "sources_used": sources_used,
+        "providers_used": providers_used,
+        "deep_live_provider_used": bool(providers_used),
+        "fixtures_total": len(fixtures),
+        "live_count": live_count,
+        "final_count": final_count,
+        "should_be_live_by_clock_count": len(should_be_live),
+        "missing_live_payload_count": len(missing_live_payload),
+        "stale_live_warning": bool(missing_live_payload and (used_fallback or not scoreboard_available or live_count == 0)),
+        "stale_live_fixtures": missing_live_payload[:6],
+        "action_if_warning": (
+            "No cargar como in-play profundo: revisar GitHub Actions, ESPN/API base o activar proveedor profundo. "
+            "Si ya hay marcador/estado live, el modelo queda en in-play base limitado; si falta marcador/minuto, usa fallback hasta recibir datos reales."
+        ),
+    }
+    LIVE_SYNC_STATUS_FILE.write_text(json.dumps(status, indent=2, ensure_ascii=True))
+    return status
+
+
 def main() -> None:
     used_fallback = False
+    scoreboard_available = False
+    fallback_reason = ""
     try:
         payload = run_curl_json(SCOREBOARD_URL)
+        scoreboard_available = True
         fixtures = build_live_fixtures(payload)
         OUTPUT_FILE.write_text(json.dumps(fixtures, indent=2, ensure_ascii=True))
     except Exception as exc:
         if not OUTPUT_FILE.exists():
             raise
         used_fallback = True
+        fallback_reason = str(exc)
         fixtures = json.loads(OUTPUT_FILE.read_text())
         print(f"Advertencia: ESPN scoreboard no disponible ({exc}); se reutiliza {OUTPUT_FILE}")
 
+    sync_status = write_live_sync_status(
+        fixtures,
+        scoreboard_available=scoreboard_available,
+        used_fallback=used_fallback,
+        fallback_reason=fallback_reason,
+    )
     print(f"Fixtures vivos guardados en {OUTPUT_FILE}")
+    print(f"Estado live guardado en {LIVE_SYNC_STATUS_FILE}")
     print(f"Partidos sincronizados: {len(fixtures)}")
     print(f"Fallback por feed base: {'si' if used_fallback else 'no'}")
-    print(f"Proveedor live profundo activo: {'si' if provider_enabled() else 'no'}")
+    print(f"Proveedores configurados: {', '.join(sync_status['configured_providers']) or 'ninguno'}")
+    print(f"Proveedores usados en fixtures: {', '.join(sync_status['providers_used']) or 'ninguno'}")
+    print(f"Alerta stale live: {'si' if sync_status['stale_live_warning'] else 'no'}")
     print(f"Actualizado: {iso_now()}")
 
 

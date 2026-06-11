@@ -9548,8 +9548,8 @@ def live_provider_catalog() -> List[dict]:
             "category": "Fixture/resultados",
             "priority": "Backup abierto",
             "coverage": "Competiciones, equipos, partidos y resultados vía API v4.",
-            "integration": "Requiere adaptador",
-            "env": "FOOTBALL_DATA_KEY",
+            "integration": "Ya cableado si hay token",
+            "env": "FOOTBALL_DATA_TOKEN",
             "role": "Buen backup de calendario/resultados; no reemplaza eventos live profundos.",
         },
         {
@@ -9557,7 +9557,7 @@ def live_provider_catalog() -> List[dict]:
             "category": "Free/backup",
             "priority": "Backup gratuito",
             "coverage": "JSON API, datos, arte, eventos, highlights y livescores premium cada 2 minutos.",
-            "integration": "Requiere adaptador",
+            "integration": "Ya cableado como backup público ligero",
             "env": "THESPORTSDB_KEY",
             "role": "Backup económico para datos públicos, arte y highlights; menor profundidad analítica.",
         },
@@ -12011,6 +12011,27 @@ def build_runtime_status_html(entries: Sequence[dict], bracket_payload: dict) ->
     live_count = sum(1 for entry in fixture_entries if fixture_is_live(entry))
     final_count = sum(1 for entry in fixture_entries if fixture_is_final(entry))
     pending_count = max(len(fixture_entries) - live_count - final_count, 0)
+    now_utc = datetime.now(timezone.utc)
+
+    def _should_be_live_by_clock(entry: dict) -> bool:
+        kickoff_text = str(entry.get("kickoff_utc") or "").strip()
+        if not kickoff_text or fixture_is_final(entry):
+            return False
+        try:
+            kickoff = datetime.fromisoformat(kickoff_text.replace("Z", "+00:00"))
+        except ValueError:
+            return False
+        return kickoff <= now_utc and (now_utc - kickoff).total_seconds() <= 150 * 60
+
+    should_be_live = [entry for entry in fixture_entries if _should_be_live_by_clock(entry)]
+    missing_live_payload = [
+        entry
+        for entry in should_be_live
+        if entry.get("live_score_a") is None
+        and entry.get("live_score_b") is None
+        and entry.get("live_elapsed_minutes") is None
+        and entry.get("minute") is None
+    ]
     runtime = provider_runtime_diagnostics(entries)
     deep_providers = runtime["deep_sources"]
     live_sources = runtime["live_sources"]
@@ -12072,6 +12093,17 @@ def build_runtime_status_html(entries: Sequence[dict], bracket_payload: dict) ->
             f"<strong>{final_count}</strong> finales y <strong>{pending_count}</strong> pendientes.",
         ),
     ]
+    if missing_live_payload:
+        labels = ", ".join(str(entry.get("label") or entry.get("id") or "partido") for entry in missing_live_payload[:3])
+        cards.insert(
+            0,
+            (
+                "Alerta de ingestión live",
+                f"Por horario ya debería haber datos en vivo para <strong>{html.escape(labels)}</strong>, "
+                "pero este corte no trae minuto ni marcador. El modelo queda en modo prepartido/fallback "
+                "hasta que ESPN o un proveedor conectado entregue datos reales.",
+            ),
+        )
     card_html = "".join(
         (
             "<article class=\"runtime-card\">"
@@ -12524,6 +12556,10 @@ def predictive_robustness_gate(
 
     if brier_active and historical_ready and benchmark_ready and strict_inputs:
         status = "operativo_con_evidencia"
+    elif live_count > 0:
+        status = "torneo_en_curso_live_activo"
+    elif final_count > 0 or completed_matches > 0:
+        status = "torneo_en_curso_con_finales"
     elif strict_inputs and (historical_ready or benchmark_ready or iterations >= 100000):
         status = "operativo_con_guardrails"
     else:
@@ -12531,6 +12567,7 @@ def predictive_robustness_gate(
 
     return {
         "status": status,
+        "tournament_phase": "en_curso" if live_count > 0 or final_count > 0 or completed_matches > 0 else "pretorneo",
         "iterations": iterations,
         "fixture_count": len(fixture_entries),
         "projected_count": len(projected_entries),
@@ -12568,7 +12605,14 @@ def build_predictive_robustness_gate_html(
     """Render the operational fixes for the model's predictive weak points."""
 
     gate = predictive_robustness_gate(entries, bracket_payload, backtest)
-    brier_label = "Activo" if gate["brier_2026_active"] else "Listo al primer final"
+    tournament_label = "Torneo en curso" if gate.get("tournament_phase") == "en_curso" else "Preinicio"
+    tournament_detail = (
+        f"Fixtures directos: {gate['live_count']} en vivo y {gate['final_count']} finales. "
+        "El modelo ya debe leerse como in-play/torneo, no como pretorneo."
+        if gate.get("tournament_phase") == "en_curso"
+        else "Todavía no hay fixture live ni final en el corte publicado."
+    )
+    brier_label = "Activo" if gate["brier_2026_active"] else "Espera primer final"
     brier_detail = (
         f"Brier 2026 ya mide {gate['completed_matches']} partidos cerrados."
         if gate["brier_2026_active"]
@@ -12602,6 +12646,12 @@ def build_predictive_robustness_gate_html(
     exact_detail = "; ".join(exact_detail_bits) or "Sin muestra suficiente de marcadores exactos en este corte."
 
     tiles = [
+        (
+            "Estado del Mundial",
+            tournament_label,
+            tournament_detail,
+            "ok" if gate.get("tournament_phase") == "en_curso" else "neutral",
+        ),
         (
             "Calibración 2026",
             brier_label,

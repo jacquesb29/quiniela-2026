@@ -1,0 +1,23 @@
+{
+  "updated_at_utc": "2026-06-11T23:28:06+00:00",
+  "scoreboard_available": false,
+  "used_fallback": true,
+  "fallback_reason": "Command '['curl', '-sL', '--max-time', '30', 'https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard?dates=20260611-20260719&limit=200']' returned non-zero exit status 6.",
+  "configured_providers": [
+    "gdelt"
+  ],
+  "sources_used": [
+    "espn_scoreboard",
+    "open_news"
+  ],
+  "providers_used": [],
+  "deep_live_provider_used": false,
+  "fixtures_total": 104,
+  "live_count": 1,
+  "final_count": 0,
+  "should_be_live_by_clock_count": 0,
+  "missing_live_payload_count": 0,
+  "stale_live_warning": false,
+  "stale_live_fixtures": [],
+  "action_if_warning": "No cargar como in-play profundo: revisar GitHub Actions, ESPN/API base o activar proveedor profundo. Si ya hay marcador/estado live, el modelo queda en in-play base limitado; si falta marcador/minuto, usa fallback hasta recibir datos reales."
+}

@@ -386,6 +386,45 @@ class RegressionLogicTest(unittest.TestCase):
         self.assertIn("<strong>1</strong> pendientes", html)
         self.assertIn("In-play limitado", html)
 
+    def test_runtime_status_warns_when_clock_says_live_but_payload_is_stale(self):
+        kickoff = (datetime.now(timezone.utc) - timedelta(minutes=20)).isoformat().replace("+00:00", "Z")
+        html = app.build_runtime_status_html(
+            [
+                {
+                    "projection": False,
+                    "label": "Mexico vs South Africa",
+                    "kickoff_utc": kickoff,
+                    "status_state": "pre",
+                }
+            ],
+            {"iterations": 100000},
+        )
+        self.assertIn("Alerta de ingestión live", html)
+        self.assertIn("Mexico vs South Africa", html)
+
+    def test_sync_status_marks_stale_live_window(self):
+        kickoff = (datetime.now(timezone.utc) - timedelta(minutes=15)).isoformat().replace("+00:00", "Z")
+        with mock.patch.object(sync, "LIVE_SYNC_STATUS_FILE") as status_path:
+            status_path.write_text = mock.Mock()
+            status = sync.write_live_sync_status(
+                [
+                    {
+                        "id": "espn-1",
+                        "label": "Mexico vs South Africa",
+                        "kickoff_utc": kickoff,
+                        "status_state": "pre",
+                        "source": "espn_scoreboard",
+                    }
+                ],
+                scoreboard_available=False,
+                used_fallback=True,
+                fallback_reason="curl failed",
+            )
+        self.assertTrue(status["stale_live_warning"])
+        self.assertEqual(status["missing_live_payload_count"], 1)
+        self.assertEqual(status["providers_used"], [])
+        self.assertIn("espn_scoreboard", status["sources_used"])
+
     def test_provider_diagnostics_separate_prepared_from_configured(self):
         entries = [{"projection": False, "source": "espn_scoreboard", "status_state": "pre"}]
         with mock.patch.dict("os.environ", {}, clear=True):
@@ -1275,7 +1314,7 @@ class RegressionLogicTest(unittest.TestCase):
         )
 
         self.assertIn("Robustez predictiva", html)
-        self.assertIn("Listo al primer final", html)
+        self.assertIn("Espera primer final", html)
         self.assertIn("No se inventa Brier", html)
         self.assertIn("Un marcador único no se fuerza a 90-95%", html)
         self.assertIn("Inputs proxy", html)
