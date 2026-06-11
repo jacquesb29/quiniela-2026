@@ -154,6 +154,7 @@ class QuinielaAuditIntegrityTest(unittest.TestCase):
         self.assertRegex(full_100k_workflow, r"cron:\s*[\"']42 4,12,20 \* \* \*[\"']")
         self.assertIn("--iterations 100000", deep_workflow)
         self.assertIn("--iterations 100000", full_100k_workflow)
+        self.assertIn("--min-iterations 100000", full_100k_workflow)
         self.assertIn("build_historical_features_1950.py --download --min-official-matches 25000", deep_workflow)
         self.assertIn("python3 -m unittest discover -s mundial_2026/tests", deep_workflow)
         self.assertIn("audit-quiniela", workflow)
