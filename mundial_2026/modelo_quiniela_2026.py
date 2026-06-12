@@ -9582,6 +9582,25 @@ def live_provider_catalog() -> List[dict]:
     ]
 
 
+def recommended_live_provider_decision() -> dict:
+    return {
+        "name": "API-Football / API-SPORTS",
+        "env": "API_FOOTBALL_KEY",
+        "status": "proveedor elegido para activar live profundo",
+        "why": (
+            "Es el candidato mas practico para hoy: ya esta cableado, cubre livescore, "
+            "fixtures, eventos, lineups, estadisticas, lesiones y odds, y tiene plan free "
+            "para validar cobertura antes de pagar."
+        ),
+        "activation_gate": (
+            "Sube el bloque de proveedores a 10/10 solo cuando live_sync_status.json marque "
+            "deep_live_provider_used=true y el feed entregue eventos/estadisticas del partido."
+        ),
+        "fallback": "ESPN scoreboard + GDELT + Open-Meteo siguen como piso automatico sin key.",
+        "second_provider": "Sportmonks queda como segundo proveedor recomendado si se necesita xG/includes mas ricos.",
+    }
+
+
 def provider_catalog_metrics() -> dict:
     catalog = live_provider_catalog()
     return {
@@ -9640,10 +9659,12 @@ def provider_runtime_diagnostics(entries: Optional[Sequence[dict]] = None) -> di
 
 def build_provider_matrix_markdown() -> List[str]:
     metrics = provider_catalog_metrics()
+    decision = recommended_live_provider_decision()
     lines = [
         "### Mapa de proveedores buscados",
         f"- Proveedores catalogados: {metrics['total']} | ya cableados: {metrics['wired']} | adaptadores pendientes: {metrics['adapters']} | enterprise/contrato: {metrics['enterprise']}.",
         "- Regla: usar automáticamente fuentes sin key primero: ESPN público, Open-Meteo, GDELT, FIFA rankings y datos históricos. Las fuentes premium quedan como mejora opcional, no como requisito para que el modelo funcione.",
+        f"- Proveedor elegido: {decision['name']} ({decision['env']}). {decision['why']} {decision['activation_gate']}",
     ]
     for item in live_provider_catalog():
         lines.append(
@@ -9659,6 +9680,7 @@ def build_provider_matrix_html(entries: Sequence[dict]) -> str:
     open_news_sources = sorted({str(entry.get("open_news_provider")) for entry in fixture_entries if entry.get("open_news_provider")})
     runtime = provider_runtime_diagnostics(entries)
     active_label = " + ".join(deep_sources or live_sources or ["feed base público"])
+    decision = recommended_live_provider_decision()
     configured_wired = runtime["configured_wired"]
     automatic_label = "ESPN + Open-Meteo + GDELT"
     if configured_wired:
@@ -9709,6 +9731,8 @@ def build_provider_matrix_html(entries: Sequence[dict]) -> str:
         for item in catalog
     )
     best_next = [
+        f"Proveedor elegido: {decision['name']}. {decision['why']}",
+        f"Criterio 10/10: {decision['activation_gate']}",
         "Ya corre automático: fixture/resultados ESPN, clima Open-Meteo, noticias abiertas GDELT, FIFA rankings e histórico trazable desde 1950.",
         "Los marcadores Penca se recalculan en cada refresh: si cambia el resultado real, una baja, el cruce proyectado o la evidencia live, cambia el marcador recomendado.",
         "Si aparece una fuente sin key con eventos tiro-a-tiro confiables para Mundial 2026, se puede sumar; por ahora no conviene scrapear SofaScore/FotMob/Flashscore sin licencia.",
@@ -9733,6 +9757,7 @@ def build_provider_matrix_html(entries: Sequence[dict]) -> str:
         "</div></div>"
         "<div class=\"confidence-tiles\">"
         f"{tile('Fuente activa visible', active_label, 'Lo que está entrando en este corte publicado.')}"
+        f"{tile('Proveedor elegido', str(decision['name']), 'Activación: ' + str(decision['env']) + '; no se marca 10/10 hasta ver datos profundos reales.')}"
         f"{tile('Automático sin cuentas', automatic_label, 'No requiere que pegues keys ni busques contratos.')}"
         f"{tile('Noticias abiertas usadas', news_usage_label, 'GDELT puede mover lesiones, sanciones y contexto si detecta señal fuerte.')}"
         f"{tile('Eventos live profundos', deep_usage_label, 'Tiros minuto a minuto solo si existe feed público/premium válido.')}"
@@ -9774,6 +9799,7 @@ def provider_stack_summary(entries: Optional[Sequence[dict]] = None) -> dict:
         "prepared": prepared,
         "deep_active": bool(deep_sources),
         "fixture_count": runtime["fixture_count"],
+        "recommended": recommended_live_provider_decision(),
     }
 
 

@@ -142,6 +142,15 @@ historical_rows = csv_metric(
     ["data/real_data_coverage_report.csv", "site/real_data_coverage_report.csv"],
     "selected_rows",
 )
+recommended_live_provider = {
+    "name": "API-Football / API-SPORTS",
+    "env": "API_FOOTBALL_KEY",
+    "status": "proveedor elegido para activar live profundo",
+    "why": "Ya esta cableado y cubre livescore, fixtures, eventos, lineups, estadisticas, lesiones y odds; es el camino practico antes de proveedores enterprise.",
+    "activation_gate": "deep_live_provider_used=true en live_sync_status.json con eventos/estadisticas reales del partido.",
+    "fallback": "ESPN scoreboard + GDELT + Open-Meteo siguen como piso automatico sin key.",
+    "second_provider": "Sportmonks queda como segundo proveedor recomendado si se necesita xG/includes mas ricos.",
+}
 published_at = datetime.now(timezone.utc).isoformat(timespec="seconds")
 payload = {
     "updated_at_utc": published_at,
@@ -206,6 +215,7 @@ payload = {
     "bracket_recalculation_policy": bracket_payload.get("recalculation_policy"),
     "live_feed_stack": live_sources or ["espn_scoreboard"],
     "live_feed_providers": live_providers,
+    "recommended_live_provider": recommended_live_provider,
     "live_ingestion_status": live_sync_status,
     "official_fifa_rankings_as_of": (teams_payload.get("meta") or {}).get("fifa_rankings_as_of"),
     "historical_base": {

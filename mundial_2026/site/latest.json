@@ -1,7 +1,7 @@
 {
-  "updated_at_utc": "2026-06-12T00:06:42+00:00",
-  "publication_updated_at_utc": "2026-06-12T00:06:42+00:00",
-  "dashboard_updated_at_utc": "2026-06-12T00:00:34+00:00",
+  "updated_at_utc": "2026-06-12T00:56:44+00:00",
+  "publication_updated_at_utc": "2026-06-12T00:56:44+00:00",
+  "dashboard_updated_at_utc": "2026-06-12T00:55:16+00:00",
   "timestamp_consistency_note": "latest.json se escribe despues de copiar el HTML; compara dashboard_updated_at_utc contra publication_updated_at_utc para detectar desfases reales de publicacion o cache.",
   "refresh_interval_minutes": 5,
   "live_refresh_interval_minutes": 5,
@@ -58,6 +58,15 @@
     "espn_scoreboard+open_news"
   ],
   "live_feed_providers": [],
+  "recommended_live_provider": {
+    "name": "API-Football / API-SPORTS",
+    "env": "API_FOOTBALL_KEY",
+    "status": "proveedor elegido para activar live profundo",
+    "why": "Ya esta cableado y cubre livescore, fixtures, eventos, lineups, estadisticas, lesiones y odds; es el camino practico antes de proveedores enterprise.",
+    "activation_gate": "deep_live_provider_used=true en live_sync_status.json con eventos/estadisticas reales del partido.",
+    "fallback": "ESPN scoreboard + GDELT + Open-Meteo siguen como piso automatico sin key.",
+    "second_provider": "Sportmonks queda como segundo proveedor recomendado si se necesita xG/includes mas ricos."
+  },
   "live_ingestion_status": {
     "updated_at_utc": "2026-06-11T23:28:06+00:00",
     "scoreboard_available": false,
