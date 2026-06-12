@@ -1,5 +1,5 @@
 {
-  "updated_at_utc": "2026-06-11T23:28:06+00:00",
+  "updated_at_utc": "2026-06-12T01:15:45+00:00",
   "scoreboard_available": false,
   "used_fallback": true,
   "fallback_reason": "Command '['curl', '-sL', '--max-time', '30', 'https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard?dates=20260611-20260719&limit=200']' returned non-zero exit status 6.",
@@ -12,6 +12,23 @@
   ],
   "providers_used": [],
   "deep_live_provider_used": false,
+  "selected_deep_live_provider": {
+    "name": "API-Football / API-SPORTS",
+    "provider_id": "api_football",
+    "env": "API_FOOTBALL_KEY",
+    "reason": "Proveedor live profundo elegido para automatizar el in-play: ya esta cableado y puede aportar fixtures live, eventos, lineups y estadisticas cuando la key existe.",
+    "auto_update": "GitHub Actions lo intenta en cada corrida de 5 minutos si API_FOOTBALL_KEY esta configurada.",
+    "fallback": "Si no hay key o el feed no devuelve el partido, el pipeline sigue con ESPN scoreboard + GDELT + Open-Meteo."
+  },
+  "automatic_live_update": {
+    "enabled": true,
+    "interval_minutes": 5,
+    "workflow": "quiniela-pages.yml",
+    "primary_provider_configured": false,
+    "primary_provider_used": false,
+    "mode": "fallback_publico_automatico",
+    "explanation": "API-Football se usa solo cuando la key existe y devuelve el partido vivo. Sin eso, el sistema igual se actualiza solo cada 5 minutos con fuentes publicas/base."
+  },
   "fixtures_total": 104,
   "live_count": 1,
   "final_count": 0,

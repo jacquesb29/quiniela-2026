@@ -57,6 +57,18 @@ NEWS_MAX_FIXTURES = int(os.environ.get("NEWS_MAX_FIXTURES", "8") or "8")
 NEWS_POST_LOOKBACK_DAYS = int(os.environ.get("NEWS_POST_LOOKBACK_DAYS", "2") or "2")
 CURL_MAX_TIME_SECONDS = int(os.environ.get("CURL_MAX_TIME_SECONDS", "30") or "30")
 
+PRIMARY_DEEP_LIVE_PROVIDER = {
+    "name": "API-Football / API-SPORTS",
+    "provider_id": "api_football",
+    "env": "API_FOOTBALL_KEY",
+    "reason": (
+        "Proveedor live profundo elegido para automatizar el in-play: ya esta cableado "
+        "y puede aportar fixtures live, eventos, lineups y estadisticas cuando la key existe."
+    ),
+    "auto_update": "GitHub Actions lo intenta en cada corrida de 5 minutos si API_FOOTBALL_KEY esta configurada.",
+    "fallback": "Si no hay key o el feed no devuelve el partido, el pipeline sigue con ESPN scoreboard + GDELT + Open-Meteo.",
+}
+
 COUNTRY_MAP = {
     "USA": "United States",
     "United States of America": "United States",
@@ -2515,6 +2527,8 @@ def write_live_sync_status(fixtures: Sequence[dict], *, scoreboard_available: bo
     ]
     providers_used = live_provider_names_from_fixtures(fixtures)
     sources_used = live_source_names_from_fixtures(fixtures) or ["espn_scoreboard"]
+    primary_configured = api_football_enabled()
+    primary_used = PRIMARY_DEEP_LIVE_PROVIDER["provider_id"] in providers_used
     status = {
         "updated_at_utc": iso_now(),
         "scoreboard_available": bool(scoreboard_available),
@@ -2524,6 +2538,25 @@ def write_live_sync_status(fixtures: Sequence[dict], *, scoreboard_available: bo
         "sources_used": sources_used,
         "providers_used": providers_used,
         "deep_live_provider_used": bool(providers_used),
+        "selected_deep_live_provider": PRIMARY_DEEP_LIVE_PROVIDER,
+        "automatic_live_update": {
+            "enabled": True,
+            "interval_minutes": 5,
+            "workflow": "quiniela-pages.yml",
+            "primary_provider_configured": bool(primary_configured),
+            "primary_provider_used": bool(primary_used),
+            "mode": (
+                "live_profundo_automatico"
+                if primary_used
+                else "proveedor_profundo_configurado_sin_match"
+                if primary_configured
+                else "fallback_publico_automatico"
+            ),
+            "explanation": (
+                "API-Football se usa solo cuando la key existe y devuelve el partido vivo. "
+                "Sin eso, el sistema igual se actualiza solo cada 5 minutos con fuentes publicas/base."
+            ),
+        },
         "fixtures_total": len(fixtures),
         "live_count": live_count,
         "final_count": final_count,
