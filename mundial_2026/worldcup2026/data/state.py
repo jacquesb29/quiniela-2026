@@ -31,6 +31,9 @@ class TeamState:
     recent_xg_for_adj: float = 0.0
     recent_xga_adj: float = 0.0
     recent_opponent_strength: float = 0.0
+    scoreline_goal_for_residual: float = 0.0
+    scoreline_goal_against_residual: float = 0.0
+    scoreline_total_residual: float = 0.0
     style_possession: float = 0.0
     style_verticality: float = 0.0
     style_pressure: float = 0.0
@@ -78,6 +81,9 @@ class TeamState:
         self.recent_xg_for_adj = clamp(float(self.recent_xg_for_adj), -1.0, 1.0)
         self.recent_xga_adj = clamp(float(self.recent_xga_adj), -1.0, 1.0)
         self.recent_opponent_strength = clamp(float(self.recent_opponent_strength), -1.0, 1.0)
+        self.scoreline_goal_for_residual = clamp(float(self.scoreline_goal_for_residual), -1.0, 1.0)
+        self.scoreline_goal_against_residual = clamp(float(self.scoreline_goal_against_residual), -1.0, 1.0)
+        self.scoreline_total_residual = clamp(float(self.scoreline_total_residual), -1.0, 1.0)
         self.yellow_load = clamp(float(self.yellow_load), 0.0, 6.0)
         self.style_possession = clamp(float(self.style_possession), -1.0, 1.0)
         self.style_verticality = clamp(float(self.style_verticality), -1.0, 1.0)
@@ -121,6 +127,9 @@ class TeamState:
             round(self.recent_xg_for_adj, 1),
             round(self.recent_xga_adj, 1),
             round(self.recent_opponent_strength, 1),
+            round(self.scoreline_goal_for_residual, 1),
+            round(self.scoreline_goal_against_residual, 1),
+            round(self.scoreline_total_residual, 1),
             round(self.style_attack_bias, 1),
             round(self.style_defense_bias, 1),
             round(self.style_tempo, 1),
@@ -178,6 +187,9 @@ def state_has_activity(state: Optional[Mapping[str, Any]]) -> bool:
             abs(normalized.recent_xg_for_adj) > 1e-9,
             abs(normalized.recent_xga_adj) > 1e-9,
             abs(normalized.recent_opponent_strength) > 1e-9,
+            abs(normalized.scoreline_goal_for_residual) > 1e-9,
+            abs(normalized.scoreline_goal_against_residual) > 1e-9,
+            abs(normalized.scoreline_total_residual) > 1e-9,
             abs(normalized.fatigue) > 1e-9,
             abs(normalized.availability - 1.0) > 1e-9,
             abs(normalized.expected_threat_live) > 1e-9,

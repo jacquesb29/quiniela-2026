@@ -348,6 +348,28 @@ def update_simulation_state(
         adjusted_xga_signal = clamp((actual_xg_against - 1.15) - 0.18 * opponent_strength_signal, -1.0, 1.0)
         state["recent_xg_for_adj"] = clamp(0.66 * state.get("recent_xg_for_adj", 0.0) + 0.34 * adjusted_xg_for_signal, -1.0, 1.0)
         state["recent_xga_adj"] = clamp(0.66 * state.get("recent_xga_adj", 0.0) + 0.34 * adjusted_xga_signal, -1.0, 1.0)
+        scoreline_for_residual = clamp((score_for - expected_for) / 1.4, -1.0, 1.0)
+        scoreline_against_residual = clamp((score_against - expected_against) / 1.4, -1.0, 1.0)
+        scoreline_total_residual = clamp(
+            ((score_for + score_against) - (expected_for + expected_against)) / 1.8,
+            -1.0,
+            1.0,
+        )
+        state["scoreline_goal_for_residual"] = clamp(
+            0.70 * state.get("scoreline_goal_for_residual", 0.0) + 0.30 * scoreline_for_residual,
+            -1.0,
+            1.0,
+        )
+        state["scoreline_goal_against_residual"] = clamp(
+            0.70 * state.get("scoreline_goal_against_residual", 0.0) + 0.30 * scoreline_against_residual,
+            -1.0,
+            1.0,
+        )
+        state["scoreline_total_residual"] = clamp(
+            0.70 * state.get("scoreline_total_residual", 0.0) + 0.30 * scoreline_total_residual,
+            -1.0,
+            1.0,
+        )
         state["recent_opponent_strength"] = clamp(
             0.64 * state.get("recent_opponent_strength", 0.0) + 0.36 * opponent_strength_signal,
             -1.0,

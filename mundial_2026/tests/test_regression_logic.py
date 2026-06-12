@@ -319,6 +319,76 @@ class RegressionLogicTest(unittest.TestCase):
         self.assertEqual(live_match.current_score_b, 1)
         self.assertIsNotNone(live_match.expected_remaining_goals_a)
 
+    def test_live_distribution_changes_when_minute_score_or_red_card_changes(self):
+        teams = app.load_teams()
+        states = app.initial_team_states(teams)
+        ctx = app.MatchContext(neutral=True)
+        base_stats = {
+            "shots_a": 7,
+            "shots_b": 6,
+            "shots_on_target_a": 2,
+            "shots_on_target_b": 2,
+            "xg_a": 0.55,
+            "xg_b": 0.50,
+            "possession_a": 52,
+            "possession_b": 48,
+            "corners_a": 3,
+            "corners_b": 2,
+            "red_cards_a": 0,
+            "red_cards_b": 0,
+        }
+
+        def live_prediction(status_detail, score_a=0, score_b=0, stats=None):
+            return app.predict_match_live(
+                teams,
+                "Spain",
+                "Uruguay",
+                ctx,
+                score_a,
+                score_b,
+                status_detail,
+                top_scores=6,
+                state_a=states["Spain"],
+                state_b=states["Uruguay"],
+                live_stats=dict(stats or base_stats),
+            )
+
+        def distribution_signature(prediction):
+            return (
+                round(prediction.win_a, 6),
+                round(prediction.draw, 6),
+                round(prediction.win_b, 6),
+                round(prediction.expected_goals_a, 6),
+                round(prediction.expected_goals_b, 6),
+                round(prediction.expected_remaining_goals_a or 0.0, 6),
+                round(prediction.expected_remaining_goals_b or 0.0, 6),
+                tuple((score, round(prob, 6)) for score, prob in prediction.exact_scores[:5]),
+            )
+
+        baseline = live_prediction("20'")
+        minute_changed = live_prediction("70'")
+        score_changed = live_prediction("20'", score_a=1, score_b=0)
+        red_stats = dict(base_stats, red_cards_a=1)
+        red_changed = live_prediction("20'", stats=red_stats)
+
+        baseline_signature = distribution_signature(baseline)
+        self.assertNotEqual(
+            baseline_signature,
+            distribution_signature(minute_changed),
+            "Changing live minute must change the live probability/score distribution.",
+        )
+        self.assertNotEqual(
+            baseline_signature,
+            distribution_signature(score_changed),
+            "Changing live score must change the live probability/score distribution.",
+        )
+        self.assertNotEqual(
+            baseline_signature,
+            distribution_signature(red_changed),
+            "Changing a live red card must change the live probability/score distribution.",
+        )
+        self.assertLess(red_changed.win_a, baseline.win_a)
+
     def test_final_result_state_changes_future_score_probabilities(self):
         teams = app.load_teams()
         states = app.initial_team_states(teams)
@@ -371,6 +441,83 @@ class RegressionLogicTest(unittest.TestCase):
         self.assertNotEqual(before.expected_goals_a, after.expected_goals_a)
         self.assertNotEqual(before.exact_scores[0][1], after.exact_scores[0][1])
         self.assertGreater(states["Spain"]["group_points"], 0)
+
+    def test_observed_scoreline_residual_conditions_future_penca_scores(self):
+        teams = app.load_teams()
+        states = app.initial_team_states(teams)
+        future_fixture = {
+            "team_a": "Uruguay",
+            "team_b": "Algeria",
+            "stage": "group",
+            "neutral": True,
+            "group": "H",
+        }
+        future_ctx = app.context_from_fixture(future_fixture, teams, states)
+        before = app.predict_match(
+            teams,
+            "Uruguay",
+            "Algeria",
+            future_ctx,
+            top_scores=8,
+            state_a=states["Uruguay"],
+            state_b=states["Algeria"],
+        )
+        before_signature = (
+            round(before.expected_goals_a, 6),
+            round(before.expected_goals_b, 6),
+            tuple((score, round(prob, 6)) for score, prob in before.exact_scores[:6]),
+            round(float(app.penca_ovacion_top_score(before)["expected_points"]), 6),
+        )
+
+        result_fixture = {
+            "team_a": "Uruguay",
+            "team_b": "Spain",
+            "stage": "group",
+            "neutral": True,
+            "group": "H",
+            "actual_score_a": 2,
+            "actual_score_b": 1,
+            "actual_yellows_a": 1,
+            "actual_yellows_b": 2,
+        }
+        result_ctx = app.context_from_fixture(result_fixture, teams, states)
+        result_prediction = app.predict_match(
+            teams,
+            "Uruguay",
+            "Spain",
+            result_ctx,
+            top_scores=8,
+            state_a=states["Uruguay"],
+            state_b=states["Spain"],
+        )
+        app.apply_state_updates(teams, states, result_fixture, result_ctx, result_prediction)
+
+        self.assertNotEqual(0.0, states["Uruguay"]["scoreline_goal_for_residual"])
+        self.assertNotEqual(0.0, states["Uruguay"]["scoreline_goal_against_residual"])
+        self.assertNotEqual(0.0, states["Uruguay"]["scoreline_total_residual"])
+
+        after_ctx = app.context_from_fixture(future_fixture, teams, states)
+        after = app.predict_match(
+            teams,
+            "Uruguay",
+            "Algeria",
+            after_ctx,
+            top_scores=8,
+            state_a=states["Uruguay"],
+            state_b=states["Algeria"],
+        )
+        after_signature = (
+            round(after.expected_goals_a, 6),
+            round(after.expected_goals_b, 6),
+            tuple((score, round(prob, 6)) for score, prob in after.exact_scores[:6]),
+            round(float(app.penca_ovacion_top_score(after)["expected_points"]), 6),
+        )
+
+        self.assertNotEqual(
+            before_signature,
+            after_signature,
+            "A final 2-1 result must condition future score and Penca distributions.",
+        )
 
     def test_runtime_status_counts_provider_status_variants(self):
         html = app.build_runtime_status_html(

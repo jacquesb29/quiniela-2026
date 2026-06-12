@@ -1859,6 +1859,18 @@ def recent_opponent_strength_signal(state: Optional[dict]) -> float:
     return clamp(state_float(state, "recent_opponent_strength", 0.0), -1.0, 1.0)
 
 
+def scoreline_goal_for_residual_signal(state: Optional[dict]) -> float:
+    return clamp(state_float(state, "scoreline_goal_for_residual", 0.0), -1.0, 1.0)
+
+
+def scoreline_goal_against_residual_signal(state: Optional[dict]) -> float:
+    return clamp(state_float(state, "scoreline_goal_against_residual", 0.0), -1.0, 1.0)
+
+
+def scoreline_total_residual_signal(state: Optional[dict]) -> float:
+    return clamp(state_float(state, "scoreline_total_residual", 0.0), -1.0, 1.0)
+
+
 def discipline_trend(state: Optional[dict]) -> float:
     return clamp(state_float(state, "discipline_drift", 0.0), -1.0, 0.5)
 
@@ -1946,7 +1958,7 @@ def expected_goals(
     state_a: Optional[dict] = None,
     state_b: Optional[dict] = None,
 ) -> Tuple[float, float]:
-    return calculate_expected_goals(
+    mu_a, mu_b = calculate_expected_goals(
         team_a,
         team_b,
         ctx,
@@ -1974,6 +1986,25 @@ def expected_goals(
         group_pressure=group_pressure,
         clamp=clamp,
     )
+    total_residual = 0.5 * (
+        scoreline_total_residual_signal(state_a)
+        + scoreline_total_residual_signal(state_b)
+    )
+    side_a_residual = (
+        scoreline_goal_for_residual_signal(state_a)
+        + scoreline_goal_against_residual_signal(state_b)
+    )
+    side_b_residual = (
+        scoreline_goal_for_residual_signal(state_b)
+        + scoreline_goal_against_residual_signal(state_a)
+    )
+    total_factor = clamp(1.0 + 0.055 * total_residual, 0.94, 1.07)
+    side_a_factor = clamp(1.0 + 0.045 * side_a_residual, 0.93, 1.08)
+    side_b_factor = clamp(1.0 + 0.045 * side_b_residual, 0.93, 1.08)
+    return (
+        clamp(mu_a * total_factor * side_a_factor, 0.10, 4.60),
+        clamp(mu_b * total_factor * side_b_factor, 0.10, 4.60),
+    )
 
 
 def scoreline_family_signal(history: HistoricalSnapshot, key: str, baseline: float, scale: float) -> float:
@@ -1994,6 +2025,9 @@ def score_shape_team_signal(profile: TeamProfile, state: Optional[dict] = None) 
     ga_signal = clamp((history.weighted_goals_against_per_match - 1.15) / 0.75, -1.0, 1.0)
     scoring_rate_signal = clamp((history.scoring_rate - 0.62) / 0.24, -1.0, 1.0)
     clean_sheet_signal = clamp((history.clean_sheet_rate - 0.26) / 0.22, -1.0, 1.0)
+    scoreline_for_residual = scoreline_goal_for_residual_signal(state)
+    scoreline_against_residual = scoreline_goal_against_residual_signal(state)
+    scoreline_total_residual = scoreline_total_residual_signal(state)
     attack = clamp(
         0.24 * centered(history.attack_index)
         + 0.18 * centered(profile.squad.finishing)
@@ -2001,7 +2035,8 @@ def score_shape_team_signal(profile: TeamProfile, state: Optional[dict] = None) 
         + 0.14 * gf_signal
         + 0.12 * scoring_rate_signal
         + 0.10 * attack_form_signal(state)
-        + 0.06 * tactical_attack_signal(state),
+        + 0.06 * tactical_attack_signal(state)
+        + 0.10 * scoreline_for_residual,
         -1.0,
         1.0,
     )
@@ -2021,7 +2056,8 @@ def score_shape_team_signal(profile: TeamProfile, state: Optional[dict] = None) 
         - 0.16 * centered(history.defense_index)
         - 0.14 * centered(profile.squad.goalkeeper_unit)
         - 0.12 * clean_sheet_signal
-        + 0.10 * recent_xga_signal(state),
+        + 0.10 * recent_xga_signal(state)
+        + 0.12 * scoreline_against_residual,
         -1.0,
         1.0,
     )
@@ -2029,7 +2065,8 @@ def score_shape_team_signal(profile: TeamProfile, state: Optional[dict] = None) 
         0.46 * attack
         + 0.22 * gf_signal
         + 0.18 * centered(profile.tempo)
-        + 0.14 * tactical_tempo_signal(state),
+        + 0.14 * tactical_tempo_signal(state)
+        + 0.12 * scoreline_total_residual,
         -1.0,
         1.0,
     )
@@ -2054,8 +2091,18 @@ def score_shape_team_signal(profile: TeamProfile, state: Optional[dict] = None) 
         1.0,
     )
     btts = scoreline_family_signal(history, "btts", 0.498, 0.180)
-    open_match = scoreline_family_signal(history, "total_4_plus", 0.239, 0.160)
-    low_total = scoreline_family_signal(history, "total_0_1", 0.274, 0.160)
+    open_match = clamp(
+        scoreline_family_signal(history, "total_4_plus", 0.239, 0.160)
+        + 0.16 * scoreline_total_residual,
+        -1.0,
+        1.0,
+    )
+    low_total = clamp(
+        scoreline_family_signal(history, "total_0_1", 0.274, 0.160)
+        - 0.16 * scoreline_total_residual,
+        -1.0,
+        1.0,
+    )
     draw_11 = scoreline_family_signal(history, "draw_11", 0.116, 0.085)
     draw_22_plus = scoreline_family_signal(history, "draw_22_plus", 0.052, 0.065)
     return {
@@ -2403,6 +2450,9 @@ def simulation_state_from_signature(signature: Tuple[float, ...]) -> dict:
         "recent_xg_for_adj",
         "recent_xga_adj",
         "recent_opponent_strength",
+        "scoreline_goal_for_residual",
+        "scoreline_goal_against_residual",
+        "scoreline_total_residual",
         "style_attack_bias",
         "style_defense_bias",
         "style_tempo",
