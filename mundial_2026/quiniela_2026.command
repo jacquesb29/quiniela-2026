@@ -88,7 +88,7 @@ case "$command_name" in
     "$PYTHON_BIN" "$LIVE_SYNC"
     "$PYTHON_BIN" "$MODEL" state-reset
     "$PYTHON_BIN" "$MODEL" fixtures "$LIVE_FIXTURES"
-    "$PYTHON_BIN" "$MODEL" project-bracket --config "$DRAW" --iterations 100000 --seed 7 --progress-every 10000
+    "$PYTHON_BIN" "$MODEL" project-bracket --config "$DRAW" --iterations 100000 --seed 7 --progress-every 10000 --fixtures "$LIVE_FIXTURES"
     "$PYTHON_BIN" "$MODEL" project-dashboard --fixtures "$LIVE_FIXTURES"
     ;;
   simulate)
@@ -97,7 +97,7 @@ case "$command_name" in
     ;;
   bracket)
     iterations="${1:-1000}"
-    "$PYTHON_BIN" "$MODEL" project-bracket --config "$DRAW" --iterations "$iterations" --seed 7 --progress-every 250
+    "$PYTHON_BIN" "$MODEL" project-bracket --config "$DRAW" --iterations "$iterations" --seed 7 --progress-every 250 --fixtures "$LIVE_FIXTURES"
     ;;
   dashboard)
     if [[ -f "$LIVE_FIXTURES" ]]; then

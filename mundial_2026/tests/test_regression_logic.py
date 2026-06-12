@@ -389,6 +389,82 @@ class RegressionLogicTest(unittest.TestCase):
         )
         self.assertLess(red_changed.win_a, baseline.win_a)
 
+    def test_live_group_state_propagates_to_future_dashboard_predictions_without_persisting(self):
+        teams = app.load_teams()
+        states = app.initial_team_states(teams)
+        future_fixture = {
+            "team_a": "South Korea",
+            "team_b": "Canada",
+            "stage": "group",
+            "neutral": True,
+            "group": "A",
+        }
+        before_ctx = app.context_from_fixture(future_fixture, teams, states)
+        before = app.predict_match(
+            teams,
+            "South Korea",
+            "Canada",
+            before_ctx,
+            top_scores=5,
+            state_a=states["South Korea"],
+            state_b=states["Canada"],
+        )
+        entries = app.dashboard_fixture_entries(
+            [
+                {
+                    "team_a": "South Korea",
+                    "team_b": "Czech Republic",
+                    "status_state": "in",
+                    "status_detail": "70'",
+                    "live_score_a": 2,
+                    "live_score_b": 1,
+                    "live_red_cards_b": 1,
+                    "live_shots_a": 12,
+                    "live_shots_b": 5,
+                    "live_xg_a": 1.7,
+                    "live_xg_b": 0.6,
+                    "neutral": True,
+                    "stage": "group",
+                    "group": "A",
+                },
+                future_fixture,
+            ],
+            teams,
+            states,
+            top_scores=5,
+        )
+        live_entry = entries[0]
+        future_prediction = entries[1]["prediction"]
+
+        self.assertTrue(live_entry["live_projection_propagated"])
+        self.assertNotEqual(round(before.win_a, 6), round(future_prediction.win_a, 6))
+        self.assertNotEqual(round(before.expected_goals_a, 6), round(future_prediction.expected_goals_a, 6))
+        self.assertEqual(states["South Korea"]["group_points"], 0)
+        self.assertEqual(states["South Korea"]["group_matches_played"], 0)
+
+    def test_conditioned_group_stage_skips_fixed_live_group_match(self):
+        teams = app.load_teams()
+        states = app.initial_team_states(teams)
+        fixed = {
+            app.fixed_group_match_key("A", "South Korea", "Czech Republic"),
+        }
+        calls = []
+
+        def fake_sample(_teams, _states, team_a, team_b, stage, group_name=None):
+            calls.append((group_name, team_a, team_b, stage))
+            return {"winner": team_a, "team_a": team_a, "team_b": team_b}
+
+        with mock.patch.object(app, "simulate_match_sample", side_effect=fake_sample):
+            app.simulate_group_stage_conditioned(
+                teams,
+                {"A": ["South Korea", "Czech Republic", "Canada", "Spain"]},
+                states,
+                fixed,
+            )
+
+        self.assertNotIn(("A", "South Korea", "Czech Republic", "group"), calls)
+        self.assertEqual(len(calls), len(app.GROUP_MATCH_PAIRS) - 1)
+
     def test_final_result_state_changes_future_score_probabilities(self):
         teams = app.load_teams()
         states = app.initial_team_states(teams)

@@ -23,7 +23,7 @@ mkdir -p "$LOG_DIR"
   "$PYTHON_BIN" "$LIVE_SYNC"
   "$PYTHON_BIN" "$MODEL" state-reset
   "$PYTHON_BIN" "$MODEL" fixtures "$LIVE_FIXTURES"
-  "$RUNNER" bracket "$ITERATIONS"
+  "$PYTHON_BIN" "$MODEL" project-bracket --config "$SCRIPT_DIR/tournament_2026_draw.json" --iterations "$ITERATIONS" --seed 7 --progress-every 10000 --fixtures "$LIVE_FIXTURES"
   "$PYTHON_BIN" "$MODEL" project-dashboard --fixtures "$LIVE_FIXTURES"
   if [[ "$ICLOUD_SYNC" != "0" && -d "$ICLOUD_ROOT" ]]; then
     mkdir -p "$ICLOUD_DIR"

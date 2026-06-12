@@ -3800,6 +3800,46 @@ def simulate_group_stage(
     )
 
 
+def fixed_group_match_key(group_name: Optional[str], team_a: str, team_b: str) -> Tuple[str, Tuple[str, str]]:
+    return (str(group_name or ""), tuple(sorted((team_a, team_b))))
+
+
+def fixed_group_match_keys_from_payload(payload: Optional[dict]) -> set[Tuple[str, Tuple[str, str]]]:
+    if not payload:
+        return set()
+    fixed_matches = payload.get("fixed_group_matches", [])
+    keys = set()
+    for item in fixed_matches:
+        group = item.get("group")
+        team_a = item.get("team_a")
+        team_b = item.get("team_b")
+        if not group or not team_a or not team_b:
+            continue
+        keys.add(fixed_group_match_key(str(group), str(team_a), str(team_b)))
+    return keys
+
+
+def simulate_group_stage_conditioned(
+    teams: Dict[str, Team],
+    groups: Dict[str, List[str]],
+    states: Dict[str, dict],
+    fixed_group_matches: set[Tuple[str, Tuple[str, str]]],
+) -> Dict[str, List[dict]]:
+    standings = {}
+    for group_name, group_teams in groups.items():
+        for team_name in group_teams:
+            ensure_state(states, team_name)
+        for index_a, index_b in GROUP_MATCH_PAIRS:
+            team_a = group_teams[index_a]
+            team_b = group_teams[index_b]
+            if fixed_group_match_key(group_name, team_a, team_b) in fixed_group_matches:
+                continue
+            simulate_match_sample(teams, states, team_a, team_b, "group", group_name=group_name)
+        entries = [standings_entry(teams, states, group_name, team_name) for team_name in group_teams]
+        standings[group_name] = sort_standings(entries)
+    return standings
+
+
 def assign_third_place_slots(
     standings: Dict[str, List[dict]],
     winner_ranks: Dict[str, int],
@@ -3843,6 +3883,16 @@ def simulate_tournament_iteration(
     config: dict,
     initial_payload: Optional[dict] = None,
 ) -> dict:
+    fixed_group_matches = fixed_group_match_keys_from_payload(initial_payload)
+    group_stage_fn = simulate_group_stage
+    if fixed_group_matches:
+        def group_stage_fn(
+            group_stage_teams: Dict[str, Team],
+            groups: Dict[str, List[str]],
+            states: Dict[str, dict],
+        ) -> Dict[str, List[dict]]:
+            return simulate_group_stage_conditioned(group_stage_teams, groups, states, fixed_group_matches)
+
     return calculate_simulate_tournament_iteration(
         teams,
         config,
@@ -3850,7 +3900,7 @@ def simulate_tournament_iteration(
         sample_playoff_placeholders=sample_playoff_placeholders,
         resolve_groups_for_iteration=resolve_groups_for_iteration,
         initial_simulation_states=initial_simulation_states,
-        simulate_group_stage_fn=simulate_group_stage,
+        simulate_group_stage_fn=group_stage_fn,
         sort_standings_fn=sort_standings,
         assign_third_place_slots_fn=assign_third_place_slots,
         resolve_r32_team_fn=resolve_r32_team,
@@ -4210,6 +4260,17 @@ def command_project_bracket(args: argparse.Namespace, teams: Dict[str, Team]) ->
 
     config = load_tournament_config(Path(args.config))
     initial_payload = None if getattr(args, "ignore_state", False) else load_persistent_payload(Path(args.state_file), teams)
+    live_conditioning_meta = {"live_projected": 0, "final_group_matches": 0, "fixed_group_matches": 0}
+    fixtures_path = getattr(args, "fixtures", None)
+    if fixtures_path and not getattr(args, "ignore_state", False):
+        path = Path(fixtures_path)
+        if path.exists():
+            initial_payload, live_conditioning_meta = condition_payload_with_fixture_state(
+                initial_payload,
+                read_fixtures(path),
+                teams,
+                top_scores=3,
+            )
     workers = args.workers if args.workers > 0 else default_parallel_workers(args.iterations)
     match_aggregate = empty_bracket_aggregate(bracket_match_order())
     if workers > 1:
@@ -4283,6 +4344,10 @@ def command_project_bracket(args: argparse.Namespace, teams: Dict[str, Team]) ->
         "strict_real_inputs_only": STRICT_REAL_INPUTS_ONLY,
         "public_popularity_proxy_enabled": not DISABLE_PUBLIC_POPULARITY_PROXY,
         "bracket_recalculated_from_scoreline_ensemble": True,
+        "live_conditioning_policy": "partidos live de grupo se aplican como estado provisional y se saltan en Monte Carlo para no duplicarlos",
+        "live_projected_group_matches": int(live_conditioning_meta.get("live_projected", 0)),
+        "final_group_matches_locked": int(live_conditioning_meta.get("final_group_matches", 0)),
+        "fixed_group_matches": int(live_conditioning_meta.get("fixed_group_matches", 0)),
         "recalculation_policy": (
             f"Los marcadores directos se refrescan cada 5 minutos. La llave completa se reconstruye con "
             f"{args.iterations:,} simulaciones en esta corrida. Si aparece 15.000, es solo el mínimo técnico "
@@ -4906,6 +4971,7 @@ def dashboard_fixture_entries(
     top_scores: int,
 ) -> List[dict]:
     entries = []
+    working_states = copy_states({"teams": states})
     for fixture in fixtures:
         if fixture.get("projection_only"):
             continue
@@ -4914,10 +4980,11 @@ def dashboard_fixture_entries(
         team_b = fixture["team_b"]
         profile_a = profile_for(teams[team_a])
         profile_b = profile_for(teams[team_b])
-        state_a = normalize_team_state(states.get(team_a, {}))
-        state_b = normalize_team_state(states.get(team_b, {}))
-        ctx = context_from_fixture(fixture, teams, states)
+        state_a = normalize_team_state(working_states.get(team_a, {}))
+        state_b = normalize_team_state(working_states.get(team_b, {}))
+        ctx = context_from_fixture(fixture, teams, working_states)
         stage = fixture_stage_name(fixture)
+        live_projection_propagated = False
         if fixture_is_live(fixture) and fixture_has_live_score(fixture):
             prediction = predict_match_live(
                 teams,
@@ -4933,6 +5000,13 @@ def dashboard_fixture_entries(
                 state_a=state_a,
                 state_b=state_b,
                 live_stats=extract_live_stats_payload(fixture),
+            )
+            live_projection_propagated = apply_transient_live_state_update(
+                teams,
+                working_states,
+                fixture,
+                ctx,
+                prediction,
             )
         else:
             prediction = predict_match(
@@ -4966,6 +5040,7 @@ def dashboard_fixture_entries(
                 "status_detail": fixture.get("status_detail"),
                 "live_score_a": fixture.get("live_score_a"),
                 "live_score_b": fixture.get("live_score_b"),
+                "live_projection_propagated": live_projection_propagated,
                 "weather_summary": dashboard_weather_summary(fixture),
                 "weather_stress": fixture.get("weather_stress"),
                 "referee": fixture.get("referee"),
@@ -14147,6 +14222,267 @@ def apply_state_updates(
     )
     states[team_a]["updated_at"] = iso_timestamp()
     states[team_b]["updated_at"] = iso_timestamp()
+
+
+def fixture_fixed_group_match_payload(fixture: dict, source: str) -> Optional[dict]:
+    if fixture_stage_name(fixture) != "group":
+        return None
+    group = fixture.get("group")
+    team_a = fixture.get("team_a")
+    team_b = fixture.get("team_b")
+    if not group or not team_a or not team_b:
+        return None
+    return {
+        "group": str(group),
+        "team_a": str(team_a),
+        "team_b": str(team_b),
+        "source": source,
+    }
+
+
+def append_fixed_group_match(payload: dict, fixed_match: Optional[dict]) -> None:
+    if not fixed_match:
+        return
+    group = fixed_match.get("group")
+    team_a = fixed_match.get("team_a")
+    team_b = fixed_match.get("team_b")
+    if not group or not team_a or not team_b:
+        return
+    existing = payload.setdefault("fixed_group_matches", [])
+    key = fixed_group_match_key(str(group), str(team_a), str(team_b))
+    for item in existing:
+        item_group = item.get("group")
+        item_a = item.get("team_a")
+        item_b = item.get("team_b")
+        if not item_group or not item_a or not item_b:
+            continue
+        if fixed_group_match_key(str(item_group), str(item_a), str(item_b)) == key:
+            return
+    if fixed_match.get("group") != str(group):
+        fixed_match = dict(fixed_match)
+        fixed_match["group"] = str(group)
+    if fixed_match.get("team_a") != str(team_a) or fixed_match.get("team_b") != str(team_b):
+        fixed_match = dict(fixed_match)
+        fixed_match["team_a"] = str(team_a)
+        fixed_match["team_b"] = str(team_b)
+    existing.append(fixed_match)
+
+
+def live_fixture_progress(fixture: dict) -> float:
+    elapsed_minutes, phase = parse_elapsed_minutes(fixture.get("status_detail"), fixture_stage_name(fixture) != "group")
+    if phase == "penalties":
+        return 1.0
+    if elapsed_minutes is None:
+        return 0.50
+    denominator = 120.0 if phase == "extra_time" else 90.0
+    return clamp(elapsed_minutes / denominator, 0.05, 1.0)
+
+
+def provisional_group_points(score_for: int, score_against: int) -> int:
+    if score_for > score_against:
+        return 3
+    if score_for == score_against:
+        return 1
+    return 0
+
+
+def apply_transient_live_state_update(
+    teams: Dict[str, Team],
+    states: Dict[str, dict],
+    fixture: dict,
+    ctx: MatchContext,
+    prediction: MatchPrediction,
+) -> bool:
+    if not (fixture_is_live(fixture) and fixture_has_live_score(fixture)):
+        return False
+
+    team_a = fixture["team_a"]
+    team_b = fixture["team_b"]
+    score_a = int(fixture.get("live_score_a", 0))
+    score_b = int(fixture.get("live_score_b", 0))
+    progress = live_fixture_progress(fixture)
+    weight = clamp(0.20 + 0.55 * progress, 0.20, 0.85)
+    live_stats = extract_live_stats_payload(fixture)
+    yellows_a = int(live_stats.get("yellow_cards_a", 0.0))
+    yellows_b = int(live_stats.get("yellow_cards_b", 0.0))
+    reds_a = int(live_stats.get("red_cards_a", 0.0))
+    reds_b = int(live_stats.get("red_cards_b", 0.0))
+    expected_final_a = max(float(prediction.expected_goals_a), 0.05)
+    expected_final_b = max(float(prediction.expected_goals_b), 0.05)
+    expected_to_date_a = max(expected_final_a * progress, 0.05)
+    expected_to_date_b = max(expected_final_b * progress, 0.05)
+    xg_to_date_a = float(live_stats.get("xg_a") or live_stats.get("xg_proxy_a") or expected_to_date_a)
+    xg_to_date_b = float(live_stats.get("xg_b") or live_stats.get("xg_proxy_b") or expected_to_date_b)
+
+    for (
+        state,
+        team_name,
+        score_for,
+        score_against,
+        expected_for,
+        expected_against,
+        xg_for,
+        xg_against,
+        yellows,
+        reds,
+    ) in (
+        (
+            ensure_state(states, team_a),
+            team_a,
+            score_a,
+            score_b,
+            expected_to_date_a,
+            expected_to_date_b,
+            xg_to_date_a,
+            xg_to_date_b,
+            yellows_a,
+            reds_a,
+        ),
+        (
+            ensure_state(states, team_b),
+            team_b,
+            score_b,
+            score_a,
+            expected_to_date_b,
+            expected_to_date_a,
+            xg_to_date_b,
+            xg_to_date_a,
+            yellows_b,
+            reds_b,
+        ),
+    ):
+        result_now = 1.0 if score_for > score_against else 0.5 if score_for == score_against else 0.0
+        result_signal = clamp(2.0 * (result_now - 0.5), -1.0, 1.0)
+        attack_signal = clamp((score_for - expected_for) / 1.5, -1.0, 1.0)
+        defense_signal = clamp((expected_against - score_against) / 1.5, -1.0, 1.0)
+        form_signal = clamp(0.34 * result_signal + 0.36 * attack_signal + 0.30 * defense_signal, -1.0, 1.0)
+        alpha = 0.26 * weight
+        state["recent_form"] = clamp((1.0 - alpha) * state["recent_form"] + alpha * form_signal, -1.0, 1.0)
+        state["attack_form"] = clamp((1.0 - alpha) * state["attack_form"] + alpha * attack_signal, -1.0, 1.0)
+        state["defense_form"] = clamp((1.0 - alpha) * state["defense_form"] + alpha * defense_signal, -1.0, 1.0)
+        state["recent_xg_for_adj"] = clamp(
+            (1.0 - alpha) * state.get("recent_xg_for_adj", 0.0) + alpha * clamp(xg_for - 1.05, -1.0, 1.0),
+            -1.0,
+            1.0,
+        )
+        state["recent_xga_adj"] = clamp(
+            (1.0 - alpha) * state.get("recent_xga_adj", 0.0) + alpha * clamp(xg_against - 1.05, -1.0, 1.0),
+            -1.0,
+            1.0,
+        )
+        state["scoreline_goal_for_residual"] = clamp(
+            (1.0 - alpha) * state.get("scoreline_goal_for_residual", 0.0)
+            + alpha * clamp((score_for - expected_for) / 1.3, -1.0, 1.0),
+            -1.0,
+            1.0,
+        )
+        state["scoreline_goal_against_residual"] = clamp(
+            (1.0 - alpha) * state.get("scoreline_goal_against_residual", 0.0)
+            + alpha * clamp((score_against - expected_against) / 1.3, -1.0, 1.0),
+            -1.0,
+            1.0,
+        )
+        state["scoreline_total_residual"] = clamp(
+            (1.0 - alpha) * state.get("scoreline_total_residual", 0.0)
+            + alpha * clamp(((score_for + score_against) - (expected_for + expected_against)) / 1.7, -1.0, 1.0),
+            -1.0,
+            1.0,
+        )
+        state["morale"] = clamp((1.0 - 0.16 * weight) * state["morale"] + 0.16 * weight * form_signal, -1.0, 1.0)
+        state["fatigue"] = clamp(state["fatigue"] + 0.10 * progress + 0.018 * yellows + 0.070 * reds, 0.0, 1.0)
+        state["availability"] = clamp(
+            state["availability"] - 0.030 * progress - 0.020 * yellows - 0.080 * reds,
+            0.40,
+            1.0,
+        )
+        state["discipline_drift"] = clamp(
+            (1.0 - 0.18 * weight) * state["discipline_drift"] + 0.18 * weight * clamp(-0.12 * yellows - 0.42 * reds, -1.0, 0.0),
+            -1.0,
+            0.5,
+        )
+        state["yellow_load"] = clamp(max(state["yellow_load"], 0.35 * yellows + 0.85 * reds), 0.0, 6.0)
+        state["red_suspensions"] = max(int(state["red_suspensions"]), reds)
+        state["updated_at"] = iso_timestamp()
+
+    update_tactical_signature_state(states[team_a], live_signature_metrics("a", live_stats))
+    update_tactical_signature_state(states[team_b], live_signature_metrics("b", live_stats))
+
+    if fixture_stage_name(fixture) == "group":
+        state_a = ensure_state(states, team_a)
+        state_b = ensure_state(states, team_b)
+        state_a["group_matches_played"] += 1
+        state_b["group_matches_played"] += 1
+        state_a["group_goals_for"] += score_a
+        state_b["group_goals_for"] += score_b
+        state_a["group_goals_against"] += score_b
+        state_b["group_goals_against"] += score_a
+        state_a["group_goal_diff"] += score_a - score_b
+        state_b["group_goal_diff"] += score_b - score_a
+        state_a["group_points"] += provisional_group_points(score_a, score_b)
+        state_b["group_points"] += provisional_group_points(score_b, score_a)
+        state_a["fair_play"] -= yellows_a + 3 * reds_a
+        state_b["fair_play"] -= yellows_b + 3 * reds_b
+
+    return True
+
+
+def condition_payload_with_fixture_state(
+    payload: Optional[dict],
+    fixtures: Sequence[dict],
+    teams: Dict[str, Team],
+    top_scores: int = 3,
+) -> Tuple[dict, dict]:
+    conditioned = normalize_persistent_payload(payload or empty_persistent_payload(teams), teams)
+    states = copy_states(conditioned)
+    meta = {"live_projected": 0, "final_group_matches": 0, "fixed_group_matches": 0}
+    fixed_payload = {"fixed_group_matches": list(conditioned.get("fixed_group_matches", []))}
+
+    for raw_fixture in fixtures:
+        if raw_fixture.get("projection_only"):
+            continue
+        try:
+            fixture = resolve_fixture_names(dict(raw_fixture), teams)
+        except SystemExit:
+            continue
+        if fixture_stage_name(fixture) != "group":
+            continue
+        if fixture_is_final(fixture) and "actual_score_a" in fixture and "actual_score_b" in fixture:
+            append_fixed_group_match(fixed_payload, fixture_fixed_group_match_payload(fixture, "final"))
+            meta["final_group_matches"] += 1
+            continue
+        if not (fixture_is_live(fixture) and fixture_has_live_score(fixture)):
+            continue
+
+        team_a = fixture["team_a"]
+        team_b = fixture["team_b"]
+        state_a = normalize_team_state(states.get(team_a, {}))
+        state_b = normalize_team_state(states.get(team_b, {}))
+        ctx = context_from_fixture(fixture, teams, states)
+        prediction = predict_match_live(
+            teams,
+            team_a,
+            team_b,
+            ctx,
+            current_score_a=int(fixture.get("live_score_a", 0)),
+            current_score_b=int(fixture.get("live_score_b", 0)),
+            status_detail=fixture.get("status_detail"),
+            top_scores=top_scores,
+            include_advancement=False,
+            show_factors=False,
+            state_a=state_a,
+            state_b=state_b,
+            live_stats=extract_live_stats_payload(fixture),
+        )
+        if apply_transient_live_state_update(teams, states, fixture, ctx, prediction):
+            append_fixed_group_match(fixed_payload, fixture_fixed_group_match_payload(fixture, "live_projection"))
+            meta["live_projected"] += 1
+
+    conditioned["teams"] = states
+    conditioned["fixed_group_matches"] = fixed_payload["fixed_group_matches"]
+    meta["fixed_group_matches"] = len(conditioned["fixed_group_matches"])
+    conditioned.setdefault("meta", {})["live_projected_group_matches"] = meta["live_projected"]
+    conditioned["meta"]["fixed_group_matches"] = meta["fixed_group_matches"]
+    return conditioned, meta
 
 
 def context_from_fixture(

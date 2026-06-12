@@ -90,6 +90,7 @@ def build_parser(
     project.add_argument("--output", default=bracket_file)
     project.add_argument("--json-output", default=bracket_json_file)
     project.add_argument("--state-file", default=state_file)
+    project.add_argument("--fixtures", default=None, help="Fixtures live/finales para condicionar provisionalmente la llave.")
     project.add_argument("--ignore-state", action="store_true")
 
     dashboard = subparsers.add_parser("project-dashboard", help="Genera un reporte actual con llave y probabilidades por partido.")
