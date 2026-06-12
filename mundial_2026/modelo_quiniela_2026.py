@@ -5199,7 +5199,7 @@ def build_recent_changes_markdown(
         )
     if entry_changes["score_changes"]:
         lines.append(
-            "- Partidos cuyo marcador proyectado cambió: "
+            "- Partidos cuyo marcador modal del modelo cambió: "
             + "; ".join(
                 f"{item['title']}: {item['previous_score']} -> {item['current_score']}"
                 for item in entry_changes["score_changes"]
@@ -5677,12 +5677,12 @@ def goals_label(prediction: MatchPrediction) -> str:
 
 def projected_score_label(prediction: MatchPrediction) -> str:
     if prediction.live_phase == "regulation":
-        return "Marcador proyectado al final del tiempo reglamentario"
+        return "Marcador mas probable del modelo al final del tiempo reglamentario"
     if prediction.live_phase == "extra_time":
-        return "Marcador proyectado al final de la prórroga"
+        return "Marcador mas probable del modelo al final de la prórroga"
     if prediction.live_phase == "penalties":
         return "Marcador actual"
-    return "Marcador proyectado"
+    return "Marcador mas probable del modelo"
 
 
 def projected_score_value(prediction: MatchPrediction) -> str:
@@ -6567,6 +6567,80 @@ def promote_calibrated_scoreline(scored: List[Dict[str, float | str]]) -> List[D
     return reordered
 
 
+def promote_primary_result_scoreline(
+    scored: List[Dict[str, float | str]],
+    dist: Dict[Tuple[int, int], float],
+    *,
+    min_result_gap: float = 0.065,
+) -> List[Dict[str, float | str]]:
+    """Keep the Penca score aligned with a clear 1X2 edge.
+
+    Exact-score modes can over-favor draws because a single draw score like 1-1
+    may be individually common even when the total win bucket is clearly larger.
+    For Penca that creates a bad contradiction: "primary pick wins" but "submit a
+    draw". This guard only promotes an aligned score when the 1X2 edge is clear
+    and the aligned score is close on the Penca/scoreline metrics.
+    """
+
+    if len(scored) < 2 or not dist:
+        return scored
+    buckets = score_outcome_bucket_probabilities(dist)
+    ranked = sorted(buckets.items(), key=lambda item: item[1], reverse=True)
+    if len(ranked) < 2:
+        return scored
+    primary_bucket, primary_prob = ranked[0]
+    second_prob = ranked[1][1]
+    if primary_bucket == "draw" or primary_prob - second_prob < min_result_gap:
+        return scored
+
+    target_code = "1" if primary_bucket == "a" else "2"
+    best = scored[0]
+    best_a, best_b = parse_score_pair(best.get("score", "0-0"))
+    if score_result_code(best_a, best_b) == target_code:
+        return scored
+
+    best_ensemble = float(best.get("ensemble_adjusted_points", 0.0))
+    best_expected = float(best.get("expected_points", 0.0))
+    best_exact = float(best.get("exact_prob", 0.0))
+    aligned_candidates: List[Dict[str, float | str]] = []
+    for candidate in scored[1:14]:
+        cand_a, cand_b = parse_score_pair(candidate.get("score", "0-0"))
+        if score_result_code(cand_a, cand_b) != target_code:
+            continue
+        cand_ensemble = float(candidate.get("ensemble_adjusted_points", 0.0))
+        cand_expected = float(candidate.get("expected_points", 0.0))
+        cand_exact = float(candidate.get("exact_prob", 0.0))
+        cand_calibration = float(candidate.get("scoreline_calibration_index", 0.0))
+        cand_scenario = float(candidate.get("scenario_ensemble_index", 0.0))
+        if cand_ensemble < best_ensemble - 0.32:
+            continue
+        if cand_expected < best_expected - 0.28:
+            continue
+        if cand_exact < max(0.006, 0.52 * best_exact):
+            continue
+        if cand_calibration < 0.60 and cand_scenario < 0.50:
+            continue
+        aligned_candidates.append(candidate)
+
+    if not aligned_candidates:
+        return scored
+    promoted = max(
+        aligned_candidates,
+        key=lambda item: (
+            float(item.get("ensemble_adjusted_points", 0.0)),
+            float(item.get("expected_points", 0.0)),
+            float(item.get("scoreline_calibration_index", 0.0)),
+            float(item.get("exact_prob", 0.0)),
+        ),
+    )
+    promoted["primary_result_promotion"] = 1.0
+    promoted["promotion_note"] = (
+        "Promovido porque el marcador recomendado debe quedar alineado con el desenlace principal "
+        "cuando la ventaja 1X2 del modelo es clara."
+    )
+    return [promoted] + [item for item in scored if item is not promoted]
+
+
 def penca_ovacion_score_options(
     dist: Dict[Tuple[int, int], float],
     top_n: int = 5,
@@ -6588,6 +6662,7 @@ def penca_ovacion_score_options(
         reverse=True,
     )
     scored = promote_calibrated_scoreline(scored)
+    scored = promote_primary_result_scoreline(scored, dist)
     return scored[:top_n]
 
 
@@ -14272,6 +14347,14 @@ def print_prediction(prediction: MatchPrediction, show_factors: bool = False) ->
         f"  {projected_score_label(prediction)}: {projected_score_value(prediction)} | "
         f"{result_prob_label(prediction)}: {prediction.win_a:.1%} / {prediction.draw:.1%} / {prediction.win_b:.1%}"
     )
+    if prediction.live_phase != "penalties":
+        top_penca = penca_ovacion_top_score(prediction)
+        top_note = " | alineado con pick principal" if float(top_penca.get("primary_result_promotion", 0.0)) > 0 else ""
+        print(
+            f"  Marcador recomendado para cargar en Penca: {top_penca.get('score')} | "
+            f"puntos esperados {float(top_penca.get('expected_points', 0.0)):.2f}"
+            f"{top_note}"
+        )
     if prediction.live_phase != "penalties":
         print(
             f"  {average_goals_label(prediction)}: {prediction.team_a} {prediction.expected_goals_a:.2f} | "

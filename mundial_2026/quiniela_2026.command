@@ -88,7 +88,7 @@ case "$command_name" in
     "$PYTHON_BIN" "$LIVE_SYNC"
     "$PYTHON_BIN" "$MODEL" state-reset
     "$PYTHON_BIN" "$MODEL" fixtures "$LIVE_FIXTURES"
-    "$PYTHON_BIN" "$MODEL" project-bracket --config "$DRAW" --iterations 15000 --seed 7 --progress-every 1500
+    "$PYTHON_BIN" "$MODEL" project-bracket --config "$DRAW" --iterations 100000 --seed 7 --progress-every 10000
     "$PYTHON_BIN" "$MODEL" project-dashboard --fixtures "$LIVE_FIXTURES"
     ;;
   simulate)

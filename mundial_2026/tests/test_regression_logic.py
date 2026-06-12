@@ -828,6 +828,87 @@ class RegressionLogicTest(unittest.TestCase):
         one_nil = app.score_expected_points_for_penca(dist, 1, 0)
         self.assertGreater(float(one_nil.get("poisson_modal_lock_penalty", 0.0)), 0.0)
 
+    def test_score_optimizer_aligns_penca_score_with_clear_primary_result(self):
+        scored = [
+            {
+                "score": "1-1",
+                "ensemble_adjusted_points": 2.38,
+                "expected_points": 1.86,
+                "exact_prob": 0.138,
+                "scoreline_calibration_index": 0.78,
+                "scenario_ensemble_index": 0.72,
+            },
+            {
+                "score": "2-1",
+                "ensemble_adjusted_points": 2.24,
+                "expected_points": 2.01,
+                "exact_prob": 0.081,
+                "scoreline_calibration_index": 0.86,
+                "scenario_ensemble_index": 0.84,
+            },
+            {
+                "score": "1-0",
+                "ensemble_adjusted_points": 2.17,
+                "expected_points": 2.03,
+                "exact_prob": 0.108,
+                "scoreline_calibration_index": 0.74,
+                "scenario_ensemble_index": 0.62,
+            },
+        ]
+        dist = {
+            (2, 1): 0.081,
+            (1, 0): 0.108,
+            (2, 0): 0.070,
+            (3, 1): 0.052,
+            (1, 1): 0.138,
+            (0, 0): 0.080,
+            (2, 2): 0.050,
+            (0, 1): 0.070,
+            (1, 2): 0.060,
+            (0, 2): 0.035,
+            (3, 0): 0.040,
+            (0, 3): 0.016,
+            (3, 2): 0.030,
+            (2, 3): 0.020,
+            (4, 1): 0.020,
+            (1, 3): 0.020,
+            (4, 0): 0.015,
+            (0, 4): 0.005,
+        }
+
+        promoted = app.promote_primary_result_scoreline(scored, dist)
+
+        self.assertEqual(promoted[0]["score"], "2-1")
+        self.assertEqual(float(promoted[0].get("primary_result_promotion", 0.0)), 1.0)
+
+    def test_korea_czech_penca_score_does_not_contradict_primary_pick(self):
+        teams = app.load_teams()
+        states = app.initial_team_states(teams)
+        ctx = app.MatchContext(
+            group="A",
+            neutral=True,
+            knockout=False,
+            importance=1.0,
+            market_prob_a=0.370,
+            market_prob_draw=0.310,
+            market_prob_b=0.320,
+        )
+        prediction = app.predict_match(
+            teams,
+            "South Korea",
+            "Czech Republic",
+            ctx,
+            top_scores=8,
+            state_a=states["South Korea"],
+            state_b=states["Czech Republic"],
+        )
+        top_score = app.penca_ovacion_top_score(prediction)["score"]
+        goals_a, goals_b = app.parse_score_pair(top_score)
+
+        self.assertGreater(prediction.win_a, prediction.draw)
+        self.assertGreater(prediction.win_a, prediction.win_b)
+        self.assertGreater(goals_a, goals_b)
+
     def test_score_optimizer_tracks_popular_score_and_differential_value(self):
         dist = {
             (1, 0): 0.18,

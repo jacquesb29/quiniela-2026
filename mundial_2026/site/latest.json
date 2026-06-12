@@ -1,7 +1,7 @@
 {
-  "updated_at_utc": "2026-06-12T04:09:38+00:00",
-  "publication_updated_at_utc": "2026-06-12T04:09:38+00:00",
-  "dashboard_updated_at_utc": "2026-06-12T04:08:48+00:00",
+  "updated_at_utc": "2026-06-12T16:40:22+00:00",
+  "publication_updated_at_utc": "2026-06-12T16:40:22+00:00",
+  "dashboard_updated_at_utc": "2026-06-12T16:38:25+00:00",
   "timestamp_consistency_note": "latest.json se escribe despues de copiar el HTML; compara dashboard_updated_at_utc contra publication_updated_at_utc para detectar desfases reales de publicacion o cache.",
   "refresh_interval_minutes": 5,
   "live_refresh_interval_minutes": 5,
@@ -24,8 +24,8 @@
   "predictive_robustness_gate": {
     "status": "calibracion_2026_activa",
     "tournament_phase": "en_curso",
-    "live_matches_2026": 1,
-    "completed_matches_2026": 1,
+    "live_matches_2026": 0,
+    "completed_matches_2026": 2,
     "calibration_2026_active": true,
     "brier_2026_policy": "Se activa con el primer partido finalizado; no se imputa ni se maquilla antes.",
     "historical_matches_available": true,
@@ -55,7 +55,8 @@
   "bracket_recalculation_policy": "Corte pre-torneo manual de 100.000 simulaciones. Durante el Mundial, solo deben actualizarse datos de estado, resultados, lesiones, sanciones, alineaciones, descanso, fatiga, grupo y mercado; no pesos ni metodologia salvo bug real.",
   "live_feed_stack": [
     "espn_scoreboard",
-    "espn_scoreboard+open_news"
+    "espn_scoreboard+open_news",
+    "espn_scoreboard+verified_result"
   ],
   "live_feed_providers": [],
   "recommended_live_provider": {
