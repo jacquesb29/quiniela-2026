@@ -1,6 +1,6 @@
 # Reporte actual del Mundial 2026
 
-Actualizado: 2026-06-12T21:10:21+00:00
+Actualizado: 2026-06-12T22:06:11+00:00
 Estado usado: /Users/jacquesbentata/Documents/New project/mundial_2026/runtime/tournament_state_2026.json
 Fixtures leidos: mundial_2026/fixtures_live_2026.json
 
@@ -389,7 +389,7 @@ Fixtures leidos: mundial_2026/fixtures_live_2026.json
 
 ## Qué cambió desde la última actualización
 
-- Comparado contra la publicación anterior de: 2026-06-12T21:03:08+00:00
+- Comparado contra la publicación anterior de: 2026-06-12T21:11:12+00:00
 - Esta sección separa dos cosas distintas: cambios de cruce proyectado y cambios de probabilidad dentro del mismo partido. Solo compara picks cuando los dos equipos son los mismos; si cambia el cruce, aparece como cambio de llave, no como movimiento de probabilidad.
 - Partidos comparables donde más se movió el pick principal: Paraguay vs Australia: Victoria Paraguay 39.8% -> Victoria Paraguay 38.4%; Norway vs Senegal: Victoria Norway 40.6% -> Victoria Norway 39.2%; Algeria vs Austria: Victoria Austria 56.5% -> Victoria Austria 55.3%; New Zealand vs Egypt: Victoria Egypt 56.6% -> Victoria Egypt 55.8%; Dieciseisavos 1: South Korea vs Canada: Victoria South Korea 38.0% -> Victoria South Korea 37.2%; Cuartos 2: France vs England: Victoria France 37.5% -> Victoria France 36.6%
 - Partidos cuyo marcador modal del modelo cambió: France vs Senegal: 1-0 -> 2-0; Mexico vs South Korea: 1-0 -> 1-1; Switzerland vs Canada: 1-0 -> 1-1; Algeria vs Austria: 0-1 -> 1-1; Dieciseisavos 7: Mexico vs Scotland: 1-0 -> 1-1; Dieciseisavos 16: Turkey vs Iran: 1-0 -> 1-1
@@ -3319,8 +3319,8 @@ Fixtures leidos: mundial_2026/fixtures_live_2026.json
 - Si empatan tras 90': gana en prórroga South Korea 21.2% | siguen empatados 60.5% | Canada 18.3%
 - Si llegan a penales: South Korea 52.1% | Canada 47.9%
 - Marcador más probable de la tanda: 5-4
-- Marcador medio esperado en la tanda: South Korea 3.81 | Canada 3.69
-- Marcadores de tanda más probables: 5-4 9.8%, 4-2 9.6%, 3-4 9.0%, 2-4 8.8%, 4-3 7.9%
+- Marcador medio esperado en la tanda: South Korea 3.83 | Canada 3.73
+- Marcadores de tanda más probables: 5-4 10.9%, 4-2 10.6%, 3-4 9.1%, 4-5 8.9%, 4-3 8.7%
 - Marcadores más probables: 1-1 14.0%, 0-0 13.0%, 1-0 10.9%, 0-1 9.6%, 2-0 7.4%, 2-1 7.1%, 1-2 6.7%, 0-2 5.7%
 
 ### Dieciseisavos 2: Germany vs Czech Republic
@@ -3358,8 +3358,8 @@ Fixtures leidos: mundial_2026/fixtures_live_2026.json
 - Si empatan tras 90': gana en prórroga Germany 35.3% | siguen empatados 55.9% | Czech Republic 8.8%
 - Si llegan a penales: Germany 52.7% | Czech Republic 47.3%
 - Marcador más probable de la tanda: 4-3
-- Marcador medio esperado en la tanda: Germany 3.69 | Czech Republic 3.58
-- Marcadores de tanda más probables: 4-3 10.8%, 4-2 9.7%, 5-4 9.4%, 3-4 9.2%, 4-5 8.1%
+- Marcador medio esperado en la tanda: Germany 3.71 | Czech Republic 3.56
+- Marcadores de tanda más probables: 4-3 11.4%, 4-2 10.5%, 3-4 9.6%, 4-5 7.8%, 5-4 7.7%
 - Marcadores más probables: 1-0 14.7%, 2-0 14.5%, 0-0 9.8%, 1-1 9.8%, 3-0 9.7%, 2-1 8.2%, 3-1 5.5%, 4-0 4.6%
 
 ### Dieciseisavos 3: Netherlands vs Morocco
@@ -3396,8 +3396,8 @@ Fixtures leidos: mundial_2026/fixtures_live_2026.json
 - Si empatan tras 90': gana en prórroga Netherlands 30.4% | siguen empatados 57.3% | Morocco 12.3%
 - Si llegan a penales: Netherlands 49.6% | Morocco 50.4%
 - Marcador más probable de la tanda: 3-4
-- Marcador medio esperado en la tanda: Netherlands 3.70 | Morocco 3.75
-- Marcadores de tanda más probables: 3-4 10.7%, 4-3 10.7%, 2-4 10.1%, 4-5 8.9%, 5-4 8.1%
+- Marcador medio esperado en la tanda: Netherlands 3.79 | Morocco 3.85
+- Marcadores de tanda más probables: 3-4 10.4%, 4-3 9.9%, 4-5 9.8%, 2-4 8.9%, 5-4 8.6%
 - Marcadores más probables: 1-0 14.4%, 2-0 12.0%, 1-1 11.8%, 0-0 11.5%, 2-1 8.4%, 3-0 6.7%, 0-1 6.3%, 3-1 4.7%
 
 ### Dieciseisavos 4: Brazil vs Japan
@@ -3434,9 +3434,9 @@ Fixtures leidos: mundial_2026/fixtures_live_2026.json
 - Quién tiene más probabilidad de avanzar: Brazil 68.4% | Japan 31.6%
 - Si empatan tras 90': gana en prórroga Brazil 27.6% | siguen empatados 58.9% | Japan 13.5%
 - Si llegan a penales: Brazil 51.7% | Japan 48.3%
-- Marcador más probable de la tanda: 4-3
-- Marcador medio esperado en la tanda: Brazil 3.74 | Japan 3.70
-- Marcadores de tanda más probables: 4-3 10.3%, 3-4 9.2%, 4-5 9.1%, 2-4 8.7%, 4-2 8.4%
+- Marcador más probable de la tanda: 3-4
+- Marcador medio esperado en la tanda: Brazil 3.77 | Japan 3.76
+- Marcadores de tanda más probables: 3-4 12.6%, 4-2 10.2%, 4-3 9.7%, 5-4 8.9%, 4-5 8.8%
 - Marcadores más probables: 1-0 13.2%, 1-1 12.7%, 0-0 11.5%, 2-0 10.7%, 2-1 8.3%, 0-1 7.0%, 3-0 5.7%, 1-2 4.7%
 
 ### Dieciseisavos 5: France vs Scotland
@@ -3473,9 +3473,9 @@ Fixtures leidos: mundial_2026/fixtures_live_2026.json
 - Quién tiene más probabilidad de avanzar: France 85.5% | Scotland 14.5%
 - Si empatan tras 90': gana en prórroga France 38.0% | siguen empatados 54.3% | Scotland 7.7%
 - Si llegan a penales: France 51.3% | Scotland 48.7%
-- Marcador más probable de la tanda: 3-4
-- Marcador medio esperado en la tanda: France 3.67 | Scotland 3.73
-- Marcadores de tanda más probables: 3-4 10.8%, 2-4 9.8%, 4-2 9.6%, 4-3 9.2%, 5-4 8.7%
+- Marcador más probable de la tanda: 4-3
+- Marcador medio esperado en la tanda: France 3.75 | Scotland 3.76
+- Marcadores de tanda más probables: 4-3 9.9%, 4-5 9.6%, 3-4 9.2%, 2-4 8.2%, 5-4 8.2%
 - Marcadores más probables: 2-0 16.7%, 1-0 15.7%, 3-0 11.8%, 0-0 10.2%, 1-1 8.1%, 2-1 7.0%, 4-0 5.7%, 3-1 5.0%
 
 ### Dieciseisavos 6: Ecuador vs Norway
@@ -3511,9 +3511,9 @@ Fixtures leidos: mundial_2026/fixtures_live_2026.json
 - Quién tiene más probabilidad de avanzar: Ecuador 50.4% | Norway 49.6%
 - Si empatan tras 90': gana en prórroga Ecuador 19.6% | siguen empatados 60.9% | Norway 19.6%
 - Si llegan a penales: Ecuador 49.6% | Norway 50.4%
-- Marcador más probable de la tanda: 4-3
-- Marcador medio esperado en la tanda: Ecuador 3.66 | Norway 3.73
-- Marcadores de tanda más probables: 4-3 11.1%, 3-4 10.6%, 2-4 9.7%, 4-5 9.6%, 4-2 9.2%
+- Marcador más probable de la tanda: 4-2
+- Marcador medio esperado en la tanda: Ecuador 3.79 | Norway 3.76
+- Marcadores de tanda más probables: 4-2 9.9%, 3-4 9.9%, 4-5 9.1%, 2-4 8.8%, 4-3 8.7%
 - Marcadores más probables: 1-1 14.6%, 0-0 12.7%, 1-0 10.2%, 0-1 9.9%, 2-1 7.3%, 1-2 7.1%, 2-0 6.5%, 0-2 6.3%
 
 ### Dieciseisavos 7: Mexico vs Scotland
@@ -3552,8 +3552,8 @@ Fixtures leidos: mundial_2026/fixtures_live_2026.json
 - Si empatan tras 90': gana en prórroga Mexico 25.6% | siguen empatados 58.6% | Scotland 15.8%
 - Si llegan a penales: Mexico 51.0% | Scotland 49.0%
 - Marcador más probable de la tanda: 3-4
-- Marcador medio esperado en la tanda: Mexico 3.67 | Scotland 3.71
-- Marcadores de tanda más probables: 3-4 10.7%, 4-5 9.4%, 2-4 9.4%, 4-3 9.2%, 4-2 9.0%
+- Marcador medio esperado en la tanda: Mexico 3.70 | Scotland 3.71
+- Marcadores de tanda más probables: 3-4 10.1%, 4-2 9.9%, 2-4 9.8%, 5-4 9.3%, 4-3 9.0%
 - Marcadores más probables: 1-1 13.1%, 1-0 12.1%, 0-0 11.9%, 2-0 9.5%, 2-1 8.1%, 0-1 7.9%, 1-2 5.5%, 3-0 4.9%
 
 ### Dieciseisavos 8: England vs Uzbekistan
@@ -3590,9 +3590,9 @@ Fixtures leidos: mundial_2026/fixtures_live_2026.json
 - Quién tiene más probabilidad de avanzar: England 86.7% | Uzbekistan 13.3%
 - Si empatan tras 90': gana en prórroga England 38.8% | siguen empatados 54.0% | Uzbekistan 7.2%
 - Si llegan a penales: England 50.9% | Uzbekistan 49.1%
-- Marcador más probable de la tanda: 4-3
-- Marcador medio esperado en la tanda: England 3.65 | Uzbekistan 3.74
-- Marcadores de tanda más probables: 4-3 11.1%, 3-4 10.6%, 2-4 9.3%, 5-4 9.1%, 4-5 9.1%
+- Marcador más probable de la tanda: 4-5
+- Marcador medio esperado en la tanda: England 3.69 | Uzbekistan 3.70
+- Marcadores de tanda más probables: 4-5 9.6%, 4-3 9.6%, 5-4 9.4%, 2-4 9.3%, 3-4 9.2%
 - Marcadores más probables: 2-0 17.2%, 1-0 16.7%, 3-0 12.2%, 0-0 10.2%, 1-1 7.5%, 2-1 6.7%, 4-0 6.0%, 3-1 4.8%
 
 ### Dieciseisavos 9: Turkey vs Bosnia and Herzegovina
@@ -3628,9 +3628,9 @@ Fixtures leidos: mundial_2026/fixtures_live_2026.json
 - Quién tiene más probabilidad de avanzar: Turkey 85.7% | Bosnia and Herzegovina 14.3%
 - Si empatan tras 90': gana en prórroga Turkey 37.9% | siguen empatados 54.5% | Bosnia and Herzegovina 7.6%
 - Si llegan a penales: Turkey 50.0% | Bosnia and Herzegovina 50.0%
-- Marcador más probable de la tanda: 3-4
-- Marcador medio esperado en la tanda: Turkey 3.66 | Bosnia and Herzegovina 3.70
-- Marcadores de tanda más probables: 3-4 10.4%, 4-3 9.5%, 2-4 9.5%, 5-4 9.4%, 4-2 9.2%
+- Marcador más probable de la tanda: 5-4
+- Marcador medio esperado en la tanda: Turkey 3.81 | Bosnia and Herzegovina 3.78
+- Marcadores de tanda más probables: 5-4 10.9%, 4-3 10.2%, 4-5 9.2%, 3-4 8.9%, 4-2 8.8%
 - Marcadores más probables: 2-0 16.5%, 1-0 15.8%, 3-0 11.4%, 0-0 9.7%, 1-1 8.0%, 2-1 7.4%, 4-0 5.7%, 3-1 5.2%
 
 ### Dieciseisavos 10: Belgium vs Czech Republic
@@ -3666,9 +3666,9 @@ Fixtures leidos: mundial_2026/fixtures_live_2026.json
 - Quién tiene más probabilidad de avanzar: Belgium 74.3% | Czech Republic 25.7%
 - Si empatan tras 90': gana en prórroga Belgium 32.0% | siguen empatados 56.8% | Czech Republic 11.2%
 - Si llegan a penales: Belgium 51.1% | Czech Republic 48.9%
-- Marcador más probable de la tanda: 4-2
-- Marcador medio esperado en la tanda: Belgium 3.71 | Czech Republic 3.66
-- Marcadores de tanda más probables: 4-2 9.9%, 5-4 9.2%, 3-4 9.1%, 2-4 8.9%, 4-5 8.6%
+- Marcador más probable de la tanda: 4-3
+- Marcador medio esperado en la tanda: Belgium 3.77 | Czech Republic 3.67
+- Marcadores de tanda más probables: 4-3 10.4%, 4-2 9.9%, 4-5 9.3%, 3-4 9.2%, 5-4 9.1%
 - Marcadores más probables: 1-0 13.4%, 2-0 11.9%, 1-1 11.7%, 0-0 10.3%, 2-1 8.8%, 3-0 7.2%, 0-1 5.7%, 3-1 5.2%
 
 ### Dieciseisavos 11: Colombia vs Croatia
@@ -3704,9 +3704,9 @@ Fixtures leidos: mundial_2026/fixtures_live_2026.json
 - Quién tiene más probabilidad de avanzar: Colombia 57.6% | Croatia 42.4%
 - Si empatan tras 90': gana en prórroga Colombia 23.0% | siguen empatados 59.6% | Croatia 17.3%
 - Si llegan a penales: Colombia 49.8% | Croatia 50.2%
-- Marcador más probable de la tanda: 4-2
-- Marcador medio esperado en la tanda: Colombia 3.71 | Croatia 3.68
-- Marcadores de tanda más probables: 4-2 10.6%, 2-4 9.6%, 4-3 9.2%, 3-4 8.9%, 5-4 8.6%
+- Marcador más probable de la tanda: 3-4
+- Marcador medio esperado en la tanda: Colombia 3.75 | Croatia 3.79
+- Marcadores de tanda más probables: 3-4 10.6%, 4-3 10.0%, 2-4 9.5%, 4-5 9.2%, 4-2 8.7%
 - Marcadores más probables: 1-1 14.0%, 0-0 12.6%, 1-0 11.7%, 0-1 8.9%, 2-0 8.0%, 2-1 7.9%, 1-2 6.1%, 0-2 4.9%
 
 ### Dieciseisavos 12: Spain vs Austria
@@ -3743,8 +3743,8 @@ Fixtures leidos: mundial_2026/fixtures_live_2026.json
 - Si empatan tras 90': gana en prórroga Spain 41.3% | siguen empatados 52.6% | Austria 6.2%
 - Si llegan a penales: Spain 51.8% | Austria 48.2%
 - Marcador más probable de la tanda: 4-3
-- Marcador medio esperado en la tanda: Spain 3.78 | Austria 3.73
-- Marcadores de tanda más probables: 4-3 11.4%, 3-4 9.8%, 4-2 9.3%, 4-5 8.8%, 5-4 8.7%
+- Marcador medio esperado en la tanda: Spain 3.82 | Austria 3.64
+- Marcadores de tanda más probables: 4-3 11.8%, 4-2 10.1%, 3-4 9.8%, 5-4 9.6%, 2-4 7.6%
 - Marcadores más probables: 2-0 17.4%, 1-0 15.7%, 3-0 13.3%, 0-0 9.0%, 4-0 7.1%, 1-1 6.9%, 2-1 6.4%, 3-1 5.0%
 
 ### Dieciseisavos 13: Switzerland vs Egypt
@@ -3780,9 +3780,9 @@ Fixtures leidos: mundial_2026/fixtures_live_2026.json
 - Quién tiene más probabilidad de avanzar: Switzerland 78.8% | Egypt 21.2%
 - Si empatan tras 90': gana en prórroga Switzerland 33.8% | siguen empatados 56.1% | Egypt 10.1%
 - Si llegan a penales: Switzerland 48.5% | Egypt 51.5%
-- Marcador más probable de la tanda: 3-4
-- Marcador medio esperado en la tanda: Switzerland 3.67 | Egypt 3.80
-- Marcadores de tanda más probables: 3-4 10.6%, 4-5 9.8%, 2-4 9.7%, 4-3 9.2%, 4-2 8.4%
+- Marcador más probable de la tanda: 4-5
+- Marcador medio esperado en la tanda: Switzerland 3.70 | Egypt 3.81
+- Marcadores de tanda más probables: 4-5 10.7%, 3-4 10.5%, 5-4 9.1%, 2-4 8.8%, 4-2 8.6%
 - Marcadores más probables: 1-0 15.4%, 2-0 13.7%, 0-0 10.6%, 1-1 10.4%, 3-0 8.5%, 2-1 8.4%, 3-1 5.1%, 0-1 5.1%
 
 ### Dieciseisavos 14: Argentina vs Uruguay
@@ -3819,9 +3819,9 @@ Fixtures leidos: mundial_2026/fixtures_live_2026.json
 - Quién tiene más probabilidad de avanzar: Argentina 80.6% | Uruguay 19.4%
 - Si empatan tras 90': gana en prórroga Argentina 35.0% | siguen empatados 56.2% | Uruguay 8.8%
 - Si llegan a penales: Argentina 51.0% | Uruguay 49.0%
-- Marcador más probable de la tanda: 3-4
-- Marcador medio esperado en la tanda: Argentina 3.72 | Uruguay 3.70
-- Marcadores de tanda más probables: 3-4 11.5%, 4-3 11.2%, 2-4 8.8%, 4-2 8.7%, 4-5 8.2%
+- Marcador más probable de la tanda: 4-3
+- Marcador medio esperado en la tanda: Argentina 3.76 | Uruguay 3.70
+- Marcadores de tanda más probables: 4-3 11.8%, 5-4 9.8%, 3-4 9.7%, 4-2 9.2%, 2-4 8.8%
 - Marcadores más probables: 1-0 15.7%, 2-0 14.7%, 0-0 10.8%, 1-1 9.9%, 3-0 9.3%, 2-1 7.8%, 3-1 4.9%, 0-1 4.9%
 
 ### Dieciseisavos 15: Colombia vs Panama
@@ -3858,9 +3858,9 @@ Fixtures leidos: mundial_2026/fixtures_live_2026.json
 - Quién tiene más probabilidad de avanzar: Colombia 83.5% | Panama 16.5%
 - Si empatan tras 90': gana en prórroga Colombia 37.0% | siguen empatados 55.0% | Panama 8.1%
 - Si llegan a penales: Colombia 50.7% | Panama 49.3%
-- Marcador más probable de la tanda: 4-3
-- Marcador medio esperado en la tanda: Colombia 3.68 | Panama 3.59
-- Marcadores de tanda más probables: 4-3 10.4%, 3-4 10.1%, 4-2 10.1%, 2-4 8.4%, 5-4 8.2%
+- Marcador más probable de la tanda: 3-4
+- Marcador medio esperado en la tanda: Colombia 3.71 | Panama 3.66
+- Marcadores de tanda más probables: 3-4 10.4%, 4-2 10.4%, 4-3 9.4%, 2-4 8.8%, 4-5 8.1%
 - Marcadores más probables: 1-0 16.5%, 2-0 15.9%, 0-0 10.8%, 3-0 10.8%, 1-1 8.8%, 2-1 7.3%, 4-0 4.9%, 3-1 4.7%
 
 ### Dieciseisavos 16: Turkey vs Iran
@@ -3897,8 +3897,8 @@ Fixtures leidos: mundial_2026/fixtures_live_2026.json
 - Si empatan tras 90': gana en prórroga Turkey 27.2% | siguen empatados 58.2% | Iran 14.6%
 - Si llegan a penales: Turkey 49.3% | Iran 50.7%
 - Marcador más probable de la tanda: 3-4
-- Marcador medio esperado en la tanda: Turkey 3.68 | Iran 3.72
-- Marcadores de tanda más probables: 3-4 11.0%, 4-3 10.1%, 2-4 8.7%, 4-5 8.6%, 4-2 8.4%
+- Marcador medio esperado en la tanda: Turkey 3.67 | Iran 3.70
+- Marcadores de tanda más probables: 3-4 11.9%, 4-3 9.9%, 4-5 9.4%, 4-2 9.0%, 2-4 8.6%
 - Marcadores más probables: 1-1 13.0%, 1-0 12.8%, 0-0 11.8%, 2-0 9.6%, 2-1 8.7%, 0-1 7.5%, 1-2 5.0%, 3-0 4.7%
 
 ### Octavos 1: Canada vs Germany
@@ -3936,8 +3936,8 @@ Fixtures leidos: mundial_2026/fixtures_live_2026.json
 - Si empatan tras 90': gana en prórroga Canada 12.6% | siguen empatados 58.0% | Germany 29.4%
 - Si llegan a penales: Canada 47.8% | Germany 52.2%
 - Marcador más probable de la tanda: 3-4
-- Marcador medio esperado en la tanda: Canada 3.57 | Germany 3.72
-- Marcadores de tanda más probables: 3-4 11.4%, 2-4 10.4%, 4-3 10.0%, 4-5 8.6%, 5-4 8.4%
+- Marcador medio esperado en la tanda: Canada 3.57 | Germany 3.71
+- Marcadores de tanda más probables: 3-4 11.9%, 2-4 10.2%, 4-3 9.6%, 4-5 8.4%, 4-2 7.9%
 - Marcadores más probables: 0-1 13.5%, 1-1 12.3%, 0-0 11.4%, 0-2 11.3%, 1-2 8.4%, 1-0 6.5%, 0-3 6.4%, 1-3 4.7%
 
 ### Octavos 2: Netherlands vs Brazil
@@ -3974,8 +3974,8 @@ Fixtures leidos: mundial_2026/fixtures_live_2026.json
 - Si empatan tras 90': gana en prórroga Netherlands 18.6% | siguen empatados 59.9% | Brazil 21.5%
 - Si llegan a penales: Netherlands 47.9% | Brazil 52.1%
 - Marcador más probable de la tanda: 3-4
-- Marcador medio esperado en la tanda: Netherlands 3.64 | Brazil 3.78
-- Marcadores de tanda más probables: 3-4 11.8%, 4-3 9.5%, 2-4 9.4%, 4-5 9.4%, 5-4 8.5%
+- Marcador medio esperado en la tanda: Netherlands 3.70 | Brazil 3.83
+- Marcadores de tanda más probables: 3-4 12.1%, 4-5 10.0%, 2-4 9.8%, 4-3 9.7%, 5-4 9.1%
 - Marcadores más probables: 1-1 14.5%, 0-0 12.1%, 0-1 10.6%, 1-0 9.1%, 1-2 7.6%, 0-2 7.3%, 2-1 6.7%, 2-0 5.4%
 
 ### Octavos 3: France vs Norway
@@ -4011,9 +4011,9 @@ Fixtures leidos: mundial_2026/fixtures_live_2026.json
 - Quién tiene más probabilidad de avanzar: France 74.3% | Norway 25.7%
 - Si empatan tras 90': gana en prórroga France 31.0% | siguen empatados 57.5% | Norway 11.5%
 - Si llegan a penales: France 51.2% | Norway 48.8%
-- Marcador más probable de la tanda: 4-2
-- Marcador medio esperado en la tanda: France 3.73 | Norway 3.62
-- Marcadores de tanda más probables: 4-2 10.4%, 4-3 10.4%, 5-4 9.4%, 3-4 9.1%, 2-4 8.3%
+- Marcador más probable de la tanda: 4-3
+- Marcador medio esperado en la tanda: France 3.84 | Norway 3.72
+- Marcadores de tanda más probables: 4-3 11.0%, 4-2 9.6%, 3-4 9.3%, 5-4 9.0%, 4-5 8.2%
 - Marcadores más probables: 1-0 13.9%, 2-0 12.5%, 1-1 11.6%, 0-0 11.0%, 2-1 8.4%, 3-0 7.3%, 0-1 5.9%, 3-1 4.9%
 
 ### Octavos 4: Mexico vs England
@@ -4051,9 +4051,9 @@ Fixtures leidos: mundial_2026/fixtures_live_2026.json
 - Quién tiene más probabilidad de avanzar: Mexico 23.5% | England 76.5%
 - Si empatan tras 90': gana en prórroga Mexico 10.9% | siguen empatados 57.1% | England 32.1%
 - Si llegan a penales: Mexico 50.1% | England 49.9%
-- Marcador más probable de la tanda: 3-4
-- Marcador medio esperado en la tanda: Mexico 3.72 | England 3.77
-- Marcadores de tanda más probables: 3-4 10.3%, 4-3 9.5%, 5-4 9.2%, 4-5 8.9%, 2-4 8.8%
+- Marcador más probable de la tanda: 2-4
+- Marcador medio esperado en la tanda: Mexico 3.75 | England 3.78
+- Marcadores de tanda más probables: 2-4 10.0%, 3-4 10.0%, 4-3 9.8%, 4-2 9.4%, 4-5 8.9%
 - Marcadores más probables: 0-1 14.5%, 0-2 13.2%, 1-1 10.8%, 0-0 10.7%, 1-2 8.3%, 0-3 8.1%, 1-0 5.5%, 1-3 5.0%
 
 ### Octavos 5: Turkey vs Belgium
@@ -4091,8 +4091,8 @@ Fixtures leidos: mundial_2026/fixtures_live_2026.json
 - Si empatan tras 90': gana en prórroga Turkey 19.4% | siguen empatados 61.4% | Belgium 19.2%
 - Si llegan a penales: Turkey 49.6% | Belgium 50.4%
 - Marcador más probable de la tanda: 3-4
-- Marcador medio esperado en la tanda: Turkey 3.68 | Belgium 3.66
-- Marcadores de tanda más probables: 3-4 10.9%, 4-2 10.9%, 4-3 10.1%, 5-4 9.2%, 4-5 9.1%
+- Marcador medio esperado en la tanda: Turkey 3.70 | Belgium 3.69
+- Marcadores de tanda más probables: 3-4 10.4%, 4-3 9.6%, 4-5 9.2%, 2-4 8.9%, 4-2 8.6%
 - Marcadores más probables: 1-1 14.5%, 0-0 12.3%, 1-0 10.0%, 0-1 9.4%, 2-1 7.5%, 1-2 6.9%, 2-0 6.5%, 0-2 6.1%
 
 ### Octavos 6: Colombia vs Spain
@@ -4129,8 +4129,8 @@ Fixtures leidos: mundial_2026/fixtures_live_2026.json
 - Si empatan tras 90': gana en prórroga Colombia 10.7% | siguen empatados 57.5% | Spain 31.8%
 - Si llegan a penales: Colombia 49.5% | Spain 50.5%
 - Marcador más probable de la tanda: 3-4
-- Marcador medio esperado en la tanda: Colombia 3.81 | Spain 3.79
-- Marcadores de tanda más probables: 3-4 10.4%, 5-4 9.9%, 4-3 9.8%, 4-2 8.9%, 4-5 8.7%
+- Marcador medio esperado en la tanda: Colombia 3.75 | Spain 3.78
+- Marcadores de tanda más probables: 3-4 10.0%, 4-5 9.6%, 2-4 9.3%, 5-4 8.9%, 4-2 8.7%
 - Marcadores más probables: 0-1 14.9%, 0-2 13.2%, 0-0 11.1%, 1-1 10.8%, 1-2 8.2%, 0-3 8.1%, 1-0 5.6%, 1-3 5.0%
 
 ### Octavos 7: Switzerland vs Argentina
@@ -4167,9 +4167,9 @@ Fixtures leidos: mundial_2026/fixtures_live_2026.json
 - Quién tiene más probabilidad de avanzar: Switzerland 19.0% | Argentina 81.0%
 - Si empatan tras 90': gana en prórroga Switzerland 9.1% | siguen empatados 55.6% | Argentina 35.3%
 - Si llegan a penales: Switzerland 47.4% | Argentina 52.6%
-- Marcador más probable de la tanda: 4-5
-- Marcador medio esperado en la tanda: Switzerland 3.56 | Argentina 3.73
-- Marcadores de tanda más probables: 4-5 9.7%, 3-4 9.5%, 2-4 9.4%, 4-3 8.6%, 5-4 7.9%
+- Marcador más probable de la tanda: 4-3
+- Marcador medio esperado en la tanda: Switzerland 3.67 | Argentina 3.69
+- Marcadores de tanda más probables: 4-3 10.4%, 3-4 10.2%, 2-4 9.9%, 4-5 9.1%, 4-2 9.1%
 - Marcadores más probables: 0-1 15.3%, 0-2 14.6%, 0-0 10.3%, 1-1 10.0%, 0-3 9.4%, 1-2 7.9%, 1-3 5.1%, 1-0 4.7%
 
 ### Octavos 8: Colombia vs Turkey
@@ -4206,8 +4206,8 @@ Fixtures leidos: mundial_2026/fixtures_live_2026.json
 - Si empatan tras 90': gana en prórroga Colombia 27.2% | siguen empatados 59.5% | Turkey 13.3%
 - Si llegan a penales: Colombia 50.9% | Turkey 49.1%
 - Marcador más probable de la tanda: 4-3
-- Marcador medio esperado en la tanda: Colombia 3.75 | Turkey 3.71
-- Marcadores de tanda más probables: 4-3 10.5%, 5-4 9.5%, 3-4 9.2%, 2-4 9.1%, 4-2 8.7%
+- Marcador medio esperado en la tanda: Colombia 3.79 | Turkey 3.71
+- Marcadores de tanda más probables: 4-3 10.6%, 5-4 9.8%, 3-4 9.7%, 4-2 9.1%, 4-5 8.9%
 - Marcadores más probables: 1-0 13.5%, 1-1 12.6%, 0-0 12.1%, 2-0 10.6%, 2-1 8.3%, 0-1 7.2%, 3-0 5.7%, 1-2 4.8%
 
 ### Cuartos 1: Germany vs Brazil
@@ -4243,9 +4243,9 @@ Fixtures leidos: mundial_2026/fixtures_live_2026.json
 - Quién tiene más probabilidad de avanzar: Germany 39.2% | Brazil 60.8%
 - Si empatan tras 90': gana en prórroga Germany 15.8% | siguen empatados 59.9% | Brazil 24.3%
 - Si llegan a penales: Germany 49.6% | Brazil 50.4%
-- Marcador más probable de la tanda: 4-5
-- Marcador medio esperado en la tanda: Germany 3.81 | Brazil 3.79
-- Marcadores de tanda más probables: 4-5 10.4%, 5-4 9.6%, 2-4 9.4%, 4-3 9.1%, 3-4 8.9%
+- Marcador más probable de la tanda: 3-4
+- Marcador medio esperado en la tanda: Germany 3.82 | Brazil 3.84
+- Marcadores de tanda más probables: 3-4 10.1%, 5-4 9.4%, 4-2 9.1%, 2-4 9.1%, 4-3 8.7%
 - Marcadores más probables: 1-1 13.9%, 0-1 11.4%, 0-0 11.3%, 0-2 8.6%, 1-2 8.2%, 1-0 7.9%, 2-1 6.0%, 2-2 4.4%
 
 ### Cuartos 2: France vs England
@@ -4282,8 +4282,8 @@ Fixtures leidos: mundial_2026/fixtures_live_2026.json
 - Si empatan tras 90': gana en prórroga France 20.8% | siguen empatados 61.2% | England 18.0%
 - Si llegan a penales: France 50.4% | England 49.6%
 - Marcador más probable de la tanda: 3-4
-- Marcador medio esperado en la tanda: France 3.81 | England 3.84
-- Marcadores de tanda más probables: 3-4 10.5%, 4-3 9.5%, 4-5 8.9%, 5-4 8.8%, 4-2 8.2%
+- Marcador medio esperado en la tanda: France 3.77 | England 3.77
+- Marcadores de tanda más probables: 3-4 9.6%, 4-5 9.5%, 4-2 9.4%, 4-3 8.7%, 2-4 8.6%
 - Marcadores más probables: 1-1 14.4%, 0-0 12.7%, 1-0 10.6%, 0-1 9.6%, 2-1 7.5%, 2-0 7.0%, 1-2 6.7%, 0-2 5.8%
 
 ### Cuartos 3: Turkey vs Spain
@@ -4321,8 +4321,8 @@ Fixtures leidos: mundial_2026/fixtures_live_2026.json
 - Si empatan tras 90': gana en prórroga Turkey 7.2% | siguen empatados 54.1% | Spain 38.8%
 - Si llegan a penales: Turkey 48.6% | Spain 51.4%
 - Marcador más probable de la tanda: 4-3
-- Marcador medio esperado en la tanda: Turkey 3.70 | Spain 3.67
-- Marcadores de tanda más probables: 4-3 10.8%, 3-4 10.1%, 4-2 9.6%, 4-5 9.4%, 5-4 8.9%
+- Marcador medio esperado en la tanda: Turkey 3.65 | Spain 3.69
+- Marcadores de tanda más probables: 4-3 10.0%, 3-4 9.5%, 2-4 9.1%, 5-4 9.1%, 4-2 9.0%
 - Marcadores más probables: 0-2 16.6%, 0-1 15.8%, 0-3 12.0%, 0-0 9.9%, 1-1 7.9%, 1-2 6.9%, 0-4 6.0%, 1-3 5.0%
 
 ### Cuartos 4: Argentina vs Colombia
@@ -4359,8 +4359,8 @@ Fixtures leidos: mundial_2026/fixtures_live_2026.json
 - Si empatan tras 90': gana en prórroga Argentina 29.3% | siguen empatados 58.2% | Colombia 12.6%
 - Si llegan a penales: Argentina 51.3% | Colombia 48.7%
 - Marcador más probable de la tanda: 4-3
-- Marcador medio esperado en la tanda: Argentina 3.73 | Colombia 3.70
-- Marcadores de tanda más probables: 4-3 11.2%, 3-4 9.6%, 4-2 9.4%, 2-4 8.9%, 4-5 8.6%
+- Marcador medio esperado en la tanda: Argentina 3.77 | Colombia 3.70
+- Marcadores de tanda más probables: 4-3 11.7%, 3-4 11.0%, 4-2 9.0%, 5-4 8.1%, 4-5 7.8%
 - Marcadores más probables: 1-0 14.2%, 1-1 12.2%, 0-0 12.2%, 2-0 11.5%, 2-1 8.2%, 0-1 7.0%, 3-0 6.2%, 3-1 4.4%
 
 ### Semifinal 1: Brazil vs France
@@ -4398,8 +4398,8 @@ Fixtures leidos: mundial_2026/fixtures_live_2026.json
 - Si empatan tras 90': gana en prórroga Brazil 15.5% | siguen empatados 60.4% | France 24.0%
 - Si llegan a penales: Brazil 51.1% | France 48.9%
 - Marcador más probable de la tanda: 4-3
-- Marcador medio esperado en la tanda: Brazil 3.78 | France 3.71
-- Marcadores de tanda más probables: 4-3 10.5%, 3-4 10.0%, 4-2 9.2%, 4-5 8.5%, 5-4 8.4%
+- Marcador medio esperado en la tanda: Brazil 3.79 | France 3.71
+- Marcadores de tanda más probables: 4-3 11.4%, 3-4 10.5%, 4-2 9.5%, 4-5 9.2%, 2-4 7.6%
 - Marcadores más probables: 1-1 13.8%, 0-0 12.2%, 0-1 11.9%, 0-2 8.6%, 1-0 8.3%, 1-2 8.2%, 2-1 5.7%, 2-0 4.5%
 
 ### Semifinal 2: Spain vs Argentina
@@ -4436,9 +4436,9 @@ Fixtures leidos: mundial_2026/fixtures_live_2026.json
 - Quién tiene más probabilidad de avanzar: Spain 58.7% | Argentina 41.3%
 - Si empatan tras 90': gana en prórroga Spain 23.5% | siguen empatados 60.1% | Argentina 16.4%
 - Si llegan a penales: Spain 49.2% | Argentina 50.8%
-- Marcador más probable de la tanda: 3-4
-- Marcador medio esperado en la tanda: Spain 3.67 | Argentina 3.68
-- Marcadores de tanda más probables: 3-4 11.6%, 4-3 11.2%, 5-4 9.2%, 2-4 9.0%, 4-2 8.8%
+- Marcador más probable de la tanda: 2-4
+- Marcador medio esperado en la tanda: Spain 3.61 | Argentina 3.68
+- Marcadores de tanda más probables: 2-4 10.5%, 3-4 10.4%, 4-3 10.0%, 4-2 9.6%, 4-5 8.9%
 - Marcadores más probables: 1-1 14.0%, 0-0 12.2%, 1-0 11.6%, 0-1 8.6%, 2-0 8.2%, 2-1 8.0%, 1-2 6.0%, 0-2 4.7%
 
 ### Final: France vs Spain
@@ -4474,9 +4474,9 @@ Fixtures leidos: mundial_2026/fixtures_live_2026.json
 - Quién tiene más probabilidad de avanzar: France 34.4% | Spain 65.6%
 - Si empatan tras 90': gana en prórroga France 14.8% | siguen empatados 58.9% | Spain 26.3%
 - Si llegan a penales: France 49.8% | Spain 50.2%
-- Marcador más probable de la tanda: 4-3
-- Marcador medio esperado en la tanda: France 3.87 | Spain 3.79
-- Marcadores de tanda más probables: 4-3 10.4%, 4-2 9.7%, 4-5 9.2%, 5-4 9.1%, 3-4 8.6%
+- Marcador más probable de la tanda: 3-4
+- Marcador medio esperado en la tanda: France 3.76 | Spain 3.80
+- Marcadores de tanda más probables: 3-4 11.6%, 5-4 9.6%, 4-3 9.0%, 4-5 8.6%, 2-4 8.6%
 - Marcadores más probables: 1-1 13.2%, 0-1 12.8%, 0-0 11.7%, 0-2 9.8%, 1-2 8.4%, 1-0 7.3%, 2-1 5.1%, 0-3 5.0%
 
 ### Tercer puesto: Brazil vs Argentina
@@ -4513,7 +4513,7 @@ Fixtures leidos: mundial_2026/fixtures_live_2026.json
 - Quién tiene más probabilidad de avanzar: Brazil 32.5% | Argentina 67.5%
 - Si empatan tras 90': gana en prórroga Brazil 13.7% | siguen empatados 58.6% | Argentina 27.7%
 - Si llegan a penales: Brazil 50.2% | Argentina 49.8%
-- Marcador más probable de la tanda: 3-4
-- Marcador medio esperado en la tanda: Brazil 3.71 | Argentina 3.63
-- Marcadores de tanda más probables: 3-4 10.4%, 4-2 9.7%, 4-3 9.7%, 5-4 9.6%, 4-5 8.8%
+- Marcador más probable de la tanda: 4-3
+- Marcador medio esperado en la tanda: Brazil 3.68 | Argentina 3.65
+- Marcadores de tanda más probables: 4-3 11.0%, 4-2 10.3%, 2-4 10.2%, 3-4 9.5%, 5-4 8.9%
 - Marcadores más probables: 0-1 13.3%, 1-1 12.9%, 0-0 11.7%, 0-2 10.4%, 1-2 8.5%, 1-0 7.2%, 0-3 5.4%, 2-1 4.7%
