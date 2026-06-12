@@ -347,7 +347,7 @@ class RegressionLogicTest(unittest.TestCase):
                 score_a,
                 score_b,
                 status_detail,
-                top_scores=6,
+                top_scores=12,
                 state_a=states["Spain"],
                 state_b=states["Uruguay"],
                 live_stats=dict(stats or base_stats),
@@ -362,7 +362,37 @@ class RegressionLogicTest(unittest.TestCase):
                 round(prediction.expected_goals_b, 6),
                 round(prediction.expected_remaining_goals_a or 0.0, 6),
                 round(prediction.expected_remaining_goals_b or 0.0, 6),
-                tuple((score, round(prob, 6)) for score, prob in prediction.exact_scores[:5]),
+                tuple((score, round(prob, 6)) for score, prob in prediction.exact_scores[:12]),
+            )
+
+        def result_probability_delta(left, right):
+            return (
+                abs(left.win_a - right.win_a)
+                + abs(left.draw - right.draw)
+                + abs(left.win_b - right.win_b)
+            )
+
+        def score_distribution_delta(left, right):
+            left_scores = dict(left.exact_scores)
+            right_scores = dict(right.exact_scores)
+            keys = set(left_scores) | set(right_scores)
+            return sum(abs(left_scores.get(key, 0.0) - right_scores.get(key, 0.0)) for key in keys)
+
+        def assert_live_distribution_moves(changed, reason):
+            self.assertNotEqual(
+                baseline_signature,
+                distribution_signature(changed),
+                reason,
+            )
+            self.assertGreater(
+                result_probability_delta(baseline, changed),
+                1e-5,
+                f"{reason} The 1X2 live probabilities did not move enough.",
+            )
+            self.assertGreater(
+                score_distribution_delta(baseline, changed),
+                1e-5,
+                f"{reason} The exact-score live distribution did not move enough.",
             )
 
         baseline = live_prediction("20'")
@@ -372,19 +402,16 @@ class RegressionLogicTest(unittest.TestCase):
         red_changed = live_prediction("20'", stats=red_stats)
 
         baseline_signature = distribution_signature(baseline)
-        self.assertNotEqual(
-            baseline_signature,
-            distribution_signature(minute_changed),
+        assert_live_distribution_moves(
+            minute_changed,
             "Changing live minute must change the live probability/score distribution.",
         )
-        self.assertNotEqual(
-            baseline_signature,
-            distribution_signature(score_changed),
+        assert_live_distribution_moves(
+            score_changed,
             "Changing live score must change the live probability/score distribution.",
         )
-        self.assertNotEqual(
-            baseline_signature,
-            distribution_signature(red_changed),
+        assert_live_distribution_moves(
+            red_changed,
             "Changing a live red card must change the live probability/score distribution.",
         )
         self.assertLess(red_changed.win_a, baseline.win_a)
