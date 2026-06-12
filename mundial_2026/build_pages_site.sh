@@ -19,6 +19,27 @@ if [[ -f "$SCRIPT_DIR/live_sync_status.json" ]]; then
 fi
 cp "$SCRIPT_DIR/historical_features_1950.json" "$SITE_DIR/historical_features_1950.json"
 
+for artifact in \
+  backtest_summary.csv \
+  backtest_by_competition.csv \
+  backtest_by_phase.csv \
+  backtest_predictions.csv \
+  benchmark_results.csv \
+  benchmark_summary.csv \
+  calibration_report.csv \
+  calibrated_predictions.csv \
+  calibration_bins.csv \
+  ablation_results.csv
+do
+  if [[ -f "$SCRIPT_DIR/outputs/real_backtest/$artifact" ]]; then
+    cp "$SCRIPT_DIR/outputs/real_backtest/$artifact" "$SITE_DIR/$artifact"
+  elif [[ -f "$SCRIPT_DIR/outputs/$artifact" ]]; then
+    cp "$SCRIPT_DIR/outputs/$artifact" "$SITE_DIR/$artifact"
+  elif [[ -f "$SCRIPT_DIR/$artifact" ]]; then
+    cp "$SCRIPT_DIR/$artifact" "$SITE_DIR/$artifact"
+  fi
+done
+
 python3 - <<'PY'
 import json
 import os
@@ -97,7 +118,20 @@ historical_backtest_available = artifact_exists(
 benchmarks_available = artifact_exists(
     "benchmark_results.csv",
     "outputs/benchmark_results.csv",
+    "outputs/real_backtest/benchmark_results.csv",
     "site/benchmark_results.csv",
+)
+calibration_report_available = artifact_exists(
+    "calibration_report.csv",
+    "outputs/calibration_report.csv",
+    "outputs/real_backtest/calibration_report.csv",
+    "site/calibration_report.csv",
+)
+ablation_available = artifact_exists(
+    "ablation_results.csv",
+    "outputs/ablation_results.csv",
+    "outputs/real_backtest/ablation_results.csv",
+    "site/ablation_results.csv",
 )
 historical_matches_available = artifact_exists(
     "historical_matches.csv",
@@ -149,6 +183,8 @@ payload = {
         "historical_backtest_available": historical_backtest_available,
         "historical_rows": historical_rows,
         "benchmarks_available": benchmarks_available,
+        "calibration_report_available": calibration_report_available,
+        "ablation_available": ablation_available,
         "deep_live_feed_active": bool(live_providers),
         "deep_live_providers": live_providers,
         "proxy_inputs_blocked": True,
@@ -186,6 +222,13 @@ payload = {
         "fixtures_live": "fixtures_live_2026.json",
         "live_sync_status": "live_sync_status.json",
         "historical_features": "historical_features_1950.json",
+        "backtest_summary": "backtest_summary.csv",
+        "benchmark_results": "benchmark_results.csv",
+        "benchmark_summary": "benchmark_summary.csv",
+        "calibration_report": "calibration_report.csv",
+        "calibration_bins": "calibration_bins.csv",
+        "calibrated_predictions": "calibrated_predictions.csv",
+        "ablation_results": "ablation_results.csv",
     },
 }
 (site_dir / "latest.json").write_text(json.dumps(payload, indent=2))

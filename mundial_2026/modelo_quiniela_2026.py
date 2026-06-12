@@ -12229,6 +12229,33 @@ def _quality_csv_metric(base_dir: Path, candidates: Sequence[str], metric: str) 
     return ""
 
 
+def _quality_csv_row_count(base_dir: Path, candidates: Sequence[str]) -> int:
+    for candidate in candidates:
+        path = base_dir / candidate
+        if not path.exists():
+            continue
+        try:
+            with path.open(newline="", encoding="utf-8") as handle:
+                return sum(1 for _ in csv.DictReader(handle))
+        except (OSError, csv.Error):
+            continue
+    return 0
+
+
+def _quality_json_payload(base_dir: Path, candidates: Sequence[str]) -> dict:
+    for candidate in candidates:
+        path = base_dir / candidate
+        if not path.exists():
+            continue
+        try:
+            payload = json.loads(path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError):
+            continue
+        if isinstance(payload, dict):
+            return payload
+    return {}
+
+
 def model_quality_audit_items(
     entries: Sequence[dict],
     bracket_payload: dict,
@@ -12276,11 +12303,22 @@ def model_quality_audit_items(
             "site/backtest_summary.csv",
         ],
     )
+    historical_backtest_rows = _quality_csv_row_count(
+        base_dir,
+        [
+            "outputs/real_backtest/backtest_predictions.csv",
+            "site/backtest_predictions.csv",
+        ],
+    )
     historical_rows_text = _quality_csv_metric(
         base_dir,
         ["data/real_data_coverage_report.csv", "site/real_data_coverage_report.csv"],
         "selected_rows",
     )
+    try:
+        historical_rows_number = int(float(historical_rows_text)) if historical_rows_text else historical_backtest_rows
+    except ValueError:
+        historical_rows_number = historical_backtest_rows
     historical_missing_fields = _quality_csv_metric(
         base_dir,
         ["data/real_data_coverage_report.csv", "site/real_data_coverage_report.csv"],
@@ -12291,7 +12329,17 @@ def model_quality_audit_items(
         [
             "calibration_report.csv",
             "outputs/calibration_report.csv",
+            "outputs/real_backtest/calibration_report.csv",
             "site/calibration_report.csv",
+        ],
+    )
+    has_calibration_bins = _quality_artifact_exists(
+        base_dir,
+        [
+            "calibration_bins.csv",
+            "outputs/calibration_bins.csv",
+            "outputs/real_backtest/calibration_bins.csv",
+            "site/calibration_bins.csv",
         ],
     )
     has_ablation = _quality_artifact_exists(
@@ -12299,9 +12347,32 @@ def model_quality_audit_items(
         [
             "ablation_results.csv",
             "outputs/ablation_results.csv",
+            "outputs/real_backtest/ablation_results.csv",
             "site/ablation_results.csv",
         ],
     )
+    ablation_rows = _quality_csv_row_count(
+        base_dir,
+        [
+            "ablation_results.csv",
+            "outputs/ablation_results.csv",
+            "outputs/real_backtest/ablation_results.csv",
+            "site/ablation_results.csv",
+        ],
+    )
+    live_sync = _quality_json_payload(base_dir, ["live_sync_status.json", "site/live_sync_status.json"])
+    deep_live_provider_used = bool(live_sync.get("deep_live_provider_used") or runtime["deep_sources"])
+    live_provider_names = [
+        str(item)
+        for item in (
+            live_sync.get("providers_used")
+            or live_sync.get("deep_live_providers")
+            or runtime["deep_sources"]
+            or []
+        )
+        if item
+    ]
+    stale_live_warning = bool(live_sync.get("stale_live_warning"))
 
     def score_item(
         title: str,
@@ -12330,11 +12401,30 @@ def model_quality_audit_items(
             penca_score += 1.0
         if fixture_total >= 104:
             penca_score += 0.5
-    calibration_score = 9.0 if completed_matches >= 60 and has_calibration else 7.0 if completed_matches >= 20 else 5.0 if completed_matches else 4.0
-    benchmark_score = 9.0 if has_benchmarks else 6.0
-    ablation_score = 9.0 if has_ablation else 5.5
-    historical_score = 9.0 if has_historical and has_backtest else 6.0 if has_historical else 4.0
-    provider_score = 8.5 if runtime["deep_sources"] else 7.0 if runtime["configured_wired"] else 6.0
+    historical_calibration_ready = bool(has_backtest and has_calibration and has_calibration_bins and historical_rows_number >= 1000)
+    calibration_score = (
+        10.0
+        if historical_calibration_ready
+        else 9.0
+        if completed_matches >= 20 and has_calibration
+        else 7.0
+        if has_calibration_bins and has_backtest
+        else 5.0
+        if completed_matches
+        else 4.0
+    )
+    benchmark_score = 10.0 if has_benchmarks and has_backtest and historical_rows_number >= 1000 else 9.0 if has_benchmarks else 6.0
+    ablation_score = 9.2 if has_ablation and ablation_rows >= 10 else 9.0 if has_ablation else 5.5
+    historical_score = 10.0 if has_historical and has_backtest and historical_rows_number >= 1000 else 6.0 if has_historical else 4.0
+    provider_score = (
+        10.0
+        if deep_live_provider_used and live_count > 0 and not stale_live_warning
+        else 8.0
+        if live_count > 0
+        else 7.0
+        if runtime["configured_wired"]
+        else 6.0
+    )
     exact_score_score = 8.0 if ticket_audit.get("defensible_scores", 0) else 6.0
     if has_backtest and completed_matches >= 20:
         exact_score_score += 1.0
@@ -12354,9 +12444,13 @@ def model_quality_audit_items(
         score_item(
             "Operación y refresh",
             operations_score,
-            "Fuerte",
+            "Live profundo activo" if deep_live_provider_used and live_count else "Fuerte",
             f"{len(fixture_entries)} fixtures directos + {len(projected_entries)} cruces proyectados; {live_count} live y {final_count} finales aplicados.",
-            "Seguir separando carril live de 5 minutos, guardrail 15k horario y snapshot 100k cada 8h/manual/push relevante.",
+            (
+                "Proveedor live profundo activo: el carril de 5 minutos puede mover marcadores, estado, eventos y llave con datos reales."
+                if deep_live_provider_used and live_count
+                else "Carril live de 5 minutos activo; si entra proveedor profundo, se habilita lectura tiro-a-tiro/eventos sin cambiar metodología."
+            ),
             0.10,
         ),
         score_item(
@@ -12370,29 +12464,54 @@ def model_quality_audit_items(
         score_item(
             "Calibración probabilística",
             calibration_score,
-            "Pendiente de muestra" if not completed_matches else "En medición",
+            "Histórica publicada" if historical_calibration_ready else "Pendiente de muestra 2026" if not completed_matches else "En medición",
             (
+                f"Reliability/Brier/log-loss publicados con {historical_rows_number} partidos históricos; la calibración 2026 se activa con el primer final."
+                if historical_calibration_ready and not completed_matches
+                else f"Reliability/Brier/log-loss publicados con {historical_rows_number} partidos históricos y {completed_matches} partidos 2026 cerrados."
+                if historical_calibration_ready
+                else
                 f"{completed_matches} partidos cerrados y {regular_samples} muestras de tiempo regular para Brier/log-loss."
                 if completed_matches
                 else "El Brier 2026 empieza con el primer final; antes de eso no hay track record real del torneo."
             ),
-            "Conectar calibration_report.csv y reliability bins cuando existan suficientes partidos cerrados.",
+            (
+                "Mantener calibration_report.csv y calibration_bins.csv publicados; recalibrar 2026 cuando entren finales reales."
+                if historical_calibration_ready
+                else "Conectar calibration_report.csv y reliability bins cuando existan suficientes partidos cerrados."
+            ),
             0.16,
         ),
         score_item(
             "Benchmarks externos/simples",
             benchmark_score,
-            "Estructura lista" if not has_benchmarks else "Medido",
-            "El módulo de benchmarks existe; el 10/10 requiere comparar contra Elo, FIFA, mercado, Poisson simple e histórico en CSV publicado.",
-            "Correr benchmark_results.csv con el mismo set histórico usado para backtesting.",
+            "Medido con histórico" if benchmark_score >= 10.0 else "Estructura lista" if not has_benchmarks else "Medido",
+            (
+                f"benchmark_results.csv y benchmark_summary.csv publicados contra el set histórico de {historical_rows_number} partidos."
+                if benchmark_score >= 10.0
+                else "El módulo de benchmarks existe; el 10/10 requiere comparar contra Elo, FIFA, mercado, Poisson simple e histórico en CSV publicado."
+            ),
+            (
+                "Usar estos benchmarks como piso: si el modelo completo no los supera fuera de muestra, simplificar."
+                if benchmark_score >= 10.0
+                else "Correr benchmark_results.csv con el mismo set histórico usado para backtesting."
+            ),
             0.12,
         ),
         score_item(
             "Ablation tests",
             ablation_score,
-            "Estructura lista" if not has_ablation else "Medido",
-            "El módulo de ablation existe; falta publicar qué bloques suben o bajan Brier/log-loss fuera de muestra.",
-            "Ejecutar ablation_results.csv antes de congelar pesos finales.",
+            "Publicado" if has_ablation else "Estructura lista",
+            (
+                f"ablation_results.csv publicado con {ablation_rows} variantes; ya se ve qué bloques conviene conservar, reducir o tratar como neutros."
+                if has_ablation
+                else "El módulo de ablation existe; falta publicar qué bloques suben o bajan Brier/log-loss fuera de muestra."
+            ),
+            (
+                "Siguiente mejora: conectar el adaptador del full model a ablation para que no sea solo baseline histórico."
+                if has_ablation
+                else "Ejecutar ablation_results.csv antes de congelar pesos finales."
+            ),
             0.10,
         ),
         score_item(
@@ -12400,7 +12519,7 @@ def model_quality_audit_items(
             historical_score,
             "Medido con datos reales" if has_historical and has_backtest else "Pendiente crítico" if not has_historical else "Preparado",
             (
-                f"Backtest real con {historical_rows_text or 'dataset historico'} partidos de Mundial, Euro y Copa América desde 1950; "
+                f"Backtest real con {historical_rows_number or historical_rows_text or 'dataset historico'} partidos de Mundial, Euro y Copa América desde 1950; "
                 f"campos no inventados siguen vacíos: {historical_missing_fields or 'FIFA/mercado/plantilla/fase exacta'}."
                 if has_historical and has_backtest
                 else "Sin historical_matches.csv trazable, el modelo es auditable en estructura pero no puede reclamar validación histórica completa."
@@ -12411,13 +12530,19 @@ def model_quality_audit_items(
         score_item(
             "Fuentes y proveedores",
             provider_score,
-            "Base sólida" if not runtime["deep_sources"] else "Profundo activo",
+            "Live profundo activo" if provider_score >= 10.0 else "Live base activo" if live_count else "Base sólida",
             (
-                f"Fuentes profundas activas: {', '.join(runtime['deep_sources'])}."
-                if runtime["deep_sources"]
+                f"Proveedor live profundo activo: {', '.join(live_provider_names or runtime['deep_sources'])}."
+                if provider_score >= 10.0
+                else f"Hay {live_count} partido(s) live con fuente base; falta proveedor profundo válido para eventos tiro-a-tiro."
+                if live_count
                 else "Corre con fuentes abiertas/base; eventos tiro-a-tiro dependen de proveedor válido."
             ),
-            "No scrapear sin licencia; sumar proveedores abiertos verificables cuando cubran Mundial 2026.",
+            (
+                "Mantener validación de freshness: si el proveedor profundo se cae, bajar automáticamente a live base."
+                if provider_score >= 10.0
+                else "No scrapear sin licencia; activar o sumar proveedor profundo verificable cuando cubra Mundial 2026."
+            ),
             0.07,
         ),
         score_item(

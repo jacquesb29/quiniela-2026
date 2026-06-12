@@ -1,7 +1,7 @@
 {
-  "updated_at_utc": "2026-06-11T23:28:50+00:00",
-  "publication_updated_at_utc": "2026-06-11T23:28:50+00:00",
-  "dashboard_updated_at_utc": "2026-06-11T23:19:27+00:00",
+  "updated_at_utc": "2026-06-12T00:06:42+00:00",
+  "publication_updated_at_utc": "2026-06-12T00:06:42+00:00",
+  "dashboard_updated_at_utc": "2026-06-12T00:00:34+00:00",
   "timestamp_consistency_note": "latest.json se escribe despues de copiar el HTML; compara dashboard_updated_at_utc contra publication_updated_at_utc para detectar desfases reales de publicacion o cache.",
   "refresh_interval_minutes": 5,
   "live_refresh_interval_minutes": 5,
@@ -32,6 +32,8 @@
     "historical_backtest_available": true,
     "historical_rows": "1930",
     "benchmarks_available": true,
+    "calibration_report_available": true,
+    "ablation_available": true,
     "deep_live_feed_active": false,
     "deep_live_providers": [],
     "proxy_inputs_blocked": true,
@@ -93,6 +95,13 @@
     "bracket_json": "llave_actual_2026.json",
     "fixtures_live": "fixtures_live_2026.json",
     "live_sync_status": "live_sync_status.json",
-    "historical_features": "historical_features_1950.json"
+    "historical_features": "historical_features_1950.json",
+    "backtest_summary": "backtest_summary.csv",
+    "benchmark_results": "benchmark_results.csv",
+    "benchmark_summary": "benchmark_summary.csv",
+    "calibration_report": "calibration_report.csv",
+    "calibration_bins": "calibration_bins.csv",
+    "calibrated_predictions": "calibrated_predictions.csv",
+    "ablation_results": "ablation_results.csv"
   }
 }
