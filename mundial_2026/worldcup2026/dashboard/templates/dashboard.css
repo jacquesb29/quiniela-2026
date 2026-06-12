@@ -2745,6 +2745,41 @@ strong {
   padding-top: 14px;
   border-top: 1px dashed rgba(15,109,102,0.20);
 }
+.score-audit-panel {
+  background:
+    radial-gradient(circle at 15% 18%, rgba(176,71,60,0.12), transparent 30%),
+    radial-gradient(circle at 86% 12%, rgba(15,109,102,0.12), transparent 34%),
+    linear-gradient(135deg, rgba(255,253,247,0.98), rgba(242,248,245,0.95));
+}
+.score-audit-list {
+  list-style: none;
+  display: grid;
+  gap: 12px;
+  margin: 18px 0 0;
+  padding: 0;
+}
+.score-audit-list li {
+  display: grid;
+  gap: 6px;
+  border: 1px solid rgba(15,109,102,0.14);
+  border-radius: 18px;
+  background: rgba(255,255,255,0.70);
+  color: var(--muted);
+  padding: 14px 16px;
+  box-shadow: var(--shadow-soft);
+}
+.score-audit-list strong {
+  color: var(--ink);
+  font-size: 1.02rem;
+}
+.score-audit-block.ok {
+  border-color: rgba(15,109,102,0.28);
+  background: linear-gradient(180deg, rgba(15,109,102,0.10), rgba(255,255,255,0.75));
+}
+.score-audit-block.warn {
+  border-color: rgba(176,71,60,0.30);
+  background: linear-gradient(180deg, rgba(176,71,60,0.10), rgba(255,255,255,0.78));
+}
 .championship-penca-panel {
   background:
     radial-gradient(circle at 12% 12%, rgba(181,131,47,0.18), transparent 30%),

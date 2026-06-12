@@ -5783,6 +5783,80 @@ def prediction_score_label(prediction: MatchPrediction, score: object) -> str:
     return score_label_with_teams(prediction.team_a, prediction.team_b, score)
 
 
+def realized_penca_points_for_score(pick_score: object, actual_score: object) -> float:
+    pick_a, pick_b = parse_score_pair(pick_score)
+    actual_a, actual_b = parse_score_pair(actual_score)
+    if pick_a == actual_a and pick_b == actual_b:
+        return PENCA_OVACION_POINTS["exact"]
+    if pick_a - pick_b == actual_a - actual_b:
+        return PENCA_OVACION_POINTS["goal_difference"]
+    if score_result_code(pick_a, pick_b) == score_result_code(actual_a, actual_b):
+        return PENCA_OVACION_POINTS["winner"]
+    return 0.0
+
+
+def finalized_score_audit(entry: dict, prediction: MatchPrediction) -> Optional[dict]:
+    if entry.get("actual_score_a") is None or entry.get("actual_score_b") is None:
+        return None
+    actual_score = f"{int(entry['actual_score_a'])}-{int(entry['actual_score_b'])}"
+    model_score = projected_score_value(prediction)
+    penca_score = str(penca_ovacion_top_score(prediction).get("score", model_score))
+    model_points = realized_penca_points_for_score(model_score, actual_score)
+    penca_points = realized_penca_points_for_score(penca_score, actual_score)
+    model_exact_hit = model_score == actual_score
+    penca_exact_hit = penca_score == actual_score
+    model_a, model_b = parse_score_pair(model_score)
+    penca_a, penca_b = parse_score_pair(penca_score)
+    actual_a, actual_b = parse_score_pair(actual_score)
+    return {
+        "title": entry.get("title") or f"{prediction.team_a} vs {prediction.team_b}",
+        "team_a": prediction.team_a,
+        "team_b": prediction.team_b,
+        "actual_score": actual_score,
+        "actual_score_with_teams": prediction_score_label(prediction, actual_score),
+        "model_score": model_score,
+        "model_score_with_teams": prediction_score_label(prediction, model_score),
+        "penca_score": penca_score,
+        "penca_score_with_teams": prediction_score_label(prediction, penca_score),
+        "model_exact_hit": model_exact_hit,
+        "penca_exact_hit": penca_exact_hit,
+        "model_points": model_points,
+        "penca_points": penca_points,
+        "model_goal_error": abs(model_a - actual_a) + abs(model_b - actual_b),
+        "penca_goal_error": abs(penca_a - actual_a) + abs(penca_b - actual_b),
+        "model_result_hit": score_result_code(model_a, model_b) == score_result_code(actual_a, actual_b),
+        "penca_result_hit": score_result_code(penca_a, penca_b) == score_result_code(actual_a, actual_b),
+        "needs_scoreline_calibration": (not model_exact_hit) or (not penca_exact_hit),
+    }
+
+
+def finalized_score_audit_html(entry: dict, prediction: MatchPrediction) -> str:
+    audit = finalized_score_audit(entry, prediction)
+    if not audit:
+        return ""
+    tone = "ok" if audit["model_exact_hit"] and audit["penca_exact_hit"] else "warn"
+    if audit["model_exact_hit"] and audit["penca_exact_hit"]:
+        headline = "El marcador final coincidió con modelo y Penca."
+    elif audit["penca_exact_hit"]:
+        headline = "El marcador Penca acertó el exacto; el modal del modelo no."
+    elif audit["model_exact_hit"]:
+        headline = "El marcador modal del modelo acertó; la optimización Penca no."
+    else:
+        headline = "Marcador final distinto al modelo y/o al recomendado Penca."
+    return (
+        f"<div class=\"reason-block score-audit-block {html.escape(tone)}\">"
+        "<h4>Auditoría del marcador finalizado</h4>"
+        f"<p class=\"meta\"><strong>{html.escape(headline)}</strong></p>"
+        f"<p class=\"meta\">Final real: {html.escape(str(audit['actual_score_with_teams']))}</p>"
+        f"<p class=\"meta\">Marcador más probable del modelo: {html.escape(str(audit['model_score_with_teams']))} | "
+        f"puntos Penca simulados: {float(audit['model_points']):.0f}/8</p>"
+        f"<p class=\"meta\">Marcador recomendado Penca: {html.escape(str(audit['penca_score_with_teams']))} | "
+        f"puntos Penca simulados: {float(audit['penca_points']):.0f}/8</p>"
+        "<p class=\"meta\">Regla general: si el resultado real no coincide, este caso entra al ledger de calibración de marcador; no se corrige a mano solo porque haya terminado 2-1.</p>"
+        "</div>"
+    )
+
+
 def average_goals_label(prediction: MatchPrediction) -> str:
     if prediction.live_phase == "regulation":
         return "Promedio estimado de goles al final del tiempo reglamentario"
@@ -13126,6 +13200,66 @@ def build_score_dynamics_html(entries: Sequence[dict]) -> str:
     )
 
 
+def build_finalized_score_audit_panel_html(entries: Sequence[dict]) -> str:
+    audits = [
+        finalized_score_audit(entry, entry["prediction"])
+        for entry in entries
+        if not entry.get("projection") and entry.get("prediction") is not None
+    ]
+    audits = [audit for audit in audits if audit]
+    if not audits:
+        return (
+            "<section class=\"panel score-audit-panel\" id=\"auditoria-marcadores-finales\">"
+            "<div class=\"panel-head\"><div>"
+            "<p class=\"eyebrow\">Auditoría de marcadores finalizados</p>"
+            "<h2>Cuando termine cada partido, el modelo comparará marcador real vs modelo vs Penca.</h2>"
+            "<p class=\"lede-tight\">Todavía no hay partidos finalizados en este corte. En cuanto haya final, se registrará si falló el marcador más probable o el marcador recomendado para Penca.</p>"
+            "</div></div>"
+            "</section>"
+        )
+
+    total = len(audits)
+    model_exact = sum(1 for audit in audits if audit["model_exact_hit"])
+    penca_exact = sum(1 for audit in audits if audit["penca_exact_hit"])
+    model_result = sum(1 for audit in audits if audit["model_result_hit"])
+    penca_result = sum(1 for audit in audits if audit["penca_result_hit"])
+    calibration_cases = sum(1 for audit in audits if audit["needs_scoreline_calibration"])
+    avg_model_error = sum(float(audit["model_goal_error"]) for audit in audits) / total
+    avg_penca_error = sum(float(audit["penca_goal_error"]) for audit in audits) / total
+    recent_rows = "".join(
+        (
+            "<li>"
+            f"<strong>{html.escape(str(audit['title']))}</strong>"
+            f"<span>Final: {html.escape(str(audit['actual_score_with_teams']))}</span>"
+            f"<span>Modelo: {html.escape(str(audit['model_score_with_teams']))} ({float(audit['model_points']):.0f}/8)</span>"
+            f"<span>Penca: {html.escape(str(audit['penca_score_with_teams']))} ({float(audit['penca_points']):.0f}/8)</span>"
+            "</li>"
+        )
+        for audit in audits[-6:]
+    )
+    return (
+        "<section class=\"panel score-audit-panel\" id=\"auditoria-marcadores-finales\">"
+        "<div class=\"panel-head\"><div>"
+        "<p class=\"eyebrow\">Auditoría de marcadores finalizados</p>"
+        "<h2>La corrección aplica a cualquier marcador que falle, no solo a un 2-1.</h2>"
+        "<p class=\"lede-tight\">Cada final compara marcador real contra marcador más probable del modelo y marcador recomendado para Penca. Si difieren, entra al ledger de calibración de marcador para próximos cortes.</p>"
+        "</div></div>"
+        "<div class=\"score-dynamics-status\">"
+        f"<span>Finales auditados <strong>{total}</strong></span>"
+        f"<span>Exacto modelo <strong>{model_exact}/{total}</strong></span>"
+        f"<span>Exacto Penca <strong>{penca_exact}/{total}</strong></span>"
+        f"<span>Casos para calibrar <strong>{calibration_cases}</strong></span>"
+        "</div>"
+        "<div class=\"score-dynamics-grid\">"
+        f"<article class=\"score-dynamics-card\"><h3>Resultado correcto</h3><p>Modelo: {model_result}/{total} | Penca: {penca_result}/{total}. Si acierta ganador pero no exacto, no se ignora: baja precisión de marcador.</p></article>"
+        f"<article class=\"score-dynamics-card\"><h3>Error de goles</h3><p>Error medio por partido: modelo {avg_model_error:.2f} goles | Penca {avg_penca_error:.2f} goles.</p></article>"
+        "<article class=\"score-dynamics-card\"><h3>Uso correcto</h3><p>No se cambia el modelo por intuición; se acumulan desvíos y se recalibra solo con muestra y tests.</p></article>"
+        "</div>"
+        f"<ul class=\"score-audit-list\">{recent_rows}</ul>"
+        "</section>"
+    )
+
+
 def build_dashboard_html(
     entries: Sequence[dict],
     bracket_text: str,
@@ -13167,6 +13301,7 @@ def build_dashboard_html(
             )
         else:
             result_html = ""
+        score_audit_html = finalized_score_audit_html(entry, prediction)
         timezone_html = ""
         if "EDT" in str(status_text):
             timezone_html = (
@@ -13354,6 +13489,7 @@ def build_dashboard_html(
             f"<h3>{html.escape(entry['title'])}</h3>"
             f"<p class=\"meta\">{html.escape(entry['stage_label'])}</p>"
             f"{result_html}"
+            f"{score_audit_html}"
             f"{timezone_html}"
             f"{venue_html}"
             f"{minute_html}"
@@ -13404,6 +13540,7 @@ def build_dashboard_html(
     predictive_robustness_gate_html = build_predictive_robustness_gate_html(entries, bracket_payload, backtest)
     runtime_status_html = build_runtime_status_html(entries, bracket_payload)
     score_dynamics_html = build_score_dynamics_html(entries)
+    finalized_score_audit_html_panel = build_finalized_score_audit_panel_html(entries)
     championship_penca_html = build_championship_penca_optimizer_html(entries)
     methodology_html = build_methodology_html(bracket_payload, backtest, entries)
     methodology_governance_html = build_methodology_governance_html(entries, bracket_payload, backtest)
@@ -13441,6 +13578,7 @@ def build_dashboard_html(
             "predictive_robustness_gate_html": predictive_robustness_gate_html,
             "runtime_status_html": runtime_status_html,
             "score_dynamics_html": score_dynamics_html,
+            "finalized_score_audit_html": finalized_score_audit_html_panel,
             "championship_penca_html": championship_penca_html,
             "methodology_html": methodology_html,
             "methodology_governance_html": methodology_governance_html,

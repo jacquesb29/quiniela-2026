@@ -725,6 +725,7 @@ class RegressionLogicTest(unittest.TestCase):
         self.assertIn("Uso educativo y entretenimiento", template)
         self.assertIn("no garantiza ganar", template)
         self.assertIn("score_dynamics_html", template)
+        self.assertIn("finalized_score_audit_html", template)
         self.assertIn("championship_penca_html", template)
         self.assertIn("predictive_robustness_gate_html", template)
         self.assertIn("methodology_governance_html", template)
@@ -1084,6 +1085,88 @@ class RegressionLogicTest(unittest.TestCase):
         self.assertIn("Switzerland", html)
         self.assertIn("Filtro de plausibilidad", html)
 
+    def test_finalized_score_audit_flags_any_model_or_penca_mismatch(self):
+        prediction = app.MatchPrediction(
+            team_a="Spain",
+            team_b="Portugal",
+            expected_goals_a=1.35,
+            expected_goals_b=1.05,
+            win_a=0.45,
+            draw=0.28,
+            win_b=0.27,
+            exact_scores=[("1-1", 0.14), ("2-1", 0.10), ("2-0", 0.09)],
+            penca_scores=[
+                {
+                    "score": "2-0",
+                    "expected_points": 2.9,
+                    "exact_prob": 0.09,
+                    "difference_prob": 0.18,
+                    "result_prob": 0.45,
+                }
+            ],
+        )
+        entry = {
+            "title": "Spain vs Portugal",
+            "actual_score_a": 2,
+            "actual_score_b": 1,
+            "prediction": prediction,
+        }
+
+        audit = app.finalized_score_audit(entry, prediction)
+
+        self.assertIsNotNone(audit)
+        self.assertEqual(audit["actual_score"], "2-1")
+        self.assertEqual(audit["model_score"], "1-1")
+        self.assertEqual(audit["penca_score"], "2-0")
+        self.assertFalse(audit["model_exact_hit"])
+        self.assertFalse(audit["penca_exact_hit"])
+        self.assertFalse(audit["model_result_hit"])
+        self.assertTrue(audit["penca_result_hit"])
+        self.assertEqual(float(audit["model_points"]), 0.0)
+        self.assertEqual(float(audit["penca_points"]), 3.0)
+        self.assertTrue(audit["needs_scoreline_calibration"])
+
+    def test_finalized_score_audit_html_is_generic_not_a_manual_two_one_fix(self):
+        prediction = app.MatchPrediction(
+            team_a="Spain",
+            team_b="Portugal",
+            expected_goals_a=1.35,
+            expected_goals_b=1.05,
+            win_a=0.45,
+            draw=0.28,
+            win_b=0.27,
+            exact_scores=[("1-1", 0.14), ("2-1", 0.10), ("2-0", 0.09)],
+            penca_scores=[
+                {
+                    "score": "2-0",
+                    "expected_points": 2.9,
+                    "exact_prob": 0.09,
+                    "difference_prob": 0.18,
+                    "result_prob": 0.45,
+                }
+            ],
+        )
+        entry = {
+            "title": "Spain vs Portugal",
+            "actual_score_a": 2,
+            "actual_score_b": 1,
+            "prediction": prediction,
+            "projection": False,
+        }
+
+        card_html = app.finalized_score_audit_html(entry, prediction)
+        panel_html = app.build_finalized_score_audit_panel_html([entry])
+
+        self.assertIn("Auditoría del marcador finalizado", card_html)
+        self.assertIn("Final real: Spain 2 - 1 Portugal", card_html)
+        self.assertIn("Marcador más probable del modelo: Spain 1 - 1 Portugal", card_html)
+        self.assertIn("Marcador recomendado Penca: Spain 2 - 0 Portugal", card_html)
+        self.assertIn("no se corrige a mano solo porque haya terminado 2-1", card_html)
+        self.assertIn("La corrección aplica a cualquier marcador que falle", panel_html)
+        self.assertIn("Finales auditados", panel_html)
+        self.assertIn("Modelo: Spain 1 - 1 Portugal", panel_html)
+        self.assertIn("Penca: Spain 2 - 0 Portugal", panel_html)
+
     def test_predict_match_exposes_penca_ovacion_recommended_score(self):
         teams = app.load_teams()
         prediction = app.predict_match(teams, "Spain", "Saudi Arabia", app.MatchContext(neutral=True), top_scores=3)
@@ -1351,6 +1434,9 @@ class RegressionLogicTest(unittest.TestCase):
         self.assertIn("Penca:", html)
         self.assertIn("Marcadores dinámicos", html)
         self.assertIn("Los marcadores cambian a medida que avanza el campeonato", html)
+        self.assertIn("Auditoría de marcadores finalizados", html)
+        self.assertIn('<section class="panel score-audit-panel"', html)
+        self.assertNotIn("&lt;section class=&#34;panel score-audit-panel&#34;", html)
         self.assertIn("Modo campeonato", html)
         self.assertIn("No se promete 104/104 marcadores exactos", html)
         self.assertIn("Exactos realistas", html)
