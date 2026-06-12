@@ -10012,7 +10012,7 @@ def build_prediction_operating_system_html(
         "<div class=\"confidence-tiles operating-tiles\">"
         f"{card('Congelar modelo final pre-torneo', freeze_reading, f'{target_file}: {freeze_note}')}"
         f"{card('Re-simulación diaria', f'{min_iterations:,}+ / ideal {deep_iterations:,}'.replace(',', '.'), f'El corte actual publica {iterations:,} simulaciones; compara movimientos contra el snapshot anterior.'.replace(',', '.'))}"
-        f"{card('Calibración viva', f'{completed_matches} finales 2026', 'Brier/log-loss empiezan apenas haya resultados; antes de eso no se inventa track record.')}"
+        f"{card('Calibración viva', f'{completed_matches} finales 2026', f'Brier/log-loss ya miden el torneo real con {completed_matches} partido(s) cerrado(s); la lectura sigue siendo provisional hasta acumular muestra.' if completed_matches else 'Brier/log-loss empiezan apenas haya resultados; antes de eso no se inventa track record.')}"
         f"{card('No cambiar pesos durante el Mundial', 'Regla dura', str(payload.get('core_rule', 'Actualizar datos, no tocar metodología.')))}"
         "</div>"
         "<div class=\"certainty-grid operating-grid\">"
@@ -13263,6 +13263,7 @@ def build_dashboard_html(
             "bracket_visual_html": bracket_visual_html,
             "bracket_html": bracket_html,
             "cards_html": "".join(cards),
+            "backtest": backtest,
         }
     )
 

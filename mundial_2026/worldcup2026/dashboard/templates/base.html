@@ -166,8 +166,13 @@
         </article>
         <article>
           <span>Track record 2026</span>
+          {% if backtest and backtest.completed_matches %}
+          <strong>La calibración empírica 2026 ya está activa</strong>
+          <p>Ya hay {{ backtest.completed_matches }} partido(s) terminado(s): Brier/log-loss empiezan a medir el torneo real. La lectura sigue siendo provisional hasta acumular más muestra.</p>
+          {% else %}
           <strong>La calibración empírica arranca con el primer final</strong>
           <p>Antes del primer partido terminado, Brier/log-loss son controles listos, no evidencia histórica del torneo. Por eso se usan priors, consenso y desacuerdo entre modelos como frenos.</p>
+          {% endif %}
         </article>
         <article>
           <span>Uso correcto</span>
@@ -248,7 +253,11 @@
         </article>
         <article>
           <strong>Calibración viva</strong>
+          {% if backtest and backtest.completed_matches %}
+          <p>El Brier 2026 ya está activo con {{ backtest.completed_matches }} partido(s) finalizado(s). Se recalcula en cada refresh y debe leerse como muestra inicial, no como veredicto definitivo.</p>
+          {% else %}
           <p>El Brier 2026 empieza apenas haya un partido finalizado. Antes de eso, se usan priors, consenso, auditoría y desacuerdo entre modelos para evitar sobreconfianza.</p>
+          {% endif %}
         </article>
         <article>
           <strong>Lectura correcta</strong>
