@@ -4558,6 +4558,36 @@ def bracket_stage_team_probabilities(bracket_payload: dict, match_ids: Sequence[
     return {team: clamp(prob, 0.0, 1.0) for team, prob in totals.items()}
 
 
+def historical_breakthrough_index_for_team(team_name: str) -> float:
+    """Recent real-results signal for dark-horse review.
+
+    This intentionally reads only the audited historical aggregate file. It does
+    not use resource proxies, public popularity, or subjective manual boosts.
+    """
+    row = (historical_features_payload().get("teams") or {}).get(team_name) or {}
+    if not row:
+        return 0.0
+    weighted_matches = float(row.get("weighted_matches_since_start", 0.0) or 0.0)
+    competitive_matches = float(row.get("competitive_matches_since_start", 0.0) or 0.0)
+    if weighted_matches < 20.0 and competitive_matches < 20.0:
+        return 0.0
+    weighted_points = float(row.get("weighted_points_per_match", 1.25) or 1.25)
+    weighted_goal_diff = float(row.get("weighted_goal_diff_per_match", 0.0) or 0.0)
+    weighted_against = float(row.get("weighted_goals_against_per_match", 1.2) or 1.2)
+    competitive_index = float(row.get("competitive_index", 0.5) or 0.5)
+    points_index = clamp((weighted_points - 0.90) / 1.50, 0.0, 1.0)
+    goal_diff_index = clamp(0.50 + weighted_goal_diff / 2.20, 0.0, 1.0)
+    defense_index = clamp((1.35 - weighted_against) / 1.10, 0.0, 1.0)
+    return clamp(
+        0.36 * points_index
+        + 0.28 * goal_diff_index
+        + 0.22 * defense_index
+        + 0.14 * competitive_index,
+        0.0,
+        1.0,
+    )
+
+
 def dark_horse_candidates(bracket_payload: dict, entries: Optional[Sequence[dict]] = None) -> List[dict]:
     adjusted_rows = consensus_adjusted_champion_probabilities(bracket_payload, entries)
     if not adjusted_rows:
@@ -4599,12 +4629,17 @@ def dark_horse_candidates(bracket_payload: dict, entries: Optional[Sequence[dict
             tier = "Tapado de mayor varianza"
             action = "No sustituye la llave base; usarlo como alerta de sorpresa si la ruta y el live lo favorecen."
         external_weight = float((external or {}).get("signal_weight", 0.0) or 0.0)
+        historical_breakthrough = historical_breakthrough_index_for_team(team)
+        if historical_breakthrough >= 0.72 and external_weight >= 0.80 and quarterfinal_prob >= 0.045:
+            tier = "Tapado serio por antecedente reciente"
+            action = "Vigilar su rama como cobertura real: la señal reciente sostiene que puede incomodar favoritos si el cuadro se abre."
         watch_index = 100.0 * clamp(
-            0.34 * min(adjusted_prob / 0.07, 1.0)
-            + 0.26 * min(semifinal_prob / 0.18, 1.0)
-            + 0.16 * min(final_prob / 0.10, 1.0)
-            + 0.14 * min(quarterfinal_prob / 0.30, 1.0)
-            + 0.10 * external_weight,
+            0.30 * min(adjusted_prob / 0.07, 1.0)
+            + 0.23 * min(semifinal_prob / 0.18, 1.0)
+            + 0.15 * min(final_prob / 0.10, 1.0)
+            + 0.12 * min(quarterfinal_prob / 0.30, 1.0)
+            + 0.10 * external_weight
+            + 0.10 * historical_breakthrough,
             0.0,
             1.0,
         )
@@ -4614,10 +4649,11 @@ def dark_horse_candidates(bracket_payload: dict, entries: Optional[Sequence[dict
         ceiling_index = 0.55 * semifinal_prob + 0.45 * final_prob
         undervalued_edge = max(delta, adjusted_delta, 0.0)
         undervalued_score = 100.0 * clamp(
-            0.36 * min(undervalued_edge / 0.025, 1.0)
-            + 0.28 * min(path_index / 0.24, 1.0)
-            + 0.20 * min(ceiling_index / 0.16, 1.0)
-            + 0.16 * min(watch_index / 100.0, 1.0),
+            0.30 * min(undervalued_edge / 0.025, 1.0)
+            + 0.24 * min(path_index / 0.24, 1.0)
+            + 0.18 * min(ceiling_index / 0.16, 1.0)
+            + 0.14 * min(watch_index / 100.0, 1.0)
+            + 0.14 * historical_breakthrough,
             0.0,
             1.0,
         )
@@ -4653,6 +4689,7 @@ def dark_horse_candidates(bracket_payload: dict, entries: Optional[Sequence[dict
                 "final_prob": final_prob,
                 "path_index": path_index,
                 "ceiling_index": ceiling_index,
+                "historical_breakthrough_index": historical_breakthrough,
                 "undervalued_score": undervalued_score,
                 "undervalued_label": undervalued_label,
                 "undervalued_action": undervalued_action,
@@ -5148,7 +5185,12 @@ def dashboard_fixture_entries(
 def load_bracket_json(path: Path) -> dict:
     if not path.exists():
         return {}
-    return json.loads(path.read_text())
+    payload = json.loads(path.read_text())
+    if payload.get("matches") and "coherent_bracket_matches" in globals():
+        normalized = dict(payload)
+        normalized["matches"] = coherent_bracket_matches(payload)
+        return normalized
+    return payload
 
 
 def dashboard_entry_key(entry: dict) -> str:
@@ -11365,8 +11407,11 @@ def coherent_bracket_matches(bracket_payload: dict) -> Dict[str, dict]:
             if conditional_winners
             else float((matchup or match).get("winner_prob", match.get("winner_prob", 0.0)) or 0.0)
         )
+        advance_probabilities = match.get("advance_probabilities") or {}
         global_slot_winner = winner
-        global_slot_winner_prob = float(match.get("winner_prob", 0.0) or 0.0)
+        global_slot_winner_prob = float(
+            advance_probabilities.get(global_slot_winner, match.get("winner_prob", 0.0)) or 0.0
+        )
         winner = matchup_favorite
         loser = team_b if winner == team_a else team_a
         conditional_prob = matchup_favorite_prob

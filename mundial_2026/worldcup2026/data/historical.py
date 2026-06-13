@@ -221,6 +221,29 @@ def historical_snapshot(
         0.0,
         1.0,
     )
+    # Recent, real-match performance should matter when old World Cup records
+    # understate a current cycle. This uses only explicit historical aggregates
+    # from the 1950+ results file, not proxy resource or popularity signals.
+    weighted_points_per_match = float(row.get("weighted_points_per_match", proxy.weighted_points_per_match))
+    weighted_goal_diff_per_match = float(row.get("weighted_goal_diff_per_match", 0.0))
+    weighted_goals_against_per_match = float(row.get("weighted_goals_against_per_match", 1.2))
+    recent_points_index = clamp((weighted_points_per_match - 0.90) / 1.50, 0.0, 1.0)
+    recent_goal_diff_index = clamp(0.50 + weighted_goal_diff_per_match / 2.20, 0.0, 1.0)
+    recent_defense_index = clamp((1.35 - weighted_goals_against_per_match) / 1.10, 0.0, 1.0)
+    recent_breakthrough_index = clamp(
+        0.36 * recent_points_index
+        + 0.28 * recent_goal_diff_index
+        + 0.22 * recent_defense_index
+        + 0.14 * competitive_index,
+        0.0,
+        1.0,
+    )
+    if world_cup_matches >= 10 and weighted_matches >= 30.0 and recent_breakthrough_index > world_cup_index + 0.14:
+        world_cup_index = clamp(
+            world_cup_index + min(0.14, 0.35 * (recent_breakthrough_index - world_cup_index)),
+            0.0,
+            1.0,
+        )
     shootout_index = clamp(
         empirical_bayes_shrinkage(float(row.get("shootout_index", proxy.shootout_index)), shootout_matches, proxy.shootout_index, 5.0),
         0.0,
@@ -232,13 +255,13 @@ def historical_snapshot(
         matches_since_start=matches_since_start,
         weighted_matches_since_start=weighted_matches,
         points_per_match=float(row.get("points_per_match", proxy.points_per_match)),
-        weighted_points_per_match=float(row.get("weighted_points_per_match", proxy.weighted_points_per_match)),
+        weighted_points_per_match=weighted_points_per_match,
         goals_for_per_match=float(row.get("goals_for_per_match", 1.2)),
         goals_against_per_match=float(row.get("goals_against_per_match", 1.2)),
         goal_diff_per_match=float(row.get("goal_diff_per_match", 0.0)),
         weighted_goals_for_per_match=float(row.get("weighted_goals_for_per_match", 1.2)),
-        weighted_goals_against_per_match=float(row.get("weighted_goals_against_per_match", 1.2)),
-        weighted_goal_diff_per_match=float(row.get("weighted_goal_diff_per_match", 0.0)),
+        weighted_goals_against_per_match=weighted_goals_against_per_match,
+        weighted_goal_diff_per_match=weighted_goal_diff_per_match,
         scoring_rate=float(row.get("scoring_rate", 0.62)),
         clean_sheet_rate=float(row.get("clean_sheet_rate", 0.26)),
         competitive_matches_since_start=competitive_matches,
