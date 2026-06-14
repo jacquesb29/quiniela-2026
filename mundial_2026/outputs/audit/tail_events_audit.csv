@@ -1,0 +1,4 @@
+threshold,observed_rate,predicted_rate,abs_error,rel_error
+total>=4,0.282902,0.25412,0.028781,0.1017
+total>=5,0.156477,0.122202,0.034275,0.219
+total>=6,0.074093,0.052432,0.021661,0.2923

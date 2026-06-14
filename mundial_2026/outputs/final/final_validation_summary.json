@@ -1,0 +1,47 @@
+{
+  "generated_at_utc": "2026-06-14T23:01:47.805519+00:00",
+  "tests": {
+    "total": 281,
+    "result": "OK"
+  },
+  "phases": {
+    "F0_real_validation": {
+      "rc": 0,
+      "label": "validado"
+    },
+    "F1_market_t60": {
+      "rc": 0,
+      "status": "operativo"
+    },
+    "F2_5_staleness_gate": {
+      "rc": 0,
+      "decision": "keep_off"
+    },
+    "F3_audit": {
+      "rc": 0,
+      "suggested_priority": "colas",
+      "vale_la_pena_intervenir": true
+    },
+    "F4_2_tail_walkforward": {
+      "rc": 0,
+      "decision": "keep_off"
+    },
+    "F5_attribution": {
+      "rc": 0,
+      "decision": "no_clear_culprit"
+    }
+  },
+  "production_flags": {
+    "elo_staleness_enabled": false
+  },
+  "f6": "not_applicable_no_clear_culprit",
+  "active_in_production": [
+    "base_model",
+    "cache_reproducibility_fix",
+    "market_t60_overlay"
+  ],
+  "off": [
+    "elo_staleness",
+    "tail_reweight"
+  ]
+}

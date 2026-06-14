@@ -1,0 +1,2 @@
+n_folds,total_test_n,scheme,min_train,step,calibrated,model_brier,model_logloss,model_accuracy,model_exact_score_accuracy,penca_points_avg,penca_points_total,poisson_simple_brier,poisson_simple_logloss,beats_poisson_simple,elo_puro_brier,elo_puro_logloss,beats_elo_puro
+8,1520,expanding,400,200,False,0.19810797357619755,0.9950408803492171,0.5328947368421053,0.14078947368421052,2.5092105263157896,3814.0,0.20037003390756375,1.005860193665233,True,0.20032631077771534,1.0034737597662724,True

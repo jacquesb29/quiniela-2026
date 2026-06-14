@@ -97,6 +97,15 @@ class ModelHyperparameters:
     expected_goal_history_strength_weight: float = 0.08
     expected_goal_attack_edge_weight: float = 0.78
     knockout_favorite_share_shrink: float = 0.08
+    # --- F2.3 Elo staleness-aware (APAGADO por defecto; identidad con flag OFF) ---
+    # Estos campos NO los consume ningún cálculo del modelo todavía: el mecanismo
+    # vive en worldcup2026/ratings y solo se activaría tras el gate de validación.
+    # Priors conservadores, NO ajustados a resultados 2026.
+    elo_staleness_enabled: bool = False
+    elo_staleness_shrink_to_fifa_weight: float = 0.50   # w_fifa: peso base del shrink
+    elo_staleness_shrink_cap: float = 0.35              # fracción máxima de shrink
+    elo_staleness_min_score: float = 0.25               # no ajustar por debajo de este score
+    elo_staleness_warning_threshold: float = 0.55       # warning fuerte por encima
 
 
 PARAMS = ModelHyperparameters()

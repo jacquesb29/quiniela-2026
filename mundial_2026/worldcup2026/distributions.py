@@ -106,14 +106,17 @@ def score_distribution(
             PARAMS.low_score_draw_positive_cap,
         )
         draw_key = int(round(draw_signal * PARAMS.cache_rho_precision))
-    return cached_primary_score_distribution(
+    # Copia defensiva: el objeto cacheado nunca se expone a mutación in-place de
+    # un caller (reproducibilidad). Claves (tuplas) y valores (float) son
+    # inmutables, así que una copia superficial es segura y completa.
+    return dict(cached_primary_score_distribution(
         quantize_for_cache(mu_a),
         quantize_for_cache(mu_b),
         knockout_key,
         importance_key,
         draw_key,
         max_goals,
-    )
+    ))
 
 
 @lru_cache(maxsize=65536)
@@ -140,11 +143,14 @@ def cached_independent_score_distribution(
 
 
 def independent_score_distribution(mu_a: float, mu_b: float, max_goals: int = 10) -> Dict[Tuple[int, int], float]:
-    return cached_independent_score_distribution(
+    # Copia defensiva: este resultado lo mutan in-place algunos consumidores
+    # (Dixon-Coles de baja anotación). Devolver una copia impide que esa mutación
+    # contamine el dict cacheado y rompa el determinismo.
+    return dict(cached_independent_score_distribution(
         quantize_for_cache(mu_a),
         quantize_for_cache(mu_b),
         max_goals,
-    )
+    ))
 
 
 @lru_cache(maxsize=32768)
@@ -192,12 +198,13 @@ def overdispersed_score_distribution(
     max_goals: int = 10,
 ) -> Dict[Tuple[int, int], float]:
     alpha = overdispersion_alpha(mu_a, mu_b, ctx)
-    return cached_overdispersed_score_distribution(
+    # Copia defensiva del dict cacheado (reproducibilidad).
+    return dict(cached_overdispersed_score_distribution(
         quantize_for_cache(mu_a),
         quantize_for_cache(mu_b),
         int(round(alpha * 1000.0)),
         max_goals,
-    )
+    ))
 
 
 def _safe_sigmoid(value: float) -> float:
@@ -691,7 +698,7 @@ def build_model_stack(
 
 
 @lru_cache(maxsize=4096)
-def cached_low_score_distribution(
+def _cached_low_score_distribution_inner(
     mu_a_key: int,
     mu_b_key: int,
     rho_key: int,
@@ -700,6 +707,8 @@ def cached_low_score_distribution(
     mu_a = mu_a_key / 20.0
     mu_b = mu_b_key / 20.0
     rho = rho_key / 100.0
+    # `independent_score_distribution` ya devuelve una copia privada, así que
+    # mutar `base` aquí no afecta a ningún caché compartido.
     base = independent_score_distribution(mu_a, mu_b, max_goals=max_goals)
     total = 0.0
     for (goals_a, goals_b), prob in list(base.items()):
@@ -710,3 +719,14 @@ def cached_low_score_distribution(
         for key in list(base):
             base[key] /= total
     return base
+
+
+def cached_low_score_distribution(
+    mu_a_key: int,
+    mu_b_key: int,
+    rho_key: int,
+    max_goals: int,
+) -> Dict[Tuple[int, int], float]:
+    # Wrapper externo: copia defensiva para no exponer el dict cacheado interno a
+    # mutación in-place de un caller. Mantiene el nombre público estable.
+    return dict(_cached_low_score_distribution_inner(mu_a_key, mu_b_key, rho_key, max_goals))

@@ -1,0 +1,10 @@
+section,model,n,logloss,brier,accuracy,exact_score_accuracy,penca_points_avg,penca_points_total
+model,baseline,1520,0.9950408803492171,0.19810797357619755,0.5328947368421053,0.14078947368421052,2.5092105263157896,3814.0
+model,staleness_experimental,1520,0.9950408803492171,0.19810797357619755,0.5328947368421053,0.14078947368421052,2.5092105263157896,3814.0
+model,poisson_simple,1520,1.005860193665233,0.20037003390756375,,,,
+model,elo_puro,1520,1.0034737597662724,0.20032631077771534,,,,
+
+section,bucket,n,logloss,brier,penca_points_avg,note
+bucket,alto,0,,,,sin partidos en este bucket (histórico)
+bucket,medio,0,,,,sin partidos en este bucket (histórico)
+bucket,bajo,1930,0.9950408803492171,0.19810797357619755,2.5092105263157896,histórico sin FIFA: todos los partidos caen en 'bajo'

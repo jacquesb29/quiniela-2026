@@ -1,0 +1,49 @@
+team,elo,fifa_points,fifa_rank,fifa_implied_elo,elo_vs_fifa_gap,last_match_age_days,recent_coverage,recent_coverage_6m,recent_coverage_12m,official_matches_12m,friendly_matches_12m,anomalous_jump,anomalous_elo_jump,activity_warning,elo_staleness_score,recommended_action,warnings
+Algeria,1674.0,1560.91,28,1759.659,-85.659,2,20,15,20,13,7,15.362,15.362,,0.3426,shrink_fifa,discrepancia moderada Elo vs FIFA
+Argentina,2113.0,1873.33,2,2111.034,1.966,2,9,5,9,4,5,18.148,18.148,,0.0454,elo_domina,
+Australia,1774.0,1574.01,27,1774.393,-0.393,2,10,6,10,6,4,15.396,15.396,,0.0091,elo_domina,
+Austria,1818.0,1585.51,24,1787.327,30.673,2,10,6,10,8,2,17.009,17.009,,0.1227,elo_domina,
+Belgium,1849.0,1730.71,9,1950.631,-101.631,2,10,6,10,8,2,10.941,10.941,,0.4065,shrink_fifa,discrepancia moderada Elo vs FIFA
+Bosnia and Herzegovina,1571.0,1362.37,71,1536.364,34.636,2,10,6,10,8,2,14.931,14.931,,0.1385,elo_domina,
+Brazil,1978.0,1760.46,5,1984.09,-6.09,2,10,6,10,5,5,21.314,21.314,,0.0431,elo_domina,
+Canada,1806.0,1559.15,29,1757.68,48.32,2,14,6,14,6,8,12.244,12.244,,0.1933,elo_domina,
+Cape Verde,1561.0,1370.49,67,1545.497,15.503,3,11,6,11,8,3,14.406,14.406,,0.062,elo_domina,
+Colombia,1998.0,1701.3,14,1917.554,80.446,4,10,6,10,4,6,13.983,13.983,,0.3518,shrink_fifa,discrepancia moderada Elo vs FIFA
+Croatia,1932.0,1716.88,11,1935.077,-3.077,2,10,6,10,8,2,13.983,13.983,,0.0123,elo_domina,
+Curacao,1467.0,1302.7,81,1469.254,-2.254,,,,,,,,,,0.015,elo_domina,sin actividad reciente (no se cargó historial)
+Czech Republic,1731.0,1487.0,43,1676.534,54.466,2,10,6,10,8,2,21.586,21.586,,0.2179,elo_domina,
+Dem. Rep. of Congo,1639.0,1468.22,48,1655.412,-16.412,,,,,,,,,,0.1094,elo_domina,sin actividad reciente (no se cargó historial)
+Ecuador,1933.0,1591.73,23,1794.322,138.678,2,10,6,10,4,6,18.148,18.148,,0.5847,shrink_fifa,discrepancia fuerte Elo vs FIFA (warning fuerte)
+Egypt,1660.0,1556.71,31,1754.936,-94.936,2,18,16,18,16,2,14.358,14.358,,0.3797,shrink_fifa,discrepancia moderada Elo vs FIFA
+England,2042.0,1834.12,4,2066.935,-24.935,2,10,6,10,6,4,16.899,16.899,,0.1072,elo_domina,
+France,2063.0,1870.0,3,2107.288,-44.288,4,10,6,10,8,2,10.713,10.713,,0.1772,elo_domina,
+Germany,1910.0,1724.15,10,1943.253,-33.253,3,10,6,10,8,2,19.297,19.297,,0.133,elo_domina,
+Ghana,1509.0,1351.09,72,1523.678,-14.678,3,10,6,10,7,3,14.931,14.931,,0.0587,elo_domina,
+Haiti,1542.0,1294.49,83,1460.021,81.979,2,13,6,13,11,2,16.457,16.457,,0.3279,shrink_fifa,discrepancia moderada Elo vs FIFA
+Iran,1754.0,1617.02,20,1822.765,-68.765,2,8,6,8,4,4,18.254,18.254,,0.3201,shrink_fifa,discrepancia moderada Elo vs FIFA
+Iraq,1583.0,1436.94,58,1620.232,-37.232,2,13,9,13,13,0,13.465,13.465,,0.1489,elo_domina,
+Ivory Coast,1637.0,1522.48,37,1716.438,-79.438,2,15,11,15,11,4,16.395,16.395,,0.3178,shrink_fifa,discrepancia moderada Elo vs FIFA
+Japan,1878.0,1650.12,19,1859.993,18.007,2,10,6,10,6,4,15.475,15.475,,0.0795,elo_domina,
+Jordan,1691.0,1388.93,64,1566.236,124.764,2,17,12,17,8,9,14.358,14.358,,0.4991,shrink_fifa,discrepancia moderada Elo vs FIFA
+Mexico,1853.0,1675.75,16,1888.818,-35.818,2,19,9,19,6,13,14.56,14.56,,0.1433,elo_domina,
+Morocco,1806.0,1736.57,8,1957.222,-151.222,2,23,19,23,16,7,10.614,10.614,,0.6,shrink_fifa,discrepancia fuerte Elo vs FIFA (warning fuerte)
+Netherlands,1959.0,1756.27,7,1979.378,-20.378,2,10,6,10,8,2,8.522,8.522,,0.0815,elo_domina,
+New Zealand,1586.0,1279.25,85,1442.88,143.12,3,10,6,10,6,4,15.792,15.792,,0.58,shrink_fifa,discrepancia fuerte Elo vs FIFA (warning fuerte)
+Norway,1922.0,1553.14,32,1750.921,171.079,2,10,6,10,6,4,16.621,16.621,,0.6075,shrink_fifa,discrepancia fuerte Elo vs FIFA (warning fuerte)
+Panama,1733.0,1539.47,33,1735.546,-2.546,2,16,8,16,12,4,9.783,9.783,,0.0102,elo_domina,
+Paraguay,1833.0,1501.5,40,1692.842,140.158,2,10,6,10,5,5,15.64,15.64,,0.5794,shrink_fifa,discrepancia fuerte Elo vs FIFA (warning fuerte)
+Portugal,1976.0,1760.38,6,1984.0,-8.0,2,10,6,10,8,2,20.174,20.174,,0.032,elo_domina,
+Qatar,1427.0,1454.96,56,1640.499,-213.499,116,11,6,11,7,4,18.73,18.73,,0.6,shrink_fifa,discrepancia fuerte Elo vs FIFA (warning fuerte)
+Saudi Arabia,1593.0,1429.48,61,1611.842,-18.842,2,20,11,20,13,7,13.444,13.444,,0.0754,elo_domina,
+Scotland,1790.0,1506.77,38,1698.769,91.231,2,10,6,10,6,4,16.691,16.691,,0.3724,shrink_fifa,discrepancia moderada Elo vs FIFA
+Senegal,1869.0,1706.83,12,1923.773,-54.773,2,17,13,17,11,6,16.899,16.899,,0.2191,elo_domina,
+South Africa,1529.0,1432.76,60,1615.531,-86.531,2,13,9,13,8,5,12.023,12.023,,0.3461,shrink_fifa,discrepancia moderada Elo vs FIFA
+South Korea,1784.0,1599.45,22,1803.005,-19.005,2,10,6,10,2,8,16.395,16.395,,0.1285,elo_domina,
+Spain,2171.0,1877.18,1,2115.364,55.636,2,10,6,10,8,2,10.046,10.046,,0.2225,elo_domina,
+Sweden,1660.0,1487.13,42,1676.68,-16.68,2,10,6,10,8,2,17.333,17.333,,0.0667,elo_domina,
+Switzerland,1897.0,1654.69,18,1865.132,31.868,2,10,6,10,6,4,12.465,12.465,,0.135,elo_domina,
+Tunisia,1614.0,1479.04,47,1667.581,-53.581,2,18,14,18,11,7,17.981,17.981,,0.2143,elo_domina,
+Turkey,1880.0,1582.69,25,1784.155,95.845,2,10,6,10,8,2,12.048,12.048,,0.3834,shrink_fifa,discrepancia moderada Elo vs FIFA
+United States,1747.0,1681.88,15,1895.713,-148.713,2,16,6,16,6,10,15.475,15.475,,0.5949,shrink_fifa,discrepancia fuerte Elo vs FIFA (warning fuerte)
+Uruguay,1890.0,1672.62,17,1885.298,4.702,2,10,6,10,4,6,15.64,15.64,,0.0488,elo_domina,
+Uzbekistan,1728.0,1462.03,52,1648.45,79.55,3,9,7,9,6,3,11.819,11.819,,0.3332,shrink_fifa,discrepancia moderada Elo vs FIFA

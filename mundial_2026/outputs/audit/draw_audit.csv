@@ -1,0 +1,6 @@
+bucket,n,observed_draw_rate,predicted_draw_rate,error,reliability_gap,verdict
+global,1930,0.243523,0.24634,0.002817,0.002817,calibrado
+parejo,444,0.277027,0.281477,0.00445,0.00445,calibrado
+favorito_leve,604,0.266556,0.267732,0.001175,0.001175,calibrado
+favorito_medio,560,0.214286,0.235969,0.021683,0.021683,sobreestima_empates
+favorito_fuerte,322,0.204969,0.175801,-0.029168,0.029168,subestima_empates

@@ -1,0 +1,8 @@
+component_id,layer,n_folds,mean_delta_tail4,mean_delta_tail5,mean_delta_tail6,mean_delta_logloss,mean_delta_penca,mean_delta_draw_error,mean_delta_goal_bias
+mu_total,mu,8,0.020786,0.009867,0.001011,0.000956,0.022173,0.004245,0.135686
+mu_clamp,mu,8,0.059838,0.033086,0.017172,0.003175,0.024349,0.013133,0.32156
+dixon_coles,ensemble,8,0.000387,0.000411,-0.000376,7.4e-05,0.031931,0.000915,-0.00043
+bivariate,ensemble,8,-0.000732,0.000433,0.00057,5.4e-05,0.000408,0.001334,-2.8e-05
+overdispersed,ensemble,8,0.000159,0.000178,-0.000166,-8e-06,0.003141,0.000119,0.000142
+reshape,shape,8,-0.000557,-8.4e-05,5.5e-05,0.0,0.010053,0.0,-0.004424
+penca_penalties,selector,8,0.0,0.0,0.0,0.0,0.0,0.0,0.0

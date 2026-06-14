@@ -1,0 +1,6 @@
+match_id,captured_at_utc,odds_updated,odds_snapshot_type,lineup_confirmed,lineup_changes,injuries_confirmed,starting_gk,gk_changed,relevant_changes,recompute_done
+20260612_Mexico_vs_South_Africa,2026-06-12T18:05:00Z,True,t60,True,1,,Guillermo Ochoa,False,gap_strong,True
+20260613_Brazil_vs_Morocco,2026-06-13T15:05:00Z,True,t60,True,0,,Alisson,False,none,True
+20260614_United_States_vs_Paraguay,2026-06-14T18:40:00Z,True,opening,True,2,,Matt Turner,False,market_contradiction,True
+20260612_Canada_vs_Bosnia_and_Herzegovina,2026-06-12T15:05:00Z,False,t60,False,0,,,False,none,False
+20260615_Australia_vs_Turkey,2026-06-15T18:05:00Z,False,,True,1,,Mathew Ryan,False,none,False

@@ -1,0 +1,8 @@
+rank,component_id,fraction_folds_close_gap,mean_tail5_recovery,consistency,mean_delta_logloss,mean_delta_brier,mean_delta_penca,mean_delta_draw_error,collateral_score,culpability_score,verdict
+1,reshape,0.625,8.4e-05,0.0,0.0,0.0,0.010053,0.0,0.0,0.0,culpable_probable
+2,penca_penalties,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,no_concluyente
+3,overdispersed,0.375,-0.000178,0.0,-8e-06,-2e-06,0.003141,0.000119,0.0119,-1.186e-05,no_concluyente
+4,dixon_coles,0.375,-0.000411,0.0,7.4e-05,2.2e-05,0.031931,0.000915,0.1398,-0.00013979,no_concluyente
+5,bivariate,0.375,-0.000433,0.0,5.4e-05,2.6e-05,0.000408,0.001334,0.1735,-0.00017351,no_concluyente
+6,mu_total,0.25,-0.009867,0.0,0.000956,0.00021,0.022173,0.004245,1.0077,-0.00100766,no_concluyente
+7,mu_clamp,0.125,-0.033086,0.2416,0.003175,0.000652,0.024349,0.013133,3.2268,-0.00322676,no_concluyente

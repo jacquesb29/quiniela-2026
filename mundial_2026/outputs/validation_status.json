@@ -1,0 +1,107 @@
+{
+  "verdict": {
+    "label": "validado",
+    "reason": "supera benchmarks comparables fuera de muestra con n=1520 y sin advertencia de leakage",
+    "n": 1520,
+    "beats_baselines": true,
+    "out_of_sample": true,
+    "leakage_warning": false
+  },
+  "model_summary": {
+    "matches": 1930,
+    "brier_score": 0.1973429339931665,
+    "log_loss": 0.9944440476838784,
+    "accuracy_1x2": 0.5409326424870466
+  },
+  "walk_forward": {
+    "n_folds": 8,
+    "total_test_n": 1520,
+    "scheme": "expanding",
+    "min_train": 400,
+    "step": 200,
+    "calibrated": false,
+    "model_brier": 0.19810797357619755,
+    "model_logloss": 0.9950408803492171,
+    "model_accuracy": 0.5328947368421053,
+    "model_exact_score_accuracy": 0.14078947368421052,
+    "penca_points_avg": 2.5092105263157896,
+    "penca_points_total": 3814.0,
+    "poisson_simple_brier": 0.20037003390756375,
+    "poisson_simple_logloss": 1.005860193665233,
+    "beats_poisson_simple": true,
+    "elo_puro_brier": 0.20032631077771534,
+    "elo_puro_logloss": 1.0034737597662724,
+    "beats_elo_puro": true
+  },
+  "elo_leakage_audit": {
+    "code_audit_walk_forward": true,
+    "n_compared": 1930,
+    "pearson_elo_a": 0.9999999999979956,
+    "pearson_elo_b": 0.9999999999978766,
+    "mean_abs_delta": 0.0002509396324318838,
+    "max_abs_delta": 0.0004999487916848011,
+    "corr_threshold": 0.99,
+    "max_abs_delta_threshold": 5.0,
+    "leakage_warning": false
+  },
+  "elo_backtest_compare": {
+    "model_original_logloss": 0.9944440476838784,
+    "model_rederived_logloss": 0.9944440476838784,
+    "model_rederived_brier": 0.1973429339931665,
+    "poisson_rederived_logloss": 1.0005756858384827,
+    "elo_puro_rederived_logloss": 1.0038472968239063,
+    "model_beats_poisson_rederived": true,
+    "model_beats_elo_rederived": true,
+    "logloss_shift_vs_original": 0.0,
+    "backtest_stable": true
+  },
+  "market_coverage": {
+    "n_total_matches": 1930,
+    "n_with_market": 0,
+    "market_coverage_pct": 0.0,
+    "has_market_sample": false
+  },
+  "paired_comparison": [
+    {
+      "baseline": "poisson_simple",
+      "n_paired": 1930,
+      "model_brier": 0.1973429339931665,
+      "baseline_brier": 0.1990659654865933,
+      "delta_brier": -0.0017230314934268132,
+      "model_logloss": 0.9944440476838784,
+      "baseline_logloss": 1.0005756858384827,
+      "delta_logloss": -0.006131638154604269,
+      "beats": true,
+      "comparison_status": "medido_superado"
+    },
+    {
+      "baseline": "elo_puro",
+      "n_paired": 1930,
+      "model_brier": 0.1973429339931665,
+      "baseline_brier": 0.19995181914933,
+      "delta_brier": -0.002608885156163504,
+      "model_logloss": 0.9944440476838784,
+      "baseline_logloss": 1.0038472968239058,
+      "delta_logloss": -0.009403249140027437,
+      "beats": true,
+      "comparison_status": "medido_superado"
+    },
+    {
+      "baseline": "mercado_puro",
+      "n_paired": 0,
+      "model_brier": "",
+      "baseline_brier": "",
+      "delta_brier": "",
+      "model_logloss": "",
+      "baseline_logloss": "",
+      "delta_logloss": "",
+      "beats": "",
+      "comparison_status": "sin_muestra"
+    }
+  ],
+  "known_issues": [
+    "RESUELTO: bug de caché mutable en worldcup2026/distributions.py (los wrappers de distribución devolvían el dict cacheado y se mutaba in-place). Corregido con copia defensiva; predict_match es determinista.",
+    "F0.4 walk-forward implementado: el veredicto usa métricas out-of-sample.",
+    "RESUELTO: F0.4b auditó elo_*_pre. La re-derivación walk-forward independiente reproduce el Elo almacenado y el backtest es estable, por lo que leakage_warning=False."
+  ]
+}

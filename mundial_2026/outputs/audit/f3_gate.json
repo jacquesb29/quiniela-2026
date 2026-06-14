@@ -1,0 +1,17 @@
+{
+  "n": 1930,
+  "sample_ok": true,
+  "subestima_empates": false,
+  "sobreestima_favoritos": false,
+  "goles_mal_calibrados": false,
+  "subestima_colas": true,
+  "optimismo_penca": false,
+  "vale_la_pena_intervenir": true,
+  "suggested_priority": "colas",
+  "draw_error_global": -0.002817,
+  "fav_overconfidence": 0.001817,
+  "total_goals_bias": -0.187485,
+  "score_tv_distance": 0.054073,
+  "max_tail_underprediction": 0.034275,
+  "penca_gap_global": 0.018194
+}

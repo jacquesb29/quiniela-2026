@@ -1,0 +1,6 @@
+match_id,captured_at_utc,lineup_confirmed,lineup_changes,injuries_confirmed,starting_gk,gk_changed,notes
+20260612_Mexico_vs_South_Africa,2026-06-12T18:05:00Z,true,1,,Guillermo Ochoa,false,XI confirmado sin sorpresas
+20260613_Brazil_vs_Morocco,2026-06-13T15:05:00Z,true,0,,Alisson,false,XI confirmado
+20260614_United_States_vs_Paraguay,2026-06-14T18:40:00Z,true,2,,Matt Turner,false,XI confirmado
+20260612_Canada_vs_Bosnia_and_Herzegovina,2026-06-12T15:05:00Z,false,0,,,false,sin alineacion ni mercado 1X2
+20260615_Australia_vs_Turkey,2026-06-15T18:05:00Z,true,1,,Mathew Ryan,false,solo hay odds closing (no usable)

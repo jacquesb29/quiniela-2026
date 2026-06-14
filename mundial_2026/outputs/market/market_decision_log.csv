@@ -1,0 +1,5 @@
+match_id,model_pick,market_pick,final_pick,action,confidence_label,contradiction_severity,gap_1x2_total_variation,contradicts_market,reason,source_status
+20260612_Mexico_vs_South_Africa,home,home,home,shade_to_market,Baja,strong,0.16195801187725076,False,"gap fuerte con mismo ganador y sin razón trazable: acercarse al mercado; final_pick sigue siendo el del modelo por ahora, confianza Baja",mercado_disponible
+20260613_Brazil_vs_Morocco,home,home,home,keep_pick,Media,mild,0.08479094155206883,False,"gap moderado con mismo ganador: se conserva el pick del modelo, confianza máxima Media",mercado_disponible
+20260614_United_States_vs_Paraguay,away,home,home,follow_market,Baja,strong,0.2667013649969143,True,contradicción de ganador: modelo=away vs mercado=home (severidad strong); se recomienda seguir al mercado,mercado_disponible
+20260612_Canada_vs_Bosnia_and_Herzegovina,home,,home,no_market_available,Media,none,,False,sin mercado suficiente: se mantiene el pick del modelo; confianza acotada (no Alta),sin_mercado
