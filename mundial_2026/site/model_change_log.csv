@@ -1,0 +1,2 @@
+timestamp_utc,file_modified,reason,metric_before,metric_after,passed_backtest,allowed_during_tournament
+2026-06-13T21:55:51+00:00,modelo_quiniela_2026.py,"auditoria estricta, tabla completa de valor de marcadores y guardrails Penca; no cambia pesos ni parchea resultados pasados",sin scoreline_value_table.csv ni gating de ablation matches=0,"scoreline_value_table.csv, pick_decision_log.csv y ablation/benchmark gating estrictos publicados","no aplica: cambio de trazabilidad/salida, no ajuste predictivo",si: no modifica metodologia ni pesos

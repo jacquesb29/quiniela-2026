@@ -1,0 +1,4 @@
+title,audit_basis,actual_score,model_score,penca_score,model_points,penca_points,model_result_hit,penca_result_hit,model_exact_hit,penca_exact_hit,status
+Mexico vs South Africa,recalculado_con_regla_actual,2-0,2-0,2-0,8.0,8.0,True,True,True,True,
+South Korea vs Czech Republic,recalculado_con_regla_actual,2-1,1-1,1-0,0.0,5.0,False,True,False,False,
+Canada vs Bosnia and Herzegovina,recalculado_con_regla_actual,1-1,2-0,1-0,0.0,0.0,False,False,False,False,

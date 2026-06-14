@@ -1,0 +1,2 @@
+matches,accuracy_1x2,brier_score,log_loss,ranked_probability_score,mae_goals_a,mae_goals_b,mae_total_goals,phase
+1930,0.5409326424870466,0.19995181914933,1.0038472968239058,0.2062373781777776,1.0562840184759257,0.8818672365324286,1.9381512550083544,unknown_stage_from_source

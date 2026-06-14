@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import csv
 import json
 import sys
 import tempfile
@@ -395,6 +396,62 @@ class QuinielaAuditIntegrityTest(unittest.TestCase):
                 ),
                 [],
             )
+
+    def test_scoreline_value_export_marks_penca_as_max_expected_points(self):
+        prediction = app.MatchPrediction(
+            team_a="Team A",
+            team_b="Team B",
+            expected_goals_a=1.35,
+            expected_goals_b=0.85,
+            win_a=0.52,
+            draw=0.27,
+            win_b=0.21,
+            exact_scores=[("1-0", 0.22), ("1-1", 0.20)],
+            score_distribution={
+                (0, 0): 0.16,
+                (1, 0): 0.22,
+                (1, 1): 0.20,
+                (2, 0): 0.19,
+                (2, 1): 0.15,
+                (0, 1): 0.08,
+            },
+        )
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            output_dir = Path(tmpdir)
+            app.export_penca_decision_tables([{"title": "Team A vs Team B", "prediction": prediction}], output_dir)
+
+            with (output_dir / "scoreline_value_table.csv").open(newline="", encoding="utf-8") as handle:
+                value_rows = list(csv.DictReader(handle))
+            with (output_dir / "pick_decision_log.csv").open(newline="", encoding="utf-8") as handle:
+                decision_rows = list(csv.DictReader(handle))
+
+        grid_rows = [row for row in value_rows if row["score"] != "7+ / otro"]
+        probability_mass = sum(float(row["prob_scoreline"] or 0.0) for row in grid_rows)
+        selected_rows = [row for row in grid_rows if row["selected_by_penca"] == "True"]
+        max_expected_points = max(float(row["expected_points_8_5_3"] or 0.0) for row in grid_rows)
+
+        self.assertAlmostEqual(probability_mass, 1.0, places=9)
+        self.assertEqual(len(selected_rows), 1)
+        self.assertEqual(int(selected_rows[0]["rank_by_expected_points"]), 1)
+        self.assertAlmostEqual(float(selected_rows[0]["expected_points_8_5_3"]), max_expected_points, places=9)
+        self.assertEqual(decision_rows[0]["penca_score"], selected_rows[0]["score"])
+
+    def test_ablation_with_zero_matches_is_not_valid_evidence(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            output_dir = Path(tmpdir)
+            with (output_dir / "ablation_results.csv").open("w", newline="", encoding="utf-8") as handle:
+                writer = csv.DictWriter(handle, fieldnames=["variant", "matches", "brier_score", "log_loss"])
+                writer.writeheader()
+                writer.writerow({"variant": "sin_mercado", "matches": "0", "brier_score": "", "log_loss": ""})
+                writer.writerow({"variant": "sin_elo", "matches": "12", "brier_score": "0.22", "log_loss": "1.10"})
+
+            evidence = app._quality_ablation_evidence(output_dir)
+
+        self.assertEqual(evidence["total"], 2)
+        self.assertEqual(evidence["valid"], 1)
+        self.assertEqual(evidence["invalid"], 1)
+        self.assertEqual(evidence["min_matches"], 12.0)
 
 
 if __name__ == "__main__":

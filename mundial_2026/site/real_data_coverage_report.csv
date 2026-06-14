@@ -1,0 +1,11 @@
+metric,value,note
+generated_at_utc,2026-06-07T16:27:11.032777+00:00,Reporte de cobertura de datos reales.
+source_url,https://github.com/martj42/international_results,Dataset publico usado para resultados historicos.
+source_raw_url,https://raw.githubusercontent.com/martj42/international_results/master/results.csv,CSV descargado a data/international_results_raw.csv.
+source_rows,49411,Total de partidos en el dataset fuente.
+selected_rows,1930,"Mundiales, Euro y Copa America desde 1950 incluidos en historical_matches.csv."
+real_pre_match_fields_available,"date,teams,score,neutral,city,country,elo_pre,historical_strength_pre",Elo/historial son features calculadas solo con resultados previos; no usan futuro.
+real_pre_match_fields_missing,"fifa_rank_pre,market_prob_pre,squad_quality_pre,exact_stage_or_knockout",Se dejan vacios para no usar proxies ni datos inventados.
+competition_rows:Copa América,631,Filas incluidas para backtesting real.
+competition_rows:FIFA World Cup,911,Filas incluidas para backtesting real.
+competition_rows:UEFA Euro,388,Filas incluidas para backtesting real.

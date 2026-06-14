@@ -29,7 +29,12 @@ for artifact in \
   calibration_report.csv \
   calibrated_predictions.csv \
   calibration_bins.csv \
-  ablation_results.csv
+  ablation_results.csv \
+  scoreline_value_table.csv \
+  pick_decision_log.csv \
+  finished_match_audit.csv \
+  market_model_gap.csv \
+  model_change_log.csv
 do
   if [[ -f "$SCRIPT_DIR/outputs/real_backtest/$artifact" ]]; then
     cp "$SCRIPT_DIR/outputs/real_backtest/$artifact" "$SITE_DIR/$artifact"
@@ -37,6 +42,13 @@ do
     cp "$SCRIPT_DIR/outputs/$artifact" "$SITE_DIR/$artifact"
   elif [[ -f "$SCRIPT_DIR/$artifact" ]]; then
     cp "$SCRIPT_DIR/$artifact" "$SITE_DIR/$artifact"
+  fi
+done
+
+for doc_artifact in MODEL_AUDIT.md VALIDATION_GATE.md ASSUMPTIONS.md
+do
+  if [[ -f "$SCRIPT_DIR/$doc_artifact" ]]; then
+    cp "$SCRIPT_DIR/$doc_artifact" "$SITE_DIR/$doc_artifact"
   fi
 done
 

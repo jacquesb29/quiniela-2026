@@ -1,0 +1,105 @@
+match_id,title,team_a,team_b,model_prob_a,model_prob_draw,model_prob_b,market_prob_a,market_prob_draw,market_prob_b,market_total_goals,market_handicap,gap_status
+,Mexico vs South Africa,Mexico,South Africa,0.7704348778,0.1730628577,0.0565022644,,,,,,sin mercado confiable prepartido; no acercar pick sin fuente
+,South Korea vs Czech Republic,South Korea,Czech Republic,0.4182140378,0.3012948157,0.2804911465,,,,,,sin mercado confiable prepartido; no acercar pick sin fuente
+,Canada vs Bosnia and Herzegovina,Canada,Bosnia and Herzegovina,0.6491593194,0.2301887591,0.1206519215,,,,,,sin mercado confiable prepartido; no acercar pick sin fuente
+,United States vs Paraguay,United States,Paraguay,0.3872739345,0.2996587229,0.3130673425,,,,,,sin mercado confiable prepartido; no acercar pick sin fuente
+,Qatar vs Switzerland,Qatar,Switzerland,0.0309985203,0.1270118162,0.8419896635,,,,,,sin mercado confiable prepartido; no acercar pick sin fuente
+,Brazil vs Morocco,Brazil,Morocco,0.6601384117,0.2262454081,0.1136161802,,,,,,sin mercado confiable prepartido; no acercar pick sin fuente
+,Haiti vs Scotland,Haiti,Scotland,0.0935011057,0.2022398949,0.7042589994,,,,,,sin mercado confiable prepartido; no acercar pick sin fuente
+,Australia vs Turkey,Australia,Turkey,0.1738305178,0.2591601935,0.5670092886,,,,,,sin mercado confiable prepartido; no acercar pick sin fuente
+,Germany vs Curacao,Germany,Curacao,0.9234926985,0.0603808232,0.0161264782,,,,,,sin mercado confiable prepartido; no acercar pick sin fuente
+,Netherlands vs Japan,Netherlands,Japan,0.5203150198,0.2724349546,0.2072500256,,,,,,sin mercado confiable prepartido; no acercar pick sin fuente
+,Ivory Coast vs Ecuador,Ivory Coast,Ecuador,0.1406264554,0.2981027847,0.5612707599,,,,,,sin mercado confiable prepartido; no acercar pick sin fuente
+,Sweden vs Tunisia,Sweden,Tunisia,0.4901001617,0.2852730991,0.2246267392,,,,,,sin mercado confiable prepartido; no acercar pick sin fuente
+,Spain vs Cape Verde,Spain,Cape Verde,0.9054298179,0.0771115185,0.0174586636,,,,,,sin mercado confiable prepartido; no acercar pick sin fuente
+,Belgium vs Egypt,Belgium,Egypt,0.6612789099,0.2238596979,0.1148613921,,,,,,sin mercado confiable prepartido; no acercar pick sin fuente
+,Saudi Arabia vs Uruguay,Saudi Arabia,Uruguay,0.0673833350,0.1822421779,0.7503744871,,,,,,sin mercado confiable prepartido; no acercar pick sin fuente
+,Iran vs New Zealand,Iran,New Zealand,0.6234090700,0.2428586466,0.1337322834,,,,,,sin mercado confiable prepartido; no acercar pick sin fuente
+,France vs Senegal,France,Senegal,0.7032904789,0.2049388963,0.0917706248,,,,,,sin mercado confiable prepartido; no acercar pick sin fuente
+,Iraq vs Norway,Iraq,Norway,0.0404865495,0.1417403349,0.8177731156,,,,,,sin mercado confiable prepartido; no acercar pick sin fuente
+,Argentina vs Algeria,Argentina,Algeria,0.7974835799,0.1576530625,0.0448633576,,,,,,sin mercado confiable prepartido; no acercar pick sin fuente
+,Austria vs Jordan,Austria,Jordan,0.6893550542,0.2075869712,0.1030579747,,,,,,sin mercado confiable prepartido; no acercar pick sin fuente
+,Portugal vs Dem. Rep. of Congo,Portugal,Dem. Rep. of Congo,0.8097891168,0.1480805763,0.0421303069,,,,,,sin mercado confiable prepartido; no acercar pick sin fuente
+,England vs Croatia,England,Croatia,0.5913032534,0.2502774280,0.1584193186,,,,,,sin mercado confiable prepartido; no acercar pick sin fuente
+,Ghana vs Panama,Ghana,Panama,0.2543501517,0.2801846099,0.4654652384,,,,,,sin mercado confiable prepartido; no acercar pick sin fuente
+,Uzbekistan vs Colombia,Uzbekistan,Colombia,0.0676982625,0.1799048869,0.7523968505,,,,,,sin mercado confiable prepartido; no acercar pick sin fuente
+,Czech Republic vs South Africa,Czech Republic,South Africa,0.6874215336,0.2119501281,0.1006283383,,,,,,sin mercado confiable prepartido; no acercar pick sin fuente
+,Switzerland vs Bosnia and Herzegovina,Switzerland,Bosnia and Herzegovina,0.7135554370,0.1975183485,0.0889262145,,,,,,sin mercado confiable prepartido; no acercar pick sin fuente
+,Canada vs Qatar,Canada,Qatar,0.7978580576,0.1558174308,0.0463245116,,,,,,sin mercado confiable prepartido; no acercar pick sin fuente
+,Mexico vs South Korea,Mexico,South Korea,0.4899685923,0.2782748318,0.2317565759,,,,,,sin mercado confiable prepartido; no acercar pick sin fuente
+,United States vs Australia,United States,Australia,0.4472654092,0.2802906802,0.2724439106,,,,,,sin mercado confiable prepartido; no acercar pick sin fuente
+,Scotland vs Morocco,Scotland,Morocco,0.2350261046,0.2907511899,0.4742227055,,,,,,sin mercado confiable prepartido; no acercar pick sin fuente
+,Brazil vs Haiti,Brazil,Haiti,0.9031056960,0.0781651697,0.0187291343,,,,,,sin mercado confiable prepartido; no acercar pick sin fuente
+,Turkey vs Paraguay,Turkey,Paraguay,0.4511073708,0.2935212444,0.2553713848,,,,,,sin mercado confiable prepartido; no acercar pick sin fuente
+,Netherlands vs Sweden,Netherlands,Sweden,0.7187098385,0.1930616198,0.0882285417,,,,,,sin mercado confiable prepartido; no acercar pick sin fuente
+,Germany vs Ivory Coast,Germany,Ivory Coast,0.7279543189,0.1878722405,0.0841734406,,,,,,sin mercado confiable prepartido; no acercar pick sin fuente
+,Ecuador vs Curacao,Ecuador,Curacao,0.8511355831,0.1191143192,0.0297500977,,,,,,sin mercado confiable prepartido; no acercar pick sin fuente
+,Tunisia vs Japan,Tunisia,Japan,0.1004361621,0.2148934761,0.6846703618,,,,,,sin mercado confiable prepartido; no acercar pick sin fuente
+,Spain vs Saudi Arabia,Spain,Saudi Arabia,0.9030791561,0.0785988419,0.0183220020,,,,,,sin mercado confiable prepartido; no acercar pick sin fuente
+,Belgium vs Iran,Belgium,Iran,0.6356505496,0.2299295151,0.1344199354,,,,,,sin mercado confiable prepartido; no acercar pick sin fuente
+,Uruguay vs Cape Verde,Uruguay,Cape Verde,0.7662247126,0.1721794053,0.0615958820,,,,,,sin mercado confiable prepartido; no acercar pick sin fuente
+,New Zealand vs Egypt,New Zealand,Egypt,0.1804280802,0.2577424831,0.5618294367,,,,,,sin mercado confiable prepartido; no acercar pick sin fuente
+,Argentina vs Austria,Argentina,Austria,0.7674999436,0.1730409306,0.0594591258,,,,,,sin mercado confiable prepartido; no acercar pick sin fuente
+,France vs Iraq,France,Iraq,0.8589112382,0.1181269946,0.0229617671,,,,,,sin mercado confiable prepartido; no acercar pick sin fuente
+,Norway vs Senegal,Norway,Senegal,0.3987447621,0.3008882353,0.3003670026,,,,,,sin mercado confiable prepartido; no acercar pick sin fuente
+,Jordan vs Algeria,Jordan,Algeria,0.3461435041,0.3076977579,0.3461587380,,,,,,sin mercado confiable prepartido; no acercar pick sin fuente
+,Portugal vs Uzbekistan,Portugal,Uzbekistan,0.7218985684,0.1963760744,0.0817253573,,,,,,sin mercado confiable prepartido; no acercar pick sin fuente
+,England vs Ghana,England,Ghana,0.8683378860,0.1112917317,0.0203703823,,,,,,sin mercado confiable prepartido; no acercar pick sin fuente
+,Panama vs Croatia,Panama,Croatia,0.1059269029,0.2164400843,0.6776330128,,,,,,sin mercado confiable prepartido; no acercar pick sin fuente
+,Colombia vs Dem. Rep. of Congo,Colombia,Dem. Rep. of Congo,0.8035988870,0.1508492467,0.0455518663,,,,,,sin mercado confiable prepartido; no acercar pick sin fuente
+,Bosnia and Herzegovina vs Qatar,Bosnia and Herzegovina,Qatar,0.6065145049,0.2471704708,0.1463150243,,,,,,sin mercado confiable prepartido; no acercar pick sin fuente
+,Switzerland vs Canada,Switzerland,Canada,0.5507600995,0.2667788738,0.1824610267,,,,,,sin mercado confiable prepartido; no acercar pick sin fuente
+,Morocco vs Haiti,Morocco,Haiti,0.7445477204,0.1860889431,0.0693633365,,,,,,sin mercado confiable prepartido; no acercar pick sin fuente
+,Scotland vs Brazil,Scotland,Brazil,0.0989699833,0.2140871051,0.6869429117,,,,,,sin mercado confiable prepartido; no acercar pick sin fuente
+,Czech Republic vs Mexico,Czech Republic,Mexico,0.1409108535,0.2391922945,0.6198968520,,,,,,sin mercado confiable prepartido; no acercar pick sin fuente
+,South Africa vs South Korea,South Africa,South Korea,0.0452081735,0.1631162752,0.7916755513,,,,,,sin mercado confiable prepartido; no acercar pick sin fuente
+,Curacao vs Ivory Coast,Curacao,Ivory Coast,0.1263186931,0.2335066251,0.6401746819,,,,,,sin mercado confiable prepartido; no acercar pick sin fuente
+,Ecuador vs Germany,Ecuador,Germany,0.3136653519,0.3009787893,0.3853558588,,,,,,sin mercado confiable prepartido; no acercar pick sin fuente
+,Japan vs Sweden,Japan,Sweden,0.6734317730,0.2191480119,0.1074202151,,,,,,sin mercado confiable prepartido; no acercar pick sin fuente
+,Tunisia vs Netherlands,Tunisia,Netherlands,0.0451313957,0.1559568290,0.7989117753,,,,,,sin mercado confiable prepartido; no acercar pick sin fuente
+,Paraguay vs Australia,Paraguay,Australia,0.3902553862,0.3016373261,0.3081072876,,,,,,sin mercado confiable prepartido; no acercar pick sin fuente
+,Turkey vs United States,Turkey,United States,0.5261536600,0.2705446469,0.2033016930,,,,,,sin mercado confiable prepartido; no acercar pick sin fuente
+,Norway vs France,Norway,France,0.1426243931,0.2418523411,0.6155232657,,,,,,sin mercado confiable prepartido; no acercar pick sin fuente
+,Senegal vs Iraq,Senegal,Iraq,0.7477880308,0.1838004507,0.0684115185,,,,,,sin mercado confiable prepartido; no acercar pick sin fuente
+,Cape Verde vs Saudi Arabia,Cape Verde,Saudi Arabia,0.2960305801,0.3066686638,0.3973007561,,,,,,sin mercado confiable prepartido; no acercar pick sin fuente
+,Uruguay vs Spain,Uruguay,Spain,0.0646673429,0.1739912935,0.7613413636,,,,,,sin mercado confiable prepartido; no acercar pick sin fuente
+,Egypt vs Iran,Egypt,Iran,0.2117819813,0.2786860995,0.5095319192,,,,,,sin mercado confiable prepartido; no acercar pick sin fuente
+,New Zealand vs Belgium,New Zealand,Belgium,0.0707878243,0.1830324525,0.7461797232,,,,,,sin mercado confiable prepartido; no acercar pick sin fuente
+,Croatia vs Ghana,Croatia,Ghana,0.8325327111,0.1350013085,0.0324659803,,,,,,sin mercado confiable prepartido; no acercar pick sin fuente
+,Panama vs England,Panama,England,0.0488458465,0.1602087302,0.7909454233,,,,,,sin mercado confiable prepartido; no acercar pick sin fuente
+,Colombia vs Portugal,Colombia,Portugal,0.3444130194,0.3106458855,0.3449410950,,,,,,sin mercado confiable prepartido; no acercar pick sin fuente
+,Dem. Rep. of Congo vs Uzbekistan,Dem. Rep. of Congo,Uzbekistan,0.2090677491,0.2809386474,0.5099936035,,,,,,sin mercado confiable prepartido; no acercar pick sin fuente
+,Algeria vs Austria,Algeria,Austria,0.1792736663,0.2636994425,0.5570268913,,,,,,sin mercado confiable prepartido; no acercar pick sin fuente
+,Jordan vs Argentina,Jordan,Argentina,0.0298217791,0.1311601539,0.8390180670,,,,,,sin mercado confiable prepartido; no acercar pick sin fuente
+M73,Dieciseisavos 1: South Korea vs Canada,South Korea,Canada,0.3293170687,0.3235404949,0.3471424363,,,,,,sin mercado confiable prepartido; no acercar pick sin fuente
+M74,Dieciseisavos 2: Germany vs Czech Republic,Germany,Czech Republic,0.6257928407,0.2478157327,0.1263914266,,,,,,sin mercado confiable prepartido; no acercar pick sin fuente
+M75,Dieciseisavos 3: Netherlands vs Morocco,Netherlands,Morocco,0.5675960899,0.2706911735,0.1617127365,,,,,,sin mercado confiable prepartido; no acercar pick sin fuente
+M76,Dieciseisavos 4: Brazil vs Japan,Brazil,Japan,0.5166335970,0.2868884111,0.1964779919,,,,,,sin mercado confiable prepartido; no acercar pick sin fuente
+M77,Dieciseisavos 5: France vs Scotland,France,Scotland,0.7208536533,0.2035736667,0.0755726800,,,,,,sin mercado confiable prepartido; no acercar pick sin fuente
+M78,Dieciseisavos 6: Ecuador vs Norway,Ecuador,Norway,0.3430201711,0.3226928852,0.3342869437,,,,,,sin mercado confiable prepartido; no acercar pick sin fuente
+M79,Dieciseisavos 7: Mexico vs Scotland,Mexico,Scotland,0.4777556575,0.2936199515,0.2286243911,,,,,,sin mercado confiable prepartido; no acercar pick sin fuente
+M80,Dieciseisavos 8: England vs Uzbekistan,England,Uzbekistan,0.7381096352,0.1947844769,0.0671058879,,,,,,sin mercado confiable prepartido; no acercar pick sin fuente
+M81,Dieciseisavos 9: Turkey vs Bosnia and Herzegovina,Turkey,Bosnia and Herzegovina,0.7281194201,0.1983405865,0.0735399933,,,,,,sin mercado confiable prepartido; no acercar pick sin fuente
+M82,Dieciseisavos 10: Belgium vs Czech Republic,Belgium,Czech Republic,0.5276099982,0.2810227428,0.1913672589,,,,,,sin mercado confiable prepartido; no acercar pick sin fuente
+M83,Dieciseisavos 11: Colombia vs Croatia,Colombia,Croatia,0.4108961630,0.3141687779,0.2749350590,,,,,,sin mercado confiable prepartido; no acercar pick sin fuente
+M84,Dieciseisavos 12: Spain vs Austria,Spain,Austria,0.7701136896,0.1749560939,0.0549302165,,,,,,sin mercado confiable prepartido; no acercar pick sin fuente
+M85,Dieciseisavos 13: Switzerland vs Egypt,Switzerland,Egypt,0.6407741264,0.2405995138,0.1186263598,,,,,,sin mercado confiable prepartido; no acercar pick sin fuente
+M86,Dieciseisavos 14: Argentina vs Uruguay,Argentina,Uruguay,0.6562048257,0.2351044638,0.1086907105,,,,,,sin mercado confiable prepartido; no acercar pick sin fuente
+M87,Dieciseisavos 15: Colombia vs Panama,Colombia,Panama,0.6935241700,0.2183048315,0.0881709986,,,,,,sin mercado confiable prepartido; no acercar pick sin fuente
+M88,Dieciseisavos 16: Turkey vs Iran,Turkey,Iran,0.4850424436,0.2955415521,0.2194160044,,,,,,sin mercado confiable prepartido; no acercar pick sin fuente
+M89,Octavos 1: Canada vs Germany,Canada,Germany,0.1776930036,0.2802120321,0.5420949643,,,,,,sin mercado confiable prepartido; no acercar pick sin fuente
+M90,Octavos 2: Netherlands vs Brazil,Netherlands,Brazil,0.3000947931,0.3183554432,0.3815497637,,,,,,sin mercado confiable prepartido; no acercar pick sin fuente
+M91,Octavos 3: France vs Norway,France,Norway,0.5832103190,0.2639928480,0.1527968330,,,,,,sin mercado confiable prepartido; no acercar pick sin fuente
+M92,Octavos 4: Mexico vs England,Mexico,England,0.1385040049,0.2484074549,0.6130885402,,,,,,sin mercado confiable prepartido; no acercar pick sin fuente
+M93,Octavos 5: Turkey vs Belgium,Turkey,Belgium,0.3523619329,0.3216302679,0.3260077992,,,,,,sin mercado confiable prepartido; no acercar pick sin fuente
+M94,Octavos 6: Colombia vs Spain,Colombia,Spain,0.1332428182,0.2520460414,0.6147111404,,,,,,sin mercado confiable prepartido; no acercar pick sin fuente
+M95,Octavos 7: Switzerland vs Argentina,Switzerland,Argentina,0.1074942266,0.2327406497,0.6597651238,,,,,,sin mercado confiable prepartido; no acercar pick sin fuente
+M96,Octavos 8: Colombia vs Turkey,Colombia,Turkey,0.5105656633,0.2897459598,0.1996883769,,,,,,sin mercado confiable prepartido; no acercar pick sin fuente
+M97,Cuartos 1: Germany vs Brazil,Germany,Brazil,0.2526391043,0.3056667683,0.4416941274,,,,,,sin mercado confiable prepartido; no acercar pick sin fuente
+M98,Cuartos 2: France vs England,France,England,0.3663997155,0.3216007038,0.3119995807,,,,,,sin mercado confiable prepartido; no acercar pick sin fuente
+M99,Cuartos 3: Turkey vs Spain,Turkey,Spain,0.0713587000,0.1989028922,0.7297384078,,,,,,sin mercado confiable prepartido; no acercar pick sin fuente
+M100,Cuartos 4: Argentina vs Colombia,Argentina,Colombia,0.5369149784,0.2830964940,0.1799885276,,,,,,sin mercado confiable prepartido; no acercar pick sin fuente
+M101,Semifinal 1: Brazil vs France,Brazil,France,0.2513062823,0.3087340022,0.4399597154,,,,,,sin mercado confiable prepartido; no acercar pick sin fuente
+M102,Semifinal 2: Spain vs Argentina,Spain,Argentina,0.4210946533,0.3123069726,0.2665983741,,,,,,sin mercado confiable prepartido; no acercar pick sin fuente
+M103,Final: France vs Spain,France,Spain,0.2139702639,0.2951985703,0.4908311658,,,,,,sin mercado confiable prepartido; no acercar pick sin fuente
+M104,Tercer puesto: Brazil vs Argentina,Brazil,Argentina,0.1998056930,0.2898950834,0.5102992236,,,,,,sin mercado confiable prepartido; no acercar pick sin fuente

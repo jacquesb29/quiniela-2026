@@ -662,6 +662,7 @@ class MatchPrediction:
     model_stack: Optional[Dict[str, object]] = None
     penca_scores: Optional[List[Dict[str, float | str]]] = None
     score_guidance: Optional[Dict[str, object]] = None
+    score_distribution: Optional[Dict[Tuple[int, int], float]] = None
 
 
 def clamp(value: float, low: float, high: float) -> float:
@@ -2703,6 +2704,7 @@ def predict_match(
         factors=factors,
         statistical_depth=compute_statistical_depth(dist, win_a, draw, win_b, ctx, model_stack=model_stack),
         model_stack=model_stack,
+        score_distribution=dict(dist),
     )
 
 
@@ -2807,6 +2809,7 @@ def predict_match_live(
             live_phase=phase,
             statistical_depth=compute_statistical_depth(final_dist, 0.0, 1.0, 0.0, ctx),
             live_patterns=patterns,
+            score_distribution=dict(final_dist),
         )
 
     if phase == "extra_time":
@@ -2928,6 +2931,7 @@ def predict_match_live(
             statistical_depth=compute_statistical_depth(final_dist, win_a, draw, win_b, ctx, model_stack=model_stack),
             live_patterns=patterns,
             model_stack=model_stack,
+            score_distribution=dict(final_dist),
         )
 
     remaining_fraction = 1.0 if elapsed_minutes is None else clamp((90.0 - elapsed_minutes) / 90.0, 0.0, 1.0)
@@ -3045,6 +3049,7 @@ def predict_match_live(
         statistical_depth=compute_statistical_depth(final_dist, win_a, draw, win_b, ctx, model_stack=model_stack),
         live_patterns=patterns,
         model_stack=model_stack,
+        score_distribution=dict(final_dist),
     )
 
 
@@ -5006,10 +5011,13 @@ def dashboard_fixture_entries(
     teams: Dict[str, Team],
     states: Dict[str, dict],
     top_scores: int,
+    applied_results: Optional[set] = None,
+    fixture_path: Optional[Path] = None,
 ) -> List[dict]:
     entries = []
     working_states = copy_states({"teams": states})
-    for fixture in fixtures:
+    applied_result_ids = set(applied_results or [])
+    for fixture_index, fixture in enumerate(fixtures):
         if fixture.get("projection_only"):
             continue
         fixture = resolve_fixture_names(dict(fixture), teams)
@@ -5057,6 +5065,14 @@ def dashboard_fixture_entries(
                 state_a=state_a,
                 state_b=state_b,
             )
+        final_result_applied = False
+        final_result_ids: List[str] = []
+        if fixture_is_final(fixture) and fixture_has_final_result(fixture):
+            final_result_ids = fixture_state_ids(fixture, fixture_path=fixture_path, index=fixture_index)
+            if not any(result_id in applied_result_ids for result_id in final_result_ids):
+                apply_state_updates(teams, working_states, fixture, ctx, prediction)
+                applied_result_ids.update(final_result_ids)
+                final_result_applied = True
         entries.append(
             {
                 "title": dashboard_fixture_title(fixture),
@@ -5078,6 +5094,8 @@ def dashboard_fixture_entries(
                 "live_score_a": fixture.get("live_score_a"),
                 "live_score_b": fixture.get("live_score_b"),
                 "live_projection_propagated": live_projection_propagated,
+                "final_result_applied": final_result_applied,
+                "final_result_ids": final_result_ids,
                 "weather_summary": dashboard_weather_summary(fixture),
                 "weather_stress": fixture.get("weather_stress"),
                 "referee": fixture.get("referee"),
@@ -5228,7 +5246,14 @@ def load_previous_site_snapshot(
     if previous_fixtures_path.exists():
         try:
             previous_fixtures = read_fixtures(previous_fixtures_path)
-            previous_entries = dashboard_fixture_entries(previous_fixtures, teams, states, top_scores)
+            previous_entries = dashboard_fixture_entries(
+                previous_fixtures,
+                teams,
+                states,
+                top_scores,
+                applied_results=set(),
+                fixture_path=previous_fixtures_path,
+            )
             previous_entries.extend(
                 projected_bracket_entries(
                     previous_fixtures,
@@ -5854,6 +5879,7 @@ def finalized_score_audit(entry: dict, prediction: MatchPrediction) -> Optional[
         "title": entry.get("title") or f"{prediction.team_a} vs {prediction.team_b}",
         "team_a": prediction.team_a,
         "team_b": prediction.team_b,
+        "audit_basis": "recalculado_con_regla_actual",
         "actual_score": actual_score,
         "actual_score_with_teams": prediction_score_label(prediction, actual_score),
         "model_score": model_score,
@@ -6840,20 +6866,17 @@ def penca_ovacion_score_options(
     scored = [score_expected_points_for_penca(dist, goals_a, goals_b, score_shape_meta) for goals_a, goals_b in dist]
     scored.sort(
         key=lambda item: (
-            float(item["ensemble_adjusted_points"]),
-            float(item["ensemble_score_index"]),
-            float(item.get("competitive_adjusted_points", 0.0)),
+            round(float(item["expected_points"]), 10),
+            round(float(item["difference_prob"]), 10),
+            round(float(item["result_prob"]), 10),
+            round(float(item["exact_prob"]), 10),
+            float(item.get("empirical_prior_index", 0.0)),
             float(item["realism_adjusted_points"]),
             float(item.get("plausibility_index", 0.0)),
-            float(item["expected_points"]),
-            float(item["exact_prob"]),
-            float(item["difference_prob"]),
-            float(item["result_prob"]),
+            float(item["ensemble_adjusted_points"]),
         ),
         reverse=True,
     )
-    scored = promote_calibrated_scoreline(scored)
-    scored = promote_primary_result_scoreline(scored, dist)
     return scored[:top_n]
 
 
@@ -7191,19 +7214,18 @@ def penca_score_portfolio(
     balanced_ranked = sorted(
         candidates,
         key=lambda item: (
-            float(item["ensemble_adjusted_points"]),
-            float(item["ensemble_score_index"]),
-            float(item.get("competitive_adjusted_points", 0.0)),
+            round(float(item["expected_points"]), 10),
+            round(float(item["difference_prob"]), 10),
+            round(float(item["result_prob"]), 10),
+            round(float(item["exact_prob"]), 10),
+            float(item.get("empirical_prior_index", 0.0)),
             float(item["realism_adjusted_points"]),
             float(item.get("plausibility_index", 0.0)),
-            float(item["expected_points"]),
-            float(item["exact_prob"]),
-            float(item["difference_prob"]),
-            float(item["result_prob"]),
+            float(item["ensemble_adjusted_points"]),
         ),
         reverse=True,
     )
-    balanced = promote_calibrated_scoreline(balanced_ranked)[0]
+    balanced = balanced_ranked[0]
     safe = max(
         candidates,
         key=lambda item: (
@@ -12587,6 +12609,93 @@ def _quality_csv_row_count(base_dir: Path, candidates: Sequence[str]) -> int:
     return 0
 
 
+def _quality_csv_rows(base_dir: Path, candidates: Sequence[str]) -> List[dict]:
+    for candidate in candidates:
+        path = base_dir / candidate
+        if not path.exists():
+            continue
+        try:
+            with path.open(newline="", encoding="utf-8") as handle:
+                return [dict(row) for row in csv.DictReader(handle)]
+        except (OSError, csv.Error):
+            continue
+    return []
+
+
+def _safe_metric_float(value: object, default: Optional[float] = None) -> Optional[float]:
+    try:
+        if value is None or str(value).strip() == "":
+            return default
+        return float(value)
+    except (TypeError, ValueError):
+        return default
+
+
+def _quality_ablation_evidence(base_dir: Path) -> dict:
+    rows = _quality_csv_rows(
+        base_dir,
+        [
+            "ablation_results.csv",
+            "outputs/ablation_results.csv",
+            "outputs/real_backtest/ablation_results.csv",
+            "site/ablation_results.csv",
+        ],
+    )
+    valid_rows = []
+    invalid_rows = []
+    for row in rows:
+        matches = _safe_metric_float(row.get("matches"), 0.0) or 0.0
+        if matches > 0:
+            valid_rows.append(row)
+        else:
+            invalid_rows.append(row)
+    return {
+        "rows": rows,
+        "total": len(rows),
+        "valid": len(valid_rows),
+        "invalid": len(invalid_rows),
+        "min_matches": min((_safe_metric_float(row.get("matches"), 0.0) or 0.0 for row in valid_rows), default=0.0),
+    }
+
+
+def _quality_benchmark_evidence(base_dir: Path, current_brier: Optional[float], current_log_loss: Optional[float]) -> dict:
+    rows = _quality_csv_rows(
+        base_dir,
+        [
+            "benchmark_summary.csv",
+            "outputs/benchmark_summary.csv",
+            "site/benchmark_summary.csv",
+        ],
+    )
+    best_brier = None
+    best_log_loss = None
+    best_brier_model = ""
+    best_log_model = ""
+    for row in rows:
+        brier = _safe_metric_float(row.get("brier_score"))
+        log_loss = _safe_metric_float(row.get("log_loss"))
+        model = str(row.get("benchmark") or row.get("model") or "").strip()
+        if brier is not None and (best_brier is None or brier < best_brier):
+            best_brier = brier
+            best_brier_model = model
+        if log_loss is not None and (best_log_loss is None or log_loss < best_log_loss):
+            best_log_loss = log_loss
+            best_log_model = model
+    beats_brier = current_brier is not None and best_brier is not None and current_brier <= best_brier + 1e-12
+    beats_log = current_log_loss is not None and best_log_loss is not None and current_log_loss <= best_log_loss + 1e-12
+    return {
+        "rows": rows,
+        "count": len(rows),
+        "best_brier": best_brier,
+        "best_log_loss": best_log_loss,
+        "best_brier_model": best_brier_model,
+        "best_log_model": best_log_model,
+        "beats_brier": beats_brier,
+        "beats_log": beats_log,
+        "beats_both": beats_brier and beats_log,
+    }
+
+
 def _quality_json_payload(base_dir: Path, candidates: Sequence[str]) -> dict:
     for candidate in candidates:
         path = base_dir / candidate
@@ -12696,6 +12805,7 @@ def model_quality_audit_items(
             "site/ablation_results.csv",
         ],
     )
+    ablation_evidence = _quality_ablation_evidence(base_dir)
     ablation_rows = _quality_csv_row_count(
         base_dir,
         [
@@ -12705,6 +12815,31 @@ def model_quality_audit_items(
             "site/ablation_results.csv",
         ],
     )
+    historical_brier = _safe_metric_float(
+        _quality_csv_metric(
+            base_dir,
+            [
+                "backtest_summary.csv",
+                "outputs/backtest_summary.csv",
+                "outputs/real_backtest/backtest_summary.csv",
+                "site/backtest_summary.csv",
+            ],
+            "brier_score",
+        )
+    )
+    historical_log_loss = _safe_metric_float(
+        _quality_csv_metric(
+            base_dir,
+            [
+                "backtest_summary.csv",
+                "outputs/backtest_summary.csv",
+                "outputs/real_backtest/backtest_summary.csv",
+                "site/backtest_summary.csv",
+            ],
+            "log_loss",
+        )
+    )
+    benchmark_evidence = _quality_benchmark_evidence(base_dir, historical_brier, historical_log_loss)
     live_sync = _quality_json_payload(base_dir, ["live_sync_status.json", "site/live_sync_status.json"])
     deep_live_provider_used = bool(live_sync.get("deep_live_provider_used") or runtime["deep_sources"])
     live_provider_names = [
@@ -12775,7 +12910,9 @@ def model_quality_audit_items(
         penca_score = max(penca_score, 10.0)
     historical_calibration_ready = bool(has_backtest and has_calibration and has_calibration_bins and historical_rows_number >= 1000)
     calibration_score = (
-        10.0
+        8.7
+        if historical_calibration_ready and completed_matches < 30
+        else 10.0
         if historical_calibration_ready
         else 9.0
         if completed_matches >= 20 and has_calibration
@@ -12785,9 +12922,24 @@ def model_quality_audit_items(
         if completed_matches
         else 4.0
     )
-    benchmark_score = 10.0 if has_benchmarks and has_backtest and historical_rows_number >= 1000 else 9.0 if has_benchmarks else 6.0
-    ablation_score = 10.0 if has_ablation and ablation_rows >= 10 and historical_rows_number >= 1000 else 9.0 if has_ablation else 5.5
-    historical_score = 10.0 if has_historical and has_backtest and historical_rows_number >= 1000 else 6.0 if has_historical else 4.0
+    benchmark_score = (
+        10.0
+        if has_benchmarks and has_backtest and historical_rows_number >= 1000 and benchmark_evidence["beats_both"]
+        else 7.2
+        if has_benchmarks and has_backtest and historical_rows_number >= 1000
+        else 9.0
+        if has_benchmarks
+        else 6.0
+    )
+    ablation_valid = bool(
+        has_ablation
+        and ablation_evidence["total"] >= 10
+        and ablation_evidence["invalid"] == 0
+        and historical_rows_number >= 1000
+    )
+    ablation_partial = bool(has_ablation and ablation_evidence["valid"] > 0)
+    ablation_score = 10.0 if ablation_valid else 6.4 if ablation_partial else 5.5
+    historical_score = 8.4 if has_historical and has_backtest and historical_rows_number >= 1000 else 6.0 if has_historical else 4.0
     provider_score = (
         10.0
         if deep_live_provider_used and live_count > 0 and not stale_live_warning
@@ -12848,7 +13000,7 @@ def model_quality_audit_items(
         score_item(
             "Calibración probabilística",
             calibration_score,
-            "Histórica publicada" if historical_calibration_ready else "Pendiente de muestra 2026" if not completed_matches else "En medición",
+            "Histórica útil; 2026 provisional" if historical_calibration_ready and completed_matches < 30 else "Histórica publicada" if historical_calibration_ready else "Pendiente de muestra 2026" if not completed_matches else "En medición",
             (
                 f"Reliability/Brier/log-loss publicados con {historical_rows_number} partidos históricos; la calibración 2026 se activa con el primer final."
                 if historical_calibration_ready and not completed_matches
@@ -12860,7 +13012,9 @@ def model_quality_audit_items(
                 else "El Brier 2026 empieza con el primer final; antes de eso no hay track record real del torneo."
             ),
             (
-                "Mantener calibration_report.csv y calibration_bins.csv publicados; recalibrar 2026 cuando entren finales reales."
+                "La calibración histórica ayuda, pero la etiqueta 2026 sigue provisional hasta n>=30 finales; n<30 no valida el torneo."
+                if historical_calibration_ready and completed_matches < 30
+                else "Mantener calibration_report.csv y calibration_bins.csv publicados; recalibrar 2026 cuando entren finales reales."
                 if historical_calibration_ready
                 else "Conectar calibration_report.csv y reliability bins cuando existan suficientes partidos cerrados."
             ),
@@ -12869,14 +13023,18 @@ def model_quality_audit_items(
         score_item(
             "Benchmarks externos/simples",
             benchmark_score,
-            "Medido con histórico" if benchmark_score >= 10.0 else "Estructura lista" if not has_benchmarks else "Medido",
+            "Supera benchmarks" if benchmark_score >= 10.0 else "Medido, no superado" if has_benchmarks and has_backtest else "Estructura lista" if not has_benchmarks else "Medido",
             (
-                f"benchmark_results.csv y benchmark_summary.csv publicados contra el set histórico de {historical_rows_number} partidos."
+                f"benchmark_summary.csv publicado sobre {historical_rows_number} partidos; el mejor Brier lo tiene {benchmark_evidence['best_brier_model'] or 'benchmark simple'} ({benchmark_evidence['best_brier']:.4f}), el modelo histórico queda en {historical_brier:.4f}."
+                if has_benchmarks and has_backtest and benchmark_evidence["best_brier"] is not None and historical_brier is not None and benchmark_score < 10.0
+                else f"benchmark_results.csv y benchmark_summary.csv publicados contra el set histórico de {historical_rows_number} partidos."
                 if benchmark_score >= 10.0
                 else "El módulo de benchmarks existe; el 10/10 requiere comparar contra Elo, FIFA, mercado, Poisson simple e histórico en CSV publicado."
             ),
             (
-                "Usar estos benchmarks como piso: si el modelo completo no los supera fuera de muestra, simplificar."
+                "No congelar pesos como definitivos: si Poisson/Elo ganan fuera de muestra, simplificar o calibrar antes de reclamar mejora."
+                if has_benchmarks and has_backtest and benchmark_score < 10.0
+                else "Usar estos benchmarks como piso: si el modelo completo no los supera fuera de muestra, simplificar."
                 if benchmark_score >= 10.0
                 else "Correr benchmark_results.csv con el mismo set histórico usado para backtesting."
             ),
@@ -12885,14 +13043,18 @@ def model_quality_audit_items(
         score_item(
             "Ablation tests",
             ablation_score,
-            "Publicado 10/10" if ablation_score >= 10.0 else "Publicado" if has_ablation else "Estructura lista",
+            "Válido fuera de muestra" if ablation_score >= 10.0 else "Parcial; no validar" if has_ablation else "Estructura lista",
             (
-                f"ablation_results.csv publicado con {ablation_rows} variantes sobre {historical_rows_number} partidos; ya se ve qué bloques conviene conservar, reducir o tratar como neutros."
+                f"ablation_results.csv tiene {ablation_evidence['valid']} variantes con muestra y {ablation_evidence['invalid']} inválida(s) con matches=0; eso no cuenta como evidencia predictiva completa."
+                if has_ablation and not ablation_valid
+                else f"ablation_results.csv publicado con {ablation_rows} variantes sobre {historical_rows_number} partidos; ya se ve qué bloques conviene conservar, reducir o tratar como neutros."
                 if has_ablation
                 else "El módulo de ablation existe; falta publicar qué bloques suben o bajan Brier/log-loss fuera de muestra."
             ),
             (
-                "Mantener ablation como guardrail antes de tocar pesos: si una capa no mejora fuera de muestra, no se infla."
+                "Rehacer ablation: ninguna variante con n=0 puede subir score ni justificar pesos."
+                if has_ablation and not ablation_valid
+                else "Mantener ablation como guardrail antes de tocar pesos: si una capa no mejora fuera de muestra, no se infla."
                 if has_ablation
                 else "Ejecutar ablation_results.csv antes de congelar pesos finales."
             ),
@@ -13012,6 +13174,344 @@ def build_model_quality_audit_html(
         f"<div class=\"quality-audit-grid\">{''.join(cards)}</div>"
         "<p class=\"quality-audit-footnote\"><strong>Regla:</strong> no subimos una métrica a 90/95 o 10/10 por diseño visual. Solo sube si mejora Brier, log-loss, benchmarks, ablation o puntos Penca fuera de muestra.</p>"
         "</section>"
+    )
+
+
+def _csv_float(value: object, digits: int = 10) -> str:
+    try:
+        return f"{float(value):.{digits}f}"
+    except (TypeError, ValueError):
+        return ""
+
+
+def _format_score_metric_list(items: Sequence[dict], key: str, limit: int = 3) -> str:
+    chunks = []
+    for item in list(items)[:limit]:
+        score = str(item.get("score", ""))
+        value = _safe_metric_float(item.get(key), 0.0) or 0.0
+        if "prob" in key:
+            chunks.append(f"{score} ({value * 100:.1f}%)")
+        else:
+            chunks.append(f"{score} ({value:.2f} pts)")
+    return "; ".join(chunks)
+
+
+def _scoreline_rows_for_entry(entry: dict, prediction: MatchPrediction) -> Tuple[List[dict], dict]:
+    dist = dict(prediction.score_distribution or {})
+    if not dist:
+        for score_label, probability in prediction.exact_scores:
+            goals_a, goals_b = parse_score_pair(score_label)
+            dist[(goals_a, goals_b)] = float(probability)
+    if not dist:
+        return [], {}
+
+    model_score, model_prob = max(dist.items(), key=lambda item: (float(item[1]), -sum(item[0])))
+    penca_pick = penca_ovacion_top_score(prediction)
+    penca_score = str(penca_pick.get("score", ""))
+    scored_rows: List[dict] = []
+    grid_probability = 0.0
+    for goals_a in range(7):
+        for goals_b in range(7):
+            probability = float(dist.get((goals_a, goals_b), 0.0))
+            grid_probability += probability
+            metrics = score_expected_points_for_penca(dist, goals_a, goals_b)
+            scored_rows.append(
+                {
+                    "score": f"{goals_a}-{goals_b}",
+                    "goals_a": goals_a,
+                    "goals_b": goals_b,
+                    "prob_scoreline": probability,
+                    "expected_points_8_5_3": float(metrics.get("expected_points", 0.0)),
+                    "exact_prob": float(metrics.get("exact_prob", 0.0)),
+                    "difference_prob": float(metrics.get("difference_prob", 0.0)),
+                    "result_prob": float(metrics.get("result_prob", 0.0)),
+                    "risk_adjusted_points": float(metrics.get("risk_adjusted_points", 0.0)),
+                    "ensemble_adjusted_points": float(metrics.get("ensemble_adjusted_points", 0.0)),
+                    "competitive_adjusted_points": float(metrics.get("competitive_adjusted_points", 0.0)),
+                    "public_score_popularity_index": float(metrics.get("public_score_popularity_index", 0.0)),
+                    "differential_value_index": float(metrics.get("differential_value_index", 0.0)),
+                    "plausibility_index": float(metrics.get("plausibility_index", 0.0)),
+                    "selected_by_model": f"{goals_a}-{goals_b}" == f"{model_score[0]}-{model_score[1]}",
+                    "selected_by_penca": f"{goals_a}-{goals_b}" == penca_score,
+                }
+            )
+
+    by_probability = sorted(scored_rows, key=lambda row: (float(row["prob_scoreline"]), float(row["expected_points_8_5_3"])), reverse=True)
+    by_expected = sorted(scored_rows, key=lambda row: (float(row["expected_points_8_5_3"]), float(row["prob_scoreline"])), reverse=True)
+    for rank, row in enumerate(by_probability, start=1):
+        row["rank_by_probability"] = rank
+    for rank, row in enumerate(by_expected, start=1):
+        row["rank_by_expected_points"] = rank
+
+    tail_probability = clamp(1.0 - grid_probability, 0.0, 1.0)
+    common = {
+        "match_id": entry.get("match_id") or entry.get("id") or "",
+        "stage_label": entry.get("stage_label", ""),
+        "title": entry.get("title") or f"{prediction.team_a} vs {prediction.team_b}",
+        "team_a": prediction.team_a,
+        "team_b": prediction.team_b,
+        "model_modal_score": f"{model_score[0]}-{model_score[1]}",
+        "model_modal_prob": float(model_prob),
+        "penca_score": penca_score,
+        "penca_expected_points": float(penca_pick.get("expected_points", 0.0) or 0.0),
+    }
+    for row in scored_rows:
+        row.update(common)
+        row["tail_7plus_or_other_prob"] = tail_probability
+    scored_rows.append(
+        {
+            **common,
+            "score": "7+ / otro",
+            "goals_a": "",
+            "goals_b": "",
+            "prob_scoreline": tail_probability,
+            "expected_points_8_5_3": "",
+            "exact_prob": "",
+            "difference_prob": "",
+            "result_prob": "",
+            "risk_adjusted_points": "",
+            "ensemble_adjusted_points": "",
+            "competitive_adjusted_points": "",
+            "public_score_popularity_index": "",
+            "differential_value_index": "",
+            "plausibility_index": "",
+            "rank_by_probability": "",
+            "rank_by_expected_points": "",
+            "selected_by_model": False,
+            "selected_by_penca": False,
+            "tail_7plus_or_other_prob": tail_probability,
+        }
+    )
+    summary = {
+        **common,
+        "top3_by_probability": _format_score_metric_list(by_probability, "prob_scoreline", 3),
+        "top3_by_expected_points": _format_score_metric_list(by_expected, "expected_points_8_5_3", 3),
+        "tail_7plus_or_other_prob": tail_probability,
+        "modal_metrics": next((row for row in scored_rows if row.get("score") == common["model_modal_score"]), {}),
+        "penca_metrics": next((row for row in scored_rows if row.get("score") == penca_score), {}),
+    }
+    return scored_rows, summary
+
+
+def _penca_decision_reason(summary: dict) -> str:
+    modal = summary.get("model_modal_score", "")
+    penca = summary.get("penca_score", "")
+    modal_metrics = summary.get("modal_metrics") or {}
+    penca_metrics = summary.get("penca_metrics") or {}
+    if not modal or not penca:
+        return "Sin distribución suficiente para explicar la decisión."
+    if modal == penca:
+        return "Modelo y Penca coinciden: el marcador más probable también maximiza valor esperado bajo 8/5/3."
+    modal_points = _safe_metric_float(modal_metrics.get("expected_points_8_5_3"), 0.0) or 0.0
+    penca_points = _safe_metric_float(penca_metrics.get("expected_points_8_5_3"), 0.0) or 0.0
+    modal_prob = _safe_metric_float(modal_metrics.get("prob_scoreline"), 0.0) or 0.0
+    penca_prob = _safe_metric_float(penca_metrics.get("prob_scoreline"), 0.0) or 0.0
+    return (
+        f"No elegimos {modal} aunque sea el modal ({modal_prob * 100:.1f}%) porque {penca} "
+        f"da mayor valor Penca esperado ({penca_points:.2f} vs {modal_points:.2f} pts) "
+        "al combinar exacto, diferencia y resultado."
+    )
+
+
+def export_penca_decision_tables(entries: Sequence[dict], output_dir: Path) -> None:
+    output_dir.mkdir(parents=True, exist_ok=True)
+    value_rows: List[dict] = []
+    decision_rows: List[dict] = []
+    finished_rows: List[dict] = []
+    market_rows: List[dict] = []
+    for entry in entries:
+        prediction = entry.get("prediction")
+        if prediction is None:
+            continue
+        rows, summary = _scoreline_rows_for_entry(entry, prediction)
+        value_rows.extend(rows)
+        if not summary:
+            continue
+        penca_metrics = summary.get("penca_metrics") or {}
+        modal_metrics = summary.get("modal_metrics") or {}
+        exact_prob = _safe_metric_float(penca_metrics.get("prob_scoreline"), 0.0) or 0.0
+        expected_points = _safe_metric_float(penca_metrics.get("expected_points_8_5_3"), 0.0) or 0.0
+        confidence_label = "Alta" if expected_points >= 3.2 and exact_prob >= 0.10 else "Media" if expected_points >= 2.5 else "Baja"
+        warnings = []
+        if summary["tail_7plus_or_other_prob"] > 0.025:
+            warnings.append("cola 7+ relevante")
+        if summary["model_modal_score"] != summary["penca_score"]:
+            warnings.append("Penca difiere del modal")
+        if exact_prob > 0.35:
+            warnings.append("guardrail: probabilidad exacta muy alta; revisar")
+        decision_rows.append(
+            {
+                "match_id": summary.get("match_id", ""),
+                "stage_label": summary.get("stage_label", ""),
+                "title": summary.get("title", ""),
+                "team_a": summary.get("team_a", ""),
+                "team_b": summary.get("team_b", ""),
+                "model_modal_score": summary["model_modal_score"],
+                "model_modal_prob": _csv_float(summary["model_modal_prob"]),
+                "penca_score": summary["penca_score"],
+                "penca_exact_prob": _csv_float(exact_prob),
+                "penca_expected_points_8_5_3": _csv_float(expected_points),
+                "top3_by_probability": summary["top3_by_probability"],
+                "top3_by_expected_points": summary["top3_by_expected_points"],
+                "recommended_strategy": "balanced",
+                "leader_score": summary["model_modal_score"],
+                "middle_score": summary["penca_score"],
+                "chaser_score": summary["penca_score"],
+                "confidence_label": confidence_label,
+                "why_not_model_modal": _penca_decision_reason(summary),
+                "tail_7plus_or_other_prob": _csv_float(summary["tail_7plus_or_other_prob"]),
+                "warnings": "; ".join(warnings),
+                "modal_expected_points_8_5_3": _csv_float(modal_metrics.get("expected_points_8_5_3")),
+            }
+        )
+        audit = finalized_score_audit(entry, prediction)
+        if audit:
+            finished_rows.append(audit)
+        market_rows.append(
+            {
+                "match_id": summary.get("match_id", ""),
+                "title": summary.get("title", ""),
+                "team_a": summary.get("team_a", ""),
+                "team_b": summary.get("team_b", ""),
+                "model_prob_a": _csv_float(prediction.win_a),
+                "model_prob_draw": _csv_float(prediction.draw),
+                "model_prob_b": _csv_float(prediction.win_b),
+                "market_prob_a": "",
+                "market_prob_draw": "",
+                "market_prob_b": "",
+                "market_total_goals": "",
+                "market_handicap": "",
+                "gap_status": "sin mercado confiable prepartido; no acercar pick sin fuente",
+            }
+        )
+
+    def write_rows(path: Path, rows: List[dict], fieldnames: Sequence[str]) -> None:
+        with path.open("w", newline="", encoding="utf-8") as handle:
+            writer = csv.DictWriter(handle, fieldnames=fieldnames, extrasaction="ignore", lineterminator="\n")
+            writer.writeheader()
+            for row in rows:
+                writer.writerow(row)
+
+    write_rows(
+        output_dir / "scoreline_value_table.csv",
+        value_rows,
+        [
+            "match_id",
+            "stage_label",
+            "title",
+            "team_a",
+            "team_b",
+            "score",
+            "goals_a",
+            "goals_b",
+            "prob_scoreline",
+            "expected_points_8_5_3",
+            "exact_prob",
+            "difference_prob",
+            "result_prob",
+            "risk_adjusted_points",
+            "ensemble_adjusted_points",
+            "competitive_adjusted_points",
+            "public_score_popularity_index",
+            "differential_value_index",
+            "plausibility_index",
+            "rank_by_probability",
+            "rank_by_expected_points",
+            "selected_by_model",
+            "selected_by_penca",
+            "model_modal_score",
+            "model_modal_prob",
+            "penca_score",
+            "penca_expected_points",
+            "tail_7plus_or_other_prob",
+        ],
+    )
+    write_rows(
+        output_dir / "pick_decision_log.csv",
+        decision_rows,
+        [
+            "match_id",
+            "stage_label",
+            "title",
+            "team_a",
+            "team_b",
+            "model_modal_score",
+            "model_modal_prob",
+            "penca_score",
+            "penca_exact_prob",
+            "penca_expected_points_8_5_3",
+            "modal_expected_points_8_5_3",
+            "top3_by_probability",
+            "top3_by_expected_points",
+            "recommended_strategy",
+            "leader_score",
+            "middle_score",
+            "chaser_score",
+            "confidence_label",
+            "why_not_model_modal",
+            "tail_7plus_or_other_prob",
+            "warnings",
+        ],
+    )
+    write_rows(
+        output_dir / "finished_match_audit.csv",
+        finished_rows,
+        [
+            "title",
+            "audit_basis",
+            "actual_score",
+            "model_score",
+            "penca_score",
+            "model_points",
+            "penca_points",
+            "model_result_hit",
+            "penca_result_hit",
+            "model_exact_hit",
+            "penca_exact_hit",
+            "status",
+        ],
+    )
+    write_rows(
+        output_dir / "market_model_gap.csv",
+        market_rows,
+        [
+            "match_id",
+            "title",
+            "team_a",
+            "team_b",
+            "model_prob_a",
+            "model_prob_draw",
+            "model_prob_b",
+            "market_prob_a",
+            "market_prob_draw",
+            "market_prob_b",
+            "market_total_goals",
+            "market_handicap",
+            "gap_status",
+        ],
+    )
+    write_rows(
+        output_dir / "model_change_log.csv",
+        [
+            {
+                "timestamp_utc": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+                "file_modified": "modelo_quiniela_2026.py",
+                "reason": "auditoria estricta, tabla completa de valor de marcadores y guardrails Penca; no cambia pesos ni parchea resultados pasados",
+                "metric_before": "sin scoreline_value_table.csv ni gating de ablation matches=0",
+                "metric_after": "scoreline_value_table.csv, pick_decision_log.csv y ablation/benchmark gating estrictos publicados",
+                "passed_backtest": "no aplica: cambio de trazabilidad/salida, no ajuste predictivo",
+                "allowed_during_tournament": "si: no modifica metodologia ni pesos",
+            }
+        ],
+        [
+            "timestamp_utc",
+            "file_modified",
+            "reason",
+            "metric_before",
+            "metric_after",
+            "passed_backtest",
+            "allowed_during_tournament",
+        ],
     )
 
 
@@ -13589,6 +14089,25 @@ def build_dashboard_html(
                 f"{html.escape(prediction.team_a)} {prediction.expected_goals_a:.2f} | "
                 f"{html.escape(prediction.team_b)} {prediction.expected_goals_b:.2f}</p>"
             )
+        is_final_entry = entry["actual_score_a"] is not None and entry["actual_score_b"] is not None
+        model_metric_label = "Marcador más probable del modelo"
+        penca_metric_label = "Marcador recomendado Penca Ovación"
+        result_metric_label = top_result_label(prediction)
+        result_metric_value = top_result_summary(prediction)
+        final_closed_note = ""
+        if is_final_entry:
+            actual_score_text = (
+                f"{prediction.team_a} {int(entry['actual_score_a'])} - "
+                f"{int(entry['actual_score_b'])} {prediction.team_b}"
+            )
+            model_metric_label = "Proyección anterior del modelo"
+            penca_metric_label = "Recomendación Penca anterior"
+            result_metric_label = "Resultado cerrado"
+            result_metric_value = actual_score_text
+            final_closed_note = (
+                "<p class=\"meta final-closed-note\"><strong>Partido cerrado:</strong> "
+                "ya no es un marcador para cargar. Este resultado alimenta estado, tabla, Brier, calibración y próximos cruces.</p>"
+            )
         cards.append(
             "<section class=\"card\">"
             f"{status_html}"
@@ -13612,10 +14131,11 @@ def build_dashboard_html(
             f"{reason_html}"
             f"{next_round_html}"
             f"{projection_html}"
+            f"{final_closed_note}"
             "<div class=\"hero-metrics\">"
-            f"<div class=\"metric metric-score\"><span>Marcador más probable del modelo</span><strong>{html.escape(prediction_score_label(prediction, projected_score_value(prediction)))}</strong></div>"
-            f"<div class=\"metric metric-penca\"><span>Marcador recomendado Penca Ovación</span><strong>{html.escape(prediction_score_label(prediction, top_penca_score['score']))}</strong></div>"
-            f"<div class=\"metric metric-probs\"><span>{html.escape(top_result_label(prediction))}</span><strong>{html.escape(top_result_summary(prediction))}</strong></div>"
+            f"<div class=\"metric metric-score\"><span>{html.escape(model_metric_label)}</span><strong>{html.escape(prediction_score_label(prediction, projected_score_value(prediction)))}</strong></div>"
+            f"<div class=\"metric metric-penca\"><span>{html.escape(penca_metric_label)}</span><strong>{html.escape(prediction_score_label(prediction, top_penca_score['score']))}</strong></div>"
+            f"<div class=\"metric metric-probs\"><span>{html.escape(result_metric_label)}</span><strong>{html.escape(result_metric_value)}</strong></div>"
             "</div>"
             f"{average_goals_html}"
             f"{goal_forecast_block_html}"
@@ -13729,7 +14249,14 @@ def command_project_dashboard(args: argparse.Namespace, teams: Dict[str, Team]) 
         args.top_scores,
     )
 
-    entries = dashboard_fixture_entries(fixtures, teams, states, args.top_scores)
+    entries = dashboard_fixture_entries(
+        fixtures,
+        teams,
+        states,
+        args.top_scores,
+        applied_results=set(payload.get("applied_results", [])),
+        fixture_path=fixture_path,
+    )
     entries.extend(
         projected_bracket_entries(
             fixtures,
@@ -13741,6 +14268,9 @@ def command_project_dashboard(args: argparse.Namespace, teams: Dict[str, Team]) 
         )
     )
     backtest = compute_backtest_summary(fixtures, teams, args.top_scores)
+    output_md = Path(args.output_md)
+    output_html = Path(args.output_html)
+    export_penca_decision_tables(entries, output_html.parent)
     markdown = build_dashboard_markdown(
         entries,
         bracket_text,
@@ -13764,8 +14294,6 @@ def command_project_dashboard(args: argparse.Namespace, teams: Dict[str, Team]) 
         previous_updated_at=previous_updated_at,
     )
 
-    output_md = Path(args.output_md)
-    output_html = Path(args.output_html)
     output_md.write_text(markdown)
     output_html.write_text(html_content)
     print(f"Reporte Markdown guardado en {output_md}")
@@ -14680,8 +15208,9 @@ def condition_payload_with_fixture_state(
     states = copy_states(conditioned)
     meta = {"live_projected": 0, "final_group_matches": 0, "fixed_group_matches": 0}
     fixed_payload = {"fixed_group_matches": list(conditioned.get("fixed_group_matches", []))}
+    applied_results = set(conditioned.get("applied_results", []))
 
-    for raw_fixture in fixtures:
+    for fixture_index, raw_fixture in enumerate(fixtures):
         if raw_fixture.get("projection_only"):
             continue
         try:
@@ -14693,6 +15222,26 @@ def condition_payload_with_fixture_state(
         if fixture_is_final(fixture) and "actual_score_a" in fixture and "actual_score_b" in fixture:
             append_fixed_group_match(fixed_payload, fixture_fixed_group_match_payload(fixture, "final"))
             meta["final_group_matches"] += 1
+            result_ids = fixture_state_ids(fixture, fixture_path=Path("fixtures_live_2026.json"), index=fixture_index)
+            if not any(result_id in applied_results for result_id in result_ids):
+                team_a = fixture["team_a"]
+                team_b = fixture["team_b"]
+                state_a = normalize_team_state(states.get(team_a, {}))
+                state_b = normalize_team_state(states.get(team_b, {}))
+                ctx = context_from_fixture(fixture, teams, states)
+                prediction = predict_match(
+                    teams,
+                    team_a,
+                    team_b,
+                    ctx,
+                    top_scores=top_scores,
+                    include_advancement=False,
+                    show_factors=False,
+                    state_a=state_a,
+                    state_b=state_b,
+                )
+                apply_state_updates(teams, states, fixture, ctx, prediction)
+                applied_results.update(result_ids)
             continue
         if not (fixture_is_live(fixture) and fixture_has_live_score(fixture)):
             continue
@@ -14723,6 +15272,7 @@ def condition_payload_with_fixture_state(
 
     conditioned["teams"] = states
     conditioned["fixed_group_matches"] = fixed_payload["fixed_group_matches"]
+    conditioned["applied_results"] = sorted(applied_results)
     meta["fixed_group_matches"] = len(conditioned["fixed_group_matches"])
     conditioned.setdefault("meta", {})["live_projected_group_matches"] = meta["live_projected"]
     conditioned["meta"]["fixed_group_matches"] = meta["fixed_group_matches"]

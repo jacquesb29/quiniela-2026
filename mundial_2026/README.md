@@ -222,7 +222,7 @@ python3 mundial_2026/sync_fifa_rankings.py
 - Alineaciones confirmadas, cambios de XI, arbitro y bajas/ausencias estan preparados en modo best-effort: se cargan automaticamente si el feed publico los expone para ese partido.
 - `sync_live_data_2026.py` tambien puede enriquecer partidos en vivo con un proveedor mas profundo de eventos y estadisticas. Si defines `API_FOOTBALL_KEY`, el pipeline intenta usar API-Football para lineups, eventos y stats live, manteniendo ESPN como base y fallback.
 - La web ya muestra un mapa de proveedores para no depender solo de ESPN. El orden practico recomendado es: ESPN como fallback, API-Football como live profundo ya cableado, Sportmonks como segundo live profundo, The Odds API/OddsJam/Pinnacle/Betfair como mercado, NewsAPI/GDELT/fuentes oficiales como noticias, y Sportradar/Opta/Stats Perform como capa enterprise si hay contrato.
-- La llave publicada en el dashboard cloud ahora usa 15000 iteraciones por defecto para reducir ruido Monte Carlo frente a configuraciones mas chicas.
+- La llave profunda publicada usa 100000 iteraciones como snapshot principal. El carril de 15000 queda solo como minimo tecnico para corridas rapidas u horarias cuando no conviene recalcular el snapshot profundo.
 - La base histórica se reconstruye desde 1950 y exige al menos 25000 partidos oficiales cerrados. En el corte auditado contiene 29562 partidos oficiales con marcador válido; la definición excluye `Friendly` y `Unofficial Friendly`.
 - Si un partido real se va a proroga o penales y lo marcas en el JSON, el estado acumula fatiga adicional y baja de disponibilidad para el siguiente partido.
 - Si corriges un resultado viejo, lo correcto es ejecutar `state-reset` y luego volver a correr `fixtures` sobre el archivo completo en orden cronologico.
@@ -290,8 +290,35 @@ Archivos publicados en el sitio:
 - `llave_actual_2026.md`
 - `llave_actual_2026.json`
 - `fixtures_live_2026.json`
+- `scoreline_value_table.csv`
+- `pick_decision_log.csv`
+- `finished_match_audit.csv`
+- `market_model_gap.csv`
+- `model_change_log.csv`
+- `MODEL_AUDIT.md`
+- `VALIDATION_GATE.md`
+- `ASSUMPTIONS.md`
 
 Importante:
 
 - GitHub Actions corre con cron cada 5 minutos, pero no tiene SLA duro; puede demorarse algunos minutos.
 - Si quieres una cadencia realmente estricta aun con Mac apagada, lo correcto es migrarlo a un VPS o servidor dedicado.
+
+## Auditoria y decision Penca
+
+El modelo no promete acertar todos los marcadores exactos. La meta operativa es maximizar puntos esperados y no confundir probabilidad futbolistica con estrategia de Penca.
+
+Nuevos artefactos clave:
+
+- `scoreline_value_table.csv`: todos los marcadores 0-0 a 6-6 por partido, mas cola 7+/otro, con probabilidad, puntos esperados 8/5/3, ranking por probabilidad y ranking por valor Penca.
+- `pick_decision_log.csv`: marcador modal del modelo, marcador recomendado para Penca, top 3 por probabilidad, top 3 por puntos esperados y razon si Penca no elige el modal.
+- `finished_match_audit.csv`: compara partidos finalizados contra marcador modal y marcador Penca.
+- `market_model_gap.csv`: deja preparada la comparacion contra mercado. Si no hay odds confiables, no inventa mercado y baja confianza.
+- `model_change_log.csv`: registra cambios de auditoria/salida para no modificar pesos silenciosamente.
+
+Reglas de lectura:
+
+- Si `Marcador modelo` y `Marcador Penca` difieren, carga el de Penca salvo que el log marque warning fuerte.
+- Una ablation con `matches=0` no vale como evidencia.
+- Con menos de 30 partidos 2026 cerrados, Brier/log-loss del torneo son exploratorios.
+- Una metrica 9/10 o 10/10 solo debe aparecer si hay muestra, benchmark y validacion suficiente.
