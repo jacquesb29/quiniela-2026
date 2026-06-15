@@ -1,0 +1,4 @@
+source,total_matches,finalized_matches,latest_date,notes
+fixtures_live_2026.json,104,3,2026-06-12,FUENTE PRIMARIA: feed directo 2026; criterio finalizado = actual_score no nulo
+finished_match_audit.csv,3,3,n/d (el CSV no guarda fecha),FALLBACK: derivado del dashboard; sincronizado con el feed
+data/historical_matches.csv,1930,1930,2024-07-14,Histórico F3/F7 (1950→2024-07-14); partidos 2026 = 0 (no se usa para 2026)

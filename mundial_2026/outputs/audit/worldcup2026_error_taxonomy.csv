@@ -1,0 +1,4 @@
+title,actual_score,model_pick,market_pick,final_pick_t60,points_obtained_final,points_obtained_model,max_points,model_fav,model_fav_prob,actual_outcome,error_categories,primary_error,notes
+Mexico vs South Africa,2-0,2-0,DraftKings (odds en feed; no aplicadas),2-0 (Penca; T-60 n/d),8.0,8.0,8.0,home,0.7706,home,sin_error,sin_error,
+South Korea vs Czech Republic,2-1,1-1,DraftKings (odds en feed; no aplicadas),1-0 (Penca; T-60 n/d),5.0,0.0,8.0,home,0.425,home,error_marcador_exacto;error_empate,error_empate,
+Canada vs Bosnia and Herzegovina,1-1,2-0,DraftKings (odds en feed; no aplicadas),1-0 (Penca; T-60 n/d),0.0,0.0,8.0,home,0.6501,draw,error_marcador_exacto;error_empate;error_favorito,error_favorito,
