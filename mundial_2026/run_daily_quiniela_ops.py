@@ -113,6 +113,26 @@ def run_odds_sync(enabled: bool, dry_run: bool = False):
 
 
 # --------------------------------------------------------------------------- #
+# Paso 3: enriquecimiento prepartido (opcional, a prueba de fallos)
+# --------------------------------------------------------------------------- #
+def run_enrichment_sync(enabled: bool, now, dry_run: bool = False):
+    """Enriquece próximos partidos (alineaciones/bajas/GK) y actualiza t60_inputs.
+
+    Devuelve (meta|None, msg). Nunca rompe: sin fuente/sin key → feed local y
+    fallback manual; no inventa datos."""
+    if not enabled:
+        return (None, "enriquecimiento desactivado (--no-enrichment-sync); se usan T-60/odds locales")
+    try:
+        import sync_pre_match_enrichment as ENR
+        meta = ENR.run(now=now, dry_run=dry_run, write_t60=not dry_run)
+        return (meta, f"enrichment OK: {meta['confirmed_lineups']}/{meta['upcoming']} XI confirmados, "
+                      f"GK={meta['with_gk']}, bajas={meta['with_injuries']}, "
+                      f"t60_escritos={meta['t60_written']}")
+    except Exception as exc:  # nunca romper la operación diaria
+        return (None, f"enriquecimiento no disponible ({type(exc).__name__}); se usan datos locales")
+
+
+# --------------------------------------------------------------------------- #
 # Paso 1: sync seguro (feed)
 # --------------------------------------------------------------------------- #
 def run_sync(enabled: bool, script: Path = SYNC_SCRIPT, timeout: int = 150):
@@ -325,6 +345,7 @@ def write_summary(rows, meta):
         f"- **Corrida:** {meta['now'].isoformat()} (ventana próximas {meta['horizon_h']} h)",
         f"- **Fuente:** `{meta['source']}` (modo `{meta['mode']}`) — sync feed: **{meta['sync_state']}** ({meta['sync_msg']})",
         f"- **Odds:** origen **{meta['odds_source']}** ({meta['odds_msg']})",
+        f"- **Enriquecimiento:** {meta.get('enrichment_msg', 'n/d')}",
         f"- **Fixtures totales:** {meta['total_fixtures']} · **finalizados:** {meta['finalized']} · "
         f"**próximos (24 h):** {meta['upcoming']}",
         f"- **Próximos con odds:** {meta['with_odds']} · **con T-60:** {meta['with_t60']}",
@@ -382,7 +403,9 @@ def main(argv=None) -> int:
     parser = argparse.ArgumentParser(description="Operación diaria de la quiniela 2026")
     parser.add_argument("--no-sync", action="store_true", help="no intentar actualizar el feed (usa el local)")
     parser.add_argument("--no-odds-sync", action="store_true", help="no actualizar odds desde la API (usa el CSV local)")
-    parser.add_argument("--dry-run", action="store_true", help="no modifica datos de entrada (odds/feed); solo preview")
+    parser.add_argument("--no-enrichment-sync", action="store_true", help="no enriquecer alineaciones/bajas")
+    parser.add_argument("--dry-run", action="store_true", help="no modifica datos de entrada; solo preview")
+    parser.add_argument("--enrichment-dry-run", action="store_true", help="enriquece pero no escribe t60_inputs")
     parser.add_argument("--now", default=None, help="ISO UTC de referencia (default: ahora)")
     parser.add_argument("--horizon-hours", type=int, default=24)
     parser.add_argument("--sync-script", default=str(SYNC_SCRIPT), help="ruta al script de sync")
@@ -393,20 +416,26 @@ def main(argv=None) -> int:
     if now.tzinfo is None:
         now = now.replace(tzinfo=timezone.utc)
 
-    # 0) sync de ODDS primero (a prueba de fallos: sin key / API caída → CSV local)
-    odds_source, odds_msg = run_odds_sync(not args.no_odds_sync, dry_run=args.dry_run)
-
-    # 1) sync del feed (no toca la red en dry-run)
+    # 1) sync del feed/fixtures (no toca la red en dry-run)
     sync_state, sync_msg = run_sync(not args.no_sync and not args.dry_run, script=Path(args.sync_script))
 
-    # 6-7) pipelines (no rompen la operación) — consumen el CSV ya actualizado
+    # 2) sync de ODDS (a prueba de fallos: sin key / API caída → CSV local)
+    odds_source, odds_msg = run_odds_sync(not args.no_odds_sync, dry_run=args.dry_run)
+
+    # 3) enriquecimiento prepartido (alineaciones/bajas/GK → t60_inputs)
+    enr_dry = args.dry_run or args.enrichment_dry_run
+    enr_meta, enr_msg = run_enrichment_sync(not args.no_enrichment_sync, now, dry_run=enr_dry)
+
+    # 4) pipelines (no rompen la operación) — consumen odds/T-60 ya actualizados
     market_msg = improvement_msg = ""
     if not args.skip_pipelines:
         _, market_msg = _run_module_main("run_market_t60_pipeline", argv=[])
         _, improvement_msg = _run_module_main("run_improvement_review", argv=[])
 
+    # 5) picks
     rows, meta = build_picks(now, args.horizon_hours, sync_state, sync_msg, market_msg,
                              improvement_msg, odds_source=odds_source, odds_msg=odds_msg)
+    meta["enrichment_msg"] = enr_msg
     write_csv(rows)
     write_summary(rows, meta)
 
@@ -414,6 +443,7 @@ def main(argv=None) -> int:
           f"| odds={meta['odds_source']} ({meta['odds_msg']})")
     print(f"Finalizados={meta['finalized']} | próximos(24h)={meta['upcoming']} | "
           f"con_odds={meta['with_odds']} | con_t60={meta['with_t60']} | picks={len(rows)}")
+    print(f"Enriquecimiento: {meta.get('enrichment_msg', 'n/d')}")
     print(f"Resumen: {SUMMARY_MD}")
     print(f"Picks:   {PICKS_CSV}")
     print("Modelo intacto: no se tocaron pesos/lambdas/Penca/flags ni predicciones.")

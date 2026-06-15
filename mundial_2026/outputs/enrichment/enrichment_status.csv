@@ -1,0 +1,5 @@
+match_id,kickoff_utc,team_a,team_b,odds_status,fixture_status,lineup_status,injury_status,goalkeeper_status,t60_status,source,captured_at_utc,warnings
+20260615_Spain_vs_Cape_Verde,2026-06-15T16:00:00Z,Spain,Cape Verde,none,feed,none,none,none,skipped,,2026-06-15T02:05:22Z,sin alineación disponible (no se inventa); sin bajas confiables
+20260615_Belgium_vs_Egypt,2026-06-15T19:00:00Z,Belgium,Egypt,none,feed,none,none,none,skipped,,2026-06-15T02:05:22Z,sin alineación disponible (no se inventa); sin bajas confiables
+20260615_Saudi_Arabia_vs_Uruguay,2026-06-15T22:00:00Z,Saudi Arabia,Uruguay,none,feed,none,none,none,skipped,,2026-06-15T02:05:22Z,sin alineación disponible (no se inventa); sin bajas confiables
+20260616_Iran_vs_New_Zealand,2026-06-16T01:00:00Z,Iran,New Zealand,none,feed,none,none,none,skipped,,2026-06-15T02:05:22Z,sin alineación disponible (no se inventa); sin bajas confiables
