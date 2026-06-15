@@ -15,6 +15,7 @@ Obligatorios:
 from __future__ import annotations
 
 import csv
+import os
 import sys
 import unittest
 from pathlib import Path
@@ -59,7 +60,7 @@ class TestDailyOps(unittest.TestCase):
         rc = OPS.main(["--now", REF_NOW, "--sync-script", str(ROOT / "__no_such_sync__.py")])
         self.assertEqual(rc, 0)
         text = OPS.SUMMARY_MD.read_text(encoding="utf-8")
-        self.assertIn("sync: **failed**", text)
+        self.assertIn("sync feed: **failed**", text)
         self.assertIn("último feed local", text)
         # restaura estado base
         OPS.main(COMMON_ARGS)
@@ -122,6 +123,108 @@ class TestDailyOps(unittest.TestCase):
         OPS.main(COMMON_ARGS)
         after = snapshot()
         self.assertEqual(before, after)
+
+
+class TestDailyOpsOddsSync(unittest.TestCase):
+    """Encadenado del sync de odds (paso 0) en la operación diaria."""
+
+    MARKET_CSV = ROOT / "data" / "market_odds_input.csv"
+
+    def _csv_snapshot(self):
+        return self.MARKET_CSV.read_text(encoding="utf-8") if self.MARKET_CSV.exists() else None
+
+    def test_daily_ops_runs_odds_sync_first(self):
+        order = []
+        orig_odds = OPS.run_odds_sync
+        orig_mod = OPS._run_module_main
+
+        def fake_odds(enabled, dry_run=False):
+            order.append("odds_sync")
+            return orig_odds(enabled, dry_run=dry_run)
+
+        def fake_mod(name, argv=None):
+            order.append(name)
+            return (0, "")
+
+        OPS.run_odds_sync, OPS._run_module_main = fake_odds, fake_mod
+        try:
+            OPS.main(["--no-sync", "--now", REF_NOW])
+        finally:
+            OPS.run_odds_sync, OPS._run_module_main = orig_odds, orig_mod
+        self.assertIn("odds_sync", order)
+        self.assertIn("run_market_t60_pipeline", order)
+        # el sync de odds ocurre ANTES del pipeline de mercado/T-60
+        self.assertLess(order.index("odds_sync"), order.index("run_market_t60_pipeline"))
+
+    def test_daily_ops_no_key_falls_back_to_local_csv(self):
+        os.environ.pop("THE_ODDS_API_KEY", None)
+        before = self._csv_snapshot()
+        OPS.main(["--no-sync", "--skip-pipelines", "--now", REF_NOW])
+        text = OPS.SUMMARY_MD.read_text(encoding="utf-8")
+        self.assertIn("origen **local_csv**", text)
+        self.assertIn("THE_ODDS_API_KEY", text)
+        self.assertEqual(before, self._csv_snapshot())  # CSV intacto
+
+    def test_daily_ops_api_failure_falls_back_to_local_csv(self):
+        import sync_market_odds
+        from worldcup2026.odds_provider import OddsProviderError
+        os.environ["THE_ODDS_API_KEY"] = "TEST_KEY"
+        orig = sync_market_odds.generate_rows
+        sync_market_odds.generate_rows = lambda *a, **k: (_ for _ in ()).throw(OddsProviderError("boom"))
+        before = self._csv_snapshot()
+        try:
+            OPS.main(["--no-sync", "--skip-pipelines", "--now", REF_NOW])
+        finally:
+            sync_market_odds.generate_rows = orig
+            os.environ.pop("THE_ODDS_API_KEY", None)
+        text = OPS.SUMMARY_MD.read_text(encoding="utf-8")
+        self.assertIn("origen **local_csv**", text)
+        self.assertIn("falló", text)
+        self.assertEqual(before, self._csv_snapshot())  # CSV intacto
+
+    def test_daily_ops_no_odds_sync_flag_skips_sync(self):
+        called = {"n": 0}
+        import sync_market_odds
+        orig = sync_market_odds.generate_rows
+
+        def spy(*a, **k):
+            called["n"] += 1
+            return orig(*a, **k)
+
+        sync_market_odds.generate_rows = spy
+        os.environ["THE_ODDS_API_KEY"] = "TEST_KEY"
+        try:
+            OPS.main(["--no-sync", "--no-odds-sync", "--skip-pipelines", "--now", REF_NOW])
+        finally:
+            sync_market_odds.generate_rows = orig
+            os.environ.pop("THE_ODDS_API_KEY", None)
+        self.assertEqual(called["n"], 0)  # no se intentó descargar
+        text = OPS.SUMMARY_MD.read_text(encoding="utf-8")
+        self.assertIn("desactivado", text)
+        self.assertIn("origen **local_csv**", text)
+
+    def test_daily_ops_summary_reports_odds_source(self):
+        OPS.main(["--no-sync", "--skip-pipelines", "--now", REF_NOW])
+        text = OPS.SUMMARY_MD.read_text(encoding="utf-8")
+        self.assertIn("**Odds:**", text)
+        self.assertTrue(("origen **api**" in text) or ("origen **local_csv**" in text))
+
+    def test_no_model_predictions_changed_with_odds_sync(self):
+        import modelo_quiniela_2026 as M
+        teams = M.load_teams()
+        pairs = [("Spain", "Cape Verde"), ("Belgium", "Egypt")]
+
+        def snapshot():
+            return {(a, b): M.predict_match(teams, a, b).exact_scores[0][0] for a, b in pairs}
+
+        before = snapshot()
+        OPS.main(["--no-sync", "--skip-pipelines", "--now", REF_NOW])
+        self.assertEqual(before, snapshot())
+
+
+def tearDownModule():
+    # deja la operación en estado base reproducible
+    OPS.main(COMMON_ARGS)
 
 
 if __name__ == "__main__":

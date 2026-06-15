@@ -79,7 +79,41 @@ def _parse_iso(value: str):
 
 
 # --------------------------------------------------------------------------- #
-# Paso 1: sync seguro
+# Paso 0: sync de odds (opcional, a prueba de fallos)
+# --------------------------------------------------------------------------- #
+def run_odds_sync(enabled: bool, dry_run: bool = False):
+    """Actualiza data/market_odds_input.csv desde la API antes de F1/T-60.
+
+    Devuelve (odds_source, msg):
+      odds_source ∈ {"api", "local_csv"}.
+    Nunca rompe: sin key / API caída / sin cuotas → conserva el CSV local y avisa.
+    No inventa odds.
+    """
+    if not enabled:
+        return ("local_csv", "sync de odds desactivado (--no-odds-sync); se usa el CSV local existente")
+    try:
+        import sync_market_odds
+        from worldcup2026.odds_provider import TheOddsApiProvider, OddsProviderError
+        provider = TheOddsApiProvider()
+        if not provider.has_key:
+            return ("local_csv", "sin THE_ODDS_API_KEY: se usa el CSV local existente (no se inventan odds)")
+        try:
+            rows, stats = sync_market_odds.generate_rows(provider)
+        except OddsProviderError as exc:
+            return ("local_csv", f"API de odds falló ({type(exc).__name__}); se usa el CSV local existente")
+        if not rows:
+            return ("local_csv", "la API no devolvió cuotas pre-match válidas; se usa el CSV local existente")
+        if dry_run:
+            return ("api", f"[dry-run] API OK con {stats['matches']} partidos; CSV NO modificado")
+        sync_market_odds.write_csv(rows)
+        return ("api", f"odds actualizadas desde API ({stats['matches']} partidos, "
+                       f"{stats['valid']} cuotas válidas)")
+    except Exception as exc:  # nunca romper la operación diaria
+        return ("local_csv", f"sync de odds no disponible ({type(exc).__name__}); se usa el CSV local")
+
+
+# --------------------------------------------------------------------------- #
+# Paso 1: sync seguro (feed)
 # --------------------------------------------------------------------------- #
 def run_sync(enabled: bool, script: Path = SYNC_SCRIPT, timeout: int = 150):
     if not enabled:
@@ -164,7 +198,7 @@ def load_decision_log(path: Path, key_field: str = "match_id") -> dict:
 # Construcción de picks
 # --------------------------------------------------------------------------- #
 def build_picks(now: datetime, horizon_h: int, sync_state, sync_msg,
-                market_rc_msg, improvement_rc_msg):
+                market_rc_msg, improvement_rc_msg, odds_source="local_csv", odds_msg=""):
     src = RI.load_results_source()
     fixtures = RI.load_fixtures() or []
     finalized = RI.finalized_fixtures(fixtures)
@@ -263,6 +297,7 @@ def build_picks(now: datetime, horizon_h: int, sync_state, sync_msg,
         "with_t60": sum(1 for r in rows if r["t60_available"]),
         "sync_state": sync_state, "sync_msg": sync_msg,
         "market_msg": market_rc_msg, "improvement_msg": improvement_rc_msg,
+        "odds_source": odds_source, "odds_msg": odds_msg,
         "finalized_list": finalized,
     }
     return rows, meta
@@ -288,7 +323,8 @@ def write_summary(rows, meta):
     L = [
         "# Resumen operativo diario — Quiniela Mundial 2026", "",
         f"- **Corrida:** {meta['now'].isoformat()} (ventana próximas {meta['horizon_h']} h)",
-        f"- **Fuente:** `{meta['source']}` (modo `{meta['mode']}`) — sync: **{meta['sync_state']}** ({meta['sync_msg']})",
+        f"- **Fuente:** `{meta['source']}` (modo `{meta['mode']}`) — sync feed: **{meta['sync_state']}** ({meta['sync_msg']})",
+        f"- **Odds:** origen **{meta['odds_source']}** ({meta['odds_msg']})",
         f"- **Fixtures totales:** {meta['total_fixtures']} · **finalizados:** {meta['finalized']} · "
         f"**próximos (24 h):** {meta['upcoming']}",
         f"- **Próximos con odds:** {meta['with_odds']} · **con T-60:** {meta['with_t60']}",
@@ -345,6 +381,8 @@ def write_summary(rows, meta):
 def main(argv=None) -> int:
     parser = argparse.ArgumentParser(description="Operación diaria de la quiniela 2026")
     parser.add_argument("--no-sync", action="store_true", help="no intentar actualizar el feed (usa el local)")
+    parser.add_argument("--no-odds-sync", action="store_true", help="no actualizar odds desde la API (usa el CSV local)")
+    parser.add_argument("--dry-run", action="store_true", help="no modifica datos de entrada (odds/feed); solo preview")
     parser.add_argument("--now", default=None, help="ISO UTC de referencia (default: ahora)")
     parser.add_argument("--horizon-hours", type=int, default=24)
     parser.add_argument("--sync-script", default=str(SYNC_SCRIPT), help="ruta al script de sync")
@@ -355,20 +393,25 @@ def main(argv=None) -> int:
     if now.tzinfo is None:
         now = now.replace(tzinfo=timezone.utc)
 
-    # 1) sync seguro
-    sync_state, sync_msg = run_sync(not args.no_sync, script=Path(args.sync_script))
+    # 0) sync de ODDS primero (a prueba de fallos: sin key / API caída → CSV local)
+    odds_source, odds_msg = run_odds_sync(not args.no_odds_sync, dry_run=args.dry_run)
 
-    # 6-7) pipelines (no rompen la operación)
+    # 1) sync del feed (no toca la red en dry-run)
+    sync_state, sync_msg = run_sync(not args.no_sync and not args.dry_run, script=Path(args.sync_script))
+
+    # 6-7) pipelines (no rompen la operación) — consumen el CSV ya actualizado
     market_msg = improvement_msg = ""
     if not args.skip_pipelines:
         _, market_msg = _run_module_main("run_market_t60_pipeline", argv=[])
         _, improvement_msg = _run_module_main("run_improvement_review", argv=[])
 
-    rows, meta = build_picks(now, args.horizon_hours, sync_state, sync_msg, market_msg, improvement_msg)
+    rows, meta = build_picks(now, args.horizon_hours, sync_state, sync_msg, market_msg,
+                             improvement_msg, odds_source=odds_source, odds_msg=odds_msg)
     write_csv(rows)
     write_summary(rows, meta)
 
-    print(f"Operación diaria: {meta['now'].isoformat()} | fuente={meta['source']} sync={meta['sync_state']}")
+    print(f"Operación diaria: {meta['now'].isoformat()} | fuente={meta['source']} sync={meta['sync_state']} "
+          f"| odds={meta['odds_source']} ({meta['odds_msg']})")
     print(f"Finalizados={meta['finalized']} | próximos(24h)={meta['upcoming']} | "
           f"con_odds={meta['with_odds']} | con_t60={meta['with_t60']} | picks={len(rows)}")
     print(f"Resumen: {SUMMARY_MD}")

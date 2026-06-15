@@ -1,7 +1,8 @@
 # Resumen operativo diario — Quiniela Mundial 2026
 
 - **Corrida:** 2026-06-15T00:00:00+00:00 (ventana próximas 24 h)
-- **Fuente:** `fixtures_live_2026.json` (modo `feed`) — sync: **skipped** (sync omitido (--no-sync); se usa el feed local existente)
+- **Fuente:** `fixtures_live_2026.json` (modo `feed`) — sync feed: **skipped** (sync omitido (--no-sync); se usa el feed local existente)
+- **Odds:** origen **local_csv** (sin THE_ODDS_API_KEY: se usa el CSV local existente (no se inventan odds))
 - **Fixtures totales:** 104 · **finalizados:** 3 · **próximos (24 h):** 4
 - **Próximos con odds:** 0 · **con T-60:** 0
 - Pipeline mercado/T-60: OK · Revisión de mejoras: OK
