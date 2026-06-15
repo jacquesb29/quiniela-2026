@@ -1,0 +1,5 @@
+match_id,kickoff_utc,team_a,team_b,model_pick,market_pick,final_pick,final_score_recommendation,confidence_label,action,reason,odds_available,t60_available,warnings
+espn-760424,2026-06-15T02:00:00Z,Sweden,Tunisia,home,,home,1-0,Baja: priorizar cobertura,no_market_available,sin odds usables: se confía en el modelo (trust_model por defecto),False,False,sin T-60 en data/t60_inputs.csv
+espn-760428,2026-06-15T16:00:00Z,Spain,Cape Verde,home,,home,3-0,Media para Penca,no_market_available,sin odds usables: se confía en el modelo (trust_model por defecto),False,False,sin T-60 en data/t60_inputs.csv
+espn-760426,2026-06-15T19:00:00Z,Belgium,Egypt,home,,home,1-0,Baja: priorizar cobertura,no_market_available,sin odds usables: se confía en el modelo (trust_model por defecto),False,False,sin T-60 en data/t60_inputs.csv
+espn-760429,2026-06-15T22:00:00Z,Saudi Arabia,Uruguay,away,,away,0-1,Media para Penca,no_market_available,sin odds usables: se confía en el modelo (trust_model por defecto),False,False,sin T-60 en data/t60_inputs.csv
