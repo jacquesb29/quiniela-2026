@@ -26,10 +26,13 @@ echo "  ${CRON_LINE}  ${CRON_TAG}"
 echo
 
 if [[ "${1:-}" == "--install" ]]; then
-  read -r -p "¿Instalar esta línea en tu crontab? [y/N] " ans
+  ans="N"
+  read -r -p "¿Instalar esta línea en tu crontab? [y/N] " ans || true
   if [[ "${ans:-N}" == "y" || "${ans:-N}" == "Y" ]]; then
     mkdir -p "${REPO_DIR}/outputs/ops"
-    ( crontab -l 2>/dev/null | grep -v -F "${CRON_TAG}" ; echo "${CRON_LINE}  ${CRON_TAG}" ) | crontab -
+    # Robusto si no existe crontab previo (evita que pipefail/set -e aborten).
+    existing="$(crontab -l 2>/dev/null | grep -v -F "${CRON_TAG}" || true)"
+    { [[ -n "${existing}" ]] && printf '%s\n' "${existing}"; printf '%s\n' "${CRON_LINE}  ${CRON_TAG}"; } | crontab -
     echo "Instalado. Revisa con: crontab -l"
   else
     echo "Cancelado. No se modificó el crontab."
